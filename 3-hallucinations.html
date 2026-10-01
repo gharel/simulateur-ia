@@ -225,6 +225,17 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .check { display: grid; gap: 8px; }
 .check label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start; padding: 10px 12px; background: var(--surface-2); border-radius: 12px; cursor: pointer; font-weight: 700; }
 .check input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--accent); }
+.yes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+@media (max-width: 900px) { .yes { grid-template-columns: minmax(0, 1fr); } }
+.yes-col { display: grid; gap: 14px; align-content: start; }
+.yes-col h3 { display: flex; gap: 10px; align-items: center; }
+.yes-col h3 b { font-weight: 400; background: var(--accent); color: var(--on-accent); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .95rem; flex: none; }
+.thread { display: grid; gap: 10px; }
+.who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.msg-me { justify-self: end; max-width: 88%; display: grid; gap: 4px; background: var(--accent); color: var(--on-accent); border-radius: 18px 18px 4px 18px; padding: 12px 16px; font-weight: 700; }
+.msg-me .who { color: var(--on-accent); opacity: .7; }
+.thread .bubble { max-width: 94%; }
+.bubble.faded { opacity: .6; }
 .check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
 </style>
 
@@ -234,9 +245,9 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     <section class="card hero s4">
       <div class="hero-grid">
         <div class="ctl">
-          <span class="eyebrow">Comprendre l'IA · Fiche 3 sur 5</span>
+          <span class="eyebrow">Comprendre l'IA · Fiche 3 sur 6</span>
           <h1>Le Détecteur<br>de Bobards</h1>
-          <p class="lead">Parfois, l'IA invente. Elle le dit avec assurance. Apprends à repérer quand ça arrive.</p>
+          <p class="lead">Parfois, l'IA invente. Parfois, elle te donne raison trop vite. Apprends à repérer quand ça arrive.</p>
         </div>
         <div class="word-card">
           <span class="eyebrow">Le mot à connaître</span>
@@ -302,10 +313,49 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <div class="levers" id="levers"></div>
     </section>
 
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true">🪞</span><h2>Elle te donne raison</h2></div>
+      <p>L'IA a tendance à aller dans ton sens. On appelle ça la <strong>complaisance</strong>.
+        Pendant son entraînement, des humains notaient ses réponses. Ils préféraient souvent celles qui leur donnaient raison. L'IA a appris à plaire.</p>
+      <div class="ctl">
+        <span>Choisis une situation</span>
+        <div class="seg" id="segYes" role="group" aria-label="Situation">
+          <button type="button" data-v="visa" aria-pressed="true">🛂 Un visa</button>
+          <button type="button" data-v="slogan" aria-pressed="false">📣 Un slogan</button>
+          <button type="button" data-v="annul" aria-pressed="false">💸 Une annulation</button>
+        </div>
+      </div>
+      <div class="yes">
+        <div class="yes-col">
+          <h3><b>1</b>La façon de demander</h3>
+          <div class="seg" id="segFrame" role="group" aria-label="Façon de demander">
+            <button type="button" data-v="neutre" aria-pressed="true">Neutre</button>
+            <button type="button" data-v="oui" aria-pressed="false">« Je pense que oui »</button>
+            <button type="button" data-v="non" aria-pressed="false">« Je pense que non »</button>
+          </div>
+          <div class="thread" id="yesA" aria-live="polite"></div>
+          <div class="meter">
+            <div class="meter-top"><span>La réponse suit ton avis</span><span id="yesVal">0 %</span></div>
+            <div class="track"><div class="fill" id="yesFill"></div></div>
+          </div>
+          <span class="pill" id="yesPillA"></span>
+        </div>
+        <div class="yes-col">
+          <h3><b>2</b>Quand tu insistes</h3>
+          <label class="sw" for="franc"><span>📝 Mes consignes disent : « Sois franche. Dis-moi si je me trompe. »</span><input type="checkbox" id="franc"></label>
+          <div class="thread" id="yesB" aria-live="polite"></div>
+          <span class="pill" id="yesPillB"></span>
+        </div>
+      </div>
+      <div class="legend"><span>✅ Juste</span><span>⚠️ Penche vers ton avis</span><span>❌ Faux</span></div>
+      <p class="small muted">Exemples fabriqués pour comprendre. Les modèles récents résistent mieux, mais la tendance existe toujours.
+        Pour un vrai voyage, vérifie les règles d'entrée sur le site officiel du pays.</p>
+    </section>
+
     <section class="card s2">
       <div class="head"><span class="emo" aria-hidden="true">🛡️</span><h2>Mes réflexes anti-bobards</h2></div>
       <div class="meter">
-        <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 6</span></div>
+        <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 8</span></div>
         <div class="track"><div class="fill" id="chkFill"></div></div>
       </div>
       <div class="check" id="check">
@@ -315,6 +365,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <label><input type="checkbox" id="c4"><span>J'écris : « Si tu ne sais pas, dis-le. »</span></label>
         <label><input type="checkbox" id="c5"><span>Je pose la question autrement, pour comparer.</span></label>
         <label><input type="checkbox" id="c6"><span>Santé, argent, droit : je demande aussi à un humain.</span></label>
+        <label><input type="checkbox" id="c7"><span>Je pose ma question sans donner mon avis.</span></label>
+        <label><input type="checkbox" id="c8"><span>J'écris : « Critique mon idée, sans me ménager. »</span></label>
       </div>
     </section>
 
@@ -323,13 +375,13 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <ul>
         <li><span>L'IA peut inventer des faits, des chiffres ou des noms. Ça s'appelle une hallucination.</span></li>
         <li><span>Donne-lui des documents ou la recherche web. Le risque baisse beaucoup.</span></li>
-        <li><span>Pour une info importante : vérifie toujours la source.</span></li>
+        <li><span>L'IA a tendance à te donner raison. Pose ta question sans donner ton avis, et vérifie la source.</span></li>
       </ul>
     </section>
 
   </div>
   <footer class="foot">
-    <nav class="series" aria-label="Les 5 fiches"><strong>Comprendre l’IA en 5 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-modele-effort.html">2 Modèle et effort</a><a aria-current="page">3 Hallucinations</a><a href="4-boite-outils.html">4 Les outils Claude</a><a href="5-forfait-api.html">5 Forfait ou API</a></nav>
+    <nav class="series" aria-label="Les 6 fiches"><strong>Comprendre l’IA en 6 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-modele-effort.html">2 Modèle et effort</a><a aria-current="page">3 Hallucinations</a><a href="4-boite-outils.html">4 Les outils Claude</a><a href="5-forfait-api.html">5 Forfait ou API</a><a href="6-message-piege.html">6 Message piégé</a></nav>
     <span>Le pourcentage est une estimation pour comprendre. Le vrai risque dépend du modèle et de la question.</span>
   </footer>
 </main>
@@ -461,14 +513,97 @@ function lever(label, val, ratio, cls) {
 }
 
 function renderCheck() {
-  const n = $$("#check input:checked").length;
-  $("#chkTxt").textContent = n + " sur 6" + (n === 6 ? " 🎉" : "");
-  $("#chkFill").style.width = (n / 6) * 100 + "%";
+  const n = $$("#check input:checked").length, total = $$("#check input").length;
+  $("#chkTxt").textContent = n + " sur " + total + (n === total ? " 🎉" : "");
+  $("#chkFill").style.width = (n / total) * 100 + "%";
 }
+
+// Complaisance : la réponse suit l'avis glissé dans la question
+const YES = {
+  visa: {
+    neutre: { me: "Avec un passeport français, faut-il une autorisation pour 10 jours de vacances en Australie ?", follow: 5,
+      ai: [["Oui. Il faut une autorisation électronique : l'eVisitor.", "ok"], ["La demande se fait en ligne, avant le départ.", "ok"], ["Vérifie sur le site officiel du gouvernement australien.", "ok"]],
+      pill: ["ok", "✅ Réponse fondée sur les faits"] },
+    oui: { me: "Il faut une autorisation pour 10 jours en Australie, non ?", follow: 70,
+      ai: [["Oui, tu as raison. Il faut l'eVisitor, à demander en ligne.", "ok"]],
+      pill: ["warn", "⚠️ Juste, mais par chance : ton avis était bon"] },
+    non: { me: "Pas besoin d'autorisation pour 10 jours en Australie, non ?", follow: 90,
+      ai: [["Tu as raison, pour un court séjour c'est simple.", "bad"], ["Un passeport valide devrait suffire.", "bad"]],
+      pill: ["bad", "❌ Faux : elle a suivi ton erreur"] },
+    push: { me: "Tu es sûre ? Une collègue m'a dit que ce n'est pas obligatoire.",
+      flip: [["Tu as raison, excuse-moi pour l'erreur.", "bad"], ["Pour 10 jours, le passeport suffit.", "bad"]],
+      hold: [["Je comprends ton doute, mais je garde ma réponse.", "ok"], ["L'eVisitor est obligatoire, même pour un court séjour.", "ok"], ["Tu peux le vérifier sur le site officiel australien.", "ok"]] },
+  },
+  slogan: {
+    neutre: { me: "Que penses-tu de ce slogan pour notre post : « L'île des Pins, la plus belle île du monde ! » ?", follow: 5,
+      ai: [["L'idée est claire et donne envie.", "ok"], ["Mais « la plus belle du monde » est un cliché, et on ne peut pas le prouver.", "ok"], ["Ajoute un détail concret : la piscine naturelle, une offre, une date.", "ok"]],
+      pill: ["ok", "✅ Avis équilibré : qualités et défauts"] },
+    oui: { me: "Je trouve notre slogan génial : « L'île des Pins, la plus belle île du monde ! » Tu es d'accord ?", follow: 90,
+      ai: [["Oui, il est excellent !", "warn"], ["Il est court, percutant, il donne envie de partir.", "warn"]],
+      pill: ["warn", "⚠️ Que des compliments : aucun défaut signalé"] },
+    non: { me: "Je trouve notre slogan nul : « L'île des Pins, la plus belle île du monde ! » Tu es d'accord ?", follow: 85,
+      ai: [["Oui, il manque d'originalité.", "warn"], ["« La plus belle du monde », tout le monde le dit.", "ok"], ["Il vaudrait mieux tout réécrire.", "warn"]],
+      pill: ["warn", "⚠️ Que des critiques : les qualités ont disparu"] },
+    push: { me: "Tu es dure. Moi, je le trouve parfait.",
+      flip: [["Tu as raison, il est parfait comme ça.", "warn"], ["Tu connais ton public mieux que moi.", "warn"]],
+      hold: [["Il a de vraies qualités : il est court et clair.", "ok"], ["Mais je garde mon conseil : ajoute un détail concret.", "ok"]] },
+  },
+  annul: {
+    neutre: { me: "Un client annule 10 jours avant son départ. Combien doit-on lui rembourser ?", follow: 5,
+      ai: [["Ça dépend de tes conditions de vente et de celles des fournisseurs.", "ok"], ["Souvent, les frais augmentent quand le départ approche.", "ok"], ["Montre-moi tes conditions : je te dirai ce qu'elles prévoient.", "ok"]],
+      pill: ["ok", "✅ Elle dit ce qu'il lui manque pour répondre"] },
+    oui: { me: "Un client annule 10 jours avant son départ. On doit tout lui rembourser, non ?", follow: 90,
+      ai: [["Oui, un remboursement complet semble normal.", "bad"], ["Le client sera content et reviendra.", "warn"]],
+      pill: ["bad", "❌ Elle ne connaît pas tes conditions, mais elle dit oui"] },
+    non: { me: "Un client annule 10 jours avant son départ. On ne rembourse rien, non ?", follow: 90,
+      ai: [["Exact, si près du départ, rien n'est remboursé.", "bad"], ["C'est la règle habituelle.", "bad"]],
+      pill: ["bad", "❌ Elle ne connaît pas tes conditions, mais elle dit oui"] },
+    push: { me: "Tu es sûre ? Je pense qu'on doit tout rembourser.",
+      flip: [["Tu as raison, il faut tout rembourser.", "bad"]],
+      hold: [["Je ne peux pas l'affirmer sans tes conditions de vente.", "ok"], ["Envoie-les-moi : je te dirai ce qu'elles prévoient.", "ok"]] },
+  },
+};
+const yes = { sc: "visa", fr: "neutre" };
+
+function sents(list) {
+  return list.map(([t, c]) => { const e = document.createElement("span"); e.className = "sent " + c; e.textContent = t; return e; });
+}
+function msg(who, list, cls) {
+  const d = document.createElement("div");
+  d.className = cls;
+  const w = document.createElement("span"); w.className = "who"; w.textContent = who;
+  d.append(w);
+  if (typeof list === "string") d.append(list); else d.append(...sents(list));
+  return d;
+}
+function setPill(el, [cls, txt]) { el.className = "pill " + cls; el.textContent = txt; }
+
+function renderYes() {
+  const S = YES[yes.sc], F = S[yes.fr];
+  $("#yesA").replaceChildren(msg("Toi", F.me, "msg-me"), msg("IA", F.ai, "bubble"));
+  $("#yesVal").textContent = F.follow + " %";
+  $("#yesFill").style.width = F.follow + "%";
+  setPill($("#yesPillA"), F.pill);
+
+  const franc = $("#franc").checked;
+  $("#yesB").replaceChildren(
+    msg("IA, réponse neutre", [S.neutre.ai[0]], "bubble faded"),
+    msg("Toi", S.push.me, "msg-me"),
+    msg("IA", franc ? S.push.hold : S.push.flip, "bubble"),
+  );
+  setPill($("#yesPillB"), franc
+    ? ["ok", "✅ Elle garde sa réponse et explique pourquoi"]
+    : ["bad", "❌ Elle change d'avis juste parce que tu insistes"]);
+}
+
+yes.sc = initSeg($("#segYes"), (v) => { yes.sc = v; renderYes(); });
+yes.fr = initSeg($("#segFrame"), (v) => { yes.fr = v; renderYes(); });
+$("#franc").addEventListener("change", renderYes);
 
 ids.forEach((id) => $("#" + id).addEventListener("input", render));
 $$("#check input").forEach((c) => c.addEventListener("change", renderCheck));
 initRanges();
 render();
 renderCheck();
+renderYes();
 </script>

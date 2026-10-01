@@ -2,8 +2,8 @@
 <html lang="fr">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Comprendre l'IA en 5 fiches</title>
-<meta name="description" content="5 fiches interactives et faciles à lire pour comprendre l'IA : tokens, modèles, hallucinations, outils et prix.">
+<title>Comprendre l'IA en 6 fiches</title>
+<meta name="description" content="6 fiches interactives et faciles à lire pour comprendre l'IA : tokens, modèles, hallucinations, outils, prix et sécurité.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
@@ -43,17 +43,16 @@ body {
   grid-column: span 2; background: var(--accent); color: var(--on-accent);
   text-decoration: none; transition: transform .2s ease;
 }
-.fiche:nth-of-type(n+4) { grid-column: span 3; }
 .fiche:hover { transform: translateY(-4px); }
 .fiche:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
 @media (max-width: 900px) {
   .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero { grid-column: span 2; }
-  .fiche, .fiche:nth-of-type(n+4) { grid-column: span 1; }
+  .fiche { grid-column: span 1; }
 }
 @media (max-width: 640px) {
   .bento { grid-template-columns: minmax(0, 1fr); }
-  .hero, .fiche, .fiche:nth-of-type(n+4) { grid-column: span 1; }
+  .hero, .fiche { grid-column: span 1; }
   .card { padding: 18px; }
 }
 h1, h2 { font-family: var(--font-display); font-weight: 400; line-height: 1.02; margin: 0; text-wrap: balance; }
@@ -73,7 +72,7 @@ p { margin: 0; max-width: 60ch; }
   <div class="bento">
     <section class="card hero">
       <span class="eyebrow">Fiches interactives · Facile à lire</span>
-      <h1>Comprendre l'IA<br>en 5 fiches</h1>
+      <h1>Comprendre l'IA<br>en 6 fiches</h1>
       <p class="lead">Des fiches courtes à manipuler. Bouge les curseurs, tape du texte, regarde le résultat.</p>
     </section>
 
@@ -92,7 +91,7 @@ p { margin: 0; max-width: 60ch; }
     <a class="card fiche" href="3-hallucinations.html" style="--accent:#FF6B00">
       <span class="eyebrow">Fiche 3</span>
       <h2>Le Détecteur de Bobards</h2>
-      <p>Parfois, l'IA invente. Apprends à repérer quand ça arrive.</p>
+      <p>Parfois, l'IA invente. Parfois, elle te donne raison trop vite. Apprends à le repérer.</p>
       <span class="go">Ouvrir la fiche →</span>
     </a>
     <a class="card fiche" href="4-boite-outils.html" style="--accent:#00E5FF">
@@ -105,6 +104,12 @@ p { margin: 0; max-width: 60ch; }
       <span class="eyebrow">Fiche 5</span>
       <h2>Forfait ou Compteur ?</h2>
       <p>Payer un prix fixe chaque mois, ou payer à chaque token ? Fais le calcul.</p>
+      <span class="go">Ouvrir la fiche →</span>
+    </a>
+    <a class="card fiche" href="6-message-piege.html" style="--accent:#FFE600">
+      <span class="eyebrow">Fiche 6</span>
+      <h2>Le Message Piégé</h2>
+      <p>Un e-mail ou une page web peut cacher des ordres. Apprends à ne pas laisser l'IA obéir à un inconnu.</p>
       <span class="go">Ouvrir la fiche →</span>
     </a>
   </div>
