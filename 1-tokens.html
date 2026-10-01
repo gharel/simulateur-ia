@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le Sac à Tokens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Bento : grille de 4 colonnes. Une carte « hero » pleine couleur, les autres en cartes sombres. */
+:root {
+  --bg: #0B0B12;
+  --surface: #15151F;
+  --surface-2: #1F1F2C;
+  --line: #2B2B3C;
+  --fg: #F3F3F8;
+  --muted: #A6A6BA;
+  --ok: #3DDC84;
+  --warn: #FFC233;
+  --bad: #FF5C5C;
+  --on-accent: #0B0B12;
+  --accent-text: var(--accent);
+  --font-display: "Archivo Black", "Arial Black", Impact, system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", Roboto, system-ui, sans-serif;
+  --radius: 22px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
+    --fg: #12121A; --muted: #55556B; --ok: #0F7A45; --warn: #8A5A00; --bad: #C42626;
+    --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
+  --fg: #12121A; --muted: #55556B; --ok: #0F7A45; --warn: #8A5A00; --bad: #C42626;
+  --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 18px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; }
+.bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 24px; min-width: 0; display: flex; flex-direction: column; gap: 16px;
+}
+.s2 { grid-column: span 2; } .s3 { grid-column: span 3; } .s4 { grid-column: span 4; }
+@media (max-width: 900px) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .s1, .s3, .s4 { grid-column: span 2; }
+  .s2 { grid-column: span 1; }
+}
+@media (max-width: 640px) {
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .s1, .s2, .s3, .s4 { grid-column: span 1; }
+  .card { padding: 18px; }
+}
+
+/* Hero : la couleur dominante */
+.hero { background: var(--accent); color: var(--on-accent); border: none; }
+.hero .eyebrow { color: var(--on-accent); opacity: .7; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; align-items: end; }
+@media (max-width: 760px) { .hero-grid { grid-template-columns: minmax(0, 1fr); } }
+.word-card {
+  background: color-mix(in oklab, var(--on-accent) 9%, transparent);
+  border: 2px solid var(--on-accent); border-radius: 18px; padding: 18px;
+  display: grid; gap: 6px;
+}
+.word-card strong { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1; }
+.word-card p { font-weight: 700; }
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.02; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h1 { font-size: clamp(2.7rem, 8vw, 5.6rem); text-transform: uppercase; letter-spacing: -.02em; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.15rem; }
+.eyebrow { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.lead { font-size: 1.3rem; font-weight: 700; line-height: 1.35; max-width: 34ch; margin: 0; }
+p { margin: 0; max-width: 65ch; }
+.muted { color: var(--muted); }
+.small { font-size: .9rem; }
+.big { font-family: var(--font-display); font-size: clamp(2.3rem, 5vw, 3.4rem); line-height: 1; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.emo { font-size: 1.6rem; line-height: 1; }
+
+/* Réglages */
+.ctl { display: grid; gap: 10px; font-weight: 700; }
+.ctl-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.ctl-val { font-family: var(--font-display); color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.ctl-ends { display: flex; justify-content: space-between; gap: 12px; font-size: .85rem; color: var(--muted); font-weight: 400; }
+input[type="range"] {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 12px; margin: 8px 0;
+  border-radius: 99px; cursor: pointer;
+  background: linear-gradient(to right, var(--accent) var(--p, 50%), var(--surface-2) var(--p, 50%));
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--fg); border: 5px solid var(--accent); box-shadow: 0 0 0 4px var(--bg);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--fg); border: 5px solid var(--accent); box-shadow: 0 0 0 4px var(--bg);
+}
+textarea, input[type="number"], input[type="text"] {
+  width: 100%; background: var(--surface-2); color: var(--fg);
+  border: 2px solid var(--line); border-radius: 14px; padding: 12px 14px; font: inherit;
+}
+textarea { resize: vertical; min-height: 96px; }
+textarea:focus, input[type="number"]:focus, input[type="text"]:focus { border-color: var(--accent); outline: none; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.seg { display: flex; flex-wrap: wrap; gap: 6px; background: var(--surface-2); padding: 5px; border-radius: 14px; }
+.seg button {
+  flex: 1 1 auto; border: 0; background: transparent; color: var(--fg); font: inherit; font-weight: 700;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer; min-height: 44px;
+}
+.seg button:hover { background: var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.sw {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 12px 14px; background: var(--surface-2); border-radius: 14px; cursor: pointer; font-weight: 700;
+}
+.sw input {
+  -webkit-appearance: none; appearance: none; flex: none; margin: 0;
+  width: 54px; height: 30px; border-radius: 99px; background: var(--line);
+  position: relative; cursor: pointer; transition: background .2s;
+}
+.sw input::after {
+  content: ""; position: absolute; top: 4px; left: 4px; width: 22px; height: 22px;
+  border-radius: 50%; background: var(--fg); transition: transform .2s;
+}
+.sw input:checked { background: var(--accent); }
+.sw input:checked::after { transform: translateX(24px); background: var(--on-accent); }
+
+.btn {
+  border: 2px solid var(--line); background: var(--surface-2); color: var(--fg);
+  font: inherit; font-weight: 700; padding: 10px 16px; border-radius: 12px; cursor: pointer; min-height: 44px;
+}
+.btn:hover { border-color: var(--accent); }
+
+/* Jauges */
+.meter { display: grid; gap: 6px; }
+.meter-top { display: flex; justify-content: space-between; gap: 12px; font-weight: 700; }
+.track { height: 16px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.fill { height: 100%; width: 0; border-radius: 99px; background: var(--accent); transition: width .45s ease; }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 99px;
+  font-weight: 700; font-size: .95rem; background: var(--surface-2); color: var(--fg);
+}
+.pill.ok { background: color-mix(in oklab, var(--ok) 18%, transparent); color: var(--ok); }
+.pill.warn { background: color-mix(in oklab, var(--warn) 18%, transparent); color: var(--warn); }
+.pill.bad { background: color-mix(in oklab, var(--bad) 18%, transparent); color: var(--bad); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
+.stat { background: var(--surface-2); border-radius: 16px; padding: 14px; display: grid; gap: 2px; }
+.stat b { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; line-height: 1.05; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.stat span { font-size: .9rem; color: var(--muted); }
+
+/* À retenir */
+.retenir { background: var(--surface-2); }
+.retenir ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; counter-reset: r; }
+.retenir li { counter-increment: r; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: start; font-weight: 700; }
+.retenir li::before {
+  content: counter(r); font-family: var(--font-display); background: var(--accent); color: var(--on-accent);
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .95rem;
+}
+
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.foot { margin-top: 28px; display: grid; gap: 6px; color: var(--muted); font-size: .9rem; }
+.foot strong { color: var(--fg); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+.series { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.series a { color: var(--fg); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--accent); }
+.series a:hover { color: var(--accent-text); }
+.series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
+
+:root { --accent: #C6FF00; }
+
+.tokens { display: flex; flex-wrap: wrap; gap: 6px; min-height: 48px; align-content: flex-start; }
+.tok {
+  white-space: pre; padding: 4px 8px; border-radius: 8px; font-weight: 700; font-size: 1.05rem;
+  background: var(--accent); color: var(--on-accent);
+}
+.tok:nth-child(3n+2) { background: color-mix(in oklab, var(--accent) 45%, var(--surface)); color: var(--fg); }
+.tok:nth-child(3n) { background: transparent; color: var(--accent-text); box-shadow: inset 0 0 0 2px var(--accent); }
+.examples { display: grid; gap: 10px; }
+.ex { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface-2); border-radius: 12px; }
+.ex code { font-family: var(--font-body); font-weight: 700; overflow-wrap: anywhere; }
+.ex .n { font-family: var(--font-display); color: var(--accent-text); white-space: nowrap; }
+
+.mem { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 28px; }
+@media (max-width: 900px) { .mem { grid-template-columns: minmax(0, 1fr); } }
+.controls { display: grid; gap: 20px; align-content: start; }
+.viz { display: grid; gap: 18px; align-content: start; }
+.status { padding: 14px 16px; border-radius: 14px; font-weight: 700; background: var(--surface-2); }
+.status.ok { box-shadow: inset 4px 0 0 var(--ok); }
+.status.warn { box-shadow: inset 4px 0 0 var(--warn); }
+.status.squeeze { box-shadow: inset 4px 0 0 var(--accent); }
+
+.stack-wrap { position: relative; }
+.stack { display: flex; height: 30px; border-radius: 10px; overflow: hidden; background: var(--surface-2); }
+.stack span { height: 100%; transition: width .45s ease; }
+.c-sys { background: var(--muted); }
+.c-msg { background: var(--accent); }
+.c-over { background: repeating-linear-gradient(45deg, var(--bad) 0 8px, color-mix(in oklab, var(--bad) 45%, var(--surface)) 8px 16px); }
+.c-sum { background: repeating-linear-gradient(45deg, var(--warn) 0 6px, color-mix(in oklab, var(--warn) 40%, var(--surface)) 6px 12px); }
+.limit { position: absolute; top: -6px; bottom: -6px; width: 3px; background: var(--fg); border-radius: 2px; transition: left .45s ease; }
+.limit::after { content: "limite"; position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-size: .75rem; font-weight: 700; color: var(--fg); }
+.bar-label { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; margin-bottom: 8px; flex-wrap: wrap; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: .9rem; color: var(--muted); }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; }
+
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.stair { display: grid; gap: 8px; }
+.srow { display: grid; grid-template-columns: 70px minmax(0, 1fr) 84px; gap: 10px; align-items: center; font-weight: 700; font-size: .9rem; }
+.srow .sn { text-align: right; font-variant-numeric: tabular-nums; color: var(--accent-text); }
+.srow.gap { color: var(--muted); font-size: 1.2rem; line-height: 1; }
+.sbar { display: flex; height: 22px; overflow: hidden; }
+.sbar span { height: 100%; flex: none; box-shadow: inset -2px 0 0 var(--surface); transition: width .45s ease; }
+.sbar span:first-child { border-radius: 5px 0 0 5px; }
+.sbar span:last-child { border-radius: 0 5px 5px 0; box-shadow: none; }
+.b-sys { background: var(--muted); }
+.b-old { background: color-mix(in oklab, var(--accent) 50%, var(--surface)); }
+.b-new { background: var(--accent); }
+.bars { display: flex; align-items: flex-end; gap: 2px; height: 150px; border-bottom: 2px solid var(--line); }
+.bars span { flex: 1 1 0; min-width: 0; border-radius: 4px 4px 0 0; background: color-mix(in oklab, var(--accent) 50%, var(--surface)); transition: height .3s ease; }
+.bars span:last-child { background: var(--accent); }
+.bars-ends { display: flex; justify-content: space-between; gap: 10px; font-size: .85rem; color: var(--muted); margin-top: 6px; }
+
+.dots { display: flex; flex-wrap: wrap; gap: 3px; }
+.dot { width: 10px; height: 10px; border-radius: 3px; background: var(--accent); }
+.dot.old { background: transparent; box-shadow: inset 0 0 0 1.5px var(--warn); }
+</style>
+
+<main class="wrap">
+  <div class="bento">
+
+    <section class="card hero s4">
+      <div class="hero-grid">
+        <div class="ctl">
+          <span class="eyebrow">Comprendre l'IA · Fiche 1 sur 5</span>
+          <h1>Le Sac<br>à Tokens</h1>
+          <p class="lead">L'IA ne lit pas des mots. Elle lit des petits morceaux de texte : les tokens.</p>
+        </div>
+        <div class="word-card">
+          <span class="eyebrow">Le mot à connaître</span>
+          <strong>Token</strong>
+          <p>Un petit morceau de mot. Souvent 3 ou 4 lettres.</p>
+          <p>L'IA compte tout en tokens : ce qu'elle lit, ce qu'elle écrit, ce que ça coûte.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card s3">
+      <div class="head"><span class="emo" aria-hidden="true">✏️</span><h2>Écris une phrase</h2></div>
+      <p class="muted">Regarde comment l'IA la découpe en morceaux.</p>
+      <label class="ctl" for="txt">Ton texte
+        <textarea id="txt" rows="3">Bonjour ! Peux-tu m'aider à préparer mon voyage à Nouméa en décembre ?</textarea>
+      </label>
+      <div class="tokens" id="toks" aria-live="polite"></div>
+      <div class="stats">
+        <div class="stat"><b id="sWords">0</b><span>mots</span></div>
+        <div class="stat"><b id="sToks">0</b><span>tokens</span></div>
+        <div class="stat"><b id="sChars">0</b><span>caractères</span></div>
+        <div class="stat"><b id="sRatio">0</b><span>tokens par mot</span></div>
+      </div>
+      <p class="small muted">Découpage simplifié pour l'exemple. Le vrai découpage change un peu selon le modèle.</p>
+    </section>
+
+    <section class="card s1">
+      <div class="head"><span class="emo" aria-hidden="true">📏</span><h2>Court ou long ?</h2></div>
+      <p>Un mot court = 1 token.</p>
+      <p>Un mot long = plusieurs tokens.</p>
+      <div class="examples" id="examples"></div>
+      <p class="small muted">Les espaces et la ponctuation comptent aussi.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true">🔁</span><h2>Chaque message renvoie toute la conversation</h2></div>
+      <p>L'IA ne se souvient de rien entre deux messages. À chaque envoi, elle reçoit à nouveau <strong>toute la conversation depuis le début</strong> :
+        les consignes, toutes tes questions, toutes ses réponses, puis ta nouvelle question. Tout ce qu'elle relit, ce sont des <strong>tokens d'entrée</strong>, et ils se paient.</p>
+      <div class="mem">
+        <div class="controls">
+          <div class="ctl">
+            <div class="ctl-row"><label for="nSend">Messages envoyés</label><span class="ctl-val" id="vSend">8</span></div>
+            <input type="range" id="nSend" min="1" max="40" value="8">
+            <div class="ctl-ends"><span>1 message</span><span>40 messages</span></div>
+          </div>
+          <div class="btns">
+            <button type="button" class="btn" id="btnSend">➕ Envoyer un message</button>
+            <button type="button" class="btn" id="btnReset">↺ Recommencer</button>
+          </div>
+          <div class="ctl">
+            <span>Taille d'un échange</span>
+            <div class="seg" id="segSend" role="group" aria-label="Taille d'un échange">
+              <button type="button" data-v="150" aria-pressed="false">Court</button>
+              <button type="button" data-v="800" aria-pressed="true">Moyen</button>
+              <button type="button" data-v="5000" aria-pressed="false">Avec un document</button>
+            </div>
+            <span class="small muted">Un échange = ta question + la réponse de l'IA.</span>
+          </div>
+          <div class="stats">
+            <div class="stat"><b id="sLast">0</b><span>tokens relus pour ce message</span></div>
+            <div class="stat"><b id="sCum">0</b><span>tokens lus en tout</span></div>
+            <div class="stat"><b id="sMult">×1</b><span>par rapport au texte écrit</span></div>
+          </div>
+        </div>
+
+        <div class="viz">
+          <div>
+            <div class="bar-label"><span>Ce que l'IA relit à chaque envoi</span></div>
+            <div class="stair" id="stair" aria-hidden="true"></div>
+          </div>
+          <div class="legend">
+            <span><i class="b-sys"></i>Consignes de départ</span>
+            <span><i class="b-old"></i>Anciens échanges, relus</span>
+            <span><i class="b-new"></i>Nouvelle question</span>
+          </div>
+          <div>
+            <div class="bar-label"><span>Tokens lus, envoi après envoi</span><span class="muted" id="lBars"></span></div>
+            <div class="bars" id="bars" aria-hidden="true"></div>
+            <div class="bars-ends"><span>1er envoi</span><span id="lBarsEnd"></span></div>
+          </div>
+          <div class="status" id="convStatus" aria-live="polite"></div>
+          <p class="small muted">Les spécialistes disent que ça grimpe de façon « quadratique » : 2 fois plus de messages, c'est environ 4 fois plus de tokens lus.
+            Certains services gardent le début de la conversation en cache : la relecture coûte alors moins cher, mais elle remplit quand même la mémoire.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true">🧠</span><h2>La mémoire de travail de l'IA</h2></div>
+      <p>L'IA a une mémoire de taille fixe. On l'appelle la <strong>fenêtre de contexte</strong>.
+        Toute la conversation doit tenir dedans. Si elle déborde, l'IA fait un résumé : c'est la <strong>compression</strong>.</p>
+      <div class="mem">
+        <div class="controls">
+          <div class="ctl">
+            <div class="ctl-row"><label for="nMsg">Nombre de messages</label><span class="ctl-val" id="vMsg">300</span></div>
+            <input type="range" id="nMsg" min="1" max="400" value="300">
+            <div class="ctl-ends"><span>1 message</span><span>400 messages</span></div>
+          </div>
+          <div class="ctl">
+            <span>Taille d'un message</span>
+            <div class="seg" id="segPer" role="group" aria-label="Taille d'un message">
+              <button type="button" data-v="150" aria-pressed="false">Court</button>
+              <button type="button" data-v="800" aria-pressed="true">Moyen</button>
+              <button type="button" data-v="5000" aria-pressed="false">Avec un document</button>
+            </div>
+            <span class="small muted" id="perHint">≈ 800 tokens par message (question + réponse)</span>
+          </div>
+          <div class="ctl">
+            <span>Taille de la mémoire</span>
+            <div class="seg" id="segWin" role="group" aria-label="Taille de la mémoire">
+              <button type="button" data-v="200000" aria-pressed="true">200 000 tokens</button>
+              <button type="button" data-v="1000000" aria-pressed="false">1 million</button>
+            </div>
+            <span class="small muted">200 000 tokens ≈ un gros roman. 1 million ≈ 5 romans.</span>
+          </div>
+        </div>
+
+        <div class="viz">
+          <div class="stats">
+            <div class="stat"><b id="sFill">0 %</b><span>mémoire remplie</span></div>
+            <div class="stat"><b id="sAfter">–</b><span>après compression</span></div>
+            <div class="stat"><b id="sReread">0</b><span>tokens relus à chaque nouveau message</span></div>
+          </div>
+
+          <div>
+            <div class="bar-label"><span>Sans compression</span><span class="muted" id="lRaw"></span></div>
+            <div class="stack-wrap">
+              <div class="stack"><span class="c-sys" id="rSys"></span><span class="c-msg" id="rMsg"></span><span class="c-over" id="rOver"></span></div>
+              <div class="limit" id="rLimit"></div>
+            </div>
+          </div>
+          <div>
+            <div class="bar-label"><span>Avec compression</span><span class="muted" id="lCmp"></span></div>
+            <div class="stack"><span class="c-sys" id="cSys"></span><span class="c-sum" id="cSum"></span><span class="c-msg" id="cMsg"></span></div>
+          </div>
+          <div class="legend">
+            <span><i class="c-sys"></i>Consignes de départ</span>
+            <span><i class="c-msg"></i>Messages gardés en entier</span>
+            <span><i class="c-sum"></i>Résumé des vieux messages</span>
+            <span><i class="c-over"></i>Ça déborde</span>
+          </div>
+
+          <div class="status" id="status" aria-live="polite"></div>
+
+          <div class="ctl">
+            <span class="small muted">Chaque carré = 1 message. Les carrés vides sont résumés.</span>
+            <div class="dots" id="dots" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card s2">
+      <div class="head"><span class="emo" aria-hidden="true">📚</span><h2>Ça fait combien de tokens ?</h2></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Texte</th><th class="num">Tokens</th><th class="num">Tient dans 200 000 ?</th></tr></thead>
+          <tbody>
+            <tr><td>1 SMS</td><td class="num">≈ 30</td><td class="num">✅</td></tr>
+            <tr><td>1 e-mail</td><td class="num">≈ 300</td><td class="num">✅</td></tr>
+            <tr><td>1 page de livre</td><td class="num">≈ 500</td><td class="num">✅</td></tr>
+            <tr><td>1 roman de 300 pages</td><td class="num">≈ 150 000</td><td class="num">✅ tout juste</td></tr>
+            <tr><td>Tout le code d'une grosse appli</td><td class="num">1 million et +</td><td class="num">❌</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">Ordres de grandeur pour un texte en français.</p>
+    </section>
+
+    <section class="card s2 retenir">
+      <div class="head"><span class="emo" aria-hidden="true">🧠</span><h2>À retenir</h2></div>
+      <ul>
+        <li><span>L'IA lit et écrit en tokens. Un token = un petit bout de mot.</span></li>
+        <li><span>Chaque message renvoie toute la conversation. Plus elle est longue, plus chaque nouveau message coûte cher.</span></li>
+        <li><span>Sa mémoire a une taille fixe. Quand elle est pleine, l'IA résume le début et oublie des détails.</span></li>
+        <li><span>Pour un nouveau sujet, ouvre une nouvelle conversation. C'est plus rapide, moins cher et plus précis.</span></li>
+      </ul>
+    </section>
+
+  </div>
+  <footer class="foot">
+    <nav class="series" aria-label="Les 5 fiches"><strong>Comprendre l’IA en 5 fiches :</strong><a href="index.html">Accueil</a><a aria-current="page">1 Tokens</a><a href="2-modele-effort.html">2 Modèle et effort</a><a href="3-hallucinations.html">3 Hallucinations</a><a href="4-boite-outils.html">4 Les outils Claude</a><a href="5-forfait-api.html">5 Forfait ou API</a></nav>
+    <span>Chiffres arrondis, pour comprendre. Ce ne sont pas des mesures exactes.</span>
+  </footer>
+</main>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const fmt = (n, d = 0) => n.toLocaleString("fr-FR", { maximumFractionDigits: d, minimumFractionDigits: d });
+function paintRange(r) {
+  r.style.setProperty("--p", ((r.value - r.min) / (r.max - r.min)) * 100 + "%");
+}
+function initRanges() {
+  $$('input[type="range"]').forEach((r) => { r.addEventListener("input", () => paintRange(r)); paintRange(r); });
+}
+// Groupe de boutons à choix unique : <div class="seg" data-name="x"><button data-v="..">
+function initSeg(el, onChange) {
+  const btns = $$("button", el);
+  btns.forEach((b) => b.addEventListener("click", () => {
+    btns.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    onChange(b.dataset.v);
+  }));
+  const cur = btns.find((b) => b.getAttribute("aria-pressed") === "true") || btns[0];
+  return cur.dataset.v;
+}
+
+
+// Mots fréquents gardés en un seul token, comme le font les vrais découpeurs.
+const COMMON = new Set("bonjour merci aider pouvez voyage demain travail comment pourquoi toujours beaucoup quelque maison bonsoir parce depuis pendant maintenant question réponse peux-tu combien".split(" "));
+
+function tokenize(text) {
+  const parts = text.match(/\s*[\p{L}\p{M}\p{N}]+|\s*[^\s\p{L}\p{M}\p{N}]/gu) || [];
+  const out = [];
+  for (const p of parts) {
+    const lead = p.match(/^\s*/)[0].replace(/\s+/g, " ");
+    const core = p.trimStart();
+    if (core.length <= 5 || !/\p{L}/u.test(core) || COMMON.has(core.toLowerCase())) { out.push(lead + core); continue; }
+    let i = 0, k = 0;
+    while (i < core.length) {
+      const rest = core.length - i;
+      const len = rest <= 5 ? rest : (k === 0 ? 4 : 3 + (k % 2));
+      out.push((k === 0 ? lead : "") + core.slice(i, i + len));
+      i += len; k++;
+    }
+  }
+  return out;
+}
+
+const txt = $("#txt");
+function renderText() {
+  const t = txt.value;
+  const toks = tokenize(t);
+  const words = (t.match(/[\p{L}\p{N}][\p{L}\p{M}\p{N}'’-]*/gu) || []).length;
+  const box = $("#toks");
+  box.replaceChildren(...toks.slice(0, 400).map((s) => { const e = document.createElement("span"); e.className = "tok"; e.textContent = s; return e; }));
+  $("#sWords").textContent = fmt(words);
+  $("#sToks").textContent = fmt(toks.length);
+  $("#sChars").textContent = fmt([...t].length);
+  $("#sRatio").textContent = words ? fmt(toks.length / words, 1) : "0";
+}
+txt.addEventListener("input", renderText);
+
+$("#examples").replaceChildren(...["chat", "maison", "incroyable", "anticonstitutionnellement", "2026", "😀"].map((w) => {
+  const d = document.createElement("div"); d.className = "ex";
+  const n = w === "😀" ? 2 : tokenize(w).length;
+  d.innerHTML = `<code></code><span class="n">${n} token${n > 1 ? "s" : ""}</span>`;
+  d.querySelector("code").textContent = w;
+  return d;
+}));
+
+// Mémoire de travail
+const SYS = 2000;
+const mem = { n: 300, per: 800, W: 200000 };
+const PER_HINT = { 150: "≈ 150 tokens par message (petite question, petite réponse)", 800: "≈ 800 tokens par message (question + réponse)", 5000: "≈ 5 000 tokens par message (on colle un document)" };
+const pct = (a, b) => (a / b) * 100 + "%";
+
+function renderMem() {
+  const { n, per, W } = mem;
+  const msgs = n * per;
+  const used = SYS + msgs;
+  const fill = used / W;
+  const compress = used > 0.95 * W;
+
+  $("#vMsg").textContent = fmt(n);
+  $("#perHint").textContent = PER_HINT[per];
+  $("#sFill").textContent = fmt(fill * 100) + " %";
+  $("#lRaw").textContent = fmt(used) + " tokens";
+
+  const scale = Math.max(used, W);
+  $("#rSys").style.width = pct(SYS, scale);
+  $("#rMsg").style.width = pct(Math.min(msgs, W - SYS), scale);
+  $("#rOver").style.width = pct(Math.max(0, used - W), scale);
+  $("#rLimit").style.left = `calc(${pct(W, scale)} - 2px)`;
+
+  let kept = n, summary = 0;
+  if (compress) {
+    summary = Math.max(2000, Math.round(0.02 * W));
+    kept = Math.max(1, Math.floor((0.4 * W) / per));
+  }
+  const after = SYS + summary + kept * per;
+  $("#cSys").style.width = pct(SYS, W);
+  $("#cSum").style.width = pct(summary, W);
+  $("#cMsg").style.width = pct(kept * per, W);
+  $("#sAfter").textContent = compress ? fmt((after / W) * 100) + " %" : "–";
+  $("#lCmp").textContent = compress ? fmt(after) + " tokens" : "pas nécessaire";
+  $("#sReread").textContent = fmt(compress ? after : Math.min(used, W));
+
+  const st = $("#status");
+  if (compress) {
+    st.className = "status squeeze";
+    st.textContent = `🗜️ Compression ! Les ${fmt(n - kept)} premiers messages deviennent un court résumé. L'IA garde l'essentiel, mais elle oublie des détails.`;
+  } else if (fill > 0.7) {
+    st.className = "status warn";
+    st.textContent = "⚠️ La mémoire est presque pleine. Bientôt, l'IA devra résumer le début.";
+  } else {
+    st.className = "status ok";
+    st.textContent = "✅ Tout tient dans la mémoire. L'IA se souvient de chaque message.";
+  }
+
+  const dots = $("#dots");
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < n; i++) {
+    const d = document.createElement("span");
+    d.className = i < n - kept ? "dot old" : "dot";
+    frag.appendChild(d);
+  }
+  dots.replaceChildren(frag);
+}
+
+$("#nMsg").addEventListener("input", (e) => { mem.n = +e.target.value; renderMem(); });
+mem.per = +initSeg($("#segPer"), (v) => { mem.per = +v; renderMem(); });
+mem.W = +initSeg($("#segWin"), (v) => { mem.W = +v; renderMem(); });
+
+// Conversation qui s'allonge : chaque envoi relit tout l'historique
+const conv = { n: 8, per: 800 };
+const qOf = (per) => Math.round(per * 0.3);
+const inputAt = (i, per) => SYS + (i - 1) * per + qOf(per);
+const cumTo = (n, per) => { let s = 0; for (let i = 1; i <= n; i++) s += inputAt(i, per); return s; };
+
+function block(cls, w) { const s = document.createElement("span"); s.className = cls; s.style.width = w; return s; }
+function stairRow(i, per, max) {
+  const row = document.createElement("div"); row.className = "srow";
+  const lab = document.createElement("span"); lab.textContent = `Envoi ${i}`;
+  const bar = document.createElement("div"); bar.className = "sbar";
+  bar.append(block("b-sys", pct(SYS, max)));
+  for (let k = 1; k < i; k++) bar.append(block("b-old", pct(per, max)));
+  bar.append(block("b-new", pct(qOf(per), max)));
+  const val = document.createElement("span"); val.className = "sn"; val.textContent = fmt(inputAt(i, per));
+  row.append(lab, bar, val);
+  return row;
+}
+
+function renderConv() {
+  const { n, per } = conv;
+  const last = inputAt(n, per);
+  const cum = cumTo(n, per);
+  const written = SYS + n * per;
+
+  $("#vSend").textContent = fmt(n);
+  $("#sLast").textContent = fmt(last);
+  $("#sCum").textContent = fmt(cum);
+  $("#sMult").textContent = "×" + fmt(cum / written, 1);
+
+  const rows = n <= 7 ? Array.from({ length: n }, (_, k) => k + 1) : [1, 2, 3, 0, n - 1, n];
+  $("#stair").replaceChildren(...rows.map((i) => {
+    if (i) return stairRow(i, per, last);
+    const g = document.createElement("div"); g.className = "srow gap"; g.innerHTML = "<span></span><span>⋮</span>";
+    return g;
+  }));
+
+  $("#bars").replaceChildren(...Array.from({ length: n }, (_, k) => {
+    const s = document.createElement("span"); s.style.height = pct(inputAt(k + 1, per), last); return s;
+  }));
+  $("#lBars").textContent = `dernier : ${fmt(last)}`;
+  $("#lBarsEnd").textContent = n > 1 ? `${n}e envoi` : "";
+
+  const c2 = cumTo(2 * n, per);
+  let msg = `📈 Avec ${fmt(2 * n)} messages au lieu de ${fmt(n)}, l'IA lirait ${fmt(c2)} tokens en tout : ×${fmt(c2 / cum, 1)}, pas ×2.`;
+  if (n > 10) {
+    const split = Math.floor(n / 10) * cumTo(10, per) + cumTo(n % 10, per);
+    msg += ` 💡 En ouvrant une nouvelle conversation tous les 10 messages : ${fmt(split)} tokens (−${fmt((1 - split / cum) * 100)} %).`;
+  }
+  if (last > 200000) msg += " ⚠️ La conversation dépasse 200 000 tokens : l'IA doit compresser (voir plus bas).";
+  const st = $("#convStatus");
+  st.className = "status " + (last > 200000 ? "warn" : n > 10 ? "squeeze" : "ok");
+  st.textContent = msg;
+}
+
+const nSend = $("#nSend");
+function setSend(v) { conv.n = Math.min(+nSend.max, Math.max(1, v)); nSend.value = conv.n; paintRange(nSend); renderConv(); }
+nSend.addEventListener("input", () => setSend(+nSend.value));
+$("#btnSend").addEventListener("click", () => setSend(conv.n + 1));
+$("#btnReset").addEventListener("click", () => setSend(1));
+conv.per = +initSeg($("#segSend"), (v) => { conv.per = +v; renderConv(); });
+
+initRanges();
+renderText();
+renderMem();
+renderConv();
+</script>

@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le Détecteur de Bobards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Bento : grille de 4 colonnes. Une carte « hero » pleine couleur, les autres en cartes sombres. */
+:root {
+  --bg: #0B0B12;
+  --surface: #15151F;
+  --surface-2: #1F1F2C;
+  --line: #2B2B3C;
+  --fg: #F3F3F8;
+  --muted: #A6A6BA;
+  --ok: #3DDC84;
+  --warn: #FFC233;
+  --bad: #FF5C5C;
+  --on-accent: #0B0B12;
+  --accent-text: var(--accent);
+  --font-display: "Archivo Black", "Arial Black", Impact, system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", Roboto, system-ui, sans-serif;
+  --radius: 22px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
+    --fg: #12121A; --muted: #55556B; --ok: #0F7A45; --warn: #8A5A00; --bad: #C42626;
+    --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
+  --fg: #12121A; --muted: #55556B; --ok: #0F7A45; --warn: #8A5A00; --bad: #C42626;
+  --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 18px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; }
+.bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 24px; min-width: 0; display: flex; flex-direction: column; gap: 16px;
+}
+.s2 { grid-column: span 2; } .s3 { grid-column: span 3; } .s4 { grid-column: span 4; }
+@media (max-width: 900px) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .s1, .s3, .s4 { grid-column: span 2; }
+  .s2 { grid-column: span 1; }
+}
+@media (max-width: 640px) {
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .s1, .s2, .s3, .s4 { grid-column: span 1; }
+  .card { padding: 18px; }
+}
+
+/* Hero : la couleur dominante */
+.hero { background: var(--accent); color: var(--on-accent); border: none; }
+.hero .eyebrow { color: var(--on-accent); opacity: .7; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; align-items: end; }
+@media (max-width: 760px) { .hero-grid { grid-template-columns: minmax(0, 1fr); } }
+.word-card {
+  background: color-mix(in oklab, var(--on-accent) 9%, transparent);
+  border: 2px solid var(--on-accent); border-radius: 18px; padding: 18px;
+  display: grid; gap: 6px;
+}
+.word-card strong { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1; }
+.word-card p { font-weight: 700; }
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.02; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h1 { font-size: clamp(2.7rem, 8vw, 5.6rem); text-transform: uppercase; letter-spacing: -.02em; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.15rem; }
+.eyebrow { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.lead { font-size: 1.3rem; font-weight: 700; line-height: 1.35; max-width: 34ch; margin: 0; }
+p { margin: 0; max-width: 65ch; }
+.muted { color: var(--muted); }
+.small { font-size: .9rem; }
+.big { font-family: var(--font-display); font-size: clamp(2.3rem, 5vw, 3.4rem); line-height: 1; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.emo { font-size: 1.6rem; line-height: 1; }
+
+/* Réglages */
+.ctl { display: grid; gap: 10px; font-weight: 700; }
+.ctl-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.ctl-val { font-family: var(--font-display); color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.ctl-ends { display: flex; justify-content: space-between; gap: 12px; font-size: .85rem; color: var(--muted); font-weight: 400; }
+input[type="range"] {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 12px; margin: 8px 0;
+  border-radius: 99px; cursor: pointer;
+  background: linear-gradient(to right, var(--accent) var(--p, 50%), var(--surface-2) var(--p, 50%));
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--fg); border: 5px solid var(--accent); box-shadow: 0 0 0 4px var(--bg);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--fg); border: 5px solid var(--accent); box-shadow: 0 0 0 4px var(--bg);
+}
+textarea, input[type="number"], input[type="text"] {
+  width: 100%; background: var(--surface-2); color: var(--fg);
+  border: 2px solid var(--line); border-radius: 14px; padding: 12px 14px; font: inherit;
+}
+textarea { resize: vertical; min-height: 96px; }
+textarea:focus, input[type="number"]:focus, input[type="text"]:focus { border-color: var(--accent); outline: none; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.seg { display: flex; flex-wrap: wrap; gap: 6px; background: var(--surface-2); padding: 5px; border-radius: 14px; }
+.seg button {
+  flex: 1 1 auto; border: 0; background: transparent; color: var(--fg); font: inherit; font-weight: 700;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer; min-height: 44px;
+}
+.seg button:hover { background: var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.sw {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 12px 14px; background: var(--surface-2); border-radius: 14px; cursor: pointer; font-weight: 700;
+}
+.sw input {
+  -webkit-appearance: none; appearance: none; flex: none; margin: 0;
+  width: 54px; height: 30px; border-radius: 99px; background: var(--line);
+  position: relative; cursor: pointer; transition: background .2s;
+}
+.sw input::after {
+  content: ""; position: absolute; top: 4px; left: 4px; width: 22px; height: 22px;
+  border-radius: 50%; background: var(--fg); transition: transform .2s;
+}
+.sw input:checked { background: var(--accent); }
+.sw input:checked::after { transform: translateX(24px); background: var(--on-accent); }
+
+.btn {
+  border: 2px solid var(--line); background: var(--surface-2); color: var(--fg);
+  font: inherit; font-weight: 700; padding: 10px 16px; border-radius: 12px; cursor: pointer; min-height: 44px;
+}
+.btn:hover { border-color: var(--accent); }
+
+/* Jauges */
+.meter { display: grid; gap: 6px; }
+.meter-top { display: flex; justify-content: space-between; gap: 12px; font-weight: 700; }
+.track { height: 16px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.fill { height: 100%; width: 0; border-radius: 99px; background: var(--accent); transition: width .45s ease; }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 99px;
+  font-weight: 700; font-size: .95rem; background: var(--surface-2); color: var(--fg);
+}
+.pill.ok { background: color-mix(in oklab, var(--ok) 18%, transparent); color: var(--ok); }
+.pill.warn { background: color-mix(in oklab, var(--warn) 18%, transparent); color: var(--warn); }
+.pill.bad { background: color-mix(in oklab, var(--bad) 18%, transparent); color: var(--bad); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
+.stat { background: var(--surface-2); border-radius: 16px; padding: 14px; display: grid; gap: 2px; }
+.stat b { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; line-height: 1.05; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.stat span { font-size: .9rem; color: var(--muted); }
+
+/* À retenir */
+.retenir { background: var(--surface-2); }
+.retenir ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; counter-reset: r; }
+.retenir li { counter-increment: r; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: start; font-weight: 700; }
+.retenir li::before {
+  content: counter(r); font-family: var(--font-display); background: var(--accent); color: var(--on-accent);
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .95rem;
+}
+
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.foot { margin-top: 28px; display: grid; gap: 6px; color: var(--muted); font-size: .9rem; }
+.foot strong { color: var(--fg); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+.series { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.series a { color: var(--fg); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--accent); }
+.series a:hover { color: var(--accent-text); }
+.series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
+
+:root { --accent: #FF6B00; }
+
+.switches { display: grid; gap: 8px; }
+.ring-box { display: grid; place-items: center; gap: 10px; text-align: center; }
+.ring { width: min(190px, 100%); height: auto; }
+.ring .bg { fill: none; stroke: var(--surface-2); stroke-width: 14; }
+.ring .fg { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset .5s ease, stroke .3s; transform: rotate(-90deg); transform-origin: 60px 60px; }
+.ring .fg.ok { stroke: var(--ok); } .ring .fg.warn { stroke: var(--warn); } .ring .fg.bad { stroke: var(--bad); }
+.ring text { fill: var(--fg); font-family: var(--font-display); font-size: 26px; }
+.ring .sub { font-family: var(--font-body); font-size: 9px; font-weight: 700; fill: var(--muted); }
+
+.question { font-family: var(--font-display); font-size: 1.2rem; line-height: 1.2; }
+.bubble { background: var(--surface-2); border-radius: 18px 18px 18px 4px; padding: 16px; display: grid; gap: 8px; }
+.sent { padding: 6px 10px; border-radius: 8px; font-weight: 700; display: block; }
+.sent::before { margin-right: 8px; }
+.sent.ok { background: color-mix(in oklab, var(--ok) 16%, transparent); }
+.sent.ok::before { content: "✅"; }
+.sent.warn { background: color-mix(in oklab, var(--warn) 18%, transparent); }
+.sent.warn::before { content: "⚠️"; }
+.sent.bad { background: color-mix(in oklab, var(--bad) 18%, transparent); text-decoration: underline wavy var(--bad); text-underline-offset: 4px; }
+.sent.bad::before { content: "❌"; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: .9rem; color: var(--muted); }
+
+.levers { display: grid; gap: 12px; }
+.lever { display: grid; gap: 4px; }
+.lever .meter-top { font-size: .95rem; }
+.lever .fill { background: var(--muted); }
+.lever.on .fill { background: var(--accent); }
+.lever.up .fill { background: var(--bad); }
+.lever .meter-top span:last-child { font-variant-numeric: tabular-nums; }
+
+.check { display: grid; gap: 8px; }
+.check label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start; padding: 10px 12px; background: var(--surface-2); border-radius: 12px; cursor: pointer; font-weight: 700; }
+.check input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--accent); }
+.check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
+</style>
+
+<main class="wrap">
+  <div class="bento">
+
+    <section class="card hero s4">
+      <div class="hero-grid">
+        <div class="ctl">
+          <span class="eyebrow">Comprendre l'IA · Fiche 3 sur 5</span>
+          <h1>Le Détecteur<br>de Bobards</h1>
+          <p class="lead">Parfois, l'IA invente. Elle le dit avec assurance. Apprends à repérer quand ça arrive.</p>
+        </div>
+        <div class="word-card">
+          <span class="eyebrow">Le mot à connaître</span>
+          <strong>Hallucination</strong>
+          <p>Quand l'IA invente une réponse qui a l'air vraie.</p>
+          <p>Elle ne ment pas exprès. Elle complète au hasard.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card s2">
+      <div class="head"><span class="emo" aria-hidden="true">🎛️</span><h2>Tes réglages</h2></div>
+      <div class="ctl">
+        <div class="ctl-row"><label for="level">Ma question porte sur…</label></div>
+        <span class="ctl-val" id="vLevel"></span>
+        <input type="range" id="level" min="0" max="4" step="1" value="3">
+        <div class="ctl-ends"><span>Un fait très connu</span><span>Un fait très récent</span></div>
+      </div>
+      <div class="switches">
+        <label class="sw" for="doc"><span>📎 Je donne un document</span><input type="checkbox" id="doc"></label>
+        <label class="sw" for="web"><span>🌐 La recherche web est activée</span><input type="checkbox" id="web"></label>
+        <label class="sw" for="idk"><span>🙋 J'autorise « je ne sais pas »</span><input type="checkbox" id="idk"></label>
+        <label class="sw" for="src"><span>🔗 Je demande les sources</span><input type="checkbox" id="src"></label>
+      </div>
+      <div class="ctl">
+        <div class="ctl-row"><label for="crea">Ce que je demande</label><span class="ctl-val" id="vCrea"></span></div>
+        <input type="range" id="crea" min="0" max="100" value="30">
+        <div class="ctl-ends"><span>Des faits précis</span><span>De l'imagination</span></div>
+      </div>
+    </section>
+
+    <section class="card s1 ring-box">
+      <div class="head"><span class="emo" aria-hidden="true">🚨</span><h2>Risque d'invention</h2></div>
+      <svg class="ring" viewBox="0 0 120 120" role="img" aria-labelledby="ringLabel">
+        <title id="ringLabel">Risque d'invention</title>
+        <circle class="bg" cx="60" cy="60" r="50"></circle>
+        <circle class="fg" id="ringFg" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="314.16"></circle>
+        <text id="ringTxt" x="60" y="64" text-anchor="middle">0 %</text>
+        <text class="sub" x="60" y="80" text-anchor="middle">de risque</text>
+      </svg>
+      <span class="pill" id="riskPill" aria-live="polite"></span>
+    </section>
+
+    <section class="card s1">
+      <div class="head"><span class="emo" aria-hidden="true">🤔</span><h2>Pourquoi elle invente ?</h2></div>
+      <p>L'IA devine le mot qui vient le plus souvent après.</p>
+      <p>Si elle ne sait pas, elle devine quand même.</p>
+      <p>La réponse a l'air sûre. <strong>Mais elle peut être fausse.</strong></p>
+      <p class="small muted">Le risque est plus grand pour les sujets rares, locaux ou très récents.</p>
+    </section>
+
+    <section class="card s2">
+      <div class="head"><span class="emo" aria-hidden="true">💬</span><h2>Exemple de réponse</h2></div>
+      <p class="question" id="question"></p>
+      <div class="bubble" id="answer" aria-live="polite"></div>
+      <div class="legend"><span>✅ Vrai ou vérifiable</span><span>⚠️ À vérifier</span><span>❌ Inventé</span></div>
+      <p class="small muted">Exemple fabriqué pour comprendre. Les noms et les dates sont inventés.</p>
+    </section>
+
+    <section class="card s2">
+      <div class="head"><span class="emo" aria-hidden="true">📉</span><h2>Ce qui change le risque</h2></div>
+      <p class="muted">Pour ta question. Les barres orange sont activées.</p>
+      <div class="levers" id="levers"></div>
+    </section>
+
+    <section class="card s2">
+      <div class="head"><span class="emo" aria-hidden="true">🛡️</span><h2>Mes réflexes anti-bobards</h2></div>
+      <div class="meter">
+        <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 6</span></div>
+        <div class="track"><div class="fill" id="chkFill"></div></div>
+      </div>
+      <div class="check" id="check">
+        <label><input type="checkbox" id="c1"><span>Je demande d'où vient l'information.</span></label>
+        <label><input type="checkbox" id="c2"><span>Je vérifie les chiffres, les dates et les noms.</span></label>
+        <label><input type="checkbox" id="c3"><span>Je donne mes propres documents.</span></label>
+        <label><input type="checkbox" id="c4"><span>J'écris : « Si tu ne sais pas, dis-le. »</span></label>
+        <label><input type="checkbox" id="c5"><span>Je pose la question autrement, pour comparer.</span></label>
+        <label><input type="checkbox" id="c6"><span>Santé, argent, droit : je demande aussi à un humain.</span></label>
+      </div>
+    </section>
+
+    <section class="card s2 retenir">
+      <div class="head"><span class="emo" aria-hidden="true">🧠</span><h2>À retenir</h2></div>
+      <ul>
+        <li><span>L'IA peut inventer des faits, des chiffres ou des noms. Ça s'appelle une hallucination.</span></li>
+        <li><span>Donne-lui des documents ou la recherche web. Le risque baisse beaucoup.</span></li>
+        <li><span>Pour une info importante : vérifie toujours la source.</span></li>
+      </ul>
+    </section>
+
+  </div>
+  <footer class="foot">
+    <nav class="series" aria-label="Les 5 fiches"><strong>Comprendre l’IA en 5 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-modele-effort.html">2 Modèle et effort</a><a aria-current="page">3 Hallucinations</a><a href="4-boite-outils.html">4 Les outils Claude</a><a href="5-forfait-api.html">5 Forfait ou API</a></nav>
+    <span>Le pourcentage est une estimation pour comprendre. Le vrai risque dépend du modèle et de la question.</span>
+  </footer>
+</main>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const fmt = (n, d = 0) => n.toLocaleString("fr-FR", { maximumFractionDigits: d, minimumFractionDigits: d });
+function paintRange(r) {
+  r.style.setProperty("--p", ((r.value - r.min) / (r.max - r.min)) * 100 + "%");
+}
+function initRanges() {
+  $$('input[type="range"]').forEach((r) => { r.addEventListener("input", () => paintRange(r)); paintRange(r); });
+}
+// Groupe de boutons à choix unique : <div class="seg" data-name="x"><button data-v="..">
+function initSeg(el, onChange) {
+  const btns = $$("button", el);
+  btns.forEach((b) => b.addEventListener("click", () => {
+    btns.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    onChange(b.dataset.v);
+  }));
+  const cur = btns.find((b) => b.getAttribute("aria-pressed") === "true") || btns[0];
+  return cur.dataset.v;
+}
+
+
+const LEVELS = [
+  { name: "Un fait très connu", base: 5, q: "Combien de jours y a-t-il dans une semaine ?",
+    good: [["Il y a 7 jours dans une semaine.", "ok"]],
+    mixed: [["Il y a 7 jours dans une semaine.", "ok"], ["On dit que ce chiffre vient de la Lune.", "warn"]],
+    bad: [["Il y a 7 jours dans une semaine.", "ok"], ["Le dimanche a été ajouté en 1820 par un roi.", "bad"]] },
+  { name: "Un sujet courant", base: 22, q: "Comment faire une pâte à crêpes ?",
+    good: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Ajoute une pincée de sel.", "ok"], ["Laisse reposer la pâte si tu as le temps.", "ok"]],
+    mixed: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Ajoute de la vanille : c'est la recette officielle.", "warn"]],
+    bad: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Les crêpes ont été inventées en 1534 par le cuisinier du roi.", "bad"]] },
+  { name: "Un détail précis", base: 45, q: "À quelle page de mon livre se trouve cette citation ?",
+    sourced: [["D'après ton document, la citation est à la page 87.", "ok"], ["Voici la phrase exacte, pour que tu vérifies.", "ok"]],
+    good: [["Je ne peux pas connaître la page exacte.", "ok"], ["Elle change selon l'édition du livre.", "ok"]],
+    mixed: [["La citation se trouve sans doute vers le chapitre 3.", "warn"], ["Vérifie dans ton édition.", "ok"]],
+    bad: [["La citation est à la page 142, ligne 12.", "bad"], ["C'est dans l'édition de 1998.", "bad"]] },
+  { name: "Un sujet rare ou local", base: 70, q: "Qui a fondé le club de foot de mon village ?",
+    sourced: [["D'après la source, le club a été fondé par un groupe d'habitants.", "ok"], ["La date exacte est écrite dans le document.", "ok"]],
+    mixed: [["Le club a sans doute été créé par des habitants.", "warn"], ["Je n'ai pas trouvé la date exacte.", "ok"]],
+    bad: [["Le club a été fondé en 1952 par Marcel Dupont.", "bad"], ["Il a gagné 3 coupes régionales.", "bad"]] },
+  { name: "Un fait très récent", base: 88, q: "Qui a gagné le match d'hier soir ?",
+    sourced: [["D'après le site de résultats consulté ce matin, l'équipe locale a gagné.", "ok"], ["Voici le lien pour vérifier le score.", "ok"]],
+    mixed: [["Je ne connais pas les résultats d'hier.", "ok"], ["Mais l'équipe locale gagne souvent à domicile.", "warn"]],
+    bad: [["L'équipe locale a gagné 3 à 1.", "bad"], ["Le numéro 10 a marqué deux buts.", "bad"]] },
+];
+const IDK = [["Je ne sais pas.", "ok"], ["Je n'ai pas d'information fiable sur ce sujet.", "ok"], ["Tu peux vérifier auprès d'une source officielle.", "ok"]];
+
+const ids = ["level", "doc", "web", "idk", "src", "crea"];
+function readState() {
+  return {
+    level: +$("#level").value, doc: $("#doc").checked, web: $("#web").checked,
+    idk: $("#idk").checked, src: $("#src").checked, crea: +$("#crea").value,
+  };
+}
+function factors(s) {
+  return {
+    doc: 0.35,
+    web: s.level === 4 ? 0.25 : 0.55,
+    idk: 0.7,
+    src: 0.8,
+    crea: 0.85 + (s.crea / 100) * 0.6,
+  };
+}
+function riskOf(s) {
+  const f = factors(s);
+  let r = LEVELS[s.level].base;
+  if (s.doc) r *= f.doc;
+  if (s.web) r *= f.web;
+  if (s.idk) r *= f.idk;
+  if (s.src) r *= f.src;
+  r *= f.crea;
+  return Math.round(Math.max(2, Math.min(95, r)));
+}
+function pickAnswer(s, risk) {
+  const L = LEVELS[s.level];
+  const sourced = s.doc || s.web;
+  if (risk < 30) return (sourced && L.sourced) || L.good || L.sourced || IDK;
+  if (s.idk) return IDK;
+  if (risk < 60) return L.mixed;
+  return L.bad;
+}
+
+function render() {
+  const s = readState();
+  const risk = riskOf(s);
+  const cls = risk < 30 ? "ok" : risk < 60 ? "warn" : "bad";
+  $("#vLevel").textContent = LEVELS[s.level].name;
+  $("#vCrea").textContent = s.crea < 34 ? "Des faits" : s.crea < 67 ? "Un peu des deux" : "De l'imagination";
+
+  const fg = $("#ringFg");
+  fg.setAttribute("class", "fg " + cls);
+  fg.setAttribute("stroke-dashoffset", String(314.16 * (1 - risk / 100)));
+  $("#ringTxt").textContent = risk + " %";
+  const pill = $("#riskPill");
+  pill.className = "pill " + cls;
+  pill.textContent = cls === "ok" ? "✅ Risque faible" : cls === "warn" ? "⚠️ Risque moyen" : "❌ Risque élevé";
+
+  $("#question").textContent = "« " + LEVELS[s.level].q + " »";
+  $("#answer").replaceChildren(...pickAnswer(s, risk).map(([t, c]) => {
+    const e = document.createElement("span"); e.className = "sent " + c; e.textContent = t; return e;
+  }));
+
+  const f = factors(s);
+  const rows = [
+    { key: "doc", label: "📎 Donner un document", v: 1 - f.doc },
+    { key: "web", label: "🌐 Activer la recherche web", v: 1 - f.web },
+    { key: "idk", label: "🙋 Autoriser « je ne sais pas »", v: 1 - f.idk },
+    { key: "src", label: "🔗 Demander les sources", v: 1 - f.src },
+  ];
+  const up = f.crea - 1;
+  const box = $("#levers");
+  box.replaceChildren(...rows.map((r) => lever(r.label, "− " + Math.round(r.v * 100) + " %", r.v, s[r.key] ? "on" : "")));
+  box.appendChild(up >= 0
+    ? lever("🎨 Demander de l'imagination", "+ " + Math.round(up * 100) + " %", up, "up")
+    : lever("🎯 Demander des faits précis", "− " + Math.round(-up * 100) + " %", -up, "on"));
+}
+function lever(label, val, ratio, cls) {
+  const d = document.createElement("div");
+  d.className = "lever " + cls;
+  d.innerHTML = `<div class="meter-top"><span></span><span></span></div><div class="track"><div class="fill"></div></div>`;
+  const spans = d.querySelectorAll(".meter-top span");
+  spans[0].textContent = label; spans[1].textContent = val;
+  d.querySelector(".fill").style.width = Math.max(3, ratio * 100) + "%";
+  return d;
+}
+
+function renderCheck() {
+  const n = $$("#check input:checked").length;
+  $("#chkTxt").textContent = n + " sur 6" + (n === 6 ? " 🎉" : "");
+  $("#chkFill").style.width = (n / 6) * 100 + "%";
+}
+
+ids.forEach((id) => $("#" + id).addEventListener("input", render));
+$$("#check input").forEach((c) => c.addEventListener("change", renderCheck));
+initRanges();
+render();
+renderCheck();
+</script>

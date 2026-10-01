@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Boîte à Outils Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Bento : grille de 4 colonnes. Une carte « hero » pleine couleur, les autres en cartes sombres. */
+:root {
+  --bg: #0B0B12;
+  --surface: #15151F;
+  --surface-2: #1F1F2C;
+  --line: #2B2B3C;
+  --fg: #F3F3F8;
+  --muted: #A6A6BA;
+  --ok: #3DDC84;
+  --warn: #FFC233;
+  --bad: #FF5C5C;
+  --on-accent: #0B0B12;
+  --accent-text: var(--accent);
+  --font-display: "Archivo Black", "Arial Black", Impact, system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", Roboto, system-ui, sans-serif;
+  --radius: 22px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
+    --fg: #12121A; --muted: #55556B; --ok: #0F7A45; --warn: #8A5A00; --bad: #C42626;
+    --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
+  --fg: #12121A; --muted: #55556B; --ok: #0F7A45; --warn: #8A5A00; --bad: #C42626;
+  --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 18px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; }
+.bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 24px; min-width: 0; display: flex; flex-direction: column; gap: 16px;
+}
+.s2 { grid-column: span 2; } .s3 { grid-column: span 3; } .s4 { grid-column: span 4; }
+@media (max-width: 900px) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .s1, .s3, .s4 { grid-column: span 2; }
+  .s2 { grid-column: span 1; }
+}
+@media (max-width: 640px) {
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .s1, .s2, .s3, .s4 { grid-column: span 1; }
+  .card { padding: 18px; }
+}
+
+/* Hero : la couleur dominante */
+.hero { background: var(--accent); color: var(--on-accent); border: none; }
+.hero .eyebrow { color: var(--on-accent); opacity: .7; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; align-items: end; }
+@media (max-width: 760px) { .hero-grid { grid-template-columns: minmax(0, 1fr); } }
+.word-card {
+  background: color-mix(in oklab, var(--on-accent) 9%, transparent);
+  border: 2px solid var(--on-accent); border-radius: 18px; padding: 18px;
+  display: grid; gap: 6px;
+}
+.word-card strong { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1; }
+.word-card p { font-weight: 700; }
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.02; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h1 { font-size: clamp(2.7rem, 8vw, 5.6rem); text-transform: uppercase; letter-spacing: -.02em; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.15rem; }
+.eyebrow { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.lead { font-size: 1.3rem; font-weight: 700; line-height: 1.35; max-width: 34ch; margin: 0; }
+p { margin: 0; max-width: 65ch; }
+.muted { color: var(--muted); }
+.small { font-size: .9rem; }
+.big { font-family: var(--font-display); font-size: clamp(2.3rem, 5vw, 3.4rem); line-height: 1; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.emo { font-size: 1.6rem; line-height: 1; }
+
+/* Réglages */
+.ctl { display: grid; gap: 10px; font-weight: 700; }
+.ctl-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.ctl-val { font-family: var(--font-display); color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.ctl-ends { display: flex; justify-content: space-between; gap: 12px; font-size: .85rem; color: var(--muted); font-weight: 400; }
+input[type="range"] {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 12px; margin: 8px 0;
+  border-radius: 99px; cursor: pointer;
+  background: linear-gradient(to right, var(--accent) var(--p, 50%), var(--surface-2) var(--p, 50%));
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--fg); border: 5px solid var(--accent); box-shadow: 0 0 0 4px var(--bg);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--fg); border: 5px solid var(--accent); box-shadow: 0 0 0 4px var(--bg);
+}
+textarea, input[type="number"], input[type="text"] {
+  width: 100%; background: var(--surface-2); color: var(--fg);
+  border: 2px solid var(--line); border-radius: 14px; padding: 12px 14px; font: inherit;
+}
+textarea { resize: vertical; min-height: 96px; }
+textarea:focus, input[type="number"]:focus, input[type="text"]:focus { border-color: var(--accent); outline: none; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.seg { display: flex; flex-wrap: wrap; gap: 6px; background: var(--surface-2); padding: 5px; border-radius: 14px; }
+.seg button {
+  flex: 1 1 auto; border: 0; background: transparent; color: var(--fg); font: inherit; font-weight: 700;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer; min-height: 44px;
+}
+.seg button:hover { background: var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.sw {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 12px 14px; background: var(--surface-2); border-radius: 14px; cursor: pointer; font-weight: 700;
+}
+.sw input {
+  -webkit-appearance: none; appearance: none; flex: none; margin: 0;
+  width: 54px; height: 30px; border-radius: 99px; background: var(--line);
+  position: relative; cursor: pointer; transition: background .2s;
+}
+.sw input::after {
+  content: ""; position: absolute; top: 4px; left: 4px; width: 22px; height: 22px;
+  border-radius: 50%; background: var(--fg); transition: transform .2s;
+}
+.sw input:checked { background: var(--accent); }
+.sw input:checked::after { transform: translateX(24px); background: var(--on-accent); }
+
+.btn {
+  border: 2px solid var(--line); background: var(--surface-2); color: var(--fg);
+  font: inherit; font-weight: 700; padding: 10px 16px; border-radius: 12px; cursor: pointer; min-height: 44px;
+}
+.btn:hover { border-color: var(--accent); }
+
+/* Jauges */
+.meter { display: grid; gap: 6px; }
+.meter-top { display: flex; justify-content: space-between; gap: 12px; font-weight: 700; }
+.track { height: 16px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.fill { height: 100%; width: 0; border-radius: 99px; background: var(--accent); transition: width .45s ease; }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 99px;
+  font-weight: 700; font-size: .95rem; background: var(--surface-2); color: var(--fg);
+}
+.pill.ok { background: color-mix(in oklab, var(--ok) 18%, transparent); color: var(--ok); }
+.pill.warn { background: color-mix(in oklab, var(--warn) 18%, transparent); color: var(--warn); }
+.pill.bad { background: color-mix(in oklab, var(--bad) 18%, transparent); color: var(--bad); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
+.stat { background: var(--surface-2); border-radius: 16px; padding: 14px; display: grid; gap: 2px; }
+.stat b { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; line-height: 1.05; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.stat span { font-size: .9rem; color: var(--muted); }
+
+/* À retenir */
+.retenir { background: var(--surface-2); }
+.retenir ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; counter-reset: r; }
+.retenir li { counter-increment: r; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: start; font-weight: 700; }
+.retenir li::before {
+  content: counter(r); font-family: var(--font-display); background: var(--accent); color: var(--on-accent);
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .95rem;
+}
+
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.foot { margin-top: 28px; display: grid; gap: 6px; color: var(--muted); font-size: .9rem; }
+.foot strong { color: var(--fg); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+.series { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.series a { color: var(--fg); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--accent); }
+.series a:hover { color: var(--accent-text); }
+.series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
+
+:root { --accent: #00E5FF; }
+
+.switches { display: grid; gap: 8px; }
+.winner { display: grid; gap: 6px; }
+.winner .big { font-size: clamp(2.6rem, 6vw, 4rem); }
+.score .fill { background: var(--muted); }
+.score.top .fill { background: var(--accent); }
+
+.cmp th.hl, .cmp td.hl { background: color-mix(in oklab, var(--accent) 14%, transparent); }
+.cmp thead th.hl { color: var(--accent-text); }
+.cmp thead th { font-family: var(--font-display); font-size: 1.15rem; text-transform: none; letter-spacing: 0; color: var(--fg); }
+.cmp thead th:first-child { font-family: var(--font-body); font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.cmp tbody th { font-size: .78rem; width: 18%; }
+.cmp td { min-width: 180px; }
+
+.kitchen { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .kitchen { grid-template-columns: minmax(0, 1fr); } }
+.piece {
+  text-align: left; font: inherit; color: var(--fg); cursor: pointer;
+  background: var(--surface-2); border: 2px dashed var(--line); border-radius: 18px; padding: 18px;
+  display: grid; gap: 8px; align-content: start;
+}
+.piece:hover { border-color: var(--accent); }
+.piece[aria-pressed="true"] { border-style: solid; border-color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, var(--surface-2)); }
+.piece .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.piece .ic { font-size: 2rem; }
+.piece .nm { font-family: var(--font-display); font-size: 1.4rem; }
+.piece .meta { font-weight: 700; color: var(--accent-text); }
+.piece .state { font-size: .8rem; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: var(--line); }
+.piece[aria-pressed="true"] .state { background: var(--accent); color: var(--on-accent); }
+.can { background: var(--surface-2); border-radius: 18px; padding: 18px; display: grid; gap: 10px; }
+.can ul { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 8px; }
+.can li { font-weight: 700; }
+.can .ex { font-style: italic; color: var(--muted); }
+
+.quiz { display: grid; gap: 14px; }
+.qi { display: grid; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.qi:last-child { border-bottom: 0; padding-bottom: 0; }
+.qi p { font-weight: 700; }
+.qi .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.qi .btn.good { background: color-mix(in oklab, var(--ok) 22%, var(--surface-2)); border-color: var(--ok); }
+.qi .btn.wrong { background: color-mix(in oklab, var(--bad) 22%, var(--surface-2)); border-color: var(--bad); }
+.qi .fb { font-size: .95rem; min-height: 1.5em; }
+</style>
+
+<main class="wrap">
+  <div class="bento">
+
+    <section class="card hero s4">
+      <div class="hero-grid">
+        <div class="ctl">
+          <span class="eyebrow">Comprendre l'IA · Fiche 4 sur 5</span>
+          <h1>La Boîte<br>à Outils Claude</h1>
+          <p class="lead">Chat, Cowork ou Code ? Projet, Skill ou Connecteur ? Trouve le bon outil pour ton besoin.</p>
+        </div>
+        <div class="word-card">
+          <span class="eyebrow">En résumé</span>
+          <strong>3 façons</strong>
+          <p>d'utiliser Claude : Chat, Cowork, Code.</p>
+          <strong>3 bonus</strong>
+          <p>pour l'aider : Projet, Skill, Connecteur.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card s2">
+      <div class="head"><span class="emo" aria-hidden="true">🧭</span><h2>Quel Claude pour moi ?</h2></div>
+      <p class="muted">Coche ce qui te ressemble.</p>
+      <div class="switches">
+        <label class="sw" for="q1"><span>💬 Je veux poser des questions, écrire, réfléchir</span><input type="checkbox" id="q1"></label>
+        <label class="sw" for="q2"><span>📁 Claude doit ouvrir et ranger des fichiers de mon ordinateur</span><input type="checkbox" id="q2" checked></label>
+        <label class="sw" for="q3"><span>🏃 Claude doit faire une longue tâche tout seul</span><input type="checkbox" id="q3" checked></label>
+        <label class="sw" for="q4"><span>🛠️ Je veux créer ou modifier un logiciel, un site, une appli</span><input type="checkbox" id="q4"></label>
+      </div>
+    </section>
+
+    <section class="card s2">
+      <div class="head"><span class="emo" aria-hidden="true">🎯</span><h2>Ma recommandation</h2></div>
+      <div class="winner">
+        <span class="eyebrow">Utilise plutôt</span>
+        <span class="big" id="winName" aria-live="polite">Cowork</span>
+        <p id="winTxt"></p>
+      </div>
+      <div class="meter score" id="scChat"><div class="meter-top"><span>💬 Chat</span><span></span></div><div class="track"><div class="fill"></div></div></div>
+      <div class="meter score" id="scCowork"><div class="meter-top"><span>🤝 Cowork</span><span></span></div><div class="track"><div class="fill"></div></div></div>
+      <div class="meter score" id="scCode"><div class="meter-top"><span>👩‍💻 Code</span><span></span></div><div class="track"><div class="fill"></div></div></div>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true">📋</span><h2>Chat, Cowork, Code : les différences</h2></div>
+      <div class="tbl-wrap">
+        <table class="cmp" id="cmp">
+          <thead><tr><th></th><th data-col="chat">💬 Chat</th><th data-col="cowork">🤝 Cowork</th><th data-col="code">👩‍💻 Code</th></tr></thead>
+          <tbody>
+            <tr><th>C'est quoi ?</th><td data-col="chat">Une conversation. Tu demandes, Claude répond.</td><td data-col="cowork">Claude fait une tâche de bureau à ta place, en plusieurs étapes.</td><td data-col="code">Claude écrit du code, le teste et lance des commandes.</td></tr>
+            <tr><th>Pour qui ?</th><td data-col="chat">Tout le monde.</td><td data-col="cowork">Ceux qui veulent déléguer des tâches.</td><td data-col="code">Les développeurs et les curieux du numérique.</td></tr>
+            <tr><th>Où ?</th><td data-col="chat">Site web, appli mobile, appli ordinateur.</td><td data-col="cowork">Appli Claude sur ordinateur.</td><td data-col="code">Terminal, éditeur de code, appli ordinateur, web.</td></tr>
+            <tr><th>Claude peut toucher</th><td data-col="chat">Ce que tu écris et les fichiers que tu envoies.</td><td data-col="cowork">Un dossier de ton ordinateur que tu choisis.</td><td data-col="code">Les fichiers d'un projet et le terminal.</td></tr>
+            <tr><th>Exemple</th><td data-col="chat">« Aide-moi à écrire un mail à mon propriétaire. »</td><td data-col="cowork">« Range mes factures et fais-en un tableau. »</td><td data-col="code">« Ajoute un bouton de connexion à mon site. »</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">Dans Cowork et Code, Claude te demande la permission avant les actions importantes.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true">🍳</span><h2>Projet, Skill, Connecteur : la cuisine de Claude</h2></div>
+      <p>Claude est le cuisinier. Clique pour lui donner des outils.</p>
+      <div class="kitchen">
+        <button type="button" class="piece" data-k="projet" aria-pressed="true">
+          <span class="top"><span class="ic" aria-hidden="true">🗂️</span><span class="state">Activé</span></span>
+          <span class="nm">Projet</span>
+          <span class="meta">= le plan de travail avec tes ingrédients</span>
+          <span>Un espace où tu ranges des documents et des consignes. Claude les garde pour toutes les conversations du projet.</span>
+        </button>
+        <button type="button" class="piece" data-k="skill" aria-pressed="false">
+          <span class="top"><span class="ic" aria-hidden="true">📜</span><span class="state">Désactivé</span></span>
+          <span class="nm">Skill</span>
+          <span class="meta">= la fiche recette</span>
+          <span>Une méthode écrite une fois. Claude la suit dès que la tâche correspond.</span>
+        </button>
+        <button type="button" class="piece" data-k="connecteur" aria-pressed="false">
+          <span class="top"><span class="ic" aria-hidden="true">🔌</span><span class="state">Désactivé</span></span>
+          <span class="nm">Connecteur</span>
+          <span class="meta">= la porte du frigo et du magasin</span>
+          <span>Un branchement vers tes outils : Gmail, Google Drive, agenda, Slack… Claude y lit ou agit, si tu l'autorises.</span>
+        </button>
+      </div>
+      <div class="can" aria-live="polite">
+        <strong>Avec ça, Claude peut :</strong>
+        <ul id="canList"></ul>
+        <p class="ex" id="canEx"></p>
+      </div>
+    </section>
+
+    <section class="card s2">
+      <div class="head"><span class="emo" aria-hidden="true">❓</span><h2>Mini-quiz</h2><span class="pill" id="quizScore">0 / 4</span></div>
+      <div class="quiz" id="quiz"></div>
+    </section>
+
+    <section class="card s2 retenir">
+      <div class="head"><span class="emo" aria-hidden="true">🧠</span><h2>À retenir</h2></div>
+      <ul>
+        <li><span>Chat pour parler. Cowork pour déléguer une tâche sur tes fichiers. Code pour créer des logiciels.</span></li>
+        <li><span>Projet = tes documents et consignes rangés au même endroit.</span></li>
+        <li><span>Skill = une méthode réutilisable. Connecteur = un accès à tes autres outils.</span></li>
+      </ul>
+    </section>
+
+  </div>
+  <footer class="foot">
+    <nav class="series" aria-label="Les 5 fiches"><strong>Comprendre l’IA en 5 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-modele-effort.html">2 Modèle et effort</a><a href="3-hallucinations.html">3 Hallucinations</a><a aria-current="page">4 Les outils Claude</a><a href="5-forfait-api.html">5 Forfait ou API</a></nav>
+    <span>Les fonctions disponibles changent selon ton abonnement et ton appareil.</span>
+  </footer>
+</main>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const fmt = (n, d = 0) => n.toLocaleString("fr-FR", { maximumFractionDigits: d, minimumFractionDigits: d });
+function paintRange(r) {
+  r.style.setProperty("--p", ((r.value - r.min) / (r.max - r.min)) * 100 + "%");
+}
+function initRanges() {
+  $$('input[type="range"]').forEach((r) => { r.addEventListener("input", () => paintRange(r)); paintRange(r); });
+}
+// Groupe de boutons à choix unique : <div class="seg" data-name="x"><button data-v="..">
+function initSeg(el, onChange) {
+  const btns = $$("button", el);
+  btns.forEach((b) => b.addEventListener("click", () => {
+    btns.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    onChange(b.dataset.v);
+  }));
+  const cur = btns.find((b) => b.getAttribute("aria-pressed") === "true") || btns[0];
+  return cur.dataset.v;
+}
+
+
+const PRODUCTS = {
+  chat:   { name: "Chat",   txt: "Une simple conversation suffit. Écris ta demande, Claude répond." },
+  cowork: { name: "Cowork", txt: "Claude travaille dans un dossier de ton ordinateur. Il fait la tâche en plusieurs étapes, et tu vérifies le résultat." },
+  code:   { name: "Code",   txt: "Claude lit le code de ton projet, le modifie et le teste. Idéal pour créer un site ou une appli." },
+};
+function renderChooser() {
+  const q = [1, 2, 3, 4].map((i) => $("#q" + i).checked);
+  const sc = { chat: 1, cowork: 0, code: 0 };
+  if (q[0]) sc.chat += 3;
+  if (q[1]) { sc.cowork += 3; sc.code += 1; }
+  if (q[2]) { sc.cowork += 2; sc.code += 2; }
+  if (q[3]) sc.code += 4;
+  const order = ["chat", "cowork", "code"];
+  const win = order.reduce((a, b) => (sc[b] > sc[a] ? b : a));
+  const max = Math.max(...Object.values(sc));
+  $("#winName").textContent = PRODUCTS[win].name;
+  $("#winTxt").textContent = q.some(Boolean) ? PRODUCTS[win].txt : "Rien de coché ? Commence par le Chat, c'est le plus simple.";
+  const el = { chat: "#scChat", cowork: "#scCowork", code: "#scCode" };
+  for (const k of order) {
+    const m = $(el[k]);
+    m.classList.toggle("top", k === win);
+    m.querySelector(".fill").style.width = Math.max(4, (sc[k] / max) * 100) + "%";
+    m.querySelector(".meter-top span:last-child").textContent = k === win ? "le plus adapté" : sc[k] / max >= 0.6 ? "possible" : "moins adapté";
+  }
+  $$("#cmp [data-col]").forEach((c) => c.classList.toggle("hl", c.dataset.col === win));
+}
+[1, 2, 3, 4].forEach((i) => $("#q" + i).addEventListener("change", renderChooser));
+
+const CAN = {
+  projet: "🗂️ Se souvenir de tes documents et de tes consignes, à chaque conversation du projet.",
+  skill: "📜 Suivre ta méthode, toujours de la même façon. Par exemple : faire un devis à ton format.",
+  connecteur: "🔌 Chercher ou envoyer des infos dans tes outils (mails, agenda, fichiers en ligne), si tu l'autorises.",
+};
+function renderKitchen() {
+  const on = $$(".piece").filter((p) => p.getAttribute("aria-pressed") === "true").map((p) => p.dataset.k);
+  $$(".piece").forEach((p) => { p.querySelector(".state").textContent = p.getAttribute("aria-pressed") === "true" ? "Activé" : "Désactivé"; });
+  const list = $("#canList");
+  list.replaceChildren(...(on.length ? on : ["none"]).map((k) => {
+    const li = document.createElement("li");
+    li.textContent = k === "none" ? "Seulement utiliser ce que tu écris dans la conversation." : CAN[k];
+    return li;
+  }));
+  $("#canEx").textContent = on.length === 3
+    ? "Exemple : « Prépare le compte-rendu de la réunion d'hier. Prends l'heure dans mon agenda, suis notre modèle habituel et appuie-toi sur les documents du projet. »"
+    : on.length ? "Active les 3 pour voir ce qu'ils font ensemble." : "Clique sur une carte pour l'activer.";
+}
+$$(".piece").forEach((p) => p.addEventListener("click", () => {
+  p.setAttribute("aria-pressed", String(p.getAttribute("aria-pressed") !== "true"));
+  renderKitchen();
+}));
+
+const QUIZ = [
+  { q: "Je veux que Claude lise mes mails Gmail.", a: "Connecteur", why: "Il faut un branchement vers Gmail." },
+  { q: "Je veux des comptes-rendus toujours faits avec le même plan.", a: "Skill", why: "C'est une méthode à réutiliser." },
+  { q: "J'écris un mémoire avec 10 PDF et des consignes à garder.", a: "Projet", why: "Les documents et les consignes restent rangés ensemble." },
+  { q: "Je veux que Claude ajoute un rendez-vous dans mon agenda.", a: "Connecteur", why: "Il faut un accès à ton agenda." },
+];
+const answered = new Map();
+function buildQuiz() {
+  const box = $("#quiz");
+  QUIZ.forEach((item, i) => {
+    const d = document.createElement("div"); d.className = "qi";
+    const p = document.createElement("p"); p.textContent = (i + 1) + ". " + item.q;
+    const opts = document.createElement("div"); opts.className = "opts";
+    const fb = document.createElement("span"); fb.className = "fb"; fb.setAttribute("aria-live", "polite");
+    ["Projet", "Skill", "Connecteur"].forEach((o) => {
+      const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = o;
+      b.addEventListener("click", () => {
+        $$("button", opts).forEach((x) => x.classList.remove("good", "wrong"));
+        const ok = o === item.a;
+        b.classList.add(ok ? "good" : "wrong");
+        fb.textContent = ok ? "✅ Bravo ! " + item.why : "❌ Pas tout à fait. Essaie encore.";
+        answered.set(i, ok);
+        $("#quizScore").textContent = [...answered.values()].filter(Boolean).length + " / 4";
+      });
+      opts.appendChild(b);
+    });
+    d.append(p, opts, fb); box.appendChild(d);
+  });
+}
+
+buildQuiz();
+renderChooser();
+renderKitchen();
+</script>

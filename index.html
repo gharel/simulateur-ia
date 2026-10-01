@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comprendre l'IA en 5 fiches</title>
+<meta name="description" content="5 fiches interactives et faciles à lire pour comprendre l'IA : tokens, modèles, hallucinations, outils et prix.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root {
+  --bg: #0B0B12; --surface: #15151F; --surface-2: #1F1F2C; --line: #2B2B3C;
+  --fg: #F3F3F8; --muted: #A6A6BA; --on-accent: #0B0B12;
+  --font-display: "Archivo Black", "Arial Black", Impact, system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", Roboto, system-ui, sans-serif;
+  --radius: 22px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
+    --fg: #12121A; --muted: #55556B; color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
+  --fg: #12121A; --muted: #55556B; color-scheme: light;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 18px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; }
+.bento { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
+.card {
+  border-radius: var(--radius); padding: 24px; min-width: 0;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.hero { grid-column: span 6; background: var(--surface); border: 1px solid var(--line); }
+.fiche {
+  grid-column: span 2; background: var(--accent); color: var(--on-accent);
+  text-decoration: none; transition: transform .2s ease;
+}
+.fiche:nth-of-type(n+4) { grid-column: span 3; }
+.fiche:hover { transform: translateY(-4px); }
+.fiche:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+@media (max-width: 900px) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero { grid-column: span 2; }
+  .fiche, .fiche:nth-of-type(n+4) { grid-column: span 1; }
+}
+@media (max-width: 640px) {
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .hero, .fiche, .fiche:nth-of-type(n+4) { grid-column: span 1; }
+  .card { padding: 18px; }
+}
+h1, h2 { font-family: var(--font-display); font-weight: 400; line-height: 1.02; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.5rem, 7vw, 5rem); text-transform: uppercase; letter-spacing: -.02em; }
+h2 { font-size: 1.6rem; }
+p { margin: 0; max-width: 60ch; }
+.eyebrow { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.fiche .eyebrow { color: var(--on-accent); opacity: .7; }
+.lead { font-size: 1.3rem; font-weight: 700; line-height: 1.35; }
+.fiche p { font-weight: 700; }
+.go { margin-top: auto; font-weight: 700; }
+.foot { margin-top: 28px; color: var(--muted); font-size: .9rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main class="wrap">
+  <div class="bento">
+    <section class="card hero">
+      <span class="eyebrow">Fiches interactives · Facile à lire</span>
+      <h1>Comprendre l'IA<br>en 5 fiches</h1>
+      <p class="lead">Des fiches courtes à manipuler. Bouge les curseurs, tape du texte, regarde le résultat.</p>
+    </section>
+
+    <a class="card fiche" href="1-tokens.html" style="--accent:#C6FF00">
+      <span class="eyebrow">Fiche 1</span>
+      <h2>Le Sac à Tokens</h2>
+      <p>L'IA lit des petits morceaux de texte : les tokens. Et chaque message relit toute la conversation.</p>
+      <span class="go">Ouvrir la fiche →</span>
+    </a>
+    <a class="card fiche" href="2-modele-effort.html" style="--accent:#FF2E93">
+      <span class="eyebrow">Fiche 2</span>
+      <h2>Le Bon Cerveau</h2>
+      <p>Une petite tâche n'a pas besoin d'un expert. Choisis le bon modèle et le bon effort.</p>
+      <span class="go">Ouvrir la fiche →</span>
+    </a>
+    <a class="card fiche" href="3-hallucinations.html" style="--accent:#FF6B00">
+      <span class="eyebrow">Fiche 3</span>
+      <h2>Le Détecteur de Bobards</h2>
+      <p>Parfois, l'IA invente. Apprends à repérer quand ça arrive.</p>
+      <span class="go">Ouvrir la fiche →</span>
+    </a>
+    <a class="card fiche" href="4-boite-outils.html" style="--accent:#00E5FF">
+      <span class="eyebrow">Fiche 4</span>
+      <h2>La Boîte à Outils Claude</h2>
+      <p>Chat, Cowork ou Code ? Projet, Skill ou Connecteur ? Trouve le bon outil.</p>
+      <span class="go">Ouvrir la fiche →</span>
+    </a>
+    <a class="card fiche" href="5-forfait-api.html" style="--accent:#B14EFF">
+      <span class="eyebrow">Fiche 5</span>
+      <h2>Forfait ou Compteur ?</h2>
+      <p>Payer un prix fixe chaque mois, ou payer à chaque token ? Fais le calcul.</p>
+      <span class="go">Ouvrir la fiche →</span>
+    </a>
+  </div>
+  <p class="foot">Chiffres arrondis, pour comprendre. Ce ne sont pas des mesures exactes.</p>
+</main>
