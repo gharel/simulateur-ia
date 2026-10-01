@@ -191,6 +191,53 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
+/* Parcours : devine d'abord, défi final, badge, mode atelier (même bloc dans chaque fiche) */
+.guess { background: var(--surface-2); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; box-shadow: inset 4px 0 0 var(--accent); }
+.guess p, .qi p { font-weight: 700; overflow-wrap: anywhere; }
+.locked { filter: blur(7px); opacity: .5; user-select: none; }
+.unlocking { transition: filter .5s ease, opacity .5s ease; }
+.quiz { display: grid; gap: 12px; }
+.challenge .quiz { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 900px) { .challenge .quiz { grid-template-columns: minmax(0, 1fr); } }
+.qi { background: var(--surface-2); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; }
+.qbtns { display: flex; flex-wrap: wrap; gap: 6px; }
+.qbtns button {
+  flex: 1 1 auto; border: 2px solid var(--line); background: var(--surface); color: var(--fg);
+  font: inherit; font-weight: 700; font-size: .9rem; padding: 8px 10px; border-radius: 10px; cursor: pointer; min-height: 44px;
+}
+.qbtns button:hover { border-color: var(--accent); }
+.qbtns button.picked { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 22%, var(--surface)); }
+.qbtns button.right { border-color: var(--ok); background: color-mix(in oklab, var(--ok) 18%, var(--surface)); }
+.qbtns button.wrong { border-color: var(--bad); background: color-mix(in oklab, var(--bad) 18%, var(--surface)); }
+.qfb { font-size: .95rem; }
+.qfb:empty, .result:empty { display: none; }
+.reveal { justify-self: start; align-self: flex-start; }
+.challenge { border: 2px solid var(--accent); }
+.prize { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.prize-txt { display: grid; gap: 2px; flex: 1 1 220px; }
+.badge {
+  flex: none; width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 2.2rem;
+  background: var(--surface-2); filter: grayscale(1); opacity: .55; transition: transform .4s ease, filter .4s, opacity .4s;
+}
+.badge.won { background: var(--accent); filter: none; opacity: 1; transform: rotate(-10deg) scale(1.05); }
+.stars { font-size: 1.6rem; letter-spacing: .08em; color: var(--warn); }
+.result { padding: 14px 16px; border-radius: 14px; font-weight: 700; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
+.next {
+  background: var(--accent); color: var(--on-accent); border: none; text-decoration: none;
+  flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; transition: transform .2s ease;
+}
+.next:hover { transform: translateY(-3px); }
+.next:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+.next .eyebrow { color: var(--on-accent); opacity: .7; }
+.next strong { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 4vw, 2.2rem); line-height: 1.05; }
+.next .emo { font-size: 2.4rem; }
+.foot .btn { justify-self: start; }
+.confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+.confetti span { position: absolute; top: -48px; font-size: 1.8rem; animation: fall 2.2s cubic-bezier(.3, .6, .6, 1) forwards; }
+@keyframes fall { to { transform: translateY(115vh) rotate(600deg); } }
+:root[data-mode="atelier"] body { font-size: 21px; }
+:root[data-mode="atelier"] .wrap { max-width: 1440px; }
+
 :root { --accent: #FF2E93; }
 
 .models { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
@@ -217,6 +264,24 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
 .analogy { display: grid; gap: 10px; }
 .analogy div { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 10px; align-items: center; }
 .analogy span:first-child { font-size: 1.7rem; text-align: center; }
+
+/* Jeu : mission budget */
+.mis { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
+@media (max-width: 900px) { .mis { grid-template-columns: minmax(0, 1fr); } }
+.mis-col { display: grid; gap: 14px; align-content: start; }
+.mis-card { background: var(--surface-2); border-radius: 16px; padding: 18px; display: grid; gap: 14px; box-shadow: inset 4px 0 0 var(--accent); }
+.mis-card .seg { background: var(--surface); }
+.mis-task { font-family: var(--font-display); font-size: 1.4rem; line-height: 1.15; }
+.mis-play { display: grid; gap: 14px; }
+.mis-play[hidden] { display: none; }
+.mis-card .btn { justify-self: start; }
+.btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.seg.off { opacity: .45; pointer-events: none; }
+.log { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.log li { padding: 10px 12px; border-radius: 10px; background: var(--surface-2); font-weight: 700; font-size: .95rem; }
+.log li.ok { box-shadow: inset 4px 0 0 var(--ok); }
+.log li.warn { box-shadow: inset 4px 0 0 var(--warn); }
+.log li.bad { box-shadow: inset 4px 0 0 var(--bad); }
 </style>
 
 <main class="wrap">
@@ -300,6 +365,52 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
       <div class="reco" id="reco"></div>
     </section>
 
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true">💰</span><h2>Jeu : mission budget</h2><span class="pill" id="misScore">0 / 5</span></div>
+      <p>5 tâches arrivent l'une après l'autre. Pour chacune, choisis un modèle et un effort, puis lance.
+        <strong>Réussis chaque tâche en dépensant le moins possible.</strong> Si c'est raté, tu paies quand même, et tu recommences.</p>
+      <div class="mis">
+        <div class="mis-col">
+          <div class="mis-card" id="misCard" tabindex="-1">
+            <span class="eyebrow" id="misStep"></span>
+            <span class="mis-task" id="misTask"></span>
+            <span class="small" id="misNeed"></span>
+            <div class="mis-play" id="misPlay">
+              <div class="ctl">
+                <span>Modèle</span>
+                <div class="seg" id="misModel" role="group" aria-label="Modèle pour la mission">
+                  <button type="button" data-v="haiku" aria-pressed="false">🐇 Haiku</button>
+                  <button type="button" data-v="sonnet" aria-pressed="true">🧑‍💼 Sonnet</button>
+                  <button type="button" data-v="opus" aria-pressed="false">🧑‍🔬 Opus</button>
+                </div>
+              </div>
+              <div class="ctl">
+                <span>Effort</span>
+                <div class="seg" id="misEffort" role="group" aria-label="Effort pour la mission">
+                  <button type="button" data-v="0" aria-pressed="false">Bas</button>
+                  <button type="button" data-v="1" aria-pressed="true">Moyen</button>
+                  <button type="button" data-v="2" aria-pressed="false">Haut</button>
+                  <button type="button" data-v="3" aria-pressed="false">Très haut</button>
+                  <button type="button" data-v="4" aria-pressed="false">Max</button>
+                </div>
+              </div>
+              <button type="button" class="btn go" id="misGo">🚀 Lancer la tâche</button>
+            </div>
+            <button type="button" class="btn" id="misAgain" hidden>↺ Rejouer</button>
+          </div>
+        </div>
+        <div class="mis-col">
+          <div class="stats">
+            <div class="stat"><b id="misSpent">0 $</b><span>dépensé</span></div>
+            <div class="stat"><b id="misMin">0 $</b><span>le moins cher possible</span></div>
+          </div>
+          <ol class="log" id="misLog" aria-live="polite"></ol>
+          <div class="result" id="misResult" aria-live="polite"></div>
+        </div>
+      </div>
+      <p class="small muted">Prix pour une tâche, avec les tarifs de l'API. La qualité est une estimation pour comprendre.</p>
+    </section>
+
     <section class="card s2">
       <div class="head"><span class="emo" aria-hidden="true">🗂️</span><h2>Les 3 modèles en bref</h2></div>
       <div class="tbl-wrap">
@@ -324,10 +435,28 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
       </ul>
     </section>
 
+    <section class="card s4 challenge" id="defi">
+      <div class="head"><span class="emo" aria-hidden="true">🏁</span><h2>Défi final</h2><span class="pill" id="defiScore"></span></div>
+      <div class="prize">
+        <span class="badge" id="badge" aria-hidden="true"></span>
+        <div class="prize-txt"><strong id="badgeName"></strong><span class="small muted" id="badgeTxt"></span></div>
+        <span class="stars" id="stars"></span>
+      </div>
+      <div class="quiz" id="defiQuiz"></div>
+      <div class="result" id="defiResult" aria-live="polite"></div>
+      <button type="button" class="btn reveal" id="defiReset">↺ Rejouer le défi</button>
+    </section>
+
+    <a class="card s4 next" href="3-hallucinations.html">
+      <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>3 · Le Détecteur de Bobards</strong></span>
+      <span class="emo" aria-hidden="true">→</span>
+    </a>
+
   </div>
   <footer class="foot">
     <nav class="series" aria-label="Les 6 fiches"><strong>Comprendre l’IA en 6 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a aria-current="page">2 Modèle et effort</a><a href="3-hallucinations.html">3 Hallucinations</a><a href="4-boite-outils.html">4 Les outils Claude</a><a href="5-forfait-api.html">5 Forfait ou API</a><a href="6-message-piege.html">6 Message piégé</a></nav>
     <span>Vitesse, qualité et temps sont des estimations pour comprendre, pas des mesures. Les prix sont les tarifs publics de l'API.</span>
+    <button type="button" class="btn" id="atelierBtn" aria-pressed="false">🎤 Mode atelier : non</button>
   </footer>
 </main>
 
@@ -351,6 +480,151 @@ function initSeg(el, onChange) {
   const cur = btns.find((b) => b.getAttribute("aria-pressed") === "true") || btns[0];
   return cur.dataset.v;
 }
+
+const FICHE = 2;
+// Parcours : progression gardée dans ce navigateur, mode atelier, devine d'abord, défi final (même bloc dans chaque fiche)
+const BADGES = { 1: ["🪙", "Maître des tokens"], 2: ["🧠", "Bon Cerveau"], 3: ["🕵️", "Détective anti-bobards"], 4: ["🧰", "As de la boîte à outils"], 5: ["🧮", "Pro du budget"], 6: ["🛡️", "Gardien anti-piège"] };
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+function loadProgress() { try { return JSON.parse(store.get("ia6:progress")) || {}; } catch { return {}; } }
+function saveProgress(n, stars) {
+  const p = loadProgress();
+  p[n] = Math.max(p[n] || 0, stars);
+  store.set("ia6:progress", JSON.stringify(p));
+}
+const atelierParam = new URLSearchParams(location.search).get("atelier");
+if (atelierParam !== null) store.set("ia6:atelier", atelierParam === "0" ? "0" : "1");
+const ATELIER = atelierParam !== null ? atelierParam !== "0" : store.get("ia6:atelier") === "1";
+if (ATELIER) document.documentElement.dataset.mode = "atelier";
+
+function h(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+function btn(label, cls = "") { const b = h("button", cls, label); b.type = "button"; return b; }
+const starsTxt = (n) => "★".repeat(n) + "☆".repeat(3 - n);
+
+// Une question à choix. En mode atelier, un clic choisit et « Révéler » corrige : le groupe répond d'abord.
+function ask(box, { q, options, a, why, onShow, good = "✅ Bravo ! ", bad = "❌ Pas tout à fait. " }) {
+  let pick = null, shown = false;
+  const group = h("div", "qbtns");
+  group.setAttribute("role", "group");
+  group.setAttribute("aria-label", q);
+  const bs = options.map(([v, label]) => {
+    const b = btn(label);
+    b.addEventListener("click", () => { pick = v; if (ATELIER && !shown) paint(); else show(); });
+    group.append(b);
+    return [v, b];
+  });
+  const rev = btn("👁️ Révéler la réponse", "btn reveal");
+  rev.addEventListener("click", show);
+  const fb = h("span", "qfb");
+  fb.setAttribute("aria-live", "polite");
+  function show() {
+    const first = !shown, refocus = document.activeElement === rev;
+    shown = true;
+    paint();
+    if (refocus) bs.find(([v]) => v === pick)[1].focus();
+    if (onShow) onShow(pick === a, first);
+  }
+  function paint() {
+    for (const [v, b] of bs) {
+      b.setAttribute("aria-pressed", String(v === pick));
+      b.classList.toggle("picked", !shown && v === pick);
+      b.classList.toggle("right", shown && v === a);
+      b.classList.toggle("wrong", shown && v === pick && v !== a);
+    }
+    rev.hidden = shown || pick === null;
+    fb.textContent = shown ? (pick === a ? good : bad) + (typeof why === "function" ? why() : why) : "";
+  }
+  box.replaceChildren(h("p", "", q), group, rev, fb);
+  paint();
+  return { reset() { pick = null; shown = false; paint(); } };
+}
+
+// Devine d'abord : les zones « lock » restent floues tant qu'on n'a pas répondu.
+function guess(box, { lock, q, ...opts }) {
+  const zones = [].concat(lock);
+  zones.forEach((z) => { z.classList.add("locked"); z.inert = true; });
+  box.classList.add("guess");
+  return ask(box, { ...opts, q: "🤔 Devine d'abord : " + q, good: "✅ Bien vu ! ", bad: "😮 Surprise ! ",
+    onShow() { zones.forEach((z) => { z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false; }); } });
+}
+
+function confetti(ic) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const box = h("div", "confetti");
+  box.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < 28; i++) {
+    const s = h("span", "", ["🎉", "⭐", ic, "✨"][i % 4]);
+    s.style.left = Math.random() * 96 + "%";
+    s.style.animationDelay = Math.random() * 0.7 + "s";
+    box.append(s);
+  }
+  document.body.append(box);
+  setTimeout(() => box.remove(), 3200);
+}
+
+// Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.
+function initDefi(items, options) {
+  const [ic, name] = BADGES[FICHE];
+  const total = items.length, firsts = new Map();
+  let record = loadProgress()[FICHE] || 0;
+  const box = $("#defiQuiz");
+  const asks = items.map((it, i) => {
+    const d = h("div", "qi");
+    box.append(d);
+    return ask(d, { ...it, q: `${i + 1}. ${it.q}`, options: it.options || options,
+      onShow(ok, first) { if (first) { firsts.set(i, ok); update(); } } });
+  });
+  function paintBadge() {
+    $("#badge").classList.toggle("won", record > 0);
+    $("#stars").textContent = record ? starsTxt(record) : "";
+    $("#stars").setAttribute("aria-label", record ? `Meilleur score : ${record} étoile${record > 1 ? "s" : ""} sur 3` : "");
+    $("#badgeTxt").textContent = record
+      ? "Badge gagné ! Rejoue quand tu veux pour améliorer ton score."
+      : `Réponds aux ${total} questions pour gagner ce badge. Seule ta 1re réponse compte pour les étoiles.`;
+  }
+  function update() {
+    $("#defiReset").hidden = false;
+    const good = [...firsts.values()].filter(Boolean).length;
+    $("#defiScore").textContent = `${good} / ${total}`;
+    if (firsts.size < total) return;
+    const stars = good === total ? 3 : good === total - 1 ? 2 : 1;
+    record = Math.max(record, stars);
+    saveProgress(FICHE, stars);
+    paintBadge();
+    $("#defiResult").textContent = stars === 3
+      ? `🎉 ${good} sur ${total} du premier coup ! Tu gagnes le badge ${ic} « ${name} » avec 3 étoiles.`
+      : `🎉 ${good} sur ${total} du premier coup. Tu gagnes le badge ${ic} « ${name} » avec ${stars} étoile${stars > 1 ? "s" : ""} sur 3. Rejoue pour viser 3 étoiles !`;
+    confetti(ic);
+  }
+  $("#badge").textContent = ic;
+  $("#badgeName").textContent = `${ic} Badge « ${name} »`;
+  $("#defiScore").textContent = `0 / ${total}`;
+  $("#defiReset").addEventListener("click", () => {
+    firsts.clear();
+    asks.forEach((a) => a.reset());
+    $("#defiScore").textContent = `0 / ${total}`;
+    $("#defiResult").textContent = "";
+    $("#defiReset").hidden = true;
+  });
+  $("#defiReset").hidden = true;
+  paintBadge();
+}
+
+// Mode atelier : texte plus gros, réponses révélées par l'animateur. Le réglage suit d'une fiche à l'autre.
+(function initAtelier() {
+  const b = $("#atelierBtn");
+  b.textContent = "🎤 Mode atelier : " + (ATELIER ? "oui" : "non");
+  b.setAttribute("aria-pressed", String(ATELIER));
+  b.addEventListener("click", () => { store.set("ia6:atelier", ATELIER ? "0" : "1"); location.search = ATELIER ? "atelier=0" : "atelier=1"; });
+  if (ATELIER) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?atelier=1$1"); });
+})();
 
 
 const MODELS = {
@@ -455,4 +729,80 @@ $("#effort").addEventListener("input", (e) => { st.effort = +e.target.value; ren
 st.task = +initSeg($("#segTask"), (v) => { st.task = +v; render(); });
 initRanges();
 render();
+
+// Jeu : mission budget. Une tâche compte « au meilleur prix » si elle est réussie du premier coup, à moins de 1,25 fois le minimum.
+const TASK_LABELS = $$("#segTask button").map((b) => b.textContent);
+const mis = { k: 0, model: "sonnet", effort: 1, tries: 0, spent: 0, min: 0, good: 0 };
+const cfgName = (mk, e) => MODELS[mk].name + (MODELS[mk].effort ? `, effort ${EFFORT[e].name.toLowerCase()}` : "");
+function renderMission() {
+  const done = mis.k === TASKS.length;
+  $("#misScore").textContent = `${mis.good} / ${TASKS.length}`;
+  $("#misSpent").textContent = mis.spent ? priceTxt(mis.spent) : "0 $";
+  $("#misMin").textContent = mis.min ? priceTxt(mis.min) : "0 $";
+  $("#misPlay").hidden = done;
+  $("#misAgain").hidden = !done;
+  $("#misEffort").classList.toggle("off", !MODELS[mis.model].effort);
+  if (done) {
+    $("#misStep").textContent = "Mission terminée";
+    $("#misTask").textContent = `🏁 ${mis.good} tâche${mis.good > 1 ? "s" : ""} sur ${TASKS.length} au meilleur prix`;
+    $("#misNeed").textContent = "";
+    $("#misResult").textContent = (mis.good === TASKS.length ? "🎉 Parfait ! " : "") +
+      `Tu as dépensé ${priceTxt(mis.spent)}. Le minimum était ${priceTxt(mis.min)}. ` +
+      "💡 Le savais-tu ? Pour créer une appli, Opus en effort moyen coûte moins cher que Sonnet en effort max : un modèle plus fort a besoin de moins réfléchir.";
+    if (mis.good === TASKS.length) confetti("💰");
+    return;
+  }
+  $("#misStep").textContent = `Tâche ${mis.k + 1} sur ${TASKS.length}` + (mis.tries ? ` · essai ${mis.tries + 1}` : "");
+  $("#misTask").textContent = TASK_LABELS[mis.k];
+  $("#misNeed").textContent = `Il faut une qualité d'au moins ${TASKS[mis.k].need} sur 100.`;
+  $("#misResult").textContent = "";
+}
+function launchMission() {
+  const t = TASKS[mis.k], r = evaluate(mis.model, mis.effort, mis.k), b = best(mis.k);
+  mis.spent += r.price;
+  const ok = r.quality >= t.need, ratio = r.price / b.r.price;
+  const head = `${TASK_LABELS[mis.k]} · ${cfgName(mis.model, mis.effort)} · ${priceTxt(r.price)} : `;
+  let li;
+  if (!ok) {
+    li = h("li", "bad", head + `❌ raté ! Qualité ${r.quality}, il fallait ${t.need}. Tu paies quand même. Essaie plus fort.`);
+    mis.tries++;
+  } else {
+    const top = ratio <= 1.25;
+    if (top && !mis.tries) mis.good++;
+    li = h("li", top ? "ok" : "warn", head + (top
+      ? (mis.tries ? "✅ réussi, au bon prix cette fois." : "🎯 réussi au meilleur prix !")
+      : `✅ réussi, mais ${fmt(ratio, ratio < 10 ? 1 : 0)} fois plus cher que nécessaire. Le moins cher : ${cfgName(b.mk, b.e)} (${priceTxt(b.r.price)}).`));
+    mis.min += b.r.price;
+    mis.k++;
+    mis.tries = 0;
+  }
+  $("#misLog").append(li);
+  renderMission();
+}
+mis.model = initSeg($("#misModel"), (v) => { mis.model = v; renderMission(); });
+mis.effort = +initSeg($("#misEffort"), (v) => { mis.effort = +v; });
+$("#misGo").addEventListener("click", launchMission);
+$("#misAgain").addEventListener("click", () => {
+  Object.assign(mis, { k: 0, tries: 0, spent: 0, min: 0, good: 0 });
+  $("#misLog").replaceChildren();
+  renderMission();
+  $("#misCard").focus();
+});
+renderMission();
+
+// Défi final
+initDefi([
+  { q: "Tu veux corriger les fautes d'un e-mail. Quel modèle ?", a: "haiku",
+    options: [["haiku", "🐇 Haiku"], ["sonnet", "🧑‍💼 Sonnet"], ["opus", "🧑‍🔬 Opus"]],
+    why: "Une tâche simple : le stagiaire rapide suffit. Il est rapide et pas cher." },
+  { q: "Ton appli a un bug très difficile à trouver. Que choisis-tu ?", a: "opus",
+    options: [["haiku", "Haiku"], ["sonnet", "Sonnet, effort moyen"], ["opus", "Opus, effort haut"]],
+    why: "Une tâche dure : l'expert, avec du temps pour réfléchir." },
+  { q: "Tu dois résumer 500 avis clients, chaque jour.", a: "haiku",
+    options: [["haiku", "Haiku"], ["opus", "Opus, effort max"]],
+    why: "Une tâche simple, en gros volume : Haiku coûte 4 fois moins cher qu'Opus, et il va plus vite." },
+  { q: "Monter l'effort, ça veut dire…", a: "think",
+    options: [["fast", "L'IA répond plus vite"], ["think", "L'IA réfléchit plus longtemps"], ["model", "On change de modèle"]],
+    why: "Plus d'effort = plus de tokens de réflexion. Plus lent et plus cher, mais utile pour les tâches difficiles." },
+]);
 </script>

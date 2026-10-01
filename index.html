@@ -10,7 +10,7 @@
 <style>
 :root {
   --bg: #0B0B12; --surface: #15151F; --surface-2: #1F1F2C; --line: #2B2B3C;
-  --fg: #F3F3F8; --muted: #A6A6BA; --on-accent: #0B0B12;
+  --fg: #F3F3F8; --muted: #A6A6BA; --on-accent: #0B0B12; --gold: #FFC233;
   --font-display: "Archivo Black", "Arial Black", Impact, system-ui, sans-serif;
   --font-body: "Atkinson Hyperlegible", "Segoe UI", Roboto, system-ui, sans-serif;
   --radius: 22px;
@@ -19,12 +19,12 @@
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
     --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
-    --fg: #12121A; --muted: #55556B; color-scheme: light;
+    --fg: #12121A; --muted: #55556B; --gold: #8A5A00; color-scheme: light;
   }
 }
 :root[data-theme="light"] {
   --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
-  --fg: #12121A; --muted: #55556B; color-scheme: light;
+  --fg: #12121A; --muted: #55556B; --gold: #8A5A00; color-scheme: light;
 }
 * { box-sizing: border-box; }
 body {
@@ -41,18 +41,19 @@ body {
 .hero { grid-column: span 6; background: var(--surface); border: 1px solid var(--line); }
 .fiche {
   grid-column: span 2; background: var(--accent); color: var(--on-accent);
-  text-decoration: none; transition: transform .2s ease;
+  text-decoration: none; transition: transform .2s ease; position: relative;
 }
 .fiche:hover { transform: translateY(-4px); }
 .fiche:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+.wide { grid-column: span 6; background: var(--surface); border: 1px solid var(--line); }
 @media (max-width: 900px) {
   .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .hero { grid-column: span 2; }
+  .hero, .wide { grid-column: span 2; }
   .fiche { grid-column: span 1; }
 }
 @media (max-width: 640px) {
   .bento { grid-template-columns: minmax(0, 1fr); }
-  .hero, .fiche { grid-column: span 1; }
+  .hero, .fiche, .wide { grid-column: span 1; }
   .card { padding: 18px; }
 }
 h1, h2 { font-family: var(--font-display); font-weight: 400; line-height: 1.02; margin: 0; text-wrap: balance; }
@@ -63,55 +64,278 @@ p { margin: 0; max-width: 60ch; }
 .fiche .eyebrow { color: var(--on-accent); opacity: .7; }
 .lead { font-size: 1.3rem; font-weight: 700; line-height: 1.35; }
 .fiche p { font-weight: 700; }
-.go { margin-top: auto; font-weight: 700; }
-.foot { margin-top: 28px; color: var(--muted); font-size: .9rem; }
+.go { margin-top: auto; font-weight: 700; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.foot { margin-top: 28px; color: var(--muted); font-size: .9rem; display: grid; gap: 10px; }
+.foot .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.small { font-size: .9rem; }
+.muted { color: var(--muted); }
+
+/* Parcours */
+.btn {
+  border: 2px solid var(--line); background: var(--surface-2); color: var(--fg); text-decoration: none;
+  font: inherit; font-weight: 700; padding: 10px 16px; border-radius: 12px; cursor: pointer; min-height: 44px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn:hover { border-color: var(--fg); }
+:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
+.btn.main { background: var(--fg); color: var(--bg); border-color: var(--fg); font-size: 1.1rem; padding: 12px 20px; }
+.progress { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.track { flex: 1 1 220px; height: 16px; border-radius: 99px; background: var(--surface-2); overflow: hidden; display: flex; }
+.track span { flex: 1; border-right: 3px solid var(--surface); transition: background .4s; }
+.track span:last-child { border-right: 0; }
+.fbadge {
+  position: absolute; top: 18px; right: 18px; width: 54px; height: 54px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 1.7rem; background: color-mix(in oklab, var(--on-accent) 12%, transparent);
+  filter: grayscale(1); opacity: .45;
+}
+.fbadge.won { background: var(--on-accent); filter: none; opacity: 1; transform: rotate(-10deg); }
+.fiche h2 { padding-right: 60px; }
+.fstars { letter-spacing: .06em; }
+
+/* Le permis */
+.lic-zone { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 24px; align-items: center; }
+@media (max-width: 900px) { .lic-zone { grid-template-columns: minmax(0, 1fr); } }
+.lic-side { display: grid; gap: 14px; align-content: start; }
+.lic-side label { display: grid; gap: 6px; font-weight: 700; }
+.lic-side input {
+  width: 100%; background: var(--surface-2); color: var(--fg); border: 2px solid var(--line);
+  border-radius: 14px; padding: 12px 14px; font: inherit;
+}
+.lic-side input:focus { border-color: var(--fg); outline: none; }
+.license {
+  position: relative; overflow: hidden; border-radius: 20px; padding: 28px 24px 22px;
+  background: #FBFAF4; color: #14141C; border: 2px solid #14141C; display: grid; gap: 14px;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.license::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 10px;
+  background: linear-gradient(90deg, #C6FF00 0 16.66%, #FF2E93 0 33.33%, #FF6B00 0 50%, #00E5FF 0 66.66%, #B14EFF 0 83.33%, #FFE600 0);
+}
+.license.locked .lic-body { filter: blur(3px); opacity: .55; }
+.lic-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; flex-wrap: wrap; }
+.lic-title { font-family: var(--font-display); font-size: clamp(1.4rem, 3.4vw, 2rem); line-height: 1; text-transform: uppercase; }
+.lic-kicker { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: #55556B; }
+.lic-photo { width: 64px; height: 64px; border-radius: 14px; background: #14141C; color: #FBFAF4; display: grid; place-items: center; font-size: 2rem; flex: none; }
+.lic-body { display: grid; gap: 14px; }
+.lic-fields { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; margin: 0; }
+.lic-fields dt { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #55556B; padding-top: 4px; }
+.lic-fields dd { margin: 0; font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; }
+.lic-fields dd.name { font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; line-height: 1.1; }
+.lic-badges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 640px) { .lic-badges { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.lic-badges div { border: 1.5px solid #D9D9E5; border-radius: 12px; padding: 8px 10px; display: grid; gap: 2px; font-size: .82rem; font-weight: 700; line-height: 1.25; }
+.lic-badges b { font-size: 1.4rem; }
+.lic-badges .st { color: #8A5A00; letter-spacing: .06em; }
+.lic-badges .off { opacity: .35; filter: grayscale(1); }
+.lock-msg {
+  position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px;
+  font-family: var(--font-display); font-size: 1.5rem; line-height: 1.15; color: #14141C;
+}
+.lock-msg[hidden] { display: none; }
+.lock-msg span { background: #FBFAF4; border: 2px solid #14141C; border-radius: 14px; padding: 12px 18px; }
+
+:root[data-mode="atelier"] body { font-size: 21px; }
+:root[data-mode="atelier"] .wrap { max-width: 1440px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/* À l'impression : seulement le permis */
+@media print {
+  @page { margin: 12mm; }
+  :root { color-scheme: light; }
+  html, body { background: #FFFFFF; }
+  .wrap { padding: 0; max-width: none; }
+  .bento > :not(#permis), .foot, #permis > :not(.lic-zone), .lic-side, .lock-msg { display: none !important; }
+  #permis { border: 0; padding: 0; background: none; }
+  .lic-zone { display: block; }
+  #license { max-width: 180mm; }
+}
 </style>
 
 <main class="wrap">
   <div class="bento">
     <section class="card hero">
-      <span class="eyebrow">Fiches interactives · Facile à lire</span>
+      <span class="eyebrow">Fiches interactives · Facile à lire · Environ 1 h 15 en tout</span>
       <h1>Comprendre l'IA<br>en 6 fiches</h1>
-      <p class="lead">Des fiches courtes à manipuler. Bouge les curseurs, tape du texte, regarde le résultat.</p>
+      <p class="lead">Des fiches courtes à manipuler. Bouge les curseurs, joue aux mini-jeux, réussis le défi final de chaque fiche.</p>
+      <p>Chaque défi réussi te donne un badge. Avec les 6 badges, tu gagnes ton <strong>permis de conduire l'IA</strong>.</p>
+      <div class="progress">
+        <div class="track" id="track" aria-hidden="true"></div>
+        <strong id="progTxt" aria-live="polite">0 badge sur 6</strong>
+      </div>
+      <div><a class="btn main" id="goOn" href="1-tokens.html">▶️ Commencer par la fiche 1</a></div>
     </section>
 
-    <a class="card fiche" href="1-tokens.html" style="--accent:#C6FF00">
+    <a class="card fiche" href="1-tokens.html" style="--accent:#C6FF00" data-n="1">
       <span class="eyebrow">Fiche 1</span>
       <h2>Le Sac à Tokens</h2>
       <p>L'IA lit des petits morceaux de texte : les tokens. Et chaque message relit toute la conversation.</p>
-      <span class="go">Ouvrir la fiche →</span>
+      <span class="go"><span>Ouvrir la fiche →</span><span class="fmeta" data-min="15"></span></span>
     </a>
-    <a class="card fiche" href="2-modele-effort.html" style="--accent:#FF2E93">
+    <a class="card fiche" href="2-modele-effort.html" style="--accent:#FF2E93" data-n="2">
       <span class="eyebrow">Fiche 2</span>
       <h2>Le Bon Cerveau</h2>
       <p>Une petite tâche n'a pas besoin d'un expert. Choisis le bon modèle et le bon effort.</p>
-      <span class="go">Ouvrir la fiche →</span>
+      <span class="go"><span>Ouvrir la fiche →</span><span class="fmeta" data-min="10"></span></span>
     </a>
-    <a class="card fiche" href="3-hallucinations.html" style="--accent:#FF6B00">
+    <a class="card fiche" href="3-hallucinations.html" style="--accent:#FF6B00" data-n="3">
       <span class="eyebrow">Fiche 3</span>
       <h2>Le Détecteur de Bobards</h2>
       <p>Parfois, l'IA invente. Parfois, elle te donne raison trop vite. Apprends à le repérer.</p>
-      <span class="go">Ouvrir la fiche →</span>
+      <span class="go"><span>Ouvrir la fiche →</span><span class="fmeta" data-min="15"></span></span>
     </a>
-    <a class="card fiche" href="4-boite-outils.html" style="--accent:#00E5FF">
+    <a class="card fiche" href="4-boite-outils.html" style="--accent:#00E5FF" data-n="4">
       <span class="eyebrow">Fiche 4</span>
       <h2>La Boîte à Outils Claude</h2>
       <p>Chat, Cowork ou Code ? Projet, Skill ou Connecteur ? Trouve le bon outil.</p>
-      <span class="go">Ouvrir la fiche →</span>
+      <span class="go"><span>Ouvrir la fiche →</span><span class="fmeta" data-min="10"></span></span>
     </a>
-    <a class="card fiche" href="5-forfait-api.html" style="--accent:#B14EFF">
+    <a class="card fiche" href="5-forfait-api.html" style="--accent:#B14EFF" data-n="5">
       <span class="eyebrow">Fiche 5</span>
       <h2>Forfait ou Compteur ?</h2>
       <p>Payer un prix fixe chaque mois, ou payer à chaque token ? Fais le calcul.</p>
-      <span class="go">Ouvrir la fiche →</span>
+      <span class="go"><span>Ouvrir la fiche →</span><span class="fmeta" data-min="10"></span></span>
     </a>
-    <a class="card fiche" href="6-message-piege.html" style="--accent:#FFE600">
+    <a class="card fiche" href="6-message-piege.html" style="--accent:#FFE600" data-n="6">
       <span class="eyebrow">Fiche 6</span>
       <h2>Le Message Piégé</h2>
       <p>Un e-mail ou une page web peut cacher des ordres. Apprends à ne pas laisser l'IA obéir à un inconnu.</p>
-      <span class="go">Ouvrir la fiche →</span>
+      <span class="go"><span>Ouvrir la fiche →</span><span class="fmeta" data-min="15"></span></span>
     </a>
+
+    <section class="card wide" id="permis">
+      <span class="eyebrow">La récompense</span>
+      <h2>🎓 Ton permis de conduire l'IA</h2>
+      <div class="lic-zone">
+        <div class="lic-side">
+          <p id="licHint"></p>
+          <label for="licName">Ton prénom, pour le permis
+            <input type="text" id="licName" maxlength="40" autocomplete="given-name" placeholder="Par exemple : Léa">
+          </label>
+          <div><button type="button" class="btn main" id="licPrint">🖨️ Imprimer mon permis</button></div>
+          <p class="small muted">Ta progression reste dans ce navigateur. Elle n'est envoyée nulle part.</p>
+        </div>
+        <div class="license" id="license">
+          <div class="lic-body">
+            <div class="lic-top">
+              <div>
+                <div class="lic-kicker">Comprendre l'IA en 6 fiches</div>
+                <div class="lic-title">Permis de conduire l'IA</div>
+              </div>
+              <span class="lic-photo" aria-hidden="true">🎓</span>
+            </div>
+            <dl class="lic-fields">
+              <dt>Délivré à</dt><dd class="name" id="licWho">…</dd>
+              <dt>Le</dt><dd id="licDate"></dd>
+              <dt>Niveau</dt><dd id="licLevel"></dd>
+            </dl>
+            <div class="lic-badges" id="licBadges"></div>
+          </div>
+          <div class="lock-msg" id="licLock"><span></span></div>
+        </div>
+      </div>
+    </section>
   </div>
-  <p class="foot">Chiffres arrondis, pour comprendre. Ce ne sont pas des mesures exactes.</p>
+  <footer class="foot">
+    <span>Chiffres arrondis, pour comprendre. Ce ne sont pas des mesures exactes.</span>
+    <div class="btns">
+      <button type="button" class="btn" id="atelierBtn" aria-pressed="false">🎤 Mode atelier : non</button>
+      <button type="button" class="btn" id="resetBtn">↺ Effacer ma progression</button>
+    </div>
+    <span>Mode atelier : texte plus gros, et les réponses des quiz s'affichent quand l'animateur clique « Révéler ». Adresse directe : <code>index.html?atelier=1</code></span>
+  </footer>
 </main>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+// Parcours : même stockage et même mode atelier que dans les fiches
+const BADGES = { 1: ["🪙", "Maître des tokens"], 2: ["🧠", "Bon Cerveau"], 3: ["🕵️", "Détective anti-bobards"], 4: ["🧰", "As de la boîte à outils"], 5: ["🧮", "Pro du budget"], 6: ["🛡️", "Gardien anti-piège"] };
+const FILES = { 1: "1-tokens.html", 2: "2-modele-effort.html", 3: "3-hallucinations.html", 4: "4-boite-outils.html", 5: "5-forfait-api.html", 6: "6-message-piege.html" };
+const COLORS = { 1: "#C6FF00", 2: "#FF2E93", 3: "#FF6B00", 4: "#00E5FF", 5: "#B14EFF", 6: "#FFE600" };
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+function loadProgress() { try { return JSON.parse(store.get("ia6:progress")) || {}; } catch { return {}; } }
+const atelierParam = new URLSearchParams(location.search).get("atelier");
+if (atelierParam !== null) store.set("ia6:atelier", atelierParam === "0" ? "0" : "1");
+const ATELIER = atelierParam !== null ? atelierParam !== "0" : store.get("ia6:atelier") === "1";
+if (ATELIER) document.documentElement.dataset.mode = "atelier";
+const starsTxt = (n) => "★".repeat(n) + "☆".repeat(3 - n);
+const link = (f) => f + (ATELIER ? "?atelier=1" : "");
+
+function render() {
+  const p = loadProgress();
+  const won = Object.keys(BADGES).filter((n) => p[n] > 0);
+  const total = Object.values(p).reduce((a, b) => a + b, 0);
+
+  $("#track").replaceChildren(...Object.keys(BADGES).map((n) => {
+    const s = document.createElement("span");
+    s.style.background = p[n] ? COLORS[n] : "";
+    return s;
+  }));
+  $("#progTxt").textContent = `${won.length} badge${won.length > 1 ? "s" : ""} sur 6` + (won.length ? ` · ${total} étoile${total > 1 ? "s" : ""} sur 18` : "");
+
+  const next = Object.keys(BADGES).find((n) => !p[n]);
+  const go = $("#goOn");
+  if (!won.length) { go.textContent = "▶️ Commencer par la fiche 1"; go.href = link(FILES[1]); }
+  else if (next) { go.textContent = `▶️ Continuer : fiche ${next}`; go.href = link(FILES[next]); }
+  else { go.textContent = "🎓 Voir mon permis"; go.href = "#permis"; }
+
+  $$(".fiche").forEach((a) => {
+    const n = a.dataset.n, [ic, name] = BADGES[n];
+    let b = $(".fbadge", a);
+    if (!b) { b = document.createElement("span"); b.className = "fbadge"; b.setAttribute("aria-hidden", "true"); b.textContent = ic; a.append(b); }
+    b.classList.toggle("won", p[n] > 0);
+    const meta = $(".fmeta", a);
+    meta.textContent = `⏱️ ${meta.dataset.min} min` + (p[n] ? ` · ${starsTxt(p[n])}` : "");
+    a.setAttribute("aria-label", `Fiche ${n} : ${$("h2", a).textContent}. ${p[n] ? `Badge « ${name} » gagné, ${p[n]} étoile${p[n] > 1 ? "s" : ""} sur 3.` : "Badge pas encore gagné."}`);
+  });
+
+  // Le permis
+  const done = won.length === 6, left = 6 - won.length;
+  $("#license").classList.toggle("locked", !done);
+  $("#licLock").hidden = done;
+  $("#licLock span").textContent = `🔒 Encore ${left} badge${left > 1 ? "s" : ""}`;
+  $("#licHint").textContent = done
+    ? "Bravo ! Tu as les 6 badges. Écris ton prénom, puis imprime ton permis."
+    : `Réussis le défi final de chaque fiche pour gagner son badge. Il te manque ${left} badge${left > 1 ? "s" : ""} sur 6.`;
+  $("#licName").disabled = !done;
+  $("#licPrint").disabled = !done;
+  $("#licWho").textContent = (done && $("#licName").value.trim()) || "…";
+  $("#licDate").textContent = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  $("#licLevel").textContent = total >= 18 ? "⭐ Expert : 18 étoiles sur 18" : `${total} étoile${total > 1 ? "s" : ""} sur 18`;
+  $("#licBadges").replaceChildren(...Object.entries(BADGES).map(([n, [ic, name]]) => {
+    const d = document.createElement("div");
+    if (!p[n]) d.className = "off";
+    d.innerHTML = `<b aria-hidden="true"></b><span></span><span class="st"></span>`;
+    d.children[0].textContent = ic;
+    d.children[1].textContent = name;
+    d.children[2].textContent = starsTxt(p[n] || 0);
+    return d;
+  }));
+}
+
+$("#licName").value = store.get("ia6:name") || "";
+$("#licName").addEventListener("input", (e) => { store.set("ia6:name", e.target.value.trim()); render(); });
+$("#licPrint").addEventListener("click", () => window.print());
+$("#resetBtn").addEventListener("click", () => {
+  if (!confirm("Effacer tes badges, tes étoiles et ton prénom ?")) return;
+  store.del("ia6:progress");
+  store.del("ia6:name");
+  $("#licName").value = "";
+  render();
+});
+(function initAtelier() {
+  const b = $("#atelierBtn");
+  b.textContent = "🎤 Mode atelier : " + (ATELIER ? "oui" : "non");
+  b.setAttribute("aria-pressed", String(ATELIER));
+  b.addEventListener("click", () => { store.set("ia6:atelier", ATELIER ? "0" : "1"); location.search = ATELIER ? "atelier=0" : "atelier=1"; });
+  if (ATELIER) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?atelier=1$1"); });
+})();
+// Revenir sur l'accueil (bouton « précédent ») doit montrer les badges gagnés entre-temps.
+addEventListener("pageshow", render);
+addEventListener("storage", render);
+render();
+</script>

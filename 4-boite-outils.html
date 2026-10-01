@@ -191,6 +191,53 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
+/* Parcours : devine d'abord, défi final, badge, mode atelier (même bloc dans chaque fiche) */
+.guess { background: var(--surface-2); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; box-shadow: inset 4px 0 0 var(--accent); }
+.guess p, .qi p { font-weight: 700; overflow-wrap: anywhere; }
+.locked { filter: blur(7px); opacity: .5; user-select: none; }
+.unlocking { transition: filter .5s ease, opacity .5s ease; }
+.quiz { display: grid; gap: 12px; }
+.challenge .quiz { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 900px) { .challenge .quiz { grid-template-columns: minmax(0, 1fr); } }
+.qi { background: var(--surface-2); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; }
+.qbtns { display: flex; flex-wrap: wrap; gap: 6px; }
+.qbtns button {
+  flex: 1 1 auto; border: 2px solid var(--line); background: var(--surface); color: var(--fg);
+  font: inherit; font-weight: 700; font-size: .9rem; padding: 8px 10px; border-radius: 10px; cursor: pointer; min-height: 44px;
+}
+.qbtns button:hover { border-color: var(--accent); }
+.qbtns button.picked { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 22%, var(--surface)); }
+.qbtns button.right { border-color: var(--ok); background: color-mix(in oklab, var(--ok) 18%, var(--surface)); }
+.qbtns button.wrong { border-color: var(--bad); background: color-mix(in oklab, var(--bad) 18%, var(--surface)); }
+.qfb { font-size: .95rem; }
+.qfb:empty, .result:empty { display: none; }
+.reveal { justify-self: start; align-self: flex-start; }
+.challenge { border: 2px solid var(--accent); }
+.prize { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.prize-txt { display: grid; gap: 2px; flex: 1 1 220px; }
+.badge {
+  flex: none; width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 2.2rem;
+  background: var(--surface-2); filter: grayscale(1); opacity: .55; transition: transform .4s ease, filter .4s, opacity .4s;
+}
+.badge.won { background: var(--accent); filter: none; opacity: 1; transform: rotate(-10deg) scale(1.05); }
+.stars { font-size: 1.6rem; letter-spacing: .08em; color: var(--warn); }
+.result { padding: 14px 16px; border-radius: 14px; font-weight: 700; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
+.next {
+  background: var(--accent); color: var(--on-accent); border: none; text-decoration: none;
+  flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; transition: transform .2s ease;
+}
+.next:hover { transform: translateY(-3px); }
+.next:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+.next .eyebrow { color: var(--on-accent); opacity: .7; }
+.next strong { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 4vw, 2.2rem); line-height: 1.05; }
+.next .emo { font-size: 2.4rem; }
+.foot .btn { justify-self: start; }
+.confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+.confetti span { position: absolute; top: -48px; font-size: 1.8rem; animation: fall 2.2s cubic-bezier(.3, .6, .6, 1) forwards; }
+@keyframes fall { to { transform: translateY(115vh) rotate(600deg); } }
+:root[data-mode="atelier"] body { font-size: 21px; }
+:root[data-mode="atelier"] .wrap { max-width: 1440px; }
+
 :root { --accent: #00E5FF; }
 
 .switches { display: grid; gap: 8px; }
@@ -226,14 +273,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .can li { font-weight: 700; }
 .can .ex { font-style: italic; color: var(--muted); }
 
-.quiz { display: grid; gap: 14px; }
-.qi { display: grid; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
-.qi:last-child { border-bottom: 0; padding-bottom: 0; }
-.qi p { font-weight: 700; }
-.qi .opts { display: flex; flex-wrap: wrap; gap: 8px; }
-.qi .btn.good { background: color-mix(in oklab, var(--ok) 22%, var(--surface-2)); border-color: var(--ok); }
-.qi .btn.wrong { background: color-mix(in oklab, var(--bad) 22%, var(--surface-2)); border-color: var(--bad); }
-.qi .fb { font-size: .95rem; min-height: 1.5em; }
+
+/* Jeu : les missions de la cuisine */
+.mission { background: var(--surface-2); border-radius: 16px; padding: 16px 18px; display: grid; gap: 10px; box-shadow: inset 4px 0 0 var(--accent); }
+.mission .task { font-family: var(--font-display); font-size: 1.2rem; line-height: 1.2; }
+.mission .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.mission .fb:empty { display: none; }
+.btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.retenir.s4 ul { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) { .retenir.s4 ul { grid-template-columns: minmax(0, 1fr); } }
 </style>
 
 <main class="wrap">
@@ -297,11 +345,20 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true">🍳</span><h2>Projet, Skill, Connecteur : la cuisine de Claude</h2></div>
-      <p>Claude est le cuisinier. Clique pour lui donner des outils.</p>
+      <div class="head"><span class="emo" aria-hidden="true">🍳</span><h2>Projet, Skill, Connecteur : la cuisine de Claude</h2><span class="pill" id="kScore">0 / 5</span></div>
+      <p>Claude est le cuisinier. Clique sur une carte pour lui donner un outil. <strong>Pour chaque mission, active les bons outils, puis valide.</strong></p>
+      <div class="mission" id="kMission" tabindex="-1">
+        <span class="eyebrow" id="kStep"></span>
+        <span class="task" id="kTask"></span>
+        <div class="btns">
+          <button type="button" class="btn go" id="kCheck">✅ Valider</button>
+          <button type="button" class="btn" id="kNext" hidden>Mission suivante →</button>
+        </div>
+        <span class="fb" id="kFb" aria-live="polite"></span>
+      </div>
       <div class="kitchen">
-        <button type="button" class="piece" data-k="projet" aria-pressed="true">
-          <span class="top"><span class="ic" aria-hidden="true">🗂️</span><span class="state">Activé</span></span>
+        <button type="button" class="piece" data-k="projet" aria-pressed="false">
+          <span class="top"><span class="ic" aria-hidden="true">🗂️</span><span class="state">Désactivé</span></span>
           <span class="nm">Projet</span>
           <span class="meta">= le plan de travail avec tes ingrédients</span>
           <span>Un espace où tu ranges des documents et des consignes. Claude les garde pour toutes les conversations du projet.</span>
@@ -326,12 +383,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       </div>
     </section>
 
-    <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true">❓</span><h2>Mini-quiz</h2><span class="pill" id="quizScore">0 / 4</span></div>
-      <div class="quiz" id="quiz"></div>
-    </section>
-
-    <section class="card s2 retenir">
+    <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true">🧠</span><h2>À retenir</h2></div>
       <ul>
         <li><span>Chat pour parler. Cowork pour déléguer une tâche sur tes fichiers. Code pour créer des logiciels.</span></li>
@@ -340,10 +392,28 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       </ul>
     </section>
 
+    <section class="card s4 challenge" id="defi">
+      <div class="head"><span class="emo" aria-hidden="true">🏁</span><h2>Défi final</h2><span class="pill" id="defiScore"></span></div>
+      <div class="prize">
+        <span class="badge" id="badge" aria-hidden="true"></span>
+        <div class="prize-txt"><strong id="badgeName"></strong><span class="small muted" id="badgeTxt"></span></div>
+        <span class="stars" id="stars"></span>
+      </div>
+      <div class="quiz" id="defiQuiz"></div>
+      <div class="result" id="defiResult" aria-live="polite"></div>
+      <button type="button" class="btn reveal" id="defiReset">↺ Rejouer le défi</button>
+    </section>
+
+    <a class="card s4 next" href="5-forfait-api.html">
+      <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>5 · Forfait ou Compteur ?</strong></span>
+      <span class="emo" aria-hidden="true">→</span>
+    </a>
+
   </div>
   <footer class="foot">
     <nav class="series" aria-label="Les 6 fiches"><strong>Comprendre l’IA en 6 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-modele-effort.html">2 Modèle et effort</a><a href="3-hallucinations.html">3 Hallucinations</a><a aria-current="page">4 Les outils Claude</a><a href="5-forfait-api.html">5 Forfait ou API</a><a href="6-message-piege.html">6 Message piégé</a></nav>
     <span>Les fonctions disponibles changent selon ton abonnement et ton appareil.</span>
+    <button type="button" class="btn" id="atelierBtn" aria-pressed="false">🎤 Mode atelier : non</button>
   </footer>
 </main>
 
@@ -367,6 +437,151 @@ function initSeg(el, onChange) {
   const cur = btns.find((b) => b.getAttribute("aria-pressed") === "true") || btns[0];
   return cur.dataset.v;
 }
+
+const FICHE = 4;
+// Parcours : progression gardée dans ce navigateur, mode atelier, devine d'abord, défi final (même bloc dans chaque fiche)
+const BADGES = { 1: ["🪙", "Maître des tokens"], 2: ["🧠", "Bon Cerveau"], 3: ["🕵️", "Détective anti-bobards"], 4: ["🧰", "As de la boîte à outils"], 5: ["🧮", "Pro du budget"], 6: ["🛡️", "Gardien anti-piège"] };
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+function loadProgress() { try { return JSON.parse(store.get("ia6:progress")) || {}; } catch { return {}; } }
+function saveProgress(n, stars) {
+  const p = loadProgress();
+  p[n] = Math.max(p[n] || 0, stars);
+  store.set("ia6:progress", JSON.stringify(p));
+}
+const atelierParam = new URLSearchParams(location.search).get("atelier");
+if (atelierParam !== null) store.set("ia6:atelier", atelierParam === "0" ? "0" : "1");
+const ATELIER = atelierParam !== null ? atelierParam !== "0" : store.get("ia6:atelier") === "1";
+if (ATELIER) document.documentElement.dataset.mode = "atelier";
+
+function h(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+function btn(label, cls = "") { const b = h("button", cls, label); b.type = "button"; return b; }
+const starsTxt = (n) => "★".repeat(n) + "☆".repeat(3 - n);
+
+// Une question à choix. En mode atelier, un clic choisit et « Révéler » corrige : le groupe répond d'abord.
+function ask(box, { q, options, a, why, onShow, good = "✅ Bravo ! ", bad = "❌ Pas tout à fait. " }) {
+  let pick = null, shown = false;
+  const group = h("div", "qbtns");
+  group.setAttribute("role", "group");
+  group.setAttribute("aria-label", q);
+  const bs = options.map(([v, label]) => {
+    const b = btn(label);
+    b.addEventListener("click", () => { pick = v; if (ATELIER && !shown) paint(); else show(); });
+    group.append(b);
+    return [v, b];
+  });
+  const rev = btn("👁️ Révéler la réponse", "btn reveal");
+  rev.addEventListener("click", show);
+  const fb = h("span", "qfb");
+  fb.setAttribute("aria-live", "polite");
+  function show() {
+    const first = !shown, refocus = document.activeElement === rev;
+    shown = true;
+    paint();
+    if (refocus) bs.find(([v]) => v === pick)[1].focus();
+    if (onShow) onShow(pick === a, first);
+  }
+  function paint() {
+    for (const [v, b] of bs) {
+      b.setAttribute("aria-pressed", String(v === pick));
+      b.classList.toggle("picked", !shown && v === pick);
+      b.classList.toggle("right", shown && v === a);
+      b.classList.toggle("wrong", shown && v === pick && v !== a);
+    }
+    rev.hidden = shown || pick === null;
+    fb.textContent = shown ? (pick === a ? good : bad) + (typeof why === "function" ? why() : why) : "";
+  }
+  box.replaceChildren(h("p", "", q), group, rev, fb);
+  paint();
+  return { reset() { pick = null; shown = false; paint(); } };
+}
+
+// Devine d'abord : les zones « lock » restent floues tant qu'on n'a pas répondu.
+function guess(box, { lock, q, ...opts }) {
+  const zones = [].concat(lock);
+  zones.forEach((z) => { z.classList.add("locked"); z.inert = true; });
+  box.classList.add("guess");
+  return ask(box, { ...opts, q: "🤔 Devine d'abord : " + q, good: "✅ Bien vu ! ", bad: "😮 Surprise ! ",
+    onShow() { zones.forEach((z) => { z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false; }); } });
+}
+
+function confetti(ic) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const box = h("div", "confetti");
+  box.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < 28; i++) {
+    const s = h("span", "", ["🎉", "⭐", ic, "✨"][i % 4]);
+    s.style.left = Math.random() * 96 + "%";
+    s.style.animationDelay = Math.random() * 0.7 + "s";
+    box.append(s);
+  }
+  document.body.append(box);
+  setTimeout(() => box.remove(), 3200);
+}
+
+// Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.
+function initDefi(items, options) {
+  const [ic, name] = BADGES[FICHE];
+  const total = items.length, firsts = new Map();
+  let record = loadProgress()[FICHE] || 0;
+  const box = $("#defiQuiz");
+  const asks = items.map((it, i) => {
+    const d = h("div", "qi");
+    box.append(d);
+    return ask(d, { ...it, q: `${i + 1}. ${it.q}`, options: it.options || options,
+      onShow(ok, first) { if (first) { firsts.set(i, ok); update(); } } });
+  });
+  function paintBadge() {
+    $("#badge").classList.toggle("won", record > 0);
+    $("#stars").textContent = record ? starsTxt(record) : "";
+    $("#stars").setAttribute("aria-label", record ? `Meilleur score : ${record} étoile${record > 1 ? "s" : ""} sur 3` : "");
+    $("#badgeTxt").textContent = record
+      ? "Badge gagné ! Rejoue quand tu veux pour améliorer ton score."
+      : `Réponds aux ${total} questions pour gagner ce badge. Seule ta 1re réponse compte pour les étoiles.`;
+  }
+  function update() {
+    $("#defiReset").hidden = false;
+    const good = [...firsts.values()].filter(Boolean).length;
+    $("#defiScore").textContent = `${good} / ${total}`;
+    if (firsts.size < total) return;
+    const stars = good === total ? 3 : good === total - 1 ? 2 : 1;
+    record = Math.max(record, stars);
+    saveProgress(FICHE, stars);
+    paintBadge();
+    $("#defiResult").textContent = stars === 3
+      ? `🎉 ${good} sur ${total} du premier coup ! Tu gagnes le badge ${ic} « ${name} » avec 3 étoiles.`
+      : `🎉 ${good} sur ${total} du premier coup. Tu gagnes le badge ${ic} « ${name} » avec ${stars} étoile${stars > 1 ? "s" : ""} sur 3. Rejoue pour viser 3 étoiles !`;
+    confetti(ic);
+  }
+  $("#badge").textContent = ic;
+  $("#badgeName").textContent = `${ic} Badge « ${name} »`;
+  $("#defiScore").textContent = `0 / ${total}`;
+  $("#defiReset").addEventListener("click", () => {
+    firsts.clear();
+    asks.forEach((a) => a.reset());
+    $("#defiScore").textContent = `0 / ${total}`;
+    $("#defiResult").textContent = "";
+    $("#defiReset").hidden = true;
+  });
+  $("#defiReset").hidden = true;
+  paintBadge();
+}
+
+// Mode atelier : texte plus gros, réponses révélées par l'animateur. Le réglage suit d'une fiche à l'autre.
+(function initAtelier() {
+  const b = $("#atelierBtn");
+  b.textContent = "🎤 Mode atelier : " + (ATELIER ? "oui" : "non");
+  b.setAttribute("aria-pressed", String(ATELIER));
+  b.addEventListener("click", () => { store.set("ia6:atelier", ATELIER ? "0" : "1"); location.search = ATELIER ? "atelier=0" : "atelier=1"; });
+  if (ATELIER) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?atelier=1$1"); });
+})();
 
 
 const PRODUCTS = {
@@ -420,37 +635,91 @@ $$(".piece").forEach((p) => p.addEventListener("click", () => {
   renderKitchen();
 }));
 
-const QUIZ = [
-  { q: "Je veux que Claude lise mes mails Gmail.", a: "Connecteur", why: "Il faut un branchement vers Gmail." },
-  { q: "Je veux des comptes-rendus toujours faits avec le même plan.", a: "Skill", why: "C'est une méthode à réutiliser." },
-  { q: "J'écris un mémoire avec 10 PDF et des consignes à garder.", a: "Projet", why: "Les documents et les consignes restent rangés ensemble." },
-  { q: "Je veux que Claude ajoute un rendez-vous dans mon agenda.", a: "Connecteur", why: "Il faut un accès à ton agenda." },
+// Jeu : les missions de la cuisine. Seul le 1er essai compte pour le score.
+const PIECE_NAMES = { projet: "Projet", skill: "Skill", connecteur: "Connecteur" };
+const MISSIONS = [
+  { q: "Chaque lundi, fais le planning de l'équipe à partir de mon agenda, toujours au même format.", need: ["skill", "connecteur"],
+    why: "Le Connecteur ouvre l'agenda. La Skill garde le même format chaque semaine." },
+  { q: "Écris nos devis avec nos tarifs 2027 et nos conditions de vente, à chaque conversation.", need: ["projet"],
+    why: "Les tarifs et les conditions sont des documents à garder sous la main : c'est un Projet." },
+  { q: "Trouve dans ma boîte Gmail l'e-mail de Claire, et résume-le.", need: ["connecteur"],
+    why: "Il faut un branchement vers Gmail : c'est un Connecteur." },
+  { q: "Fais chaque compte-rendu avec notre plan habituel : décisions, actions, prochaine date.", need: ["skill"],
+    why: "Une méthode écrite une fois, suivie à chaque fois : c'est une Skill." },
+  { q: "Prépare le compte-rendu d'hier : l'heure est dans mon agenda, le modèle est le nôtre, les notes sont dans nos documents.", need: ["projet", "skill", "connecteur"],
+    why: "Les trois ensemble : l'agenda (Connecteur), le modèle (Skill) et les documents (Projet)." },
 ];
-const answered = new Map();
-function buildQuiz() {
-  const box = $("#quiz");
-  QUIZ.forEach((item, i) => {
-    const d = document.createElement("div"); d.className = "qi";
-    const p = document.createElement("p"); p.textContent = (i + 1) + ". " + item.q;
-    const opts = document.createElement("div"); opts.className = "opts";
-    const fb = document.createElement("span"); fb.className = "fb"; fb.setAttribute("aria-live", "polite");
-    ["Projet", "Skill", "Connecteur"].forEach((o) => {
-      const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = o;
-      b.addEventListener("click", () => {
-        $$("button", opts).forEach((x) => x.classList.remove("good", "wrong"));
-        const ok = o === item.a;
-        b.classList.add(ok ? "good" : "wrong");
-        fb.textContent = ok ? "✅ Bravo ! " + item.why : "❌ Pas tout à fait. Essaie encore.";
-        answered.set(i, ok);
-        $("#quizScore").textContent = [...answered.values()].filter(Boolean).length + " / 4";
-      });
-      opts.appendChild(b);
-    });
-    d.append(p, opts, fb); box.appendChild(d);
-  });
+const kit = { k: 0, tries: 0, good: 0 };
+const piecesOn = () => $$(".piece").filter((p) => p.getAttribute("aria-pressed") === "true").map((p) => p.dataset.k);
+function renderMissionK() {
+  const done = kit.k === MISSIONS.length;
+  $("#kScore").textContent = `${kit.good} / ${MISSIONS.length}`;
+  $("#kCheck").hidden = done;
+  $("#kNext").hidden = true;
+  if (done) {
+    $("#kStep").textContent = "Missions terminées";
+    $("#kTask").textContent = `🏁 ${kit.good} mission${kit.good > 1 ? "s" : ""} sur ${MISSIONS.length} réussie${kit.good > 1 ? "s" : ""} du premier coup`;
+    $("#kFb").textContent = (kit.good === MISSIONS.length ? "🎉 Parfait ! " : "") + "Tu peux maintenant jouer librement avec les cartes.";
+    $("#kNext").hidden = false;
+    $("#kNext").textContent = "↺ Rejouer les missions";
+    if (kit.good === MISSIONS.length) confetti("🍳");
+    return;
+  }
+  $("#kStep").textContent = `Mission ${kit.k + 1} sur ${MISSIONS.length}` + (kit.tries ? ` · essai ${kit.tries + 1}` : "");
+  $("#kTask").textContent = "« " + MISSIONS[kit.k].q + " »";
 }
+function checkMissionK() {
+  const M = MISSIONS[kit.k], on = piecesOn();
+  const missing = M.need.filter((k) => !on.includes(k)), extra = on.filter((k) => !M.need.includes(k));
+  const list = (ks) => ks.map((k) => PIECE_NAMES[k]).join(", ");
+  if (!missing.length && !extra.length) {
+    if (!kit.tries) kit.good++;
+    $("#kScore").textContent = `${kit.good} / ${MISSIONS.length}`;
+    $("#kFb").textContent = "✅ Bravo ! " + M.why;
+    $("#kCheck").hidden = true;
+    $("#kNext").hidden = false;
+    $("#kNext").textContent = kit.k === MISSIONS.length - 1 ? "Voir mon score →" : "Mission suivante →";
+    $("#kNext").focus();
+    return;
+  }
+  kit.tries++;
+  $("#kStep").textContent = `Mission ${kit.k + 1} sur ${MISSIONS.length} · essai ${kit.tries + 1}`;
+  $("#kFb").textContent = "❌ Pas tout à fait." + (missing.length ? ` Il manque : ${list(missing)}.` : "") + (extra.length ? ` En trop : ${list(extra)}.` : "") + " Change les cartes et valide encore.";
+}
+function nextMissionK() {
+  if (kit.k === MISSIONS.length) Object.assign(kit, { k: 0, tries: 0, good: 0 });
+  else { kit.k++; kit.tries = 0; }
+  if (kit.k < MISSIONS.length) $$(".piece").forEach((p) => p.setAttribute("aria-pressed", "false"));
+  $("#kFb").textContent = "";
+  renderKitchen();
+  renderMissionK();
+  $("#kMission").focus();
+}
+$("#kCheck").addEventListener("click", checkMissionK);
+$("#kNext").addEventListener("click", nextMissionK);
 
-buildQuiz();
+// Défi final
+initDefi([
+  { q: "Tu veux de l'aide pour écrire un e-mail délicat à un client.", a: "chat",
+    options: [["chat", "💬 Chat"], ["cowork", "🤝 Cowork"], ["code", "👩‍💻 Code"]],
+    why: "Une conversation suffit : tu demandes, Claude répond." },
+  { q: "Claude doit ranger 200 factures de ton ordinateur dans des dossiers, puis en faire un tableau.", a: "cowork",
+    options: [["chat", "💬 Chat"], ["cowork", "🤝 Cowork"], ["code", "👩‍💻 Code"]],
+    why: "Une tâche de bureau en plusieurs étapes, sur tes fichiers : c'est Cowork." },
+  { q: "Tu veux ajouter une page de réservation au site de l'agence.", a: "code",
+    options: [["chat", "💬 Chat"], ["cowork", "🤝 Cowork"], ["code", "👩‍💻 Code"]],
+    why: "Créer ou modifier un site, c'est le travail de Code." },
+  { q: "Tu veux que Claude lise tes e-mails Gmail.", a: "connecteur",
+    options: [["projet", "🗂️ Projet"], ["skill", "📜 Skill"], ["connecteur", "🔌 Connecteur"]],
+    why: "Il faut un branchement vers Gmail." },
+  { q: "Tu écris un mémoire avec 10 PDF et des consignes à garder.", a: "projet",
+    options: [["projet", "🗂️ Projet"], ["skill", "📜 Skill"], ["connecteur", "🔌 Connecteur"]],
+    why: "Les documents et les consignes restent rangés ensemble, pour toutes les conversations." },
+  { q: "Chaque devis doit suivre ta méthode : mêmes étapes, même mise en page.", a: "skill",
+    options: [["projet", "🗂️ Projet"], ["skill", "📜 Skill"], ["connecteur", "🔌 Connecteur"]],
+    why: "Une méthode écrite une fois et réutilisée : c'est une Skill." },
+]);
 renderChooser();
 renderKitchen();
+renderMissionK();
 </script>

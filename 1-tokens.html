@@ -191,6 +191,53 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
+/* Parcours : devine d'abord, défi final, badge, mode atelier (même bloc dans chaque fiche) */
+.guess { background: var(--surface-2); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; box-shadow: inset 4px 0 0 var(--accent); }
+.guess p, .qi p { font-weight: 700; overflow-wrap: anywhere; }
+.locked { filter: blur(7px); opacity: .5; user-select: none; }
+.unlocking { transition: filter .5s ease, opacity .5s ease; }
+.quiz { display: grid; gap: 12px; }
+.challenge .quiz { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 900px) { .challenge .quiz { grid-template-columns: minmax(0, 1fr); } }
+.qi { background: var(--surface-2); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; }
+.qbtns { display: flex; flex-wrap: wrap; gap: 6px; }
+.qbtns button {
+  flex: 1 1 auto; border: 2px solid var(--line); background: var(--surface); color: var(--fg);
+  font: inherit; font-weight: 700; font-size: .9rem; padding: 8px 10px; border-radius: 10px; cursor: pointer; min-height: 44px;
+}
+.qbtns button:hover { border-color: var(--accent); }
+.qbtns button.picked { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 22%, var(--surface)); }
+.qbtns button.right { border-color: var(--ok); background: color-mix(in oklab, var(--ok) 18%, var(--surface)); }
+.qbtns button.wrong { border-color: var(--bad); background: color-mix(in oklab, var(--bad) 18%, var(--surface)); }
+.qfb { font-size: .95rem; }
+.qfb:empty, .result:empty { display: none; }
+.reveal { justify-self: start; align-self: flex-start; }
+.challenge { border: 2px solid var(--accent); }
+.prize { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.prize-txt { display: grid; gap: 2px; flex: 1 1 220px; }
+.badge {
+  flex: none; width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 2.2rem;
+  background: var(--surface-2); filter: grayscale(1); opacity: .55; transition: transform .4s ease, filter .4s, opacity .4s;
+}
+.badge.won { background: var(--accent); filter: none; opacity: 1; transform: rotate(-10deg) scale(1.05); }
+.stars { font-size: 1.6rem; letter-spacing: .08em; color: var(--warn); }
+.result { padding: 14px 16px; border-radius: 14px; font-weight: 700; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
+.next {
+  background: var(--accent); color: var(--on-accent); border: none; text-decoration: none;
+  flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; transition: transform .2s ease;
+}
+.next:hover { transform: translateY(-3px); }
+.next:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+.next .eyebrow { color: var(--on-accent); opacity: .7; }
+.next strong { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 4vw, 2.2rem); line-height: 1.05; }
+.next .emo { font-size: 2.4rem; }
+.foot .btn { justify-self: start; }
+.confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+.confetti span { position: absolute; top: -48px; font-size: 1.8rem; animation: fall 2.2s cubic-bezier(.3, .6, .6, 1) forwards; }
+@keyframes fall { to { transform: translateY(115vh) rotate(600deg); } }
+:root[data-mode="atelier"] body { font-size: 21px; }
+:root[data-mode="atelier"] .wrap { max-width: 1440px; }
+
 :root { --accent: #C6FF00; }
 
 .tokens { display: flex; flex-wrap: wrap; gap: 6px; min-height: 48px; align-content: flex-start; }
@@ -247,6 +294,22 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .dots { display: flex; flex-wrap: wrap; gap: 3px; }
 .dot { width: 10px; height: 10px; border-radius: 3px; background: var(--accent); }
 .dot.old { background: transparent; box-shadow: inset 0 0 0 1.5px var(--warn); }
+
+/* Jeu : ta journée */
+.day-card { background: var(--surface-2); border-radius: 16px; padding: 18px; display: grid; gap: 12px; box-shadow: inset 4px 0 0 var(--accent); }
+.day-card .q { font-family: var(--font-display); font-size: 1.2rem; line-height: 1.2; }
+.day-card .btns .btn { flex: 1 1 200px; }
+.day-card > .btn { justify-self: start; }
+.day-log { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.day-log li { padding: 10px 12px; border-radius: 10px; background: var(--surface-2); font-weight: 700; font-size: .95rem; }
+.day-log li.ok { box-shadow: inset 4px 0 0 var(--ok); }
+.day-log li.bad { box-shadow: inset 4px 0 0 var(--bad); }
+.day-log li.start { box-shadow: inset 4px 0 0 var(--muted); }
+.convs { display: grid; gap: 10px; }
+.conv { display: grid; gap: 4px; }
+.conv-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-weight: 700; font-size: .9rem; }
+.conv-top span:last-child { color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.conv .track { height: 18px; }
 </style>
 
 <main class="wrap">
@@ -286,6 +349,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
     <section class="card s1">
       <div class="head"><span class="emo" aria-hidden="true">📏</span><h2>Court ou long ?</h2></div>
+      <div id="tokGuess"></div>
       <p>Un mot court = 1 token.</p>
       <p>Un mot long = plusieurs tokens.</p>
       <div class="examples" id="examples"></div>
@@ -296,7 +360,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <div class="head"><span class="emo" aria-hidden="true">🔁</span><h2>Chaque message renvoie toute la conversation</h2></div>
       <p>L'IA ne se souvient de rien entre deux messages. À chaque envoi, elle reçoit à nouveau <strong>toute la conversation depuis le début</strong> :
         les consignes, toutes tes questions, toutes ses réponses, puis ta nouvelle question. Tout ce qu'elle relit, ce sont des <strong>tokens d'entrée</strong>, et ils se paient.</p>
-      <div class="mem">
+      <div id="convGuess"></div>
+      <div class="mem" id="convMem">
         <div class="controls">
           <div class="ctl">
             <div class="ctl-row"><label for="nSend">Messages envoyés</label><span class="ctl-val" id="vSend">8</span></div>
@@ -341,6 +406,28 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           <div class="status" id="convStatus" aria-live="polite"></div>
           <p class="small muted">Les spécialistes disent que ça grimpe de façon « quadratique » : 2 fois plus de messages, c'est environ 4 fois plus de tokens lus.
             Certains services gardent le début de la conversation en cache : la relecture coûte alors moins cher, mais elle remplit quand même la mémoire.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true">🎒</span><h2>Jeu : ta journée en 4 moments</h2><span class="pill" id="dayScore">0 / 3</span></div>
+      <p>Tu travailles avec l'IA toute la journée. À chaque moment, choisis : <strong>continuer</strong> la même conversation, ou en ouvrir une <strong>nouvelle</strong> ?</p>
+      <div class="mem">
+        <div class="controls">
+          <div class="day-card" id="dayCard" tabindex="-1"></div>
+          <ol class="day-log" id="dayLog" aria-live="polite"></ol>
+        </div>
+        <div class="viz">
+          <div class="stats">
+            <div class="stat"><b id="dayTok">0</b><span>tokens lus aujourd'hui</span></div>
+            <div class="stat"><b id="dayConvN">1</b><span>conversations ouvertes</span></div>
+          </div>
+          <div>
+            <div class="bar-label"><span>Tes conversations</span><span class="muted">tokens relus au dernier message</span></div>
+            <div class="convs" id="dayConvs"></div>
+          </div>
+          <div class="result" id="dayResult" aria-live="polite"></div>
         </div>
       </div>
     </section>
@@ -437,10 +524,28 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       </ul>
     </section>
 
+    <section class="card s4 challenge" id="defi">
+      <div class="head"><span class="emo" aria-hidden="true">🏁</span><h2>Défi final</h2><span class="pill" id="defiScore"></span></div>
+      <div class="prize">
+        <span class="badge" id="badge" aria-hidden="true"></span>
+        <div class="prize-txt"><strong id="badgeName"></strong><span class="small muted" id="badgeTxt"></span></div>
+        <span class="stars" id="stars"></span>
+      </div>
+      <div class="quiz" id="defiQuiz"></div>
+      <div class="result" id="defiResult" aria-live="polite"></div>
+      <button type="button" class="btn reveal" id="defiReset">↺ Rejouer le défi</button>
+    </section>
+
+    <a class="card s4 next" href="2-modele-effort.html">
+      <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>2 · Le Bon Cerveau</strong></span>
+      <span class="emo" aria-hidden="true">→</span>
+    </a>
+
   </div>
   <footer class="foot">
     <nav class="series" aria-label="Les 6 fiches"><strong>Comprendre l’IA en 6 fiches :</strong><a href="index.html">Accueil</a><a aria-current="page">1 Tokens</a><a href="2-modele-effort.html">2 Modèle et effort</a><a href="3-hallucinations.html">3 Hallucinations</a><a href="4-boite-outils.html">4 Les outils Claude</a><a href="5-forfait-api.html">5 Forfait ou API</a><a href="6-message-piege.html">6 Message piégé</a></nav>
     <span>Chiffres arrondis, pour comprendre. Ce ne sont pas des mesures exactes.</span>
+    <button type="button" class="btn" id="atelierBtn" aria-pressed="false">🎤 Mode atelier : non</button>
   </footer>
 </main>
 
@@ -464,6 +569,151 @@ function initSeg(el, onChange) {
   const cur = btns.find((b) => b.getAttribute("aria-pressed") === "true") || btns[0];
   return cur.dataset.v;
 }
+
+const FICHE = 1;
+// Parcours : progression gardée dans ce navigateur, mode atelier, devine d'abord, défi final (même bloc dans chaque fiche)
+const BADGES = { 1: ["🪙", "Maître des tokens"], 2: ["🧠", "Bon Cerveau"], 3: ["🕵️", "Détective anti-bobards"], 4: ["🧰", "As de la boîte à outils"], 5: ["🧮", "Pro du budget"], 6: ["🛡️", "Gardien anti-piège"] };
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+function loadProgress() { try { return JSON.parse(store.get("ia6:progress")) || {}; } catch { return {}; } }
+function saveProgress(n, stars) {
+  const p = loadProgress();
+  p[n] = Math.max(p[n] || 0, stars);
+  store.set("ia6:progress", JSON.stringify(p));
+}
+const atelierParam = new URLSearchParams(location.search).get("atelier");
+if (atelierParam !== null) store.set("ia6:atelier", atelierParam === "0" ? "0" : "1");
+const ATELIER = atelierParam !== null ? atelierParam !== "0" : store.get("ia6:atelier") === "1";
+if (ATELIER) document.documentElement.dataset.mode = "atelier";
+
+function h(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+function btn(label, cls = "") { const b = h("button", cls, label); b.type = "button"; return b; }
+const starsTxt = (n) => "★".repeat(n) + "☆".repeat(3 - n);
+
+// Une question à choix. En mode atelier, un clic choisit et « Révéler » corrige : le groupe répond d'abord.
+function ask(box, { q, options, a, why, onShow, good = "✅ Bravo ! ", bad = "❌ Pas tout à fait. " }) {
+  let pick = null, shown = false;
+  const group = h("div", "qbtns");
+  group.setAttribute("role", "group");
+  group.setAttribute("aria-label", q);
+  const bs = options.map(([v, label]) => {
+    const b = btn(label);
+    b.addEventListener("click", () => { pick = v; if (ATELIER && !shown) paint(); else show(); });
+    group.append(b);
+    return [v, b];
+  });
+  const rev = btn("👁️ Révéler la réponse", "btn reveal");
+  rev.addEventListener("click", show);
+  const fb = h("span", "qfb");
+  fb.setAttribute("aria-live", "polite");
+  function show() {
+    const first = !shown, refocus = document.activeElement === rev;
+    shown = true;
+    paint();
+    if (refocus) bs.find(([v]) => v === pick)[1].focus();
+    if (onShow) onShow(pick === a, first);
+  }
+  function paint() {
+    for (const [v, b] of bs) {
+      b.setAttribute("aria-pressed", String(v === pick));
+      b.classList.toggle("picked", !shown && v === pick);
+      b.classList.toggle("right", shown && v === a);
+      b.classList.toggle("wrong", shown && v === pick && v !== a);
+    }
+    rev.hidden = shown || pick === null;
+    fb.textContent = shown ? (pick === a ? good : bad) + (typeof why === "function" ? why() : why) : "";
+  }
+  box.replaceChildren(h("p", "", q), group, rev, fb);
+  paint();
+  return { reset() { pick = null; shown = false; paint(); } };
+}
+
+// Devine d'abord : les zones « lock » restent floues tant qu'on n'a pas répondu.
+function guess(box, { lock, q, ...opts }) {
+  const zones = [].concat(lock);
+  zones.forEach((z) => { z.classList.add("locked"); z.inert = true; });
+  box.classList.add("guess");
+  return ask(box, { ...opts, q: "🤔 Devine d'abord : " + q, good: "✅ Bien vu ! ", bad: "😮 Surprise ! ",
+    onShow() { zones.forEach((z) => { z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false; }); } });
+}
+
+function confetti(ic) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const box = h("div", "confetti");
+  box.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < 28; i++) {
+    const s = h("span", "", ["🎉", "⭐", ic, "✨"][i % 4]);
+    s.style.left = Math.random() * 96 + "%";
+    s.style.animationDelay = Math.random() * 0.7 + "s";
+    box.append(s);
+  }
+  document.body.append(box);
+  setTimeout(() => box.remove(), 3200);
+}
+
+// Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.
+function initDefi(items, options) {
+  const [ic, name] = BADGES[FICHE];
+  const total = items.length, firsts = new Map();
+  let record = loadProgress()[FICHE] || 0;
+  const box = $("#defiQuiz");
+  const asks = items.map((it, i) => {
+    const d = h("div", "qi");
+    box.append(d);
+    return ask(d, { ...it, q: `${i + 1}. ${it.q}`, options: it.options || options,
+      onShow(ok, first) { if (first) { firsts.set(i, ok); update(); } } });
+  });
+  function paintBadge() {
+    $("#badge").classList.toggle("won", record > 0);
+    $("#stars").textContent = record ? starsTxt(record) : "";
+    $("#stars").setAttribute("aria-label", record ? `Meilleur score : ${record} étoile${record > 1 ? "s" : ""} sur 3` : "");
+    $("#badgeTxt").textContent = record
+      ? "Badge gagné ! Rejoue quand tu veux pour améliorer ton score."
+      : `Réponds aux ${total} questions pour gagner ce badge. Seule ta 1re réponse compte pour les étoiles.`;
+  }
+  function update() {
+    $("#defiReset").hidden = false;
+    const good = [...firsts.values()].filter(Boolean).length;
+    $("#defiScore").textContent = `${good} / ${total}`;
+    if (firsts.size < total) return;
+    const stars = good === total ? 3 : good === total - 1 ? 2 : 1;
+    record = Math.max(record, stars);
+    saveProgress(FICHE, stars);
+    paintBadge();
+    $("#defiResult").textContent = stars === 3
+      ? `🎉 ${good} sur ${total} du premier coup ! Tu gagnes le badge ${ic} « ${name} » avec 3 étoiles.`
+      : `🎉 ${good} sur ${total} du premier coup. Tu gagnes le badge ${ic} « ${name} » avec ${stars} étoile${stars > 1 ? "s" : ""} sur 3. Rejoue pour viser 3 étoiles !`;
+    confetti(ic);
+  }
+  $("#badge").textContent = ic;
+  $("#badgeName").textContent = `${ic} Badge « ${name} »`;
+  $("#defiScore").textContent = `0 / ${total}`;
+  $("#defiReset").addEventListener("click", () => {
+    firsts.clear();
+    asks.forEach((a) => a.reset());
+    $("#defiScore").textContent = `0 / ${total}`;
+    $("#defiResult").textContent = "";
+    $("#defiReset").hidden = true;
+  });
+  $("#defiReset").hidden = true;
+  paintBadge();
+}
+
+// Mode atelier : texte plus gros, réponses révélées par l'animateur. Le réglage suit d'une fiche à l'autre.
+(function initAtelier() {
+  const b = $("#atelierBtn");
+  b.textContent = "🎤 Mode atelier : " + (ATELIER ? "oui" : "non");
+  b.setAttribute("aria-pressed", String(ATELIER));
+  b.addEventListener("click", () => { store.set("ia6:atelier", ATELIER ? "0" : "1"); location.search = ATELIER ? "atelier=0" : "atelier=1"; });
+  if (ATELIER) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?atelier=1$1"); });
+})();
 
 
 // Mots fréquents gardés en un seul token, comme le font les vrais découpeurs.
@@ -633,6 +883,124 @@ nSend.addEventListener("input", () => setSend(+nSend.value));
 $("#btnSend").addEventListener("click", () => setSend(conv.n + 1));
 $("#btnReset").addEventListener("click", () => setSend(1));
 conv.per = +initSeg($("#segSend"), (v) => { conv.per = +v; renderConv(); });
+
+// Devine d'abord
+guess($("#tokGuess"), {
+  q: "combien de tokens pour « anticonstitutionnellement » ?",
+  options: [["1", "1"], ["3", "3"], ["7", "7"]], a: "7",
+  why: "7 tokens. Un mot long et rare est coupé en plusieurs morceaux.",
+  lock: $("#examples"),
+});
+{
+  const ratio = cumTo(16, 800) / cumTo(8, 800);
+  guess($("#convGuess"), {
+    q: "une conversation a 8 messages. Tu continues jusqu'à 16 messages, 2 fois plus. Combien de tokens l'IA lit-elle en tout ?",
+    options: [["2", "×2"], ["3-4", "Entre ×3 et ×4"], ["10", "×10"]], a: "3-4",
+    why: `×${fmt(ratio, 1)} ! Chaque nouveau message relit tous les anciens. Le total grimpe bien plus vite que le nombre de messages.`,
+    lock: $("#convMem"),
+  });
+}
+
+// Jeu : ta journée. Même sujet → on continue. Nouveau sujet → nouvelle conversation.
+const DAY_PER = 800, REPASTE = 3000;
+const DAY_START = { subject: "📄 Le devis île des Pins", n: 8 };
+const DAY = [
+  { q: "Le client répond à ton devis : il veut changer les dates.", subject: "📄 Le devis, suite", n: 4, same: true,
+    good: "Même sujet : l'IA a besoin du devis pour répondre.",
+    bad: "L'IA ne connaît plus le devis. Tu dois tout lui réexpliquer, et elle risque d'oublier des détails." },
+  { q: "Nouveau sujet : le planning de l'équipe pour la semaine.", subject: "📅 Le planning", n: 10, same: false,
+    good: "Le planning n'a rien à voir avec le devis. L'IA repart légère.",
+    bad: "L'IA relit tout le devis à chaque message sur le planning. Ça coûte cher, et elle peut mélanger les sujets." },
+  { q: "Nouveau sujet : un e-mail à un fournisseur de bungalows.", subject: "✉️ L'e-mail au fournisseur", n: 8, same: false,
+    good: "Nouveau sujet, nouvelle conversation. Bien joué !",
+    bad: "L'IA relit le devis et le planning pour écrire un simple e-mail. Que des tokens pour rien." },
+];
+// Tokens lus pour n messages : chaque message relit la base et tous les échanges d'avant.
+const convRead = (c) => c.n * (c.base + qOf(DAY_PER)) + DAY_PER * c.n * (c.n - 1) / 2;
+const convLast = (c) => c.base + (c.n - 1) * DAY_PER + qOf(DAY_PER);
+function simDay(choices) {
+  const convs = [{ subjects: [DAY_START.subject], n: DAY_START.n, base: SYS }];
+  choices.forEach((cont, k) => {
+    const m = DAY[k];
+    if (cont) { const c = convs.at(-1); c.subjects.push(m.subject); c.n += m.n; }
+    else convs.push({ subjects: [m.subject], n: m.n, base: SYS + (m.same ? REPASTE : 0) });
+  });
+  return { convs, total: convs.reduce((s, c) => s + convRead(c), 0) };
+}
+let day = [];
+function renderDay() {
+  const k = day.length, card = $("#dayCard");
+  const { convs, total } = simDay(day);
+  const good = day.filter((cont, i) => cont === DAY[i].same).length;
+  $("#dayScore").textContent = `${good} / ${DAY.length}`;
+  $("#dayTok").textContent = fmt(total);
+  $("#dayConvN").textContent = fmt(convs.length);
+  // Même échelle pour tous : la conversation unique de toute la journée.
+  const max = convLast(simDay([true, true, true]).convs[0]);
+  $("#dayConvs").replaceChildren(...convs.map((c) => {
+    const d = h("div", "conv");
+    const top = h("div", "conv-top");
+    top.append(h("span", "", c.subjects.join(" + ") + ` · ${c.n} messages`), h("span", "", fmt(convLast(c))));
+    const tr = h("div", "track"), f = h("div", "fill");
+    f.style.width = (convLast(c) / max) * 100 + "%";
+    tr.append(f);
+    d.append(top, tr);
+    return d;
+  }));
+
+  if (k === DAY.length) {
+    const allIn = simDay([true, true, true]).total;
+    const again = btn("↺ Rejouer", "btn");
+    again.addEventListener("click", () => { day = []; startDay(); renderDay(); $("#dayCard").focus(); });
+    card.replaceChildren(h("span", "q", `🏁 Journée finie : ${good} bon${good > 1 ? "s" : ""} choix sur ${DAY.length}`), again);
+    $("#dayResult").textContent = (good === DAY.length ? "🎉 Parfait ! " : "") +
+      `L'IA a lu ${fmt(total)} tokens aujourd'hui. Tout dans une seule conversation : ${fmt(allIn)} tokens. ` +
+      "La règle : même sujet, on continue. Nouveau sujet, nouvelle conversation.";
+    if (good === DAY.length) confetti("🎒");
+    return;
+  }
+  $("#dayResult").textContent = "";
+  const m = DAY[k];
+  const cont = btn("➡️ Continuer la conversation", "btn"), fresh = btn("🆕 Nouvelle conversation", "btn");
+  cont.addEventListener("click", () => decideDay(true));
+  fresh.addEventListener("click", () => decideDay(false));
+  const btns = h("div", "btns");
+  btns.append(cont, fresh);
+  card.replaceChildren(h("span", "eyebrow", `Moment ${k + 1} sur ${DAY.length} · ${m.n} messages`), h("span", "q", "« " + m.q + " »"), btns);
+}
+function decideDay(cont) {
+  const m = DAY[day.length];
+  day.push(cont);
+  const ok = cont === m.same;
+  const li = h("li", ok ? "ok" : "bad");
+  li.append(h("strong", "", (cont ? "➡️ Continuer" : "🆕 Nouvelle") + " : "), (ok ? "✅ " + m.good : "❌ " + m.bad));
+  $("#dayLog").append(li);
+  renderDay();
+  $("#dayCard").focus();
+}
+function startDay() {
+  const li = h("li", "start");
+  li.append(h("strong", "", "☀️ 8 h : "), `tu commences par le devis île des Pins. ${DAY_START.n} messages.`);
+  $("#dayLog").replaceChildren(li);
+}
+startDay();
+renderDay();
+
+// Défi final
+initDefi([
+  { q: "Tu as fini ton devis. Tu passes au planning de l'équipe. Que fais-tu ?", a: "new",
+    options: [["new", "🆕 Nouvelle conversation"], ["same", "➡️ Je continue la même"]],
+    why: "Nouveau sujet, nouvelle conversation. L'IA lit moins de tokens et ne mélange pas les sujets." },
+  { q: "Ta conversation a déjà 50 messages. Le 51e message, comparé au 1er…", a: "more",
+    options: [["less", "Coûte moins cher"], ["same", "Coûte pareil"], ["more", "Coûte beaucoup plus"]],
+    why: "L'IA relit les 50 messages d'avant. Elle lit beaucoup plus de tokens." },
+  { q: "La mémoire de l'IA est pleine. Que se passe-t-il ?", a: "sum",
+    options: [["stop", "Elle s'arrête net"], ["sum", "Elle résume le début"], ["all", "Elle garde tout"]],
+    why: "C'est la compression : un court résumé remplace les vieux messages. L'IA oublie des détails." },
+  { q: "Tu colles un document de 50 pages au début de la conversation. Ensuite…", a: "each",
+    options: [["once", "L'IA le lit une seule fois"], ["each", "L'IA le relit à chaque message"], ["free", "Il ne compte pas"]],
+    why: "Le document fait partie de la conversation. Chaque nouveau message le relit, et ça se paie." },
+]);
 
 initRanges();
 renderText();
