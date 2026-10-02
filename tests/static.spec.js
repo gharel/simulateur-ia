@@ -29,7 +29,7 @@ for (const [name, cut] of Object.entries(BLOCKS)) {
 }
 
 test("logo et mention Skazy Formation identiques sur toutes les pages", () => {
-  const logo = (t) => (t.match(/<header class="brand">\n\s*(<a href="https:\/\/formation\.skazy\.nc\/"[\s\S]*?<\/a>)/) || [, ""])[1];
+  const logo = (t) => (t.match(/<header class="brand">[\s\S]*?(<a href="https:\/\/formation\.skazy\.nc\/"[\s\S]*?<\/a>)\n\s*<\/header>/) || [, ""])[1];
   const foot = (t) => (t.match(/<span class="brand-foot">.*?<\/span>/) || [""])[0];
   const ref = read(PAGES[0]);
   expect(logo(ref)).toContain(`href="${SKAZY}"`);
@@ -40,8 +40,18 @@ test("logo et mention Skazy Formation identiques sur toutes les pages", () => {
   }
 });
 
+test("chaque page a son favicon, et les fichiers existent", () => {
+  for (const f of ["favicon.svg", "favicon-32.png", "apple-touch-icon.png"]) expect(fs.existsSync(`${ROOT}/${f}`), f).toBe(true);
+  for (const f of PAGES) {
+    const t = read(f);
+    expect(t, f).toContain('<link rel="icon" href="favicon.svg" type="image/svg+xml">');
+    expect(t, f).toContain('<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">');
+    expect(t, f).toContain('<link rel="apple-touch-icon" href="apple-touch-icon.png">');
+  }
+});
+
 test("chaque fiche a un bouton Accueil en haut, et l'accueil a le mode démonstration", () => {
-  for (const f of FICHES) expect(read(f), f).toMatch(/<\/a>\n\s*<a class="home" href="index\.html">[\s\S]*?Accueil<\/a>\n\s*<\/header>/);
+  for (const f of FICHES) expect(read(f), f).toMatch(/<header class="brand">\n\s*<a class="home" href="index\.html">[\s\S]*?Accueil<\/a>\n\s*<a href="https:\/\/formation\.skazy\.nc\/"/);
   const home = read("index.html");
   expect(home).not.toContain('class="home"');
   expect(home).toContain('id="demoBtn"');
