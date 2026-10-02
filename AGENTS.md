@@ -25,7 +25,7 @@ npm test
 
 - Les tests ouvrent les pages en `file://`. Ils ont besoin d'internet : Font Awesome et les polices viennent de CDN.
 - Une seule page : `npx playwright test -g "3-hallucinations"`.
-- Les tests vérifient : pas d'emoji, blocs communs identiques, pages sans erreur JS, icônes connues, logo et lien Skazy Formation, bouton Accueil, pas de défilement horizontal, pas de grand vide en bas des cartes, zones floutées après leur question, mode démonstration, jeux et défis qui fonctionnent.
+- Les tests vérifient : pas d'emoji, blocs communs identiques, pages sans erreur JS, icônes connues, logo et lien Skazy Formation, bouton Accueil, pas de défilement horizontal, pas de grand vide en bas des cartes, zones floutées après leur question, mode démonstration, contraste de chaque texte, mode nuit des navigateurs sans effet, jeux et défis qui fonctionnent.
 - Si tu changes une mise en page, regarde aussi le rendu toi-même, sur bureau et sur téléphone (captures Playwright).
 
 ## Règles
@@ -36,6 +36,8 @@ npm test
   - dans un texte JS : `{coins}`, affiché avec `rich(el, texte)` ou `h(tag, classe, texte)` ;
   - en CSS : vise `.fa-coins` ou `.svg-inline--fa`, jamais `.fa-solid`, qui disparaît une fois l'icône affichée.
 - **FALC.** Des phrases courtes, le tutoiement, et chaque mot difficile expliqué.
+- **Contraste.** Chaque texte doit atteindre 4,5:1 contre son fond (3:1 au-dessus de 24 px, ou de 18,66 px en gras), en thème clair comme en thème sombre. N'utilise pas `opacity` pour estomper un texte : choisis une couleur (`--muted`) ou un contour. Le test `tests/contraste.spec.js` mesure chaque texte, avant et après avoir joué.
+- **Mode nuit des navigateurs.** Les pages ont leur propre thème sombre. Chaque page garde `<meta name="color-scheme" content="light dark">` et `<meta name="darkreader-lock">`, sinon le mode nuit de Brave ou Dark Reader inverse les couleurs (texte clair sur les cartes jaunes).
 - **Mise en page.** La grille a 4 colonnes (`s1` à `s4`). Les cartes d'une même rangée prennent la hauteur de la plus haute. Associe donc des contenus de hauteur proche : le test refuse plus de 120 px de vide en bas d'une carte. Si « À retenir » est plus court que sa voisine, mets-le en pleine largeur (`s4`).
 - **« Devine d'abord ».** La question vient avant les zones qu'elle floute, sur téléphone aussi. `guess()` floute les zones et y ajoute le message « Réponds d'abord à la question ». Pour flouter une zone, passe toujours par `lockZones()` : le mode démonstration (`?demo=1`) doit pouvoir tout montrer.
 - **Modes.** Atelier (`?atelier=1`) et démonstration (`?demo=1`) se gardent dans le navigateur et se transmettent dans les liens entre pages. Les boutons et leur explication sont en bas de chaque page.

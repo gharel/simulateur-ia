@@ -2,6 +2,9 @@
 <html lang="fr">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- La page a déjà ses thèmes clair et sombre : les modes nuit forcés (Dark Reader, mode nuit de Brave) ne doivent pas changer ses couleurs. -->
+<meta name="color-scheme" content="light dark">
+<meta name="darkreader-lock">
 <title>Comprendre l'IA en 6 fiches</title>
 <meta name="description" content="6 fiches interactives et faciles à lire pour comprendre l'IA : tokens, modèles, hallucinations, outils, prix et sécurité.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,7 +66,7 @@ h1 { font-size: clamp(2.5rem, 7vw, 5rem); text-transform: uppercase; letter-spac
 h2 { font-size: 1.6rem; }
 p { margin: 0; max-width: 60ch; }
 .eyebrow { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
-.fiche .eyebrow { color: var(--on-accent); opacity: .7; }
+.fiche .eyebrow { color: var(--on-accent); }
 .lead { font-size: 1.3rem; font-weight: 700; line-height: 1.35; }
 .fiche p { font-weight: 700; }
 .go { margin-top: auto; font-weight: 700; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
@@ -146,7 +149,8 @@ p { margin: 0; max-width: 60ch; }
 .lic-badges div { border: 1.5px solid #D9D9E5; border-radius: 12px; padding: 8px 10px; display: grid; gap: 2px; font-size: .82rem; font-weight: 700; line-height: 1.25; }
 .lic-badges b { font-size: 1.4rem; }
 .lic-badges .st { color: #8A5A00; letter-spacing: .06em; }
-.lic-badges .off { opacity: .35; filter: grayscale(1); }
+.lic-badges .off { color: #55556B; }
+.lic-badges .off b, .lic-badges .off .st { opacity: .35; filter: grayscale(1); }
 .lock-msg {
   position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px;
   font-family: var(--font-display); font-size: 1.5rem; line-height: 1.15; color: #14141C;

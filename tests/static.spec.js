@@ -48,6 +48,13 @@ test("chaque fiche a un bouton Accueil en haut, et l'accueil a le mode démonstr
   expect(home).toContain('class="modes-help"');
 });
 
+test("chaque page refuse les modes nuit forcés (elle a déjà son thème sombre)", () => {
+  for (const f of PAGES) {
+    expect(read(f), f).toContain('<meta name="color-scheme" content="light dark">');
+    expect(read(f), f).toContain('<meta name="darkreader-lock">');
+  }
+});
+
 test("Font Awesome chargé depuis cdnjs avec contrôle d'intégrité", () => {
   for (const f of PAGES) {
     const scripts = read(f).match(/<script defer src="https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/font-awesome\/[^"]+" integrity="sha512-[^"]+"/g) || [];

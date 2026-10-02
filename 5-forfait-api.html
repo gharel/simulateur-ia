@@ -2,6 +2,9 @@
 <html lang="fr">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- La page a déjà ses thèmes clair et sombre : les modes nuit forcés (Dark Reader, mode nuit de Brave) ne doivent pas changer ses couleurs. -->
+<meta name="color-scheme" content="light dark">
+<meta name="darkreader-lock">
 <title>Forfait ou Compteur ?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,14 +33,14 @@
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
     --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
-    --fg: #12121A; --muted: #55556B; --ok: #0F7A45; --warn: #8A5A00; --bad: #C42626;
+    --fg: #12121A; --muted: #55556B; --ok: #0C6B3B; --warn: #8A5A00; --bad: #A61E1E;
     --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
     color-scheme: light;
   }
 }
 :root[data-theme="light"] {
   --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
-  --fg: #12121A; --muted: #55556B; --ok: #0F7A45; --warn: #8A5A00; --bad: #C42626;
+  --fg: #12121A; --muted: #55556B; --ok: #0C6B3B; --warn: #8A5A00; --bad: #A61E1E;
   --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
   color-scheme: light;
 }
@@ -68,11 +71,11 @@ body {
 
 /* Hero : la couleur dominante */
 .hero { background: var(--accent); color: var(--on-accent); border: none; }
-.hero .eyebrow { color: var(--on-accent); opacity: .7; }
+.hero .eyebrow { color: var(--on-accent); }
 .hero-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; align-items: end; }
 @media (max-width: 760px) { .hero-grid { grid-template-columns: minmax(0, 1fr); } }
 .word-card {
-  background: color-mix(in oklab, var(--on-accent) 9%, transparent);
+  background: color-mix(in oklab, #FFFFFF 18%, transparent);
   border: 2px solid var(--on-accent); border-radius: 18px; padding: 18px;
   display: grid; gap: 6px;
 }
@@ -269,7 +272,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 }
 .next:hover { transform: translateY(-3px); }
 .next:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
-.next .eyebrow { color: var(--on-accent); opacity: .7; }
+.next .eyebrow { color: var(--on-accent); }
 .next strong { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 4vw, 2.2rem); line-height: 1.05; }
 .next .emo { font-size: 2.4rem; color: inherit; }
 .foot .btn { justify-self: start; }
@@ -279,7 +282,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
-:root { --accent: #B14EFF; --plan: #F3F3F8; }
+:root { --accent: #B14EFF; --accent-text: #C47BFF; --plan: #F3F3F8; }
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --plan: #12121A; } }
 :root[data-theme="light"] { --plan: #12121A; }
 

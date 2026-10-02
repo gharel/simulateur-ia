@@ -1,20 +1,12 @@
 // On joue avec les pages : clics partout, défi final, permis.
 const { test, expect } = require("@playwright/test");
-const { PAGES, FICHES, NO_PROBLEM, open, iconsReady, displayProblems } = require("./site");
+const { PAGES, FICHES, NO_PROBLEM, open, iconsReady, displayProblems, playEverything } = require("./site");
 
 for (const f of PAGES) {
   for (const query of ["", "?atelier=1"]) {
     test(`${f}${query && " en mode atelier"} : tout cliquer ne casse rien`, async ({ page }) => {
-      page.on("dialog", (d) => d.dismiss());
       const errors = await open(page, f, query);
-      // Pas les boutons des modes (ils rechargent la page) ni l'impression.
-      const controls = page.locator("main button:visible:not(#atelierBtn):not(#demoBtn):not(#licPrint), main input[type=checkbox]:visible");
-      for (let round = 0; round < 2; round++) {
-        const n = await controls.count();
-        for (let i = 0; i < n; i++) await controls.nth(i).click({ timeout: 1000 }).catch(() => {});
-        for (const r of await page.locator("main input[type=range]").all()) await r.fill(String(round ? 1 : 3)).catch(() => {});
-      }
-      await iconsReady(page);
+      await playEverything(page);
       expect(errors).toEqual([]);
       expect(await displayProblems(page)).toEqual(NO_PROBLEM);
     });

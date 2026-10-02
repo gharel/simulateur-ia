@@ -74,6 +74,8 @@ npx playwright install chromium
 npm test
 ```
 
-Les tests Playwright ouvrent chaque page sur bureau et sur téléphone. Ils vérifient les icônes, la marque Skazy Formation, la mise en page, les zones floutées et les jeux.
+Les tests Playwright ouvrent chaque page sur bureau et sur téléphone. Ils vérifient les icônes, la marque Skazy Formation, la mise en page, les zones floutées, le contraste de chaque texte (thèmes clair et sombre) et les jeux.
+
+Les pages ont leur propre thème sombre. Elles demandent aux modes nuit forcés (mode nuit de Brave, extension Dark Reader) de ne pas changer leurs couleurs, avec `<meta name="darkreader-lock">`.
 
 `npm run deploy` relance les tests, puis pousse sur `main` et sur `gh-pages` (le site GitHub Pages). Les consignes complètes pour les agents sont dans [AGENTS.md](AGENTS.md).

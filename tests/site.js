@@ -39,4 +39,24 @@ async function displayProblems(page) {
 }
 const NO_PROBLEM = { jetons: [], emoji: [], iconesInconnues: 0 };
 
-module.exports = { ROOT, FICHES, PAGES, SKAZY, PICTO, NO_PROBLEM, read, url, open, iconsReady, displayProblems };
+// Joue avec toute la page : répond aux « Devine d'abord », allume la lampe, clique partout, bouge les curseurs.
+// Pas les boutons des modes (ils rechargent la page) ni l'impression.
+async function playEverything(page, rounds = 2) {
+  page.on("dialog", (d) => d.dismiss());
+  for (const g of await page.locator(".guess").all()) {
+    await g.locator(".qbtns button").first().click().catch(() => {});
+    // En mode atelier, le clic choisit seulement : « Révéler » montre la correction.
+    const reveal = g.locator(".reveal");
+    if (await reveal.isVisible()) await reveal.click();
+  }
+  if (await page.locator("#lampSw").count()) await page.locator("#lampSw").click();
+  const controls = page.locator("main button:visible:not(#atelierBtn):not(#demoBtn):not(#licPrint), main input[type=checkbox]:visible");
+  for (let round = 0; round < rounds; round++) {
+    const n = await controls.count();
+    for (let i = 0; i < n; i++) await controls.nth(i).click({ timeout: 1000 }).catch(() => {});
+    for (const r of await page.locator("main input[type=range]").all()) await r.fill(String(round ? 1 : 3)).catch(() => {});
+  }
+  await iconsReady(page);
+}
+
+module.exports = { ROOT, FICHES, PAGES, SKAZY, PICTO, NO_PROBLEM, read, url, open, iconsReady, displayProblems, playEverything };

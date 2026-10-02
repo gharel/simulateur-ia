@@ -2,6 +2,9 @@
 <html lang="fr">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- La page a déjà ses thèmes clair et sombre : les modes nuit forcés (Dark Reader, mode nuit de Brave) ne doivent pas changer ses couleurs. -->
+<meta name="color-scheme" content="light dark">
+<meta name="darkreader-lock">
 <title>Le Message Piégé</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,14 +33,14 @@
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
     --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
-    --fg: #12121A; --muted: #55556B; --ok: #0F7A45; --warn: #8A5A00; --bad: #C42626;
+    --fg: #12121A; --muted: #55556B; --ok: #0C6B3B; --warn: #8A5A00; --bad: #A61E1E;
     --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
     color-scheme: light;
   }
 }
 :root[data-theme="light"] {
   --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
-  --fg: #12121A; --muted: #55556B; --ok: #0F7A45; --warn: #8A5A00; --bad: #C42626;
+  --fg: #12121A; --muted: #55556B; --ok: #0C6B3B; --warn: #8A5A00; --bad: #A61E1E;
   --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
   color-scheme: light;
 }
@@ -68,11 +71,11 @@ body {
 
 /* Hero : la couleur dominante */
 .hero { background: var(--accent); color: var(--on-accent); border: none; }
-.hero .eyebrow { color: var(--on-accent); opacity: .7; }
+.hero .eyebrow { color: var(--on-accent); }
 .hero-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; align-items: end; }
 @media (max-width: 760px) { .hero-grid { grid-template-columns: minmax(0, 1fr); } }
 .word-card {
-  background: color-mix(in oklab, var(--on-accent) 9%, transparent);
+  background: color-mix(in oklab, #FFFFFF 18%, transparent);
   border: 2px solid var(--on-accent); border-radius: 18px; padding: 18px;
   display: grid; gap: 6px;
 }
@@ -269,7 +272,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 }
 .next:hover { transform: translateY(-3px); }
 .next:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
-.next .eyebrow { color: var(--on-accent); opacity: .7; }
+.next .eyebrow { color: var(--on-accent); }
 .next strong { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 4vw, 2.2rem); line-height: 1.05; }
 .next .emo { font-size: 2.4rem; color: inherit; }
 .foot .btn { justify-self: start; }
@@ -335,12 +338,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .doc td { padding: 6px 4px; border-bottom: 1px solid #DDD; }
 .doc .tiny { font-size: .8rem; color: #666; }
 .flyer {
-  background: linear-gradient(135deg, #128892, #0B5E7A); color: #FFFFFF; border-radius: 12px;
+  background: linear-gradient(135deg, #0E7A83, #0B5E7A); color: #FFFFFF; border-radius: 12px;
   padding: 22px 18px; display: grid; gap: 6px; text-align: center;
 }
 .flyer strong { font-family: var(--font-display); font-weight: 400; font-size: 2.2rem; line-height: 1; }
 .doc .hid { color: #FFFFFF; font-size: 2px; line-height: 1.2; margin: 0; }
-.flyer .hid { color: #138A94; font-size: .72rem; }
+.flyer .hid { color: #11828C; font-size: .72rem; }
 .doc td.hid { padding: 0; border: 0; }
 .xray .hid, .xray .flyer .hid {
   color: #9B0016; font-size: .95rem; background: #FFF59D; outline: 2px dashed #9B0016; outline-offset: 2px;
@@ -368,12 +371,11 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
   display: grid; gap: 4px; background: var(--accent); color: var(--on-accent);
   border-radius: 18px 18px 4px 18px; padding: 12px 16px; font-weight: 700;
 }
-.msg-me .who { opacity: .7; }
 .seg.off { opacity: .45; pointer-events: none; }
 .trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .ing {
   text-align: center; padding: 12px 6px; border-radius: 14px; background: var(--surface-2);
-  font-weight: 700; font-size: .85rem; display: grid; gap: 4px; opacity: .5; transition: opacity .2s, box-shadow .2s;
+  font-weight: 700; font-size: .85rem; display: grid; gap: 4px; opacity: .72; transition: opacity .2s, box-shadow .2s;
 }
 .ing .ic { font-size: 1.6rem; line-height: 1; }
 .ing.on { opacity: 1; box-shadow: inset 0 0 0 2px var(--accent); }
