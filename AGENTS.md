@@ -12,7 +12,7 @@ Consignes pour les agents (Claude Code, Codex…) qui travaillent sur ce dépôt
 
 - `index.html` : l'accueil, la progression, le permis à imprimer.
 - `1-tokens.html` à `6-message-piege.html` : les fiches.
-- `favicon.svg` : l'icône de l'onglet, le « k » du logo Skazy. `favicon-32.png` et `apple-touch-icon.png` (180 px) en sont des copies, pour Safari et l'écran d'accueil des téléphones. Les liens sont relatifs, pour marcher sous `/simulateur-ia/` sur GitHub Pages.
+- `favicon.svg` : l'icône de l'onglet, « IA » en blanc avec une barre au vert Skazy. `favicon-32.png` et `apple-touch-icon.png` (180 px) en sont des copies, pour Safari et l'écran d'accueil des téléphones. Les liens sont relatifs, pour marcher sous `/simulateur-ia/` sur GitHub Pages.
 - `tests/` : les tests Playwright. `playwright.config.js` les lance sur bureau (1280 px) et sur téléphone (Pixel 7).
 - `README.md` : le contenu des fiches et le mode d'emploi des icônes.
 
