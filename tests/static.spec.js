@@ -16,7 +16,9 @@ test("aucun emoji dans les pages et la documentation", () => {
 const BLOCKS = {
   "CSS de base": (t) => t.slice(t.indexOf("<style>"), t.indexOf("/* Skazy Formation")),
   "CSS Skazy, icônes et Parcours": (t) => t.slice(t.indexOf("/* Skazy Formation"), t.indexOf(":root { --accent")),
-  "JS Parcours": (t) => t.slice(t.indexOf("// Parcours : progression"), t.indexOf("})();", t.indexOf("(function initAtelier")) + 5),
+  "JS Parcours": (t) => t.slice(t.indexOf("// Parcours : progression"), t.indexOf("})();", t.indexOf("(function initModes")) + 5),
+  "bandeau du haut": (t) => t.slice(t.indexOf('<header class="brand">'), t.indexOf("</header>") + 9),
+  "boutons des modes et leur explication": (t) => t.slice(t.indexOf('<div class="modes">'), t.indexOf("</div>", t.indexOf('<div class="modes-help">')) + 6),
 };
 for (const [name, cut] of Object.entries(BLOCKS)) {
   test(`bloc commun identique dans les 6 fiches : ${name}`, () => {
@@ -26,16 +28,24 @@ for (const [name, cut] of Object.entries(BLOCKS)) {
   });
 }
 
-test("bandeau et mention Skazy Formation identiques sur toutes les pages", () => {
-  const header = (t) => t.slice(t.indexOf('<header class="brand">'), t.indexOf("</header>") + 9);
+test("logo et mention Skazy Formation identiques sur toutes les pages", () => {
+  const logo = (t) => (t.match(/<header class="brand">\n\s*(<a href="https:\/\/formation\.skazy\.nc\/"[\s\S]*?<\/a>)/) || [, ""])[1];
   const foot = (t) => (t.match(/<span class="brand-foot">.*?<\/span>/) || [""])[0];
   const ref = read(PAGES[0]);
-  expect(header(ref)).toContain(`href="${SKAZY}"`);
+  expect(logo(ref)).toContain(`href="${SKAZY}"`);
   expect(foot(ref)).toContain(`href="${SKAZY}"`);
   for (const f of PAGES.slice(1)) {
-    expect(header(read(f)), f).toBe(header(ref));
+    expect(logo(read(f)), f).toBe(logo(ref));
     expect(foot(read(f)), f).toBe(foot(ref));
   }
+});
+
+test("chaque fiche a un bouton Accueil en haut, et l'accueil a le mode démonstration", () => {
+  for (const f of FICHES) expect(read(f), f).toMatch(/<\/a>\n\s*<a class="home" href="index\.html">[\s\S]*?Accueil<\/a>\n\s*<\/header>/);
+  const home = read("index.html");
+  expect(home).not.toContain('class="home"');
+  expect(home).toContain('id="demoBtn"');
+  expect(home).toContain('class="modes-help"');
 });
 
 test("Font Awesome chargé depuis cdnjs avec contrôle d'intégrité", () => {

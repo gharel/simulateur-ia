@@ -69,16 +69,26 @@ p { margin: 0; max-width: 60ch; }
 .go { margin-top: auto; font-weight: 700; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .foot { margin-top: 28px; color: var(--muted); font-size: .9rem; display: grid; gap: 10px; }
 .foot .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.foot strong { color: var(--fg); }
+.foot code { white-space: nowrap; }
 .small { font-size: .9rem; }
 .muted { color: var(--muted); }
 
 /* Skazy Formation : logo en haut, mention en bas (même bloc dans chaque fiche) */
-.brand { margin-bottom: 16px; }
+.brand { margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .brand a { display: inline-flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; color: var(--fg); text-decoration: none; border-radius: 10px; }
 .brand-logo { display: block; width: 109px; height: 36px; flex: none; }
 .brand-url { font-size: .85rem; font-weight: 700; color: var(--muted); padding-left: 14px; border-left: 2px solid var(--line); }
 .brand a:hover .brand-url { color: var(--fg); }
 .brand-foot a { color: var(--fg); font-weight: 700; }
+.brand .home {
+  flex: none; gap: 8px; padding: 8px 14px; min-height: 44px; border: 2px solid var(--line); border-radius: 12px;
+  background: var(--surface); font-weight: 700; font-size: .95rem;
+}
+.brand .home:hover { border-color: var(--accent); }
+@media (max-width: 480px) { .brand-url { display: none; } }
+.modes { display: flex; flex-wrap: wrap; gap: 8px; }
+.modes-help { display: grid; gap: 4px; max-width: 80ch; }
 
 /* Parcours */
 .btn {
@@ -260,9 +270,14 @@ p { margin: 0; max-width: 60ch; }
     <span>Chiffres arrondis, pour comprendre. Ce ne sont pas des mesures exactes.</span>
     <div class="btns">
       <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
+      <button type="button" class="btn" id="demoBtn" aria-pressed="false"><i class="fa-solid fa-lock-open" aria-hidden="true"></i> Mode démonstration : non</button>
       <button type="button" class="btn" id="resetBtn"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Effacer ma progression</button>
     </div>
-    <span>Mode atelier : texte plus gros, et les réponses des quiz s'affichent quand l'animateur clique « Révéler ». Adresse directe : <code>index.html?atelier=1</code></span>
+    <div class="modes-help">
+      <span><strong>Mode atelier</strong> : pour animer un groupe. Le texte est plus gros. Dans les quiz, un clic choisit la réponse du groupe, puis « Révéler » montre la correction.</span>
+      <span><strong>Mode démonstration</strong> : pour présenter. Rien n'est flou, tout se voit sans répondre aux questions « Devine d'abord ». Le permis se voit aussi, sans les 6 badges.</span>
+      <span>Les deux modes restent actifs d'une fiche à l'autre. Adresses directes : <code>index.html?atelier=1</code> et <code>index.html?demo=1</code></span>
+    </div>
     <span class="brand-foot">Une ressource Skazy Formation : <a href="https://formation.skazy.nc/" target="_blank" rel="noopener">formation.skazy.nc</a></span>
   </footer>
 </main>
@@ -281,9 +296,13 @@ const store = {
   del(k) { try { localStorage.removeItem(k); } catch {} },
 };
 function loadProgress() { try { return JSON.parse(store.get("ia6:progress")) || {}; } catch { return {}; } }
-const atelierParam = new URLSearchParams(location.search).get("atelier");
-if (atelierParam !== null) store.set("ia6:atelier", atelierParam === "0" ? "0" : "1");
-const ATELIER = atelierParam !== null ? atelierParam !== "0" : store.get("ia6:atelier") === "1";
+// Modes atelier et démonstration : l'adresse (?atelier=1, ?demo=0…) a le dernier mot, sinon le choix gardé dans ce navigateur.
+function mode(key) {
+  const v = new URLSearchParams(location.search).get(key);
+  if (v !== null) store.set("ia6:" + key, v === "0" ? "0" : "1");
+  return v !== null ? v !== "0" : store.get("ia6:" + key) === "1";
+}
+const ATELIER = mode("atelier"), DEMO = mode("demo");
 if (ATELIER) document.documentElement.dataset.mode = "atelier";
 // Icônes Font Awesome. Dans un texte, « {nom} » devient l'icône fa-nom (comme dans les fiches).
 function icon(name, cls) {
@@ -297,7 +316,8 @@ function rich(el, text) {
   return el;
 }
 const starIcons = (n) => [1, 2, 3].map((k) => icon("star", k > n ? "star-off" : ""));
-const link = (f) => f + (ATELIER ? "?atelier=1" : "");
+const MODE_QUERY = [ATELIER && "atelier=1", DEMO && "demo=1"].filter(Boolean).join("&");
+const link = (f) => f + (MODE_QUERY ? "?" + MODE_QUERY : "");
 
 function render() {
   const p = loadProgress();
@@ -330,8 +350,9 @@ function render() {
 
   // Le permis
   const done = won.length === 6, left = 6 - won.length;
-  $("#license").classList.toggle("locked", !done);
-  $("#licLock").hidden = done;
+  // En mode démonstration, le permis se voit, mais on ne l'imprime qu'avec les 6 badges.
+  $("#license").classList.toggle("locked", !done && !DEMO);
+  $("#licLock").hidden = done || DEMO;
   rich($("#licLock span"), `{lock} Encore ${left} badge${left > 1 ? "s" : ""}`);
   $("#licHint").textContent = done
     ? "Bravo ! Tu as les 6 badges. Écris ton prénom, puis imprime ton permis."
@@ -364,12 +385,21 @@ $("#resetBtn").addEventListener("click", () => {
   $("#licName").value = "";
   render();
 });
-(function initAtelier() {
-  const b = $("#atelierBtn");
-  rich(b, "{chalkboard-user} Mode atelier : " + (ATELIER ? "oui" : "non"));
-  b.setAttribute("aria-pressed", String(ATELIER));
-  b.addEventListener("click", () => { store.set("ia6:atelier", ATELIER ? "0" : "1"); location.search = ATELIER ? "atelier=0" : "atelier=1"; });
-  if (ATELIER) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?atelier=1$1"); });
+// Boutons des modes, comme dans les fiches
+(function initModes() {
+  const MODES = { atelier: [ATELIER, "{chalkboard-user} Mode atelier : "], demo: [DEMO, "{lock-open} Mode démonstration : "] };
+  for (const [key, [on, label]] of Object.entries(MODES)) {
+    const b = $("#" + key + "Btn");
+    rich(b, label + (on ? "oui" : "non"));
+    b.setAttribute("aria-pressed", String(on));
+    b.addEventListener("click", () => {
+      store.set("ia6:" + key, on ? "0" : "1");
+      const q = new URLSearchParams(location.search);
+      q.set(key, on ? "0" : "1");
+      location.search = q;
+    });
+  }
+  if (MODE_QUERY) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?" + MODE_QUERY + "$1"); });
 })();
 // Revenir sur l'accueil (bouton « précédent ») doit montrer les badges gagnés entre-temps.
 addEventListener("pageshow", render);

@@ -27,10 +27,18 @@ Avec les 6 badges, l'accueil délivre un **permis de conduire l'IA** à imprimer
 
 La progression reste dans le navigateur (`localStorage`). Le bouton « Effacer ma progression » de l'accueil la remet à zéro.
 
-## Mode atelier
+## Mode atelier et mode démonstration
 
-Pour animer un groupe : le bouton « Mode atelier » en bas de page, ou l'adresse `index.html?atelier=1`.
-Le texte est plus gros. Dans les quiz, un clic choisit la réponse du groupe, puis « Révéler » affiche la correction.
+Les deux boutons sont en bas de chaque page, avec une courte explication. Le mode choisi reste actif d'une page à l'autre.
+
+- **Mode atelier**, pour animer un groupe : le bouton « Mode atelier », ou l'adresse `index.html?atelier=1`.
+  Le texte est plus gros. Dans les quiz, un clic choisit la réponse du groupe, puis « Révéler » affiche la correction.
+- **Mode démonstration**, pour présenter : le bouton « Mode démonstration », ou l'adresse `index.html?demo=1`.
+  Rien n'est flou : tout se voit sans répondre aux questions « Devine d'abord ». Sur l'accueil, le permis se voit aussi, mais on ne l'imprime qu'avec les 6 badges.
+
+Pour enlever un mode : le même bouton, ou l'adresse avec `=0` (par exemple `?demo=0`).
+
+En haut de chaque fiche, le bouton « Accueil » ramène à la page d'accueil.
 
 ## Skazy Formation
 

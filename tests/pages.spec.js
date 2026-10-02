@@ -38,6 +38,14 @@ for (const f of PAGES) {
 }
 
 for (const f of FICHES) {
+  test(`${f} : le bouton Accueil est en haut de la page`, async ({ page }) => {
+    await open(page, f);
+    const home = page.locator(".brand a.home");
+    await expect(home).toBeVisible();
+    await expect(home).toHaveAttribute("href", "index.html");
+    expect((await home.boundingBox()).y).toBeLessThan(100);
+  });
+
   test(`${f} : chaque zone floutée dit quoi faire, puis se débloque`, async ({ page, isMobile }) => {
     await open(page, f);
     const n = await page.locator(".locked").count();

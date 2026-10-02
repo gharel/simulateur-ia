@@ -7,8 +7,8 @@ for (const f of PAGES) {
     test(`${f}${query && " en mode atelier"} : tout cliquer ne casse rien`, async ({ page }) => {
       page.on("dialog", (d) => d.dismiss());
       const errors = await open(page, f, query);
-      // Pas le bouton du mode atelier (il recharge la page) ni l'impression.
-      const controls = page.locator("main button:visible:not(#atelierBtn):not(#licPrint), main input[type=checkbox]:visible");
+      // Pas les boutons des modes (ils rechargent la page) ni l'impression.
+      const controls = page.locator("main button:visible:not(#atelierBtn):not(#demoBtn):not(#licPrint), main input[type=checkbox]:visible");
       for (let round = 0; round < 2; round++) {
         const n = await controls.count();
         for (let i = 0; i < n; i++) await controls.nth(i).click({ timeout: 1000 }).catch(() => {});
@@ -32,6 +32,36 @@ for (const [n, f] of FICHES.entries()) {
     expect(saved[n + 1]).toBeGreaterThan(0);
   });
 }
+
+test.describe("mode démonstration", () => {
+  for (const f of ["1-tokens.html", "3-hallucinations.html", "6-message-piege.html"]) {
+    test(`${f} : rien n'est flou`, async ({ page }) => {
+      await open(page, f, "?demo=1");
+      await expect(page.locator(".locked")).toHaveCount(0);
+      await expect(page.locator(".lock-tip")).toHaveCount(0);
+      await expect(page.locator("#demoBtn")).toHaveAttribute("aria-pressed", "true");
+      await expect(page.locator("#demoBtn")).toContainText("oui");
+    });
+  }
+
+  test("le mode suit d'une page à l'autre, montre le permis, et s'enlève avec son bouton", async ({ page }) => {
+    await open(page, "1-tokens.html", "?demo=1");
+    await page.locator(".brand a.home").click();
+    await page.waitForURL(/index\.html\?demo=1/);
+    await iconsReady(page);
+    await expect(page.locator("#license")).not.toHaveClass(/locked/);
+    await expect(page.locator("#licLock")).toBeHidden();
+    await expect(page.locator("#licPrint")).toBeDisabled();
+    // Sans rien dans l'adresse, le choix gardé dans le navigateur s'applique.
+    await open(page, "6-message-piege.html");
+    await expect(page.locator(".locked")).toHaveCount(0);
+    await page.locator("#demoBtn").click();
+    await page.waitForURL(/demo=0/);
+    await iconsReady(page);
+    await expect(page.locator(".locked")).not.toHaveCount(0);
+    await expect(page.locator("#demoBtn")).toContainText("non");
+  });
+});
 
 test("index.html : le permis se débloque avec les 6 badges", async ({ page }) => {
   await open(page, "index.html");
