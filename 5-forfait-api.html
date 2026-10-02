@@ -6,6 +6,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/js/solid.min.js" integrity="sha512-T7EGedkSB4ewtlSHpcmpJm6FQMnxZzLYhAYRPk6n4zF30ap1uJrPuXX98A3SYMwv04/ZVTOfbF89Oa6dIJyljw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/js/fontawesome.min.js" integrity="sha512-WgR61jcssTjrH2a2vWm5JiWaEy1kmFIE5G0ybjKB0UEDzygVCebYW4eP2p96XmJWXA0zk/sNhbCfb09Wx39t4A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
 /* Bento : grille de 4 colonnes. Une carte « hero » pleine couleur, les autres en cartes sombres. */
 :root {
@@ -88,7 +90,7 @@ p { margin: 0; max-width: 65ch; }
 .small { font-size: .9rem; }
 .big { font-family: var(--font-display); font-size: clamp(2.3rem, 5vw, 3.4rem); line-height: 1; color: var(--accent-text); font-variant-numeric: tabular-nums; }
 .head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.emo { font-size: 1.6rem; line-height: 1; }
+.emo { font-size: 1.6rem; line-height: 1; color: var(--accent-text); }
 
 /* Réglages */
 .ctl { display: grid; gap: 10px; font-weight: 700; }
@@ -191,6 +193,20 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
+/* Skazy Formation : logo en haut, mention en bas (même bloc dans chaque fiche) */
+.brand { margin-bottom: 16px; }
+.brand a { display: inline-flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; color: var(--fg); text-decoration: none; border-radius: 10px; }
+.brand-logo { display: block; width: 109px; height: 36px; flex: none; }
+.brand-url { font-size: .85rem; font-weight: 700; color: var(--muted); padding-left: 14px; border-left: 2px solid var(--line); }
+.brand a:hover .brand-url { color: var(--fg); }
+.brand-foot a { color: var(--fg); font-weight: 700; }
+
+/* Icônes Font Awesome : couleur des icônes d'état */
+.fa-circle-check { color: var(--ok); }
+.fa-circle-xmark { color: var(--bad); }
+.fa-triangle-exclamation { color: var(--warn); }
+.hero .emo, .next .svg-inline--fa, .seg button[aria-pressed="true"] .svg-inline--fa { color: inherit; }
+
 /* Parcours : devine d'abord, défi final, badge, mode atelier (même bloc dans chaque fiche) */
 .guess { background: var(--surface-2); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; box-shadow: inset 4px 0 0 var(--accent); }
 .guess p, .qi p { font-weight: 700; overflow-wrap: anywhere; }
@@ -219,8 +235,9 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
   flex: none; width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 2.2rem;
   background: var(--surface-2); filter: grayscale(1); opacity: .55; transition: transform .4s ease, filter .4s, opacity .4s;
 }
-.badge.won { background: var(--accent); filter: none; opacity: 1; transform: rotate(-10deg) scale(1.05); }
+.badge.won { background: var(--accent); color: var(--on-accent); filter: none; opacity: 1; transform: rotate(-10deg) scale(1.05); }
 .stars { font-size: 1.6rem; letter-spacing: .08em; color: var(--warn); }
+.star-off { opacity: .3; }
 .result { padding: 14px 16px; border-radius: 14px; font-weight: 700; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
 .next {
   background: var(--accent); color: var(--on-accent); border: none; text-decoration: none;
@@ -230,7 +247,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .next:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
 .next .eyebrow { color: var(--on-accent); opacity: .7; }
 .next strong { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 4vw, 2.2rem); line-height: 1.05; }
-.next .emo { font-size: 2.4rem; }
+.next .emo { font-size: 2.4rem; color: inherit; }
 .foot .btn { justify-self: start; }
 .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
 .confetti span { position: absolute; top: -48px; font-size: 1.8rem; animation: fall 2.2s cubic-bezier(.3, .6, .6, 1) forwards; }
@@ -280,6 +297,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 </style>
 
 <main class="wrap">
+  <header class="brand">
+    <a href="https://formation.skazy.nc/" target="_blank" rel="noopener" aria-label="Skazy Formation : formation.skazy.nc, nouvel onglet">
+      <svg class="brand-logo" viewBox="0 0 218 72" aria-hidden="true" focusable="false"><path fill-rule="evenodd" fill="currentColor" d="m202.4 1.4h15.3l-16 52.6q-1.1 3.5-3 6.3c-1.3 1.9-2.9 3.5-4.7 4.8-1.8 1.4-3.8 2.4-6 3.1-2.2 0.7-4.5 1.1-6.9 1.1-3 0-5.9-0.6-8.7-1.7v-14.4c2.8 1 5.1 1.5 7 1.5 3.7 0 5.6-2 6-6.2l-13.4-37v0.1l-21.3 25.3h26.7l3.9 11.6h-51.8c-3.1 0-5 0.1-6.3-0.8-1.6-1.1-2.6-2.8-3.1-4.9l-0.4-1.7c-2.1 2.7-4.5 4.7-7.2 6.1q-4 2.1-8.7 2.1c-2.3 0-4.5-0.4-6.5-1.2-2-0.8-3.7-1.9-5.2-3.2-1.4-1.4-2.6-3-3.4-4.8q-1.2-2.8-1.2-6c0-2.4 0.5-4.5 1.5-6.5q1.5-3 4.2-5.1c1.8-1.4 3.9-2.5 6.4-3.3 2.5-0.8 5.2-1.2 8.2-1.2 3.8 0 6.9 0.6 9.4 1.8v-1.4c0-2.2-0.6-3.8-1.9-4.9-1.3-1.1-3.3-1.6-6.2-1.6-2.7 0-5.1 0.4-7.4 1.3-2.2 0.9-4.6 2.1-7.1 3.8l-4.9-10.5c6.2-4 13.2-6 21.1-6 7.5 0 13.3 1.7 17.3 5 4.1 3.4 6.1 8.3 6.1 15v9.1c0 1.6 0.2 2.7 0.7 3.3 0.3 0.5 1.2 1.3 2.7 0l16.9-19.9h-20v-11.6h51.5l9 32.6 7.4-32.7zm-84.9 30.5v-3.3q-1.5-0.6-3.3-0.9c-1.2-0.3-2.3-0.4-3.2-0.4-2.1 0-3.8 0.5-5.2 1.5-1.4 1-2.1 2.3-2.1 3.8 0 1.3 0.6 2.4 1.6 3.2 1.1 0.8 2.4 1.2 4 1.2 1 0 2-0.2 3.1-0.5 1-0.3 2-0.8 2.8-1.3 0.7-0.5 1.2-1 1.6-1.6 0.4-0.5 0.6-1.1 0.6-1.7zm-94.6 18.2c-4.2 0.1-8.3-0.4-12.4-1.6-4.1-1.2-7.5-3.1-10.4-5.6l5.6-10.6c3.1 1.9 6 3.4 8.8 4.4 2.8 1 5.4 1.5 7.7 1.4q3.6-0.2 3.6-2.4 0-1.4-1.5-2.1c-1-0.6-2.8-1.2-5.6-1.9-3.4-0.9-6.3-1.7-8.6-2.6-2.3-0.9-4.2-1.8-5.7-2.9-1.5-1-2.5-2.2-3.2-3.5-0.7-1.3-1-2.9-1.1-4.7-0.1-2.4 0.3-4.7 1.2-6.8 0.9-2.1 2.2-3.9 3.9-5.5 1.7-1.6 3.7-2.8 6.1-3.7q3.6-1.4 7.8-1.5c3.5-0.1 6.9 0.2 10.1 1 3.2 0.8 6.5 2.5 9.8 5.2l-6.2 10.6c-3-1.8-5.6-3.1-7.6-3.9-2-0.8-3.9-1.1-5.7-1-1 0-1.9 0.3-2.5 0.7-0.7 0.4-1 1.1-0.9 1.9 0 0.9 0.5 1.6 1.5 2.2 1 0.5 2.9 1.1 5.8 1.8 3.5 0.8 6.5 1.6 8.9 2.6 2.4 0.9 4.3 1.9 5.8 3.1 1.5 1.1 2.5 2.4 3.2 3.9 0.7 1.5 1 3.2 1.1 5.1 0.1 2.5-0.3 4.7-1.1 6.7-0.8 2-2.1 3.7-3.8 5.2-1.7 1.5-3.7 2.6-6.2 3.4-2.5 0.6-5.3 1-8.4 1.1z"/><path fill="currentColor" d="m72.5 49.3l-10.9-17.5-3.5 3.8v13.7h-17.3v-49.2h17.3v19l12.9-17.8h18.3l-16.5 21 18.2 27z"/><path fill-rule="evenodd" fill="#00997A" d="m21.6 53.6v0.6h3.6v5h-3.6v11.8h-5.7v-11.8h-2.2v-5h2.2v-0.6c0-3.4 1.8-6.3 5.5-6.3 1.1 0 2.7 0.2 3.8 0.6v4.4c-0.6-0.2-1.2-0.4-1.8-0.4-1.5 0.1-1.8 1.2-1.8 1.7zm4.7 9c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm18.9-9.2l-0.9 5.7c-0.2 0-0.6-0.1-0.9-0.1-1.7 0-4.1 0.7-4.1 5.2v6.8h-5.7v-16.8h5.2l0.3 2c1.8-2 4.1-2.7 6.1-2.8zm28.8 8.5v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.9 0-2.8 1.3-2.8 3.2v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.8 0-2.8 1.3-2.8 3.2v9.1h-5.7v-16.8h5.2l0.2 1.3c1.2-1.2 2.9-1.9 5-1.9 2 0 3.9 0.6 5 2.8 1.2-1.7 3.2-2.8 5.8-2.8 3.3 0 6.3 1.6 6.3 8.3zm20.9-7.7v16.8h-5.2l-0.3-1.7c-1.2 1.5-3.1 2.3-5.3 2.3-5.1 0-8.4-4.2-8.4-9 0-5 3.5-9 8.4-9 2.2 0 4.1 0.8 5.3 2.3l0.3-1.7zm-5.7 8.3c0-2.4-1.8-3.8-3.9-3.8-2.3 0-4 1.8-4 3.9 0 2 1.6 3.9 4 3.9 2.3 0 3.9-1.7 3.9-4zm9.4 2.8v-6.2h-2.4v-4.5h0.5c1.5 0 2.4-0.8 2.4-2.3v-1.7h5.1v3.5h3.4v5h-3.4v5.9c0 1.2 0.7 1.7 1.7 1.7 0.5 0 1.2-0.2 1.7-0.3v4.3c-0.9 0.4-2.5 0.6-3.6 0.6-4.1 0-5.4-2.8-5.4-6zm11.1-15.5c0-1.6 1.4-2.8 3.2-2.8 1.8 0 3.2 1.3 3.2 2.8 0 1.5-1.3 2.8-3.2 2.8-1.9 0-3.2-1.3-3.2-2.8zm0.3 4.4h5.7v16.8h-5.7zm7.7 8.4c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm23.7-0.7v9.1h-5.7v-9.1c0-2.3-1-3.2-2.7-3.2-1.8 0-2.9 1.3-2.9 3.2v9.1h-5.7v-16.8h5.2l0.2 1.5c1.3-1.2 3-2 5.2-2 3.2-0.1 6.4 1.5 6.4 8.2z"/></svg>
+      <span class="brand-url">formation.skazy.nc <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+    </a>
+  </header>
   <div class="bento">
 
     <section class="card hero s4">
@@ -300,7 +323,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true">🎛️</span><h2>Mon usage</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span><h2>Mon usage</h2></div>
       <div class="ctl">
         <div class="ctl-row"><label for="perDay">Messages par jour</label><span class="ctl-val" id="vPerDay"></span></div>
         <input type="range" id="perDay" min="1" max="200" value="40">
@@ -326,11 +349,11 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           <button type="button" data-v="opus" aria-pressed="false">Opus</button>
         </div>
       </div>
-      <label class="sw" for="cache"><span>♻️ Mémoire cache (relire coûte moins cher)</span><input type="checkbox" id="cache"></label>
+      <label class="sw" for="cache"><span><i class="fa-solid fa-recycle" aria-hidden="true"></i> Mémoire cache (relire coûte moins cher)</span><input type="checkbox" id="cache"></label>
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true">🧮</span><h2>Le résultat par mois</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-calculator"></i></span><h2>Le résultat par mois</h2></div>
       <div class="duo">
         <div class="stat"><b id="apiCost">–</b><span>avec l'API (compteur)</span></div>
         <div class="stat plan"><b id="planCost">–</b><span>avec le forfait</span></div>
@@ -344,7 +367,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true">🎲</span><h2>Jeu : fais ton pari</h2><span class="pill" id="betScore">0 / 4</span></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-dice"></i></span><h2>Jeu : fais ton pari</h2><span class="pill" id="betScore">0 / 4</span></div>
       <p>Voici 4 profils. Pour chacun, parie : <strong>forfait à 20 $ par mois, ou API au compteur ?</strong>
         Après ta réponse, le calculateur se règle sur le profil. Regarde la courbe juste en dessous.</p>
       <div class="quiz bets" id="bets"></div>
@@ -353,7 +376,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true">📈</span><h2>Où est le point de bascule ?</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></span><h2>Où est le point de bascule ?</h2></div>
       <p class="muted">Le coût par mois selon le nombre de messages par jour.</p>
       <div class="chart-box" id="chart" role="img" aria-label="Courbe du coût de l'API comparé au prix du forfait"></div>
       <div class="legend">
@@ -364,7 +387,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true">✍️</span><h2>Les prix (modifiables)</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-pen-nib"></i></span><h2>Les prix (modifiables)</h2></div>
       <p class="muted">Les prix changent souvent. Tu peux les corriger ici.</p>
       <div class="fields">
         <label for="plan">Forfait par mois<span class="unit"><input type="number" id="plan" min="0" step="1" value="20"></span></label>
@@ -375,15 +398,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true">⛔</span><h2>Bloqué ou pas ?</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-ban"></i></span><h2>Bloqué ou pas ?</h2></div>
       <div class="versus">
         <div>
-          <h3>💳 Forfait</h3>
+          <h3><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Forfait</h3>
           <p>Le prix ne bouge pas.</p>
           <p>Si tu utilises beaucoup, tu dois faire une pause. La limite revient après quelques heures.</p>
         </div>
         <div>
-          <h3>🧾 API</h3>
+          <h3><i class="fa-solid fa-receipt" aria-hidden="true"></i> API</h3>
           <p>Pas de pause obligatoire.</p>
           <p>Mais la facture monte avec l'usage. On peut fixer un plafond de dépense.</p>
         </div>
@@ -391,10 +414,10 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true">📋</span><h2>Récap</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-clipboard-list"></i></span><h2>Récap</h2></div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th></th><th>💳 Forfait</th><th>🧾 API</th></tr></thead>
+          <thead><tr><th></th><th><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Forfait</th><th><i class="fa-solid fa-receipt" aria-hidden="true"></i> API</th></tr></thead>
           <tbody>
             <tr><th>Prix</th><td>Fixe chaque mois</td><td>Selon les tokens utilisés</td></tr>
             <tr><th>Limite</th><td>Un quota d'usage par période</td><td>Pas de pause, mais un budget</td></tr>
@@ -407,7 +430,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s2 retenir">
-      <div class="head"><span class="emo" aria-hidden="true">🧠</span><h2>À retenir</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
         <li><span>Forfait = prix fixe, mais une limite. Quand elle est atteinte, il faut attendre.</span></li>
         <li><span>API = jamais de pause obligatoire, mais tu paies chaque token.</span></li>
@@ -416,7 +439,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s4 challenge" id="defi">
-      <div class="head"><span class="emo" aria-hidden="true">🏁</span><h2>Défi final</h2><span class="pill" id="defiScore"></span></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-flag-checkered"></i></span><h2>Défi final</h2><span class="pill" id="defiScore"></span></div>
       <div class="prize">
         <span class="badge" id="badge" aria-hidden="true"></span>
         <div class="prize-txt"><strong id="badgeName"></strong><span class="small muted" id="badgeTxt"></span></div>
@@ -424,19 +447,20 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       </div>
       <div class="quiz" id="defiQuiz"></div>
       <div class="result" id="defiResult" aria-live="polite"></div>
-      <button type="button" class="btn reveal" id="defiReset">↺ Rejouer le défi</button>
+      <button type="button" class="btn reveal" id="defiReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Rejouer le défi</button>
     </section>
 
     <a class="card s4 next" href="6-message-piege.html">
       <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>6 · Le Message Piégé</strong></span>
-      <span class="emo" aria-hidden="true">→</span>
+      <span class="emo" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
     </a>
 
   </div>
   <footer class="foot">
     <nav class="series" aria-label="Les 6 fiches"><strong>Comprendre l’IA en 6 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-modele-effort.html">2 Modèle et effort</a><a href="3-hallucinations.html">3 Hallucinations</a><a href="4-boite-outils.html">4 Les outils Claude</a><a aria-current="page">5 Forfait ou API</a><a href="6-message-piege.html">6 Message piégé</a></nav>
     <span>Calcul simplifié pour comprendre. La cache est comptée ici à 10 % du prix de lecture pour 80 % du texte relu.</span>
-    <button type="button" class="btn" id="atelierBtn" aria-pressed="false">🎤 Mode atelier : non</button>
+    <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
+    <span class="brand-foot">Une ressource Skazy Formation : <a href="https://formation.skazy.nc/" target="_blank" rel="noopener">formation.skazy.nc</a></span>
   </footer>
 </main>
 
@@ -463,7 +487,7 @@ function initSeg(el, onChange) {
 
 const FICHE = 5;
 // Parcours : progression gardée dans ce navigateur, mode atelier, devine d'abord, défi final (même bloc dans chaque fiche)
-const BADGES = { 1: ["🪙", "Maître des tokens"], 2: ["🧠", "Bon Cerveau"], 3: ["🕵️", "Détective anti-bobards"], 4: ["🧰", "As de la boîte à outils"], 5: ["🧮", "Pro du budget"], 6: ["🛡️", "Gardien anti-piège"] };
+const BADGES = { 1: ["{coins}", "Maître des tokens"], 2: ["{brain}", "Bon Cerveau"], 3: ["{user-secret}", "Détective anti-bobards"], 4: ["{toolbox}", "As de la boîte à outils"], 5: ["{calculator}", "Pro du budget"], 6: ["{shield-halved}", "Gardien anti-piège"] };
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch {} },
@@ -479,28 +503,41 @@ if (atelierParam !== null) store.set("ia6:atelier", atelierParam === "0" ? "0" :
 const ATELIER = atelierParam !== null ? atelierParam !== "0" : store.get("ia6:atelier") === "1";
 if (ATELIER) document.documentElement.dataset.mode = "atelier";
 
+// Icônes Font Awesome. Dans un texte, « {nom} » devient l'icône fa-nom : "{circle-check} Bravo !"
+function icon(name, cls) {
+  const i = document.createElement("i");
+  i.className = "fa-solid fa-" + name + (cls ? " " + cls : "");
+  i.setAttribute("aria-hidden", "true");
+  return i;
+}
+function rich(el, text) {
+  el.replaceChildren(...String(text).split(/\{([a-z0-9-]+)\}/).map((s, k) => (k % 2 ? icon(s) : s)).filter((s) => s !== ""));
+  return el;
+}
+// Le même texte sans les icônes, pour les attributs (aria-label…)
+const plain = (text) => String(text).replace(/\{[a-z0-9-]+\}\s*/g, "");
 function h(tag, cls, text) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
-  if (text != null) e.textContent = text;
+  if (text != null) rich(e, text);
   return e;
 }
 function btn(label, cls = "") { const b = h("button", cls, label); b.type = "button"; return b; }
-const starsTxt = (n) => "★".repeat(n) + "☆".repeat(3 - n);
+const starIcons = (n) => [1, 2, 3].map((k) => icon("star", k > n ? "star-off" : ""));
 
 // Une question à choix. En mode atelier, un clic choisit et « Révéler » corrige : le groupe répond d'abord.
-function ask(box, { q, options, a, why, onShow, good = "✅ Bravo ! ", bad = "❌ Pas tout à fait. " }) {
+function ask(box, { q, options, a, why, onShow, good = "{circle-check} Bravo ! ", bad = "{circle-xmark} Pas tout à fait. " }) {
   let pick = null, shown = false;
   const group = h("div", "qbtns");
   group.setAttribute("role", "group");
-  group.setAttribute("aria-label", q);
+  group.setAttribute("aria-label", plain(q));
   const bs = options.map(([v, label]) => {
     const b = btn(label);
     b.addEventListener("click", () => { pick = v; if (ATELIER && !shown) paint(); else show(); });
     group.append(b);
     return [v, b];
   });
-  const rev = btn("👁️ Révéler la réponse", "btn reveal");
+  const rev = btn("{eye} Révéler la réponse", "btn reveal");
   rev.addEventListener("click", show);
   const fb = h("span", "qfb");
   fb.setAttribute("aria-live", "polite");
@@ -519,7 +556,7 @@ function ask(box, { q, options, a, why, onShow, good = "✅ Bravo ! ", bad = "�
       b.classList.toggle("wrong", shown && v === pick && v !== a);
     }
     rev.hidden = shown || pick === null;
-    fb.textContent = shown ? (pick === a ? good : bad) + (typeof why === "function" ? why() : why) : "";
+    rich(fb, shown ? (pick === a ? good : bad) + (typeof why === "function" ? why() : why) : "");
   }
   box.replaceChildren(h("p", "", q), group, rev, fb);
   paint();
@@ -531,18 +568,21 @@ function guess(box, { lock, q, ...opts }) {
   const zones = [].concat(lock);
   zones.forEach((z) => { z.classList.add("locked"); z.inert = true; });
   box.classList.add("guess");
-  return ask(box, { ...opts, q: "🤔 Devine d'abord : " + q, good: "✅ Bien vu ! ", bad: "😮 Surprise ! ",
+  return ask(box, { ...opts, q: "{circle-question} Devine d'abord : " + q, good: "{circle-check} Bien vu ! ", bad: "{face-surprise} Surprise ! ",
     onShow() { zones.forEach((z) => { z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false; }); } });
 }
 
+// Pluie d'icônes aux couleurs des 6 fiches
+const CONFETTI_COLORS = ["#C6FF00", "#FF2E93", "#FF6B00", "#00E5FF", "#B14EFF", "#FFE600"];
 function confetti(ic) {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const box = h("div", "confetti");
   box.setAttribute("aria-hidden", "true");
   for (let i = 0; i < 28; i++) {
-    const s = h("span", "", ["🎉", "⭐", ic, "✨"][i % 4]);
+    const s = h("span", "", ["{trophy}", "{star}", ic, "{wand-magic-sparkles}"][i % 4]);
     s.style.left = Math.random() * 96 + "%";
     s.style.animationDelay = Math.random() * 0.7 + "s";
+    s.style.color = CONFETTI_COLORS[i % 6];
     box.append(s);
   }
   document.body.append(box);
@@ -563,7 +603,7 @@ function initDefi(items, options) {
   });
   function paintBadge() {
     $("#badge").classList.toggle("won", record > 0);
-    $("#stars").textContent = record ? starsTxt(record) : "";
+    $("#stars").replaceChildren(...(record ? starIcons(record) : []));
     $("#stars").setAttribute("aria-label", record ? `Meilleur score : ${record} étoile${record > 1 ? "s" : ""} sur 3` : "");
     $("#badgeTxt").textContent = record
       ? "Badge gagné ! Rejoue quand tu veux pour améliorer ton score."
@@ -578,13 +618,13 @@ function initDefi(items, options) {
     record = Math.max(record, stars);
     saveProgress(FICHE, stars);
     paintBadge();
-    $("#defiResult").textContent = stars === 3
-      ? `🎉 ${good} sur ${total} du premier coup ! Tu gagnes le badge ${ic} « ${name} » avec 3 étoiles.`
-      : `🎉 ${good} sur ${total} du premier coup. Tu gagnes le badge ${ic} « ${name} » avec ${stars} étoile${stars > 1 ? "s" : ""} sur 3. Rejoue pour viser 3 étoiles !`;
+    rich($("#defiResult"), stars === 3
+      ? `{trophy} ${good} sur ${total} du premier coup ! Tu gagnes le badge ${ic} « ${name} » avec 3 étoiles.`
+      : `{trophy} ${good} sur ${total} du premier coup. Tu gagnes le badge ${ic} « ${name} » avec ${stars} étoile${stars > 1 ? "s" : ""} sur 3. Rejoue pour viser 3 étoiles !`);
     confetti(ic);
   }
-  $("#badge").textContent = ic;
-  $("#badgeName").textContent = `${ic} Badge « ${name} »`;
+  rich($("#badge"), ic);
+  rich($("#badgeName"), `${ic} Badge « ${name} »`);
   $("#defiScore").textContent = `0 / ${total}`;
   $("#defiReset").addEventListener("click", () => {
     firsts.clear();
@@ -600,7 +640,7 @@ function initDefi(items, options) {
 // Mode atelier : texte plus gros, réponses révélées par l'animateur. Le réglage suit d'une fiche à l'autre.
 (function initAtelier() {
   const b = $("#atelierBtn");
-  b.textContent = "🎤 Mode atelier : " + (ATELIER ? "oui" : "non");
+  rich(b, "{chalkboard-user} Mode atelier : " + (ATELIER ? "oui" : "non"));
   b.setAttribute("aria-pressed", String(ATELIER));
   b.addEventListener("click", () => { store.set("ia6:atelier", ATELIER ? "0" : "1"); location.search = ATELIER ? "atelier=0" : "atelier=1"; });
   if (ATELIER) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?atelier=1$1"); });
@@ -643,9 +683,9 @@ function render() {
 
   const even = cpm > 0 ? plan / (days * cpm) : Infinity;
   const v = $("#verdict");
-  if (api < plan * 0.9) v.textContent = `🧾 L'API coûte moins cher pour toi. Le forfait devient rentable à partir de ${fmt(Math.ceil(even))} messages par jour.`;
-  else if (api > plan * 1.1) v.textContent = `💳 Le forfait est moins cher pour toi. Tu économises environ ${money(api - plan)} par mois. Attention : le forfait a une limite d'usage.`;
-  else v.textContent = "🤝 Les deux coûtent à peu près pareil. Le forfait évite les surprises, l'API évite les pauses.";
+  if (api < plan * 0.9) rich(v, `{receipt} L'API coûte moins cher pour toi. Le forfait devient rentable à partir de ${fmt(Math.ceil(even))} messages par jour.`);
+  else if (api > plan * 1.1) rich(v, `{credit-card} Le forfait est moins cher pour toi. Tu économises environ ${money(api - plan)} par mois. Attention : le forfait a une limite d'usage.`);
+  else rich(v, "{handshake} Les deux coûtent à peu près pareil. Le forfait évite les surprises, l'API évite les pauses.");
 
   drawChart({ perDay, days, plan, cpm, even });
 }
@@ -702,7 +742,7 @@ function drawChart({ perDay, days, plan, cpm, even }) {
     el("line", { class: "l-even", x1: x(even), x2: x(even), y1: m.t, y2: H - m.b });
     const right = x(even) < W * 0.6;
     const te = el("text", { class: "t-even", x: x(even) + (right ? 8 : -8), y: m.t + 4, "text-anchor": right ? "start" : "end" });
-    te.textContent = "🔀 bascule : " + fmt(Math.ceil(even)) + " / jour";
+    te.textContent = "Bascule : " + fmt(Math.ceil(even)) + " / jour";
   }
   el("circle", { class: "dot-now", cx: x(perDay), cy: y(cpm * days * perDay), r: 9 });
   box.replaceChildren(svg);
@@ -717,16 +757,16 @@ render();
 const BET_PLAN = 20;
 const cpmOf = (size, model) => (SIZES[size].inTok * PRICES[model][0] + SIZES[size].outTok * PRICES[model][1]) / 1e6;
 const PROFILES = [
-  { who: "🧑‍💻 Tom, développeur. L'appli de réservation qu'il a créée envoie 50 petites questions par jour à l'IA (Sonnet), 22 jours par mois.",
+  { who: "{laptop-code} Tom, développeur. L'appli de réservation qu'il a créée envoie 50 petites questions par jour à l'IA (Sonnet), 22 jours par mois.",
     perDay: 50, days: 22, size: "short", model: "sonnet", a: "api",
     why: (api) => `API : ${money(api)} par mois, contre ${BET_PLAN} $ pour le forfait. Et l'API marche dans son appli.` },
-  { who: "👩‍💼 Sophie, responsable d'agence. 40 messages moyens par jour dans l'appli Claude (Sonnet), 22 jours par mois.",
+  { who: "{user-tie} Sophie, responsable d'agence. 40 messages moyens par jour dans l'appli Claude (Sonnet), 22 jours par mois.",
     perDay: 40, days: 22, size: "mid", model: "sonnet", a: "plan",
     why: (api) => `Avec l'API, ce serait ${money(api)} par mois. Le forfait coûte moins cher, et la facture ne bouge pas.` },
-  { who: "🧑‍🔬 Marc, développeur. 80 gros travaux par jour avec Opus, 22 jours par mois.",
+  { who: "{flask} Marc, développeur. 80 gros travaux par jour avec Opus, 22 jours par mois.",
     perDay: 80, days: 22, size: "long", model: "opus", a: "plan",
     why: (api) => `Avec l'API : ${money(api)} par mois ! Le forfait coûte bien moins cher. Mais avec autant de gros travaux, Marc atteindra la limite et devra faire des pauses.` },
-  { who: "🤖 Le robot de l'agence. Un outil qui trie 200 e-mails par jour, tout seul, avec Haiku, 31 jours par mois.",
+  { who: "{robot} Le robot de l'agence. Un outil qui trie 200 e-mails par jour, tout seul, avec Haiku, 31 jours par mois.",
     perDay: 200, days: 31, size: "short", model: "haiku", a: "api",
     why: (api) => `Piège ! Le forfait ne marche que dans l'appli Claude, avec un humain. Un robot passe par l'API : environ ${money(api)} par mois. On peut fixer un plafond de dépense.` },
 ];
@@ -743,7 +783,7 @@ function applyProfile(P) {
   PROFILES.forEach((P, i) => {
     const d = h("div", "qi");
     $("#bets").append(d);
-    ask(d, { q: P.who, options: [["plan", "💳 Forfait"], ["api", "🧾 API"]], a: P.a,
+    ask(d, { q: P.who, options: [["plan", "{credit-card} Forfait"], ["api", "{receipt} API"]], a: P.a,
       why: () => P.why(P.perDay * P.days * cpmOf(P.size, P.model)),
       onShow(ok, first) {
         applyProfile(P);
@@ -752,9 +792,9 @@ function applyProfile(P) {
         const good = [...firsts.values()].filter(Boolean).length;
         $("#betScore").textContent = `${good} / ${PROFILES.length}`;
         if (firsts.size < PROFILES.length) return;
-        $("#betResult").textContent = (good === PROFILES.length ? "🎉 4 sur 4 ! " : `${good} sur 4. `) +
-          "La règle : petit usage ou outil automatique, l'API. Gros usage dans l'appli Claude, le forfait.";
-        if (good === PROFILES.length) confetti("🎲");
+        rich($("#betResult"), (good === PROFILES.length ? "{trophy} 4 sur 4 ! " : `${good} sur 4. `) +
+          "La règle : petit usage ou outil automatique, l'API. Gros usage dans l'appli Claude, le forfait.");
+        if (good === PROFILES.length) confetti("{dice}");
       } });
   });
 }
@@ -765,13 +805,13 @@ initDefi([
     options: [["pay", "Je paie un supplément"], ["wait", "Je fais une pause"], ["stop", "Mon compte est fermé"]],
     why: "Le prix ne bouge pas. Mais il faut attendre : la limite revient après quelques heures." },
   { q: "Tu veux une facture qui ne change jamais.", a: "plan",
-    options: [["plan", "💳 Forfait"], ["api", "🧾 API"]],
+    options: [["plan", "{credit-card} Forfait"], ["api", "{receipt} API"]],
     why: "Le forfait coûte le même prix chaque mois." },
   { q: "Avec l'API, ta conversation devient très longue. Chaque nouveau message…", a: "more",
     options: [["less", "Coûte moins cher"], ["same", "Coûte pareil"], ["more", "Coûte plus cher"]],
     why: "L'IA relit toute la conversation à chaque fois. Plus de tokens lus, donc plus cher (voir la fiche 1)." },
   { q: "Ton outil interne doit appeler l'IA tout seul, la nuit.", a: "api",
-    options: [["plan", "💳 Forfait"], ["api", "🧾 API"]],
+    options: [["plan", "{credit-card} Forfait"], ["api", "{receipt} API"]],
     why: "Le forfait marche dans l'appli Claude. Un outil automatique passe par l'API." },
 ]);
 if ("ResizeObserver" in window) {

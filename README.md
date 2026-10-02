@@ -29,11 +29,26 @@ La progression reste dans le navigateur (`localStorage`). Le bouton « Effacer m
 
 ## Mode atelier
 
-Pour animer un groupe : le bouton « 🎤 Mode atelier » en bas de page, ou l'adresse `index.html?atelier=1`.
-Le texte est plus gros. Dans les quiz, un clic choisit la réponse du groupe, puis « 👁️ Révéler » affiche la correction.
+Pour animer un groupe : le bouton « Mode atelier » en bas de page, ou l'adresse `index.html?atelier=1`.
+Le texte est plus gros. Dans les quiz, un clic choisit la réponse du groupe, puis « Révéler » affiche la correction.
+
+## Skazy Formation
+
+Les fiches sont une ressource [Skazy Formation](https://formation.skazy.nc/).
+Chaque page affiche le logo en haut et une mention en bas, avec un lien vers formation.skazy.nc. Le permis imprimé porte aussi le logo.
+Le logo est un SVG intégré dans la page : le mot « skazy » prend la couleur du texte (clair ou sombre selon le thème), « formation » reste vert `#00997A`.
 
 ## Technique
 
 Pages HTML statiques, sans étape de build. Ouvrir `index.html`.
 
-Chaque fiche est autonome : CSS et JS sont dans le fichier. Le bloc « Parcours » (défi, badges, mode atelier) est le même dans les 6 fiches. Si tu le modifies, modifie-le partout.
+Chaque fiche est autonome : CSS et JS sont dans le fichier. Le bloc « Parcours » (défi, badges, mode atelier) est le même dans les 6 fiches. Si tu le modifies, modifie-le partout. Le bandeau Skazy Formation aussi.
+
+### Icônes
+
+Pas d'emoji : toutes les icônes viennent de [Font Awesome 7 Free](https://fontawesome.com/search?ic=free&s=solid), style Solid.
+Chaque page charge la version SVG + JS depuis cdnjs (`solid.min.js` et `fontawesome.min.js`). Une connexion internet est donc nécessaire pour voir les icônes.
+
+- Dans le HTML : `<i class="fa-solid fa-coins" aria-hidden="true"></i>`.
+- Dans le JS : écrire `{coins}` dans le texte, puis l'afficher avec `rich(el, texte)` ou `h(tag, classe, texte)`. Exemple : `rich(el, "{circle-check} Bravo !")`. Pour un attribut (`aria-label`…), `plain(texte)` retire les icônes.
+- Une fois l'icône affichée, le `<i>` devient un `<svg class="svg-inline--fa fa-coins">` : en CSS, cibler `.fa-coins` ou `.svg-inline--fa`, pas `.fa-solid`.

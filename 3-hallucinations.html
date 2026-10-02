@@ -6,6 +6,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/js/solid.min.js" integrity="sha512-T7EGedkSB4ewtlSHpcmpJm6FQMnxZzLYhAYRPk6n4zF30ap1uJrPuXX98A3SYMwv04/ZVTOfbF89Oa6dIJyljw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/js/fontawesome.min.js" integrity="sha512-WgR61jcssTjrH2a2vWm5JiWaEy1kmFIE5G0ybjKB0UEDzygVCebYW4eP2p96XmJWXA0zk/sNhbCfb09Wx39t4A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
 /* Bento : grille de 4 colonnes. Une carte « hero » pleine couleur, les autres en cartes sombres. */
 :root {
@@ -88,7 +90,7 @@ p { margin: 0; max-width: 65ch; }
 .small { font-size: .9rem; }
 .big { font-family: var(--font-display); font-size: clamp(2.3rem, 5vw, 3.4rem); line-height: 1; color: var(--accent-text); font-variant-numeric: tabular-nums; }
 .head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.emo { font-size: 1.6rem; line-height: 1; }
+.emo { font-size: 1.6rem; line-height: 1; color: var(--accent-text); }
 
 /* Réglages */
 .ctl { display: grid; gap: 10px; font-weight: 700; }
@@ -191,6 +193,20 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
+/* Skazy Formation : logo en haut, mention en bas (même bloc dans chaque fiche) */
+.brand { margin-bottom: 16px; }
+.brand a { display: inline-flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; color: var(--fg); text-decoration: none; border-radius: 10px; }
+.brand-logo { display: block; width: 109px; height: 36px; flex: none; }
+.brand-url { font-size: .85rem; font-weight: 700; color: var(--muted); padding-left: 14px; border-left: 2px solid var(--line); }
+.brand a:hover .brand-url { color: var(--fg); }
+.brand-foot a { color: var(--fg); font-weight: 700; }
+
+/* Icônes Font Awesome : couleur des icônes d'état */
+.fa-circle-check { color: var(--ok); }
+.fa-circle-xmark { color: var(--bad); }
+.fa-triangle-exclamation { color: var(--warn); }
+.hero .emo, .next .svg-inline--fa, .seg button[aria-pressed="true"] .svg-inline--fa { color: inherit; }
+
 /* Parcours : devine d'abord, défi final, badge, mode atelier (même bloc dans chaque fiche) */
 .guess { background: var(--surface-2); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; box-shadow: inset 4px 0 0 var(--accent); }
 .guess p, .qi p { font-weight: 700; overflow-wrap: anywhere; }
@@ -219,8 +235,9 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
   flex: none; width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 2.2rem;
   background: var(--surface-2); filter: grayscale(1); opacity: .55; transition: transform .4s ease, filter .4s, opacity .4s;
 }
-.badge.won { background: var(--accent); filter: none; opacity: 1; transform: rotate(-10deg) scale(1.05); }
+.badge.won { background: var(--accent); color: var(--on-accent); filter: none; opacity: 1; transform: rotate(-10deg) scale(1.05); }
 .stars { font-size: 1.6rem; letter-spacing: .08em; color: var(--warn); }
+.star-off { opacity: .3; }
 .result { padding: 14px 16px; border-radius: 14px; font-weight: 700; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
 .next {
   background: var(--accent); color: var(--on-accent); border: none; text-decoration: none;
@@ -230,7 +247,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .next:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
 .next .eyebrow { color: var(--on-accent); opacity: .7; }
 .next strong { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 4vw, 2.2rem); line-height: 1.05; }
-.next .emo { font-size: 2.4rem; }
+.next .emo { font-size: 2.4rem; color: inherit; }
 .foot .btn { justify-self: start; }
 .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
 .confetti span { position: absolute; top: -48px; font-size: 1.8rem; animation: fall 2.2s cubic-bezier(.3, .6, .6, 1) forwards; }
@@ -252,13 +269,10 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .question { font-family: var(--font-display); font-size: 1.2rem; line-height: 1.2; }
 .bubble { background: var(--surface-2); border-radius: 18px 18px 18px 4px; padding: 16px; display: grid; gap: 8px; }
 .sent { padding: 6px 10px; border-radius: 8px; font-weight: 700; display: block; }
-.sent::before { margin-right: 8px; }
+.sent-ic { margin-right: 8px; }
 .sent.ok { background: color-mix(in oklab, var(--ok) 16%, transparent); }
-.sent.ok::before { content: "✅"; }
 .sent.warn { background: color-mix(in oklab, var(--warn) 18%, transparent); }
-.sent.warn::before { content: "⚠️"; }
 .sent.bad { background: color-mix(in oklab, var(--bad) 18%, transparent); text-decoration: underline wavy var(--bad); text-underline-offset: 4px; }
-.sent.bad::before { content: "❌"; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: .9rem; color: var(--muted); }
 
 .levers { display: grid; gap: 12px; }
@@ -306,6 +320,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 </style>
 
 <main class="wrap">
+  <header class="brand">
+    <a href="https://formation.skazy.nc/" target="_blank" rel="noopener" aria-label="Skazy Formation : formation.skazy.nc, nouvel onglet">
+      <svg class="brand-logo" viewBox="0 0 218 72" aria-hidden="true" focusable="false"><path fill-rule="evenodd" fill="currentColor" d="m202.4 1.4h15.3l-16 52.6q-1.1 3.5-3 6.3c-1.3 1.9-2.9 3.5-4.7 4.8-1.8 1.4-3.8 2.4-6 3.1-2.2 0.7-4.5 1.1-6.9 1.1-3 0-5.9-0.6-8.7-1.7v-14.4c2.8 1 5.1 1.5 7 1.5 3.7 0 5.6-2 6-6.2l-13.4-37v0.1l-21.3 25.3h26.7l3.9 11.6h-51.8c-3.1 0-5 0.1-6.3-0.8-1.6-1.1-2.6-2.8-3.1-4.9l-0.4-1.7c-2.1 2.7-4.5 4.7-7.2 6.1q-4 2.1-8.7 2.1c-2.3 0-4.5-0.4-6.5-1.2-2-0.8-3.7-1.9-5.2-3.2-1.4-1.4-2.6-3-3.4-4.8q-1.2-2.8-1.2-6c0-2.4 0.5-4.5 1.5-6.5q1.5-3 4.2-5.1c1.8-1.4 3.9-2.5 6.4-3.3 2.5-0.8 5.2-1.2 8.2-1.2 3.8 0 6.9 0.6 9.4 1.8v-1.4c0-2.2-0.6-3.8-1.9-4.9-1.3-1.1-3.3-1.6-6.2-1.6-2.7 0-5.1 0.4-7.4 1.3-2.2 0.9-4.6 2.1-7.1 3.8l-4.9-10.5c6.2-4 13.2-6 21.1-6 7.5 0 13.3 1.7 17.3 5 4.1 3.4 6.1 8.3 6.1 15v9.1c0 1.6 0.2 2.7 0.7 3.3 0.3 0.5 1.2 1.3 2.7 0l16.9-19.9h-20v-11.6h51.5l9 32.6 7.4-32.7zm-84.9 30.5v-3.3q-1.5-0.6-3.3-0.9c-1.2-0.3-2.3-0.4-3.2-0.4-2.1 0-3.8 0.5-5.2 1.5-1.4 1-2.1 2.3-2.1 3.8 0 1.3 0.6 2.4 1.6 3.2 1.1 0.8 2.4 1.2 4 1.2 1 0 2-0.2 3.1-0.5 1-0.3 2-0.8 2.8-1.3 0.7-0.5 1.2-1 1.6-1.6 0.4-0.5 0.6-1.1 0.6-1.7zm-94.6 18.2c-4.2 0.1-8.3-0.4-12.4-1.6-4.1-1.2-7.5-3.1-10.4-5.6l5.6-10.6c3.1 1.9 6 3.4 8.8 4.4 2.8 1 5.4 1.5 7.7 1.4q3.6-0.2 3.6-2.4 0-1.4-1.5-2.1c-1-0.6-2.8-1.2-5.6-1.9-3.4-0.9-6.3-1.7-8.6-2.6-2.3-0.9-4.2-1.8-5.7-2.9-1.5-1-2.5-2.2-3.2-3.5-0.7-1.3-1-2.9-1.1-4.7-0.1-2.4 0.3-4.7 1.2-6.8 0.9-2.1 2.2-3.9 3.9-5.5 1.7-1.6 3.7-2.8 6.1-3.7q3.6-1.4 7.8-1.5c3.5-0.1 6.9 0.2 10.1 1 3.2 0.8 6.5 2.5 9.8 5.2l-6.2 10.6c-3-1.8-5.6-3.1-7.6-3.9-2-0.8-3.9-1.1-5.7-1-1 0-1.9 0.3-2.5 0.7-0.7 0.4-1 1.1-0.9 1.9 0 0.9 0.5 1.6 1.5 2.2 1 0.5 2.9 1.1 5.8 1.8 3.5 0.8 6.5 1.6 8.9 2.6 2.4 0.9 4.3 1.9 5.8 3.1 1.5 1.1 2.5 2.4 3.2 3.9 0.7 1.5 1 3.2 1.1 5.1 0.1 2.5-0.3 4.7-1.1 6.7-0.8 2-2.1 3.7-3.8 5.2-1.7 1.5-3.7 2.6-6.2 3.4-2.5 0.6-5.3 1-8.4 1.1z"/><path fill="currentColor" d="m72.5 49.3l-10.9-17.5-3.5 3.8v13.7h-17.3v-49.2h17.3v19l12.9-17.8h18.3l-16.5 21 18.2 27z"/><path fill-rule="evenodd" fill="#00997A" d="m21.6 53.6v0.6h3.6v5h-3.6v11.8h-5.7v-11.8h-2.2v-5h2.2v-0.6c0-3.4 1.8-6.3 5.5-6.3 1.1 0 2.7 0.2 3.8 0.6v4.4c-0.6-0.2-1.2-0.4-1.8-0.4-1.5 0.1-1.8 1.2-1.8 1.7zm4.7 9c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm18.9-9.2l-0.9 5.7c-0.2 0-0.6-0.1-0.9-0.1-1.7 0-4.1 0.7-4.1 5.2v6.8h-5.7v-16.8h5.2l0.3 2c1.8-2 4.1-2.7 6.1-2.8zm28.8 8.5v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.9 0-2.8 1.3-2.8 3.2v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.8 0-2.8 1.3-2.8 3.2v9.1h-5.7v-16.8h5.2l0.2 1.3c1.2-1.2 2.9-1.9 5-1.9 2 0 3.9 0.6 5 2.8 1.2-1.7 3.2-2.8 5.8-2.8 3.3 0 6.3 1.6 6.3 8.3zm20.9-7.7v16.8h-5.2l-0.3-1.7c-1.2 1.5-3.1 2.3-5.3 2.3-5.1 0-8.4-4.2-8.4-9 0-5 3.5-9 8.4-9 2.2 0 4.1 0.8 5.3 2.3l0.3-1.7zm-5.7 8.3c0-2.4-1.8-3.8-3.9-3.8-2.3 0-4 1.8-4 3.9 0 2 1.6 3.9 4 3.9 2.3 0 3.9-1.7 3.9-4zm9.4 2.8v-6.2h-2.4v-4.5h0.5c1.5 0 2.4-0.8 2.4-2.3v-1.7h5.1v3.5h3.4v5h-3.4v5.9c0 1.2 0.7 1.7 1.7 1.7 0.5 0 1.2-0.2 1.7-0.3v4.3c-0.9 0.4-2.5 0.6-3.6 0.6-4.1 0-5.4-2.8-5.4-6zm11.1-15.5c0-1.6 1.4-2.8 3.2-2.8 1.8 0 3.2 1.3 3.2 2.8 0 1.5-1.3 2.8-3.2 2.8-1.9 0-3.2-1.3-3.2-2.8zm0.3 4.4h5.7v16.8h-5.7zm7.7 8.4c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm23.7-0.7v9.1h-5.7v-9.1c0-2.3-1-3.2-2.7-3.2-1.8 0-2.9 1.3-2.9 3.2v9.1h-5.7v-16.8h5.2l0.2 1.5c1.3-1.2 3-2 5.2-2 3.2-0.1 6.4 1.5 6.4 8.2z"/></svg>
+      <span class="brand-url">formation.skazy.nc <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+    </a>
+  </header>
   <div class="bento">
 
     <section class="card hero s4">
@@ -325,7 +345,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true">🎛️</span><h2>Tes réglages</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span><h2>Tes réglages</h2></div>
       <div id="riskGuess"></div>
       <div class="set-wrap" id="riskSet">
       <div class="ctl">
@@ -335,10 +355,10 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <div class="ctl-ends"><span>Un fait très connu</span><span>Un fait très récent</span></div>
       </div>
       <div class="switches">
-        <label class="sw" for="doc"><span>📎 Je donne un document</span><input type="checkbox" id="doc"></label>
-        <label class="sw" for="web"><span>🌐 La recherche web est activée</span><input type="checkbox" id="web"></label>
-        <label class="sw" for="idk"><span>🙋 J'autorise « je ne sais pas »</span><input type="checkbox" id="idk"></label>
-        <label class="sw" for="src"><span>🔗 Je demande les sources</span><input type="checkbox" id="src"></label>
+        <label class="sw" for="doc"><span><i class="fa-solid fa-paperclip" aria-hidden="true"></i> Je donne un document</span><input type="checkbox" id="doc"></label>
+        <label class="sw" for="web"><span><i class="fa-solid fa-globe" aria-hidden="true"></i> La recherche web est activée</span><input type="checkbox" id="web"></label>
+        <label class="sw" for="idk"><span><i class="fa-solid fa-hand" aria-hidden="true"></i> J'autorise « je ne sais pas »</span><input type="checkbox" id="idk"></label>
+        <label class="sw" for="src"><span><i class="fa-solid fa-link" aria-hidden="true"></i> Je demande les sources</span><input type="checkbox" id="src"></label>
       </div>
       <div class="ctl">
         <div class="ctl-row"><label for="crea">Ce que je demande</label><span class="ctl-val" id="vCrea"></span></div>
@@ -349,7 +369,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s1 ring-box">
-      <div class="head"><span class="emo" aria-hidden="true">🚨</span><h2>Risque d'invention</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-bell"></i></span><h2>Risque d'invention</h2></div>
       <div class="ring-wrap" id="ringWrap">
       <svg class="ring" viewBox="0 0 120 120" role="img" aria-labelledby="ringLabel">
         <title id="ringLabel">Risque d'invention</title>
@@ -363,7 +383,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s1">
-      <div class="head"><span class="emo" aria-hidden="true">🤔</span><h2>Pourquoi elle invente ?</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-circle-question"></i></span><h2>Pourquoi elle invente ?</h2></div>
       <p>L'IA devine le mot qui vient le plus souvent après.</p>
       <p>Si elle ne sait pas, elle devine quand même.</p>
       <p>La réponse a l'air sûre. <strong>Mais elle peut être fausse.</strong></p>
@@ -371,21 +391,21 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true">💬</span><h2>Exemple de réponse</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-comments"></i></span><h2>Exemple de réponse</h2></div>
       <p class="question" id="question"></p>
       <div class="bubble" id="answer" aria-live="polite"></div>
-      <div class="legend"><span>✅ Vrai ou vérifiable</span><span>⚠️ À vérifier</span><span>❌ Inventé</span></div>
+      <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Vrai ou vérifiable</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> À vérifier</span><span><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Inventé</span></div>
       <p class="small muted">Exemple fabriqué pour comprendre. Les noms et les dates sont inventés.</p>
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true">📉</span><h2>Ce qui change le risque</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-arrow-trend-down"></i></span><h2>Ce qui change le risque</h2></div>
       <p class="muted">Pour ta question. Les barres orange sont activées.</p>
       <div class="levers" id="levers"></div>
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true">🖍️</span><h2>Jeu : surligne ce qu'il faut vérifier</h2><span class="pill" id="hlScore">0 / 18</span></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-highlighter"></i></span><h2>Jeu : surligne ce qu'il faut vérifier</h2><span class="pill" id="hlScore">0 / 18</span></div>
       <p>L'IA a répondu. <strong>Touche les phrases qu'il faut vérifier</strong> avant de les utiliser.
         Les indices : une date, un chiffre précis, un nom, une citation, une loi, un lien, le mot « officiel ».</p>
       <div class="hl-game">
@@ -393,8 +413,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <div class="msg-me"><span class="who">Toi</span><span id="hlQ"></span></div>
         <div class="bubble"><span class="who">IA</span><div class="hl" id="hlList"></div></div>
         <div class="hl-btns">
-          <button type="button" class="btn go" id="hlCheck">🔍 Vérifier</button>
-          <button type="button" class="btn" id="hlNext" hidden>Manche suivante →</button>
+          <button type="button" class="btn go" id="hlCheck"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Vérifier</button>
+          <button type="button" class="btn" id="hlNext" hidden>Manche suivante <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
         </div>
         <div class="result" id="hlResult" aria-live="polite"></div>
       </div>
@@ -402,15 +422,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true">🪞</span><h2>Elle te donne raison</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-clone"></i></span><h2>Elle te donne raison</h2></div>
       <p>L'IA a tendance à aller dans ton sens. On appelle ça la <strong>complaisance</strong>.
         Pendant son entraînement, des humains notaient ses réponses. Ils préféraient souvent celles qui leur donnaient raison. L'IA a appris à plaire.</p>
       <div class="ctl">
         <span>Choisis une situation</span>
         <div class="seg" id="segYes" role="group" aria-label="Situation">
-          <button type="button" data-v="visa" aria-pressed="true">🛂 Un visa</button>
-          <button type="button" data-v="slogan" aria-pressed="false">📣 Un slogan</button>
-          <button type="button" data-v="annul" aria-pressed="false">💸 Une annulation</button>
+          <button type="button" data-v="visa" aria-pressed="true"><i class="fa-solid fa-passport" aria-hidden="true"></i> Un visa</button>
+          <button type="button" data-v="slogan" aria-pressed="false"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Un slogan</button>
+          <button type="button" data-v="annul" aria-pressed="false"><i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i> Une annulation</button>
         </div>
       </div>
       <div class="yes">
@@ -430,18 +450,18 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         </div>
         <div class="yes-col">
           <h3><b>2</b>Quand tu insistes</h3>
-          <label class="sw" for="franc"><span>📝 Mes consignes disent : « Sois franche. Dis-moi si je me trompe. »</span><input type="checkbox" id="franc"></label>
+          <label class="sw" for="franc"><span><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Mes consignes disent : « Sois franche. Dis-moi si je me trompe. »</span><input type="checkbox" id="franc"></label>
           <div class="thread" id="yesB" aria-live="polite"></div>
           <span class="pill" id="yesPillB"></span>
         </div>
       </div>
-      <div class="legend"><span>✅ Juste</span><span>⚠️ Penche vers ton avis</span><span>❌ Faux</span></div>
+      <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Juste</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Penche vers ton avis</span><span><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Faux</span></div>
       <p class="small muted">Exemples fabriqués pour comprendre. Les modèles récents résistent mieux, mais la tendance existe toujours.
         Pour un vrai voyage, vérifie les règles d'entrée sur le site officiel du pays.</p>
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true">🛡️</span><h2>Mes réflexes anti-bobards</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span><h2>Mes réflexes anti-bobards</h2></div>
       <div class="meter">
         <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 8</span></div>
         <div class="track"><div class="fill" id="chkFill"></div></div>
@@ -459,7 +479,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s2 retenir">
-      <div class="head"><span class="emo" aria-hidden="true">🧠</span><h2>À retenir</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
         <li><span>L'IA peut inventer des faits, des chiffres ou des noms. Ça s'appelle une hallucination.</span></li>
         <li><span>Donne-lui des documents ou la recherche web. Le risque baisse beaucoup.</span></li>
@@ -468,7 +488,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s4 challenge" id="defi">
-      <div class="head"><span class="emo" aria-hidden="true">🏁</span><h2>Défi final</h2><span class="pill" id="defiScore"></span></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-flag-checkered"></i></span><h2>Défi final</h2><span class="pill" id="defiScore"></span></div>
       <div class="prize">
         <span class="badge" id="badge" aria-hidden="true"></span>
         <div class="prize-txt"><strong id="badgeName"></strong><span class="small muted" id="badgeTxt"></span></div>
@@ -476,19 +496,20 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       </div>
       <div class="quiz" id="defiQuiz"></div>
       <div class="result" id="defiResult" aria-live="polite"></div>
-      <button type="button" class="btn reveal" id="defiReset">↺ Rejouer le défi</button>
+      <button type="button" class="btn reveal" id="defiReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Rejouer le défi</button>
     </section>
 
     <a class="card s4 next" href="4-boite-outils.html">
       <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>4 · La Boîte à Outils Claude</strong></span>
-      <span class="emo" aria-hidden="true">→</span>
+      <span class="emo" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
     </a>
 
   </div>
   <footer class="foot">
     <nav class="series" aria-label="Les 6 fiches"><strong>Comprendre l’IA en 6 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-modele-effort.html">2 Modèle et effort</a><a aria-current="page">3 Hallucinations</a><a href="4-boite-outils.html">4 Les outils Claude</a><a href="5-forfait-api.html">5 Forfait ou API</a><a href="6-message-piege.html">6 Message piégé</a></nav>
     <span>Le pourcentage est une estimation pour comprendre. Le vrai risque dépend du modèle et de la question.</span>
-    <button type="button" class="btn" id="atelierBtn" aria-pressed="false">🎤 Mode atelier : non</button>
+    <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
+    <span class="brand-foot">Une ressource Skazy Formation : <a href="https://formation.skazy.nc/" target="_blank" rel="noopener">formation.skazy.nc</a></span>
   </footer>
 </main>
 
@@ -515,7 +536,7 @@ function initSeg(el, onChange) {
 
 const FICHE = 3;
 // Parcours : progression gardée dans ce navigateur, mode atelier, devine d'abord, défi final (même bloc dans chaque fiche)
-const BADGES = { 1: ["🪙", "Maître des tokens"], 2: ["🧠", "Bon Cerveau"], 3: ["🕵️", "Détective anti-bobards"], 4: ["🧰", "As de la boîte à outils"], 5: ["🧮", "Pro du budget"], 6: ["🛡️", "Gardien anti-piège"] };
+const BADGES = { 1: ["{coins}", "Maître des tokens"], 2: ["{brain}", "Bon Cerveau"], 3: ["{user-secret}", "Détective anti-bobards"], 4: ["{toolbox}", "As de la boîte à outils"], 5: ["{calculator}", "Pro du budget"], 6: ["{shield-halved}", "Gardien anti-piège"] };
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch {} },
@@ -531,28 +552,41 @@ if (atelierParam !== null) store.set("ia6:atelier", atelierParam === "0" ? "0" :
 const ATELIER = atelierParam !== null ? atelierParam !== "0" : store.get("ia6:atelier") === "1";
 if (ATELIER) document.documentElement.dataset.mode = "atelier";
 
+// Icônes Font Awesome. Dans un texte, « {nom} » devient l'icône fa-nom : "{circle-check} Bravo !"
+function icon(name, cls) {
+  const i = document.createElement("i");
+  i.className = "fa-solid fa-" + name + (cls ? " " + cls : "");
+  i.setAttribute("aria-hidden", "true");
+  return i;
+}
+function rich(el, text) {
+  el.replaceChildren(...String(text).split(/\{([a-z0-9-]+)\}/).map((s, k) => (k % 2 ? icon(s) : s)).filter((s) => s !== ""));
+  return el;
+}
+// Le même texte sans les icônes, pour les attributs (aria-label…)
+const plain = (text) => String(text).replace(/\{[a-z0-9-]+\}\s*/g, "");
 function h(tag, cls, text) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
-  if (text != null) e.textContent = text;
+  if (text != null) rich(e, text);
   return e;
 }
 function btn(label, cls = "") { const b = h("button", cls, label); b.type = "button"; return b; }
-const starsTxt = (n) => "★".repeat(n) + "☆".repeat(3 - n);
+const starIcons = (n) => [1, 2, 3].map((k) => icon("star", k > n ? "star-off" : ""));
 
 // Une question à choix. En mode atelier, un clic choisit et « Révéler » corrige : le groupe répond d'abord.
-function ask(box, { q, options, a, why, onShow, good = "✅ Bravo ! ", bad = "❌ Pas tout à fait. " }) {
+function ask(box, { q, options, a, why, onShow, good = "{circle-check} Bravo ! ", bad = "{circle-xmark} Pas tout à fait. " }) {
   let pick = null, shown = false;
   const group = h("div", "qbtns");
   group.setAttribute("role", "group");
-  group.setAttribute("aria-label", q);
+  group.setAttribute("aria-label", plain(q));
   const bs = options.map(([v, label]) => {
     const b = btn(label);
     b.addEventListener("click", () => { pick = v; if (ATELIER && !shown) paint(); else show(); });
     group.append(b);
     return [v, b];
   });
-  const rev = btn("👁️ Révéler la réponse", "btn reveal");
+  const rev = btn("{eye} Révéler la réponse", "btn reveal");
   rev.addEventListener("click", show);
   const fb = h("span", "qfb");
   fb.setAttribute("aria-live", "polite");
@@ -571,7 +605,7 @@ function ask(box, { q, options, a, why, onShow, good = "✅ Bravo ! ", bad = "�
       b.classList.toggle("wrong", shown && v === pick && v !== a);
     }
     rev.hidden = shown || pick === null;
-    fb.textContent = shown ? (pick === a ? good : bad) + (typeof why === "function" ? why() : why) : "";
+    rich(fb, shown ? (pick === a ? good : bad) + (typeof why === "function" ? why() : why) : "");
   }
   box.replaceChildren(h("p", "", q), group, rev, fb);
   paint();
@@ -583,18 +617,21 @@ function guess(box, { lock, q, ...opts }) {
   const zones = [].concat(lock);
   zones.forEach((z) => { z.classList.add("locked"); z.inert = true; });
   box.classList.add("guess");
-  return ask(box, { ...opts, q: "🤔 Devine d'abord : " + q, good: "✅ Bien vu ! ", bad: "😮 Surprise ! ",
+  return ask(box, { ...opts, q: "{circle-question} Devine d'abord : " + q, good: "{circle-check} Bien vu ! ", bad: "{face-surprise} Surprise ! ",
     onShow() { zones.forEach((z) => { z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false; }); } });
 }
 
+// Pluie d'icônes aux couleurs des 6 fiches
+const CONFETTI_COLORS = ["#C6FF00", "#FF2E93", "#FF6B00", "#00E5FF", "#B14EFF", "#FFE600"];
 function confetti(ic) {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const box = h("div", "confetti");
   box.setAttribute("aria-hidden", "true");
   for (let i = 0; i < 28; i++) {
-    const s = h("span", "", ["🎉", "⭐", ic, "✨"][i % 4]);
+    const s = h("span", "", ["{trophy}", "{star}", ic, "{wand-magic-sparkles}"][i % 4]);
     s.style.left = Math.random() * 96 + "%";
     s.style.animationDelay = Math.random() * 0.7 + "s";
+    s.style.color = CONFETTI_COLORS[i % 6];
     box.append(s);
   }
   document.body.append(box);
@@ -615,7 +652,7 @@ function initDefi(items, options) {
   });
   function paintBadge() {
     $("#badge").classList.toggle("won", record > 0);
-    $("#stars").textContent = record ? starsTxt(record) : "";
+    $("#stars").replaceChildren(...(record ? starIcons(record) : []));
     $("#stars").setAttribute("aria-label", record ? `Meilleur score : ${record} étoile${record > 1 ? "s" : ""} sur 3` : "");
     $("#badgeTxt").textContent = record
       ? "Badge gagné ! Rejoue quand tu veux pour améliorer ton score."
@@ -630,13 +667,13 @@ function initDefi(items, options) {
     record = Math.max(record, stars);
     saveProgress(FICHE, stars);
     paintBadge();
-    $("#defiResult").textContent = stars === 3
-      ? `🎉 ${good} sur ${total} du premier coup ! Tu gagnes le badge ${ic} « ${name} » avec 3 étoiles.`
-      : `🎉 ${good} sur ${total} du premier coup. Tu gagnes le badge ${ic} « ${name} » avec ${stars} étoile${stars > 1 ? "s" : ""} sur 3. Rejoue pour viser 3 étoiles !`;
+    rich($("#defiResult"), stars === 3
+      ? `{trophy} ${good} sur ${total} du premier coup ! Tu gagnes le badge ${ic} « ${name} » avec 3 étoiles.`
+      : `{trophy} ${good} sur ${total} du premier coup. Tu gagnes le badge ${ic} « ${name} » avec ${stars} étoile${stars > 1 ? "s" : ""} sur 3. Rejoue pour viser 3 étoiles !`);
     confetti(ic);
   }
-  $("#badge").textContent = ic;
-  $("#badgeName").textContent = `${ic} Badge « ${name} »`;
+  rich($("#badge"), ic);
+  rich($("#badgeName"), `${ic} Badge « ${name} »`);
   $("#defiScore").textContent = `0 / ${total}`;
   $("#defiReset").addEventListener("click", () => {
     firsts.clear();
@@ -652,7 +689,7 @@ function initDefi(items, options) {
 // Mode atelier : texte plus gros, réponses révélées par l'animateur. Le réglage suit d'une fiche à l'autre.
 (function initAtelier() {
   const b = $("#atelierBtn");
-  b.textContent = "🎤 Mode atelier : " + (ATELIER ? "oui" : "non");
+  rich(b, "{chalkboard-user} Mode atelier : " + (ATELIER ? "oui" : "non"));
   b.setAttribute("aria-pressed", String(ATELIER));
   b.addEventListener("click", () => { store.set("ia6:atelier", ATELIER ? "0" : "1"); location.search = ATELIER ? "atelier=0" : "atelier=1"; });
   if (ATELIER) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?atelier=1$1"); });
@@ -732,40 +769,48 @@ function render() {
   $("#ringTxt").textContent = risk + " %";
   const pill = $("#riskPill");
   pill.className = "pill " + cls;
-  pill.textContent = cls === "ok" ? "✅ Risque faible" : cls === "warn" ? "⚠️ Risque moyen" : "❌ Risque élevé";
+  rich(pill, cls === "ok" ? "{circle-check} Risque faible" : cls === "warn" ? "{triangle-exclamation} Risque moyen" : "{circle-xmark} Risque élevé");
 
   $("#question").textContent = "« " + LEVELS[s.level].q + " »";
-  $("#answer").replaceChildren(...pickAnswer(s, risk).map(([t, c]) => {
-    const e = document.createElement("span"); e.className = "sent " + c; e.textContent = t; return e;
-  }));
+  $("#answer").replaceChildren(...pickAnswer(s, risk).map(([t, c]) => sent(t, c, { ok: "Vrai ou vérifiable", warn: "À vérifier", bad: "Inventé" })));
 
   const f = factors(s);
   const rows = [
-    { key: "doc", label: "📎 Donner un document", v: 1 - f.doc },
-    { key: "web", label: "🌐 Activer la recherche web", v: 1 - f.web },
-    { key: "idk", label: "🙋 Autoriser « je ne sais pas »", v: 1 - f.idk },
-    { key: "src", label: "🔗 Demander les sources", v: 1 - f.src },
+    { key: "doc", label: "{paperclip} Donner un document", v: 1 - f.doc },
+    { key: "web", label: "{globe} Activer la recherche web", v: 1 - f.web },
+    { key: "idk", label: "{hand} Autoriser « je ne sais pas »", v: 1 - f.idk },
+    { key: "src", label: "{link} Demander les sources", v: 1 - f.src },
   ];
   const up = f.crea - 1;
   const box = $("#levers");
   box.replaceChildren(...rows.map((r) => lever(r.label, "− " + Math.round(r.v * 100) + " %", r.v, s[r.key] ? "on" : "")));
   box.appendChild(up >= 0
-    ? lever("🎨 Demander de l'imagination", "+ " + Math.round(up * 100) + " %", up, "up")
-    : lever("🎯 Demander des faits précis", "− " + Math.round(-up * 100) + " %", -up, "on"));
+    ? lever("{palette} Demander de l'imagination", "+ " + Math.round(up * 100) + " %", up, "up")
+    : lever("{bullseye} Demander des faits précis", "− " + Math.round(-up * 100) + " %", -up, "on"));
+}
+// Une phrase de réponse avec son icône d'état. says : le mot lu à la place de l'icône
+const SENT_IC = { ok: "circle-check", warn: "triangle-exclamation", bad: "circle-xmark" };
+function sent(t, c, says) {
+  const e = h("span", "sent " + c), m = h("span", "sent-ic");
+  m.setAttribute("role", "img");
+  m.setAttribute("aria-label", says[c]);
+  m.append(icon(SENT_IC[c]));
+  e.append(m, t);
+  return e;
 }
 function lever(label, val, ratio, cls) {
   const d = document.createElement("div");
   d.className = "lever " + cls;
   d.innerHTML = `<div class="meter-top"><span></span><span></span></div><div class="track"><div class="fill"></div></div>`;
   const spans = d.querySelectorAll(".meter-top span");
-  spans[0].textContent = label; spans[1].textContent = val;
+  rich(spans[0], label); spans[1].textContent = val;
   d.querySelector(".fill").style.width = Math.max(3, ratio * 100) + "%";
   return d;
 }
 
 function renderCheck() {
   const n = $$("#check input:checked").length, total = $$("#check input").length;
-  $("#chkTxt").textContent = n + " sur " + total + (n === total ? " 🎉" : "");
+  rich($("#chkTxt"), n + " sur " + total + (n === total ? " {trophy}" : ""));
   $("#chkFill").style.width = (n / total) * 100 + "%";
 }
 
@@ -774,13 +819,13 @@ const YES = {
   visa: {
     neutre: { me: "Avec un passeport français, faut-il une autorisation pour 10 jours de vacances en Australie ?", follow: 5,
       ai: [["Oui. Il faut une autorisation électronique : l'eVisitor.", "ok"], ["La demande se fait en ligne, avant le départ.", "ok"], ["Vérifie sur le site officiel du gouvernement australien.", "ok"]],
-      pill: ["ok", "✅ Réponse fondée sur les faits"] },
+      pill: ["ok", "{circle-check}Réponse fondée sur les faits"] },
     oui: { me: "Il faut une autorisation pour 10 jours en Australie, non ?", follow: 70,
       ai: [["Oui, tu as raison. Il faut l'eVisitor, à demander en ligne.", "ok"]],
-      pill: ["warn", "⚠️ Juste, mais par chance : ton avis était bon"] },
+      pill: ["warn", "{triangle-exclamation}Juste, mais par chance : ton avis était bon"] },
     non: { me: "Pas besoin d'autorisation pour 10 jours en Australie, non ?", follow: 90,
       ai: [["Tu as raison, pour un court séjour c'est simple.", "bad"], ["Un passeport valide devrait suffire.", "bad"]],
-      pill: ["bad", "❌ Faux : elle a suivi ton erreur"] },
+      pill: ["bad", "{circle-xmark}Faux : elle a suivi ton erreur"] },
     push: { me: "Tu es sûre ? Une collègue m'a dit que ce n'est pas obligatoire.",
       flip: [["Tu as raison, excuse-moi pour l'erreur.", "bad"], ["Pour 10 jours, le passeport suffit.", "bad"]],
       hold: [["Je comprends ton doute, mais je garde ma réponse.", "ok"], ["L'eVisitor est obligatoire, même pour un court séjour.", "ok"], ["Tu peux le vérifier sur le site officiel australien.", "ok"]] },
@@ -788,13 +833,13 @@ const YES = {
   slogan: {
     neutre: { me: "Que penses-tu de ce slogan pour notre post : « L'île des Pins, la plus belle île du monde ! » ?", follow: 5,
       ai: [["L'idée est claire et donne envie.", "ok"], ["Mais « la plus belle du monde » est un cliché, et on ne peut pas le prouver.", "ok"], ["Ajoute un détail concret : la piscine naturelle, une offre, une date.", "ok"]],
-      pill: ["ok", "✅ Avis équilibré : qualités et défauts"] },
+      pill: ["ok", "{circle-check}Avis équilibré : qualités et défauts"] },
     oui: { me: "Je trouve notre slogan génial : « L'île des Pins, la plus belle île du monde ! » Tu es d'accord ?", follow: 90,
       ai: [["Oui, il est excellent !", "warn"], ["Il est court, percutant, il donne envie de partir.", "warn"]],
-      pill: ["warn", "⚠️ Que des compliments : aucun défaut signalé"] },
+      pill: ["warn", "{triangle-exclamation}Que des compliments : aucun défaut signalé"] },
     non: { me: "Je trouve notre slogan nul : « L'île des Pins, la plus belle île du monde ! » Tu es d'accord ?", follow: 85,
       ai: [["Oui, il manque d'originalité.", "warn"], ["« La plus belle du monde », tout le monde le dit.", "ok"], ["Il vaudrait mieux tout réécrire.", "warn"]],
-      pill: ["warn", "⚠️ Que des critiques : les qualités ont disparu"] },
+      pill: ["warn", "{triangle-exclamation}Que des critiques : les qualités ont disparu"] },
     push: { me: "Tu es dure. Moi, je le trouve parfait.",
       flip: [["Tu as raison, il est parfait comme ça.", "warn"], ["Tu connais ton public mieux que moi.", "warn"]],
       hold: [["Il a de vraies qualités : il est court et clair.", "ok"], ["Mais je garde mon conseil : ajoute un détail concret.", "ok"]] },
@@ -802,13 +847,13 @@ const YES = {
   annul: {
     neutre: { me: "Un client annule 10 jours avant son départ. Combien doit-on lui rembourser ?", follow: 5,
       ai: [["Ça dépend de tes conditions de vente et de celles des fournisseurs.", "ok"], ["Souvent, les frais augmentent quand le départ approche.", "ok"], ["Montre-moi tes conditions : je te dirai ce qu'elles prévoient.", "ok"]],
-      pill: ["ok", "✅ Elle dit ce qu'il lui manque pour répondre"] },
+      pill: ["ok", "{circle-check}Elle dit ce qu'il lui manque pour répondre"] },
     oui: { me: "Un client annule 10 jours avant son départ. On doit tout lui rembourser, non ?", follow: 90,
       ai: [["Oui, un remboursement complet semble normal.", "bad"], ["Le client sera content et reviendra.", "warn"]],
-      pill: ["bad", "❌ Elle ne connaît pas tes conditions, mais elle dit oui"] },
+      pill: ["bad", "{circle-xmark}Elle ne connaît pas tes conditions, mais elle dit oui"] },
     non: { me: "Un client annule 10 jours avant son départ. On ne rembourse rien, non ?", follow: 90,
       ai: [["Exact, si près du départ, rien n'est remboursé.", "bad"], ["C'est la règle habituelle.", "bad"]],
-      pill: ["bad", "❌ Elle ne connaît pas tes conditions, mais elle dit oui"] },
+      pill: ["bad", "{circle-xmark}Elle ne connaît pas tes conditions, mais elle dit oui"] },
     push: { me: "Tu es sûre ? Je pense qu'on doit tout rembourser.",
       flip: [["Tu as raison, il faut tout rembourser.", "bad"]],
       hold: [["Je ne peux pas l'affirmer sans tes conditions de vente.", "ok"], ["Envoie-les-moi : je te dirai ce qu'elles prévoient.", "ok"]] },
@@ -817,7 +862,7 @@ const YES = {
 const yes = { sc: "visa", fr: "neutre" };
 
 function sents(list) {
-  return list.map(([t, c]) => { const e = document.createElement("span"); e.className = "sent " + c; e.textContent = t; return e; });
+  return list.map(([t, c]) => sent(t, c, { ok: "Juste", warn: "Penche vers ton avis", bad: "Faux" }));
 }
 function msg(who, list, cls) {
   const d = document.createElement("div");
@@ -827,7 +872,7 @@ function msg(who, list, cls) {
   if (typeof list === "string") d.append(list); else d.append(...sents(list));
   return d;
 }
-function setPill(el, [cls, txt]) { el.className = "pill " + cls; el.textContent = txt; }
+function setPill(el, [cls, txt]) { el.className = "pill " + cls; rich(el, txt); }
 
 function renderYes() {
   const S = YES[yes.sc], F = S[yes.fr];
@@ -843,8 +888,8 @@ function renderYes() {
     msg("IA", franc ? S.push.hold : S.push.flip, "bubble"),
   );
   setPill($("#yesPillB"), franc
-    ? ["ok", "✅ Elle garde sa réponse et explique pourquoi"]
-    : ["bad", "❌ Elle change d'avis juste parce que tu insistes"]);
+    ? ["ok", "{circle-check} Elle garde sa réponse et explique pourquoi"]
+    : ["bad", "{circle-xmark} Elle change d'avis juste parce que tu insistes"]);
 }
 
 yes.sc = initSeg($("#segYes"), (v) => { yes.sc = v; renderYes(); });
@@ -921,21 +966,21 @@ function checkHl() {
     if (!risky && picked) extra++;
     b.disabled = true;
     b.classList.add(ok ? "good" : "miss");
-    $(".why", b).textContent = (risky ? "⚠️ À vérifier. " : "✅ Pas besoin. ") + why + (ok ? "" : picked ? " Tu l'avais surlignée." : " Tu l'as oubliée.");
+    rich($(".why", b), (risky ? "{triangle-exclamation} À vérifier. " : "{circle-check} Pas besoin. ") + why + (ok ? "" : picked ? " Tu l'avais surlignée." : " Tu l'as oubliée."));
   });
   hl.points += good;
   $("#hlScore").textContent = `${hl.points} / ${HL.length * 6}`;
   const last = hl.round === HL.length - 1;
   const msg = [`${good} phrase${good > 1 ? "s" : ""} bien classée${good > 1 ? "s" : ""} sur 6.`];
-  if (missed) msg.push(`🕳️ ${missed} piège${missed > 1 ? "s" : ""} oublié${missed > 1 ? "s" : ""}.`);
-  if (extra) msg.push(`🔦 ${extra} phrase${extra > 1 ? "s" : ""} surlignée${extra > 1 ? "s" : ""} pour rien : celles-là, pas besoin de les vérifier.`);
-  if (last) msg.push(hl.points === HL.length * 6 ? "🎉 Parfait ! Tu es un vrai détective." : `Total : ${hl.points} sur ${HL.length * 6}.`);
-  $("#hlResult").textContent = msg.join(" ");
+  if (missed) msg.push(`{circle-exclamation} ${missed} piège${missed > 1 ? "s" : ""} oublié${missed > 1 ? "s" : ""}.`);
+  if (extra) msg.push(`{highlighter} ${extra} phrase${extra > 1 ? "s" : ""} surlignée${extra > 1 ? "s" : ""} pour rien : celles-là, pas besoin de les vérifier.`);
+  if (last) msg.push(hl.points === HL.length * 6 ? "{trophy} Parfait ! Tu es un vrai détective." : `Total : ${hl.points} sur ${HL.length * 6}.`);
+  rich($("#hlResult"), msg.join(" "));
   $("#hlCheck").hidden = true;
   $("#hlNext").hidden = false;
-  $("#hlNext").textContent = last ? "↺ Rejouer" : "Manche suivante →";
+  rich($("#hlNext"), last ? "{rotate-left} Rejouer" : "Manche suivante {arrow-right}");
   $("#hlNext").focus();
-  if (last && hl.points === HL.length * 6) confetti("🖍️");
+  if (last && hl.points === HL.length * 6) confetti("{highlighter}");
 }
 $("#hlCheck").addEventListener("click", checkHl);
 $("#hlNext").addEventListener("click", () => {

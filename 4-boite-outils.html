@@ -6,6 +6,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/js/solid.min.js" integrity="sha512-T7EGedkSB4ewtlSHpcmpJm6FQMnxZzLYhAYRPk6n4zF30ap1uJrPuXX98A3SYMwv04/ZVTOfbF89Oa6dIJyljw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/js/fontawesome.min.js" integrity="sha512-WgR61jcssTjrH2a2vWm5JiWaEy1kmFIE5G0ybjKB0UEDzygVCebYW4eP2p96XmJWXA0zk/sNhbCfb09Wx39t4A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
 /* Bento : grille de 4 colonnes. Une carte « hero » pleine couleur, les autres en cartes sombres. */
 :root {
@@ -88,7 +90,7 @@ p { margin: 0; max-width: 65ch; }
 .small { font-size: .9rem; }
 .big { font-family: var(--font-display); font-size: clamp(2.3rem, 5vw, 3.4rem); line-height: 1; color: var(--accent-text); font-variant-numeric: tabular-nums; }
 .head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.emo { font-size: 1.6rem; line-height: 1; }
+.emo { font-size: 1.6rem; line-height: 1; color: var(--accent-text); }
 
 /* Réglages */
 .ctl { display: grid; gap: 10px; font-weight: 700; }
@@ -191,6 +193,20 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
+/* Skazy Formation : logo en haut, mention en bas (même bloc dans chaque fiche) */
+.brand { margin-bottom: 16px; }
+.brand a { display: inline-flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; color: var(--fg); text-decoration: none; border-radius: 10px; }
+.brand-logo { display: block; width: 109px; height: 36px; flex: none; }
+.brand-url { font-size: .85rem; font-weight: 700; color: var(--muted); padding-left: 14px; border-left: 2px solid var(--line); }
+.brand a:hover .brand-url { color: var(--fg); }
+.brand-foot a { color: var(--fg); font-weight: 700; }
+
+/* Icônes Font Awesome : couleur des icônes d'état */
+.fa-circle-check { color: var(--ok); }
+.fa-circle-xmark { color: var(--bad); }
+.fa-triangle-exclamation { color: var(--warn); }
+.hero .emo, .next .svg-inline--fa, .seg button[aria-pressed="true"] .svg-inline--fa { color: inherit; }
+
 /* Parcours : devine d'abord, défi final, badge, mode atelier (même bloc dans chaque fiche) */
 .guess { background: var(--surface-2); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; box-shadow: inset 4px 0 0 var(--accent); }
 .guess p, .qi p { font-weight: 700; overflow-wrap: anywhere; }
@@ -219,8 +235,9 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
   flex: none; width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 2.2rem;
   background: var(--surface-2); filter: grayscale(1); opacity: .55; transition: transform .4s ease, filter .4s, opacity .4s;
 }
-.badge.won { background: var(--accent); filter: none; opacity: 1; transform: rotate(-10deg) scale(1.05); }
+.badge.won { background: var(--accent); color: var(--on-accent); filter: none; opacity: 1; transform: rotate(-10deg) scale(1.05); }
 .stars { font-size: 1.6rem; letter-spacing: .08em; color: var(--warn); }
+.star-off { opacity: .3; }
 .result { padding: 14px 16px; border-radius: 14px; font-weight: 700; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
 .next {
   background: var(--accent); color: var(--on-accent); border: none; text-decoration: none;
@@ -230,7 +247,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .next:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
 .next .eyebrow { color: var(--on-accent); opacity: .7; }
 .next strong { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 4vw, 2.2rem); line-height: 1.05; }
-.next .emo { font-size: 2.4rem; }
+.next .emo { font-size: 2.4rem; color: inherit; }
 .foot .btn { justify-self: start; }
 .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
 .confetti span { position: absolute; top: -48px; font-size: 1.8rem; animation: fall 2.2s cubic-bezier(.3, .6, .6, 1) forwards; }
@@ -263,7 +280,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .piece:hover { border-color: var(--accent); }
 .piece[aria-pressed="true"] { border-style: solid; border-color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, var(--surface-2)); }
 .piece .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.piece .ic { font-size: 2rem; }
+.piece .ic { font-size: 2rem; color: var(--accent-text); }
 .piece .nm { font-family: var(--font-display); font-size: 1.4rem; }
 .piece .meta { font-weight: 700; color: var(--accent-text); }
 .piece .state { font-size: .8rem; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: var(--line); }
@@ -280,11 +297,18 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .mission .btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .mission .fb:empty { display: none; }
 .btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.go .fa-circle-check { color: inherit; }
 .retenir.s4 ul { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 900px) { .retenir.s4 ul { grid-template-columns: minmax(0, 1fr); } }
 </style>
 
 <main class="wrap">
+  <header class="brand">
+    <a href="https://formation.skazy.nc/" target="_blank" rel="noopener" aria-label="Skazy Formation : formation.skazy.nc, nouvel onglet">
+      <svg class="brand-logo" viewBox="0 0 218 72" aria-hidden="true" focusable="false"><path fill-rule="evenodd" fill="currentColor" d="m202.4 1.4h15.3l-16 52.6q-1.1 3.5-3 6.3c-1.3 1.9-2.9 3.5-4.7 4.8-1.8 1.4-3.8 2.4-6 3.1-2.2 0.7-4.5 1.1-6.9 1.1-3 0-5.9-0.6-8.7-1.7v-14.4c2.8 1 5.1 1.5 7 1.5 3.7 0 5.6-2 6-6.2l-13.4-37v0.1l-21.3 25.3h26.7l3.9 11.6h-51.8c-3.1 0-5 0.1-6.3-0.8-1.6-1.1-2.6-2.8-3.1-4.9l-0.4-1.7c-2.1 2.7-4.5 4.7-7.2 6.1q-4 2.1-8.7 2.1c-2.3 0-4.5-0.4-6.5-1.2-2-0.8-3.7-1.9-5.2-3.2-1.4-1.4-2.6-3-3.4-4.8q-1.2-2.8-1.2-6c0-2.4 0.5-4.5 1.5-6.5q1.5-3 4.2-5.1c1.8-1.4 3.9-2.5 6.4-3.3 2.5-0.8 5.2-1.2 8.2-1.2 3.8 0 6.9 0.6 9.4 1.8v-1.4c0-2.2-0.6-3.8-1.9-4.9-1.3-1.1-3.3-1.6-6.2-1.6-2.7 0-5.1 0.4-7.4 1.3-2.2 0.9-4.6 2.1-7.1 3.8l-4.9-10.5c6.2-4 13.2-6 21.1-6 7.5 0 13.3 1.7 17.3 5 4.1 3.4 6.1 8.3 6.1 15v9.1c0 1.6 0.2 2.7 0.7 3.3 0.3 0.5 1.2 1.3 2.7 0l16.9-19.9h-20v-11.6h51.5l9 32.6 7.4-32.7zm-84.9 30.5v-3.3q-1.5-0.6-3.3-0.9c-1.2-0.3-2.3-0.4-3.2-0.4-2.1 0-3.8 0.5-5.2 1.5-1.4 1-2.1 2.3-2.1 3.8 0 1.3 0.6 2.4 1.6 3.2 1.1 0.8 2.4 1.2 4 1.2 1 0 2-0.2 3.1-0.5 1-0.3 2-0.8 2.8-1.3 0.7-0.5 1.2-1 1.6-1.6 0.4-0.5 0.6-1.1 0.6-1.7zm-94.6 18.2c-4.2 0.1-8.3-0.4-12.4-1.6-4.1-1.2-7.5-3.1-10.4-5.6l5.6-10.6c3.1 1.9 6 3.4 8.8 4.4 2.8 1 5.4 1.5 7.7 1.4q3.6-0.2 3.6-2.4 0-1.4-1.5-2.1c-1-0.6-2.8-1.2-5.6-1.9-3.4-0.9-6.3-1.7-8.6-2.6-2.3-0.9-4.2-1.8-5.7-2.9-1.5-1-2.5-2.2-3.2-3.5-0.7-1.3-1-2.9-1.1-4.7-0.1-2.4 0.3-4.7 1.2-6.8 0.9-2.1 2.2-3.9 3.9-5.5 1.7-1.6 3.7-2.8 6.1-3.7q3.6-1.4 7.8-1.5c3.5-0.1 6.9 0.2 10.1 1 3.2 0.8 6.5 2.5 9.8 5.2l-6.2 10.6c-3-1.8-5.6-3.1-7.6-3.9-2-0.8-3.9-1.1-5.7-1-1 0-1.9 0.3-2.5 0.7-0.7 0.4-1 1.1-0.9 1.9 0 0.9 0.5 1.6 1.5 2.2 1 0.5 2.9 1.1 5.8 1.8 3.5 0.8 6.5 1.6 8.9 2.6 2.4 0.9 4.3 1.9 5.8 3.1 1.5 1.1 2.5 2.4 3.2 3.9 0.7 1.5 1 3.2 1.1 5.1 0.1 2.5-0.3 4.7-1.1 6.7-0.8 2-2.1 3.7-3.8 5.2-1.7 1.5-3.7 2.6-6.2 3.4-2.5 0.6-5.3 1-8.4 1.1z"/><path fill="currentColor" d="m72.5 49.3l-10.9-17.5-3.5 3.8v13.7h-17.3v-49.2h17.3v19l12.9-17.8h18.3l-16.5 21 18.2 27z"/><path fill-rule="evenodd" fill="#00997A" d="m21.6 53.6v0.6h3.6v5h-3.6v11.8h-5.7v-11.8h-2.2v-5h2.2v-0.6c0-3.4 1.8-6.3 5.5-6.3 1.1 0 2.7 0.2 3.8 0.6v4.4c-0.6-0.2-1.2-0.4-1.8-0.4-1.5 0.1-1.8 1.2-1.8 1.7zm4.7 9c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm18.9-9.2l-0.9 5.7c-0.2 0-0.6-0.1-0.9-0.1-1.7 0-4.1 0.7-4.1 5.2v6.8h-5.7v-16.8h5.2l0.3 2c1.8-2 4.1-2.7 6.1-2.8zm28.8 8.5v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.9 0-2.8 1.3-2.8 3.2v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.8 0-2.8 1.3-2.8 3.2v9.1h-5.7v-16.8h5.2l0.2 1.3c1.2-1.2 2.9-1.9 5-1.9 2 0 3.9 0.6 5 2.8 1.2-1.7 3.2-2.8 5.8-2.8 3.3 0 6.3 1.6 6.3 8.3zm20.9-7.7v16.8h-5.2l-0.3-1.7c-1.2 1.5-3.1 2.3-5.3 2.3-5.1 0-8.4-4.2-8.4-9 0-5 3.5-9 8.4-9 2.2 0 4.1 0.8 5.3 2.3l0.3-1.7zm-5.7 8.3c0-2.4-1.8-3.8-3.9-3.8-2.3 0-4 1.8-4 3.9 0 2 1.6 3.9 4 3.9 2.3 0 3.9-1.7 3.9-4zm9.4 2.8v-6.2h-2.4v-4.5h0.5c1.5 0 2.4-0.8 2.4-2.3v-1.7h5.1v3.5h3.4v5h-3.4v5.9c0 1.2 0.7 1.7 1.7 1.7 0.5 0 1.2-0.2 1.7-0.3v4.3c-0.9 0.4-2.5 0.6-3.6 0.6-4.1 0-5.4-2.8-5.4-6zm11.1-15.5c0-1.6 1.4-2.8 3.2-2.8 1.8 0 3.2 1.3 3.2 2.8 0 1.5-1.3 2.8-3.2 2.8-1.9 0-3.2-1.3-3.2-2.8zm0.3 4.4h5.7v16.8h-5.7zm7.7 8.4c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm23.7-0.7v9.1h-5.7v-9.1c0-2.3-1-3.2-2.7-3.2-1.8 0-2.9 1.3-2.9 3.2v9.1h-5.7v-16.8h5.2l0.2 1.5c1.3-1.2 3-2 5.2-2 3.2-0.1 6.4 1.5 6.4 8.2z"/></svg>
+      <span class="brand-url">formation.skazy.nc <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+    </a>
+  </header>
   <div class="bento">
 
     <section class="card hero s4">
@@ -305,33 +329,33 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true">🧭</span><h2>Quel Claude pour moi ?</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-compass"></i></span><h2>Quel Claude pour moi ?</h2></div>
       <p class="muted">Coche ce qui te ressemble.</p>
       <div class="switches">
-        <label class="sw" for="q1"><span>💬 Je veux poser des questions, écrire, réfléchir</span><input type="checkbox" id="q1"></label>
-        <label class="sw" for="q2"><span>📁 Claude doit ouvrir et ranger des fichiers de mon ordinateur</span><input type="checkbox" id="q2" checked></label>
-        <label class="sw" for="q3"><span>🏃 Claude doit faire une longue tâche tout seul</span><input type="checkbox" id="q3" checked></label>
-        <label class="sw" for="q4"><span>🛠️ Je veux créer ou modifier un logiciel, un site, une appli</span><input type="checkbox" id="q4"></label>
+        <label class="sw" for="q1"><span><i class="fa-solid fa-comments" aria-hidden="true"></i> Je veux poser des questions, écrire, réfléchir</span><input type="checkbox" id="q1"></label>
+        <label class="sw" for="q2"><span><i class="fa-solid fa-folder-open" aria-hidden="true"></i> Claude doit ouvrir et ranger des fichiers de mon ordinateur</span><input type="checkbox" id="q2" checked></label>
+        <label class="sw" for="q3"><span><i class="fa-solid fa-person-running" aria-hidden="true"></i> Claude doit faire une longue tâche tout seul</span><input type="checkbox" id="q3" checked></label>
+        <label class="sw" for="q4"><span><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i> Je veux créer ou modifier un logiciel, un site, une appli</span><input type="checkbox" id="q4"></label>
       </div>
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true">🎯</span><h2>Ma recommandation</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></span><h2>Ma recommandation</h2></div>
       <div class="winner">
         <span class="eyebrow">Utilise plutôt</span>
         <span class="big" id="winName" aria-live="polite">Cowork</span>
         <p id="winTxt"></p>
       </div>
-      <div class="meter score" id="scChat"><div class="meter-top"><span>💬 Chat</span><span></span></div><div class="track"><div class="fill"></div></div></div>
-      <div class="meter score" id="scCowork"><div class="meter-top"><span>🤝 Cowork</span><span></span></div><div class="track"><div class="fill"></div></div></div>
-      <div class="meter score" id="scCode"><div class="meter-top"><span>👩‍💻 Code</span><span></span></div><div class="track"><div class="fill"></div></div></div>
+      <div class="meter score" id="scChat"><div class="meter-top"><span><i class="fa-solid fa-comments" aria-hidden="true"></i> Chat</span><span></span></div><div class="track"><div class="fill"></div></div></div>
+      <div class="meter score" id="scCowork"><div class="meter-top"><span><i class="fa-solid fa-handshake" aria-hidden="true"></i> Cowork</span><span></span></div><div class="track"><div class="fill"></div></div></div>
+      <div class="meter score" id="scCode"><div class="meter-top"><span><i class="fa-solid fa-laptop-code" aria-hidden="true"></i> Code</span><span></span></div><div class="track"><div class="fill"></div></div></div>
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true">📋</span><h2>Chat, Cowork, Code : les différences</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-clipboard-list"></i></span><h2>Chat, Cowork, Code : les différences</h2></div>
       <div class="tbl-wrap">
         <table class="cmp" id="cmp">
-          <thead><tr><th></th><th data-col="chat">💬 Chat</th><th data-col="cowork">🤝 Cowork</th><th data-col="code">👩‍💻 Code</th></tr></thead>
+          <thead><tr><th></th><th data-col="chat"><i class="fa-solid fa-comments" aria-hidden="true"></i> Chat</th><th data-col="cowork"><i class="fa-solid fa-handshake" aria-hidden="true"></i> Cowork</th><th data-col="code"><i class="fa-solid fa-laptop-code" aria-hidden="true"></i> Code</th></tr></thead>
           <tbody>
             <tr><th>C'est quoi ?</th><td data-col="chat">Une conversation. Tu demandes, Claude répond.</td><td data-col="cowork">Claude fait une tâche de bureau à ta place, en plusieurs étapes.</td><td data-col="code">Claude écrit du code, le teste et lance des commandes.</td></tr>
             <tr><th>Pour qui ?</th><td data-col="chat">Tout le monde.</td><td data-col="cowork">Ceux qui veulent déléguer des tâches.</td><td data-col="code">Les développeurs et les curieux du numérique.</td></tr>
@@ -345,32 +369,32 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true">🍳</span><h2>Projet, Skill, Connecteur : la cuisine de Claude</h2><span class="pill" id="kScore">0 / 5</span></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-kitchen-set"></i></span><h2>Projet, Skill, Connecteur : la cuisine de Claude</h2><span class="pill" id="kScore">0 / 5</span></div>
       <p>Claude est le cuisinier. Clique sur une carte pour lui donner un outil. <strong>Pour chaque mission, active les bons outils, puis valide.</strong></p>
       <div class="mission" id="kMission" tabindex="-1">
         <span class="eyebrow" id="kStep"></span>
         <span class="task" id="kTask"></span>
         <div class="btns">
-          <button type="button" class="btn go" id="kCheck">✅ Valider</button>
-          <button type="button" class="btn" id="kNext" hidden>Mission suivante →</button>
+          <button type="button" class="btn go" id="kCheck"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Valider</button>
+          <button type="button" class="btn" id="kNext" hidden>Mission suivante <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
         </div>
         <span class="fb" id="kFb" aria-live="polite"></span>
       </div>
       <div class="kitchen">
         <button type="button" class="piece" data-k="projet" aria-pressed="false">
-          <span class="top"><span class="ic" aria-hidden="true">🗂️</span><span class="state">Désactivé</span></span>
+          <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></span><span class="state">Désactivé</span></span>
           <span class="nm">Projet</span>
           <span class="meta">= le plan de travail avec tes ingrédients</span>
           <span>Un espace où tu ranges des documents et des consignes. Claude les garde pour toutes les conversations du projet.</span>
         </button>
         <button type="button" class="piece" data-k="skill" aria-pressed="false">
-          <span class="top"><span class="ic" aria-hidden="true">📜</span><span class="state">Désactivé</span></span>
+          <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-scroll"></i></span><span class="state">Désactivé</span></span>
           <span class="nm">Skill</span>
           <span class="meta">= la fiche recette</span>
           <span>Une méthode écrite une fois. Claude la suit dès que la tâche correspond.</span>
         </button>
         <button type="button" class="piece" data-k="connecteur" aria-pressed="false">
-          <span class="top"><span class="ic" aria-hidden="true">🔌</span><span class="state">Désactivé</span></span>
+          <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-plug"></i></span><span class="state">Désactivé</span></span>
           <span class="nm">Connecteur</span>
           <span class="meta">= la porte du frigo et du magasin</span>
           <span>Un branchement vers tes outils : Gmail, Google Drive, agenda, Slack… Claude y lit ou agit, si tu l'autorises. Plus de pouvoir, plus de prudence : voir la fiche 6.</span>
@@ -384,7 +408,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s4 retenir">
-      <div class="head"><span class="emo" aria-hidden="true">🧠</span><h2>À retenir</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
         <li><span>Chat pour parler. Cowork pour déléguer une tâche sur tes fichiers. Code pour créer des logiciels.</span></li>
         <li><span>Projet = tes documents et consignes rangés au même endroit.</span></li>
@@ -393,7 +417,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s4 challenge" id="defi">
-      <div class="head"><span class="emo" aria-hidden="true">🏁</span><h2>Défi final</h2><span class="pill" id="defiScore"></span></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-flag-checkered"></i></span><h2>Défi final</h2><span class="pill" id="defiScore"></span></div>
       <div class="prize">
         <span class="badge" id="badge" aria-hidden="true"></span>
         <div class="prize-txt"><strong id="badgeName"></strong><span class="small muted" id="badgeTxt"></span></div>
@@ -401,19 +425,20 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       </div>
       <div class="quiz" id="defiQuiz"></div>
       <div class="result" id="defiResult" aria-live="polite"></div>
-      <button type="button" class="btn reveal" id="defiReset">↺ Rejouer le défi</button>
+      <button type="button" class="btn reveal" id="defiReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Rejouer le défi</button>
     </section>
 
     <a class="card s4 next" href="5-forfait-api.html">
       <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>5 · Forfait ou Compteur ?</strong></span>
-      <span class="emo" aria-hidden="true">→</span>
+      <span class="emo" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
     </a>
 
   </div>
   <footer class="foot">
     <nav class="series" aria-label="Les 6 fiches"><strong>Comprendre l’IA en 6 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-modele-effort.html">2 Modèle et effort</a><a href="3-hallucinations.html">3 Hallucinations</a><a aria-current="page">4 Les outils Claude</a><a href="5-forfait-api.html">5 Forfait ou API</a><a href="6-message-piege.html">6 Message piégé</a></nav>
     <span>Les fonctions disponibles changent selon ton abonnement et ton appareil.</span>
-    <button type="button" class="btn" id="atelierBtn" aria-pressed="false">🎤 Mode atelier : non</button>
+    <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
+    <span class="brand-foot">Une ressource Skazy Formation : <a href="https://formation.skazy.nc/" target="_blank" rel="noopener">formation.skazy.nc</a></span>
   </footer>
 </main>
 
@@ -440,7 +465,7 @@ function initSeg(el, onChange) {
 
 const FICHE = 4;
 // Parcours : progression gardée dans ce navigateur, mode atelier, devine d'abord, défi final (même bloc dans chaque fiche)
-const BADGES = { 1: ["🪙", "Maître des tokens"], 2: ["🧠", "Bon Cerveau"], 3: ["🕵️", "Détective anti-bobards"], 4: ["🧰", "As de la boîte à outils"], 5: ["🧮", "Pro du budget"], 6: ["🛡️", "Gardien anti-piège"] };
+const BADGES = { 1: ["{coins}", "Maître des tokens"], 2: ["{brain}", "Bon Cerveau"], 3: ["{user-secret}", "Détective anti-bobards"], 4: ["{toolbox}", "As de la boîte à outils"], 5: ["{calculator}", "Pro du budget"], 6: ["{shield-halved}", "Gardien anti-piège"] };
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch {} },
@@ -456,28 +481,41 @@ if (atelierParam !== null) store.set("ia6:atelier", atelierParam === "0" ? "0" :
 const ATELIER = atelierParam !== null ? atelierParam !== "0" : store.get("ia6:atelier") === "1";
 if (ATELIER) document.documentElement.dataset.mode = "atelier";
 
+// Icônes Font Awesome. Dans un texte, « {nom} » devient l'icône fa-nom : "{circle-check} Bravo !"
+function icon(name, cls) {
+  const i = document.createElement("i");
+  i.className = "fa-solid fa-" + name + (cls ? " " + cls : "");
+  i.setAttribute("aria-hidden", "true");
+  return i;
+}
+function rich(el, text) {
+  el.replaceChildren(...String(text).split(/\{([a-z0-9-]+)\}/).map((s, k) => (k % 2 ? icon(s) : s)).filter((s) => s !== ""));
+  return el;
+}
+// Le même texte sans les icônes, pour les attributs (aria-label…)
+const plain = (text) => String(text).replace(/\{[a-z0-9-]+\}\s*/g, "");
 function h(tag, cls, text) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
-  if (text != null) e.textContent = text;
+  if (text != null) rich(e, text);
   return e;
 }
 function btn(label, cls = "") { const b = h("button", cls, label); b.type = "button"; return b; }
-const starsTxt = (n) => "★".repeat(n) + "☆".repeat(3 - n);
+const starIcons = (n) => [1, 2, 3].map((k) => icon("star", k > n ? "star-off" : ""));
 
 // Une question à choix. En mode atelier, un clic choisit et « Révéler » corrige : le groupe répond d'abord.
-function ask(box, { q, options, a, why, onShow, good = "✅ Bravo ! ", bad = "❌ Pas tout à fait. " }) {
+function ask(box, { q, options, a, why, onShow, good = "{circle-check} Bravo ! ", bad = "{circle-xmark} Pas tout à fait. " }) {
   let pick = null, shown = false;
   const group = h("div", "qbtns");
   group.setAttribute("role", "group");
-  group.setAttribute("aria-label", q);
+  group.setAttribute("aria-label", plain(q));
   const bs = options.map(([v, label]) => {
     const b = btn(label);
     b.addEventListener("click", () => { pick = v; if (ATELIER && !shown) paint(); else show(); });
     group.append(b);
     return [v, b];
   });
-  const rev = btn("👁️ Révéler la réponse", "btn reveal");
+  const rev = btn("{eye} Révéler la réponse", "btn reveal");
   rev.addEventListener("click", show);
   const fb = h("span", "qfb");
   fb.setAttribute("aria-live", "polite");
@@ -496,7 +534,7 @@ function ask(box, { q, options, a, why, onShow, good = "✅ Bravo ! ", bad = "�
       b.classList.toggle("wrong", shown && v === pick && v !== a);
     }
     rev.hidden = shown || pick === null;
-    fb.textContent = shown ? (pick === a ? good : bad) + (typeof why === "function" ? why() : why) : "";
+    rich(fb, shown ? (pick === a ? good : bad) + (typeof why === "function" ? why() : why) : "");
   }
   box.replaceChildren(h("p", "", q), group, rev, fb);
   paint();
@@ -508,18 +546,21 @@ function guess(box, { lock, q, ...opts }) {
   const zones = [].concat(lock);
   zones.forEach((z) => { z.classList.add("locked"); z.inert = true; });
   box.classList.add("guess");
-  return ask(box, { ...opts, q: "🤔 Devine d'abord : " + q, good: "✅ Bien vu ! ", bad: "😮 Surprise ! ",
+  return ask(box, { ...opts, q: "{circle-question} Devine d'abord : " + q, good: "{circle-check} Bien vu ! ", bad: "{face-surprise} Surprise ! ",
     onShow() { zones.forEach((z) => { z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false; }); } });
 }
 
+// Pluie d'icônes aux couleurs des 6 fiches
+const CONFETTI_COLORS = ["#C6FF00", "#FF2E93", "#FF6B00", "#00E5FF", "#B14EFF", "#FFE600"];
 function confetti(ic) {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const box = h("div", "confetti");
   box.setAttribute("aria-hidden", "true");
   for (let i = 0; i < 28; i++) {
-    const s = h("span", "", ["🎉", "⭐", ic, "✨"][i % 4]);
+    const s = h("span", "", ["{trophy}", "{star}", ic, "{wand-magic-sparkles}"][i % 4]);
     s.style.left = Math.random() * 96 + "%";
     s.style.animationDelay = Math.random() * 0.7 + "s";
+    s.style.color = CONFETTI_COLORS[i % 6];
     box.append(s);
   }
   document.body.append(box);
@@ -540,7 +581,7 @@ function initDefi(items, options) {
   });
   function paintBadge() {
     $("#badge").classList.toggle("won", record > 0);
-    $("#stars").textContent = record ? starsTxt(record) : "";
+    $("#stars").replaceChildren(...(record ? starIcons(record) : []));
     $("#stars").setAttribute("aria-label", record ? `Meilleur score : ${record} étoile${record > 1 ? "s" : ""} sur 3` : "");
     $("#badgeTxt").textContent = record
       ? "Badge gagné ! Rejoue quand tu veux pour améliorer ton score."
@@ -555,13 +596,13 @@ function initDefi(items, options) {
     record = Math.max(record, stars);
     saveProgress(FICHE, stars);
     paintBadge();
-    $("#defiResult").textContent = stars === 3
-      ? `🎉 ${good} sur ${total} du premier coup ! Tu gagnes le badge ${ic} « ${name} » avec 3 étoiles.`
-      : `🎉 ${good} sur ${total} du premier coup. Tu gagnes le badge ${ic} « ${name} » avec ${stars} étoile${stars > 1 ? "s" : ""} sur 3. Rejoue pour viser 3 étoiles !`;
+    rich($("#defiResult"), stars === 3
+      ? `{trophy} ${good} sur ${total} du premier coup ! Tu gagnes le badge ${ic} « ${name} » avec 3 étoiles.`
+      : `{trophy} ${good} sur ${total} du premier coup. Tu gagnes le badge ${ic} « ${name} » avec ${stars} étoile${stars > 1 ? "s" : ""} sur 3. Rejoue pour viser 3 étoiles !`);
     confetti(ic);
   }
-  $("#badge").textContent = ic;
-  $("#badgeName").textContent = `${ic} Badge « ${name} »`;
+  rich($("#badge"), ic);
+  rich($("#badgeName"), `${ic} Badge « ${name} »`);
   $("#defiScore").textContent = `0 / ${total}`;
   $("#defiReset").addEventListener("click", () => {
     firsts.clear();
@@ -577,7 +618,7 @@ function initDefi(items, options) {
 // Mode atelier : texte plus gros, réponses révélées par l'animateur. Le réglage suit d'une fiche à l'autre.
 (function initAtelier() {
   const b = $("#atelierBtn");
-  b.textContent = "🎤 Mode atelier : " + (ATELIER ? "oui" : "non");
+  rich(b, "{chalkboard-user} Mode atelier : " + (ATELIER ? "oui" : "non"));
   b.setAttribute("aria-pressed", String(ATELIER));
   b.addEventListener("click", () => { store.set("ia6:atelier", ATELIER ? "0" : "1"); location.search = ATELIER ? "atelier=0" : "atelier=1"; });
   if (ATELIER) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?atelier=1$1"); });
@@ -613,9 +654,9 @@ function renderChooser() {
 [1, 2, 3, 4].forEach((i) => $("#q" + i).addEventListener("change", renderChooser));
 
 const CAN = {
-  projet: "🗂️ Se souvenir de tes documents et de tes consignes, à chaque conversation du projet.",
-  skill: "📜 Suivre ta méthode, toujours de la même façon. Par exemple : faire un devis à ton format.",
-  connecteur: "🔌 Chercher ou envoyer des infos dans tes outils (mails, agenda, fichiers en ligne), si tu l'autorises.",
+  projet: "{layer-group} Se souvenir de tes documents et de tes consignes, à chaque conversation du projet.",
+  skill: "{scroll} Suivre ta méthode, toujours de la même façon. Par exemple : faire un devis à ton format.",
+  connecteur: "{plug} Chercher ou envoyer des infos dans tes outils (mails, agenda, fichiers en ligne), si tu l'autorises.",
 };
 function renderKitchen() {
   const on = $$(".piece").filter((p) => p.getAttribute("aria-pressed") === "true").map((p) => p.dataset.k);
@@ -623,7 +664,7 @@ function renderKitchen() {
   const list = $("#canList");
   list.replaceChildren(...(on.length ? on : ["none"]).map((k) => {
     const li = document.createElement("li");
-    li.textContent = k === "none" ? "Seulement utiliser ce que tu écris dans la conversation." : CAN[k];
+    rich(li, k === "none" ? "Seulement utiliser ce que tu écris dans la conversation." : CAN[k]);
     return li;
   }));
   $("#canEx").textContent = on.length === 3
@@ -658,11 +699,11 @@ function renderMissionK() {
   $("#kNext").hidden = true;
   if (done) {
     $("#kStep").textContent = "Missions terminées";
-    $("#kTask").textContent = `🏁 ${kit.good} mission${kit.good > 1 ? "s" : ""} sur ${MISSIONS.length} réussie${kit.good > 1 ? "s" : ""} du premier coup`;
-    $("#kFb").textContent = (kit.good === MISSIONS.length ? "🎉 Parfait ! " : "") + "Tu peux maintenant jouer librement avec les cartes.";
+    rich($("#kTask"), `{flag-checkered} ${kit.good} mission${kit.good > 1 ? "s" : ""} sur ${MISSIONS.length} réussie${kit.good > 1 ? "s" : ""} du premier coup`);
+    rich($("#kFb"), (kit.good === MISSIONS.length ? "{trophy} Parfait ! " : "") + "Tu peux maintenant jouer librement avec les cartes.");
     $("#kNext").hidden = false;
-    $("#kNext").textContent = "↺ Rejouer les missions";
-    if (kit.good === MISSIONS.length) confetti("🍳");
+    rich($("#kNext"), "{rotate-left} Rejouer les missions");
+    if (kit.good === MISSIONS.length) confetti("{kitchen-set}");
     return;
   }
   $("#kStep").textContent = `Mission ${kit.k + 1} sur ${MISSIONS.length}` + (kit.tries ? ` · essai ${kit.tries + 1}` : "");
@@ -675,16 +716,16 @@ function checkMissionK() {
   if (!missing.length && !extra.length) {
     if (!kit.tries) kit.good++;
     $("#kScore").textContent = `${kit.good} / ${MISSIONS.length}`;
-    $("#kFb").textContent = "✅ Bravo ! " + M.why;
+    rich($("#kFb"), "{circle-check} Bravo ! " + M.why);
     $("#kCheck").hidden = true;
     $("#kNext").hidden = false;
-    $("#kNext").textContent = kit.k === MISSIONS.length - 1 ? "Voir mon score →" : "Mission suivante →";
+    rich($("#kNext"), kit.k === MISSIONS.length - 1 ? "Voir mon score {arrow-right}" : "Mission suivante {arrow-right}");
     $("#kNext").focus();
     return;
   }
   kit.tries++;
   $("#kStep").textContent = `Mission ${kit.k + 1} sur ${MISSIONS.length} · essai ${kit.tries + 1}`;
-  $("#kFb").textContent = "❌ Pas tout à fait." + (missing.length ? ` Il manque : ${list(missing)}.` : "") + (extra.length ? ` En trop : ${list(extra)}.` : "") + " Change les cartes et valide encore.";
+  rich($("#kFb"), "{circle-xmark} Pas tout à fait." + (missing.length ? ` Il manque : ${list(missing)}.` : "") + (extra.length ? ` En trop : ${list(extra)}.` : "") + " Change les cartes et valide encore.");
 }
 function nextMissionK() {
   if (kit.k === MISSIONS.length) Object.assign(kit, { k: 0, tries: 0, good: 0 });
@@ -701,22 +742,22 @@ $("#kNext").addEventListener("click", nextMissionK);
 // Défi final
 initDefi([
   { q: "Tu veux de l'aide pour écrire un e-mail délicat à un client.", a: "chat",
-    options: [["chat", "💬 Chat"], ["cowork", "🤝 Cowork"], ["code", "👩‍💻 Code"]],
+    options: [["chat", "{comments} Chat"], ["cowork", "{handshake} Cowork"], ["code", "{laptop-code} Code"]],
     why: "Une conversation suffit : tu demandes, Claude répond." },
   { q: "Claude doit ranger 200 factures de ton ordinateur dans des dossiers, puis en faire un tableau.", a: "cowork",
-    options: [["chat", "💬 Chat"], ["cowork", "🤝 Cowork"], ["code", "👩‍💻 Code"]],
+    options: [["chat", "{comments} Chat"], ["cowork", "{handshake} Cowork"], ["code", "{laptop-code} Code"]],
     why: "Une tâche de bureau en plusieurs étapes, sur tes fichiers : c'est Cowork." },
   { q: "Tu veux ajouter une page de réservation au site de l'agence.", a: "code",
-    options: [["chat", "💬 Chat"], ["cowork", "🤝 Cowork"], ["code", "👩‍💻 Code"]],
+    options: [["chat", "{comments} Chat"], ["cowork", "{handshake} Cowork"], ["code", "{laptop-code} Code"]],
     why: "Créer ou modifier un site, c'est le travail de Code." },
   { q: "Tu veux que Claude lise tes e-mails Gmail.", a: "connecteur",
-    options: [["projet", "🗂️ Projet"], ["skill", "📜 Skill"], ["connecteur", "🔌 Connecteur"]],
+    options: [["projet", "{layer-group} Projet"], ["skill", "{scroll} Skill"], ["connecteur", "{plug} Connecteur"]],
     why: "Il faut un branchement vers Gmail." },
   { q: "Tu écris un mémoire avec 10 PDF et des consignes à garder.", a: "projet",
-    options: [["projet", "🗂️ Projet"], ["skill", "📜 Skill"], ["connecteur", "🔌 Connecteur"]],
+    options: [["projet", "{layer-group} Projet"], ["skill", "{scroll} Skill"], ["connecteur", "{plug} Connecteur"]],
     why: "Les documents et les consignes restent rangés ensemble, pour toutes les conversations." },
   { q: "Chaque devis doit suivre ta méthode : mêmes étapes, même mise en page.", a: "skill",
-    options: [["projet", "🗂️ Projet"], ["skill", "📜 Skill"], ["connecteur", "🔌 Connecteur"]],
+    options: [["projet", "{layer-group} Projet"], ["skill", "{scroll} Skill"], ["connecteur", "{plug} Connecteur"]],
     why: "Une méthode écrite une fois et réutilisée : c'est une Skill." },
 ]);
 renderChooser();
