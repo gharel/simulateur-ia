@@ -4,7 +4,7 @@
   "description": "Comprendre l'IA en 6 fiches : pages statiques et leurs tests",
   "scripts": {
     "test": "playwright test",
-    "deploy": "npm test && git push origin HEAD:main HEAD:gh-pages"
+    "deploy": "npm test && git push origin HEAD:gh-pages && git push origin HEAD:main"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0"

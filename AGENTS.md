@@ -46,12 +46,14 @@ npm test
 
 1. `npm test` doit passer en entier.
 2. Fais un commit, avec un message en français.
-3. Lance `npm run deploy`. Il relance les tests, puis pousse le même commit sur `main` et sur `gh-pages`. GitHub Pages republie le site en 1 à 2 minutes.
+3. Lance `npm run deploy`. Il relance les tests, puis pousse le même commit sur `gh-pages`, puis sur `main`. GitHub Pages republie le site en 1 à 2 minutes.
 
 - Jamais de `--force`.
+- Pousse `gh-pages` seul, dans son propre push. Un push de 3 branches d'un coup n'a pas déclenché la publication. Pour vérifier qu'elle est partie : https://github.com/gharel/simulateur-ia/actions (« pages build and deployment »).
 - Si le push est refusé parce que le dépôt distant a avancé : récupère les changements (`git fetch`, puis rebase), relance les tests, puis pousse.
 - Si le port 22 (SSH) est bloqué, passe par le port 443 :
 
   ```bash
-  git push ssh://git@ssh.github.com:443/gharel/simulateur-ia.git HEAD:main HEAD:gh-pages
+  git push ssh://git@ssh.github.com:443/gharel/simulateur-ia.git HEAD:gh-pages
+  git push ssh://git@ssh.github.com:443/gharel/simulateur-ia.git HEAD:main
   ```
