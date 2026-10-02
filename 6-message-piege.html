@@ -193,6 +193,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
+/* Mise en page : bandeau « À retenir », réflexes sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
+.retenir.s4 ul { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 16px 24px; }
+.check.cols { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+@media (min-width: 901px) { .stick { position: sticky; top: 16px; align-self: start; } }
+[data-empty]:empty::before {
+  content: attr(data-empty); display: block; padding: 14px 16px; border-radius: 12px;
+  border: 2px dashed var(--line); color: var(--muted); font-weight: 700; font-size: .95rem;
+}
+
 /* Skazy Formation : logo en haut, mention en bas (même bloc dans chaque fiche) */
 .brand { margin-bottom: 16px; }
 .brand a { display: inline-flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; color: var(--fg); text-decoration: none; border-radius: 10px; }
@@ -210,8 +219,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 /* Parcours : devine d'abord, défi final, badge, mode atelier (même bloc dans chaque fiche) */
 .guess { background: var(--surface-2); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; box-shadow: inset 4px 0 0 var(--accent); }
 .guess p, .qi p { font-weight: 700; overflow-wrap: anywhere; }
-.locked { filter: blur(7px); opacity: .5; user-select: none; }
-.unlocking { transition: filter .5s ease, opacity .5s ease; }
+.guess { max-width: 760px; }
+.locked { position: relative; user-select: none; }
+.locked > :not(.lock-tip) { filter: blur(7px); opacity: .5; }
+.unlocking > * { transition: filter .5s ease, opacity .5s ease; }
+.lock-tip { position: absolute; inset: 0; z-index: 2; display: flex; justify-content: center; align-items: flex-start; padding: 8px; pointer-events: none; }
+.lock-tip span {
+  background: var(--surface); color: var(--fg); border: 2px solid var(--accent); border-radius: 99px;
+  padding: 6px 14px; font-weight: 700; font-size: .9rem; text-align: center; box-shadow: 0 6px 20px rgb(0 0 0 / .3);
+}
 .quiz { display: grid; gap: 12px; }
 .challenge .quiz { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 900px) { .challenge .quiz { grid-template-columns: minmax(0, 1fr); } }
@@ -281,9 +297,22 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: .9rem; color: var(--muted); }
 .legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; }
 
-/* Ce que tu vois / ce que l'IA lit */
-.panes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-@media (max-width: 760px) { .panes { grid-template-columns: minmax(0, 1fr); } }
+/* Ce que tu vois / ce que l'IA lit. Sur mobile : l'e-mail, la question, la lampe, puis ce que lit l'IA. */
+.lamp-lab {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start;
+  grid-template-areas: "see ai" "guess lamp" "guess stats";
+}
+.lab-see { grid-area: see; align-self: stretch; }
+.lab-ai { grid-area: ai; align-self: stretch; }
+.lab-guess { grid-area: guess; }
+.lab-lamp { grid-area: lamp; }
+.lab-stats { grid-area: stats; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 760px) {
+  .lamp-lab { grid-template-columns: minmax(0, 1fr); grid-template-areas: none; }
+  .lamp-lab > * { grid-area: auto; }
+}
+/* Tant que la lampe est éteinte, rien ne trahit l'ordre caché */
+.locked .ai-read mark { background: none; box-shadow: none; }
 .pane { border-radius: 16px; border: 2px solid var(--line); overflow: hidden; display: flex; flex-direction: column; }
 .pane-top { padding: 10px 14px; font-weight: 700; background: var(--surface-2); }
 .doc {
@@ -435,9 +464,25 @@ td.c, th.c { text-align: center; }
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></span><h2>Ce que tu vois, ce que l'IA lit</h2></div>
       <p>Le pirate cache son ordre là où tes yeux ne le voient pas. L'IA, elle, lit tout le texte.</p>
-      <div id="hideGuess"></div>
+      <div class="lamp-lab">
+        <div class="pane lab-see">
+          <div class="pane-top"><i class="fa-solid fa-eye" aria-hidden="true"></i> Ce que tu vois</div>
+          <div class="doc" id="docView"></div>
+        </div>
+        <div class="lab-guess" id="hideGuess"></div>
+        <label class="sw lab-lamp" for="xray" id="lampSw"><span><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Allumer la lampe : montrer le texte caché</span><input type="checkbox" id="xray"></label>
+        <div class="pane lab-ai" id="aiPane">
+          <div class="pane-top"><i class="fa-solid fa-robot" aria-hidden="true"></i> Ce que l'IA lit</div>
+          <pre class="ai-read" id="aiRead"></pre>
+        </div>
+        <div class="stats lab-stats" id="hideStats">
+          <div class="stat"><b id="wSeen">0</b><span>mots que tu vois</span></div>
+          <div class="stat"><b id="wRead">0</b><span>mots que l'IA lit</span></div>
+          <div class="stat"><b id="wHid">0</b><span>mots cachés pour toi</span></div>
+        </div>
+      </div>
       <div class="ctl" id="hideCtl">
-        <span>Où se cache le piège ?</span>
+        <span>Essaie d'autres cachettes</span>
         <div class="seg" id="segHide" role="group" aria-label="Cachette">
           <button type="button" data-v="mail" aria-pressed="true"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Un e-mail</button>
           <button type="button" data-v="web" aria-pressed="false"><i class="fa-solid fa-globe" aria-hidden="true"></i> Une page web</button>
@@ -446,22 +491,6 @@ td.c, th.c { text-align: center; }
         </div>
         <span class="small muted" id="hideHint"></span>
       </div>
-      <label class="sw" for="xray" id="lampSw"><span><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Allumer la lampe : montrer le texte caché</span><input type="checkbox" id="xray"></label>
-      <div class="panes">
-        <div class="pane">
-          <div class="pane-top"><i class="fa-solid fa-eye" aria-hidden="true"></i> Ce que tu vois</div>
-          <div class="doc" id="docView"></div>
-        </div>
-        <div class="pane" id="aiPane">
-          <div class="pane-top"><i class="fa-solid fa-robot" aria-hidden="true"></i> Ce que l'IA lit</div>
-          <pre class="ai-read" id="aiRead"></pre>
-        </div>
-      </div>
-      <div class="stats" id="hideStats">
-        <div class="stat"><b id="wSeen">0</b><span>mots que tu vois</span></div>
-        <div class="stat"><b id="wRead">0</b><span>mots que l'IA lit</span></div>
-        <div class="stat"><b id="wHid">0</b><span>mots cachés pour toi</span></div>
-      </div>
     </section>
 
     <section class="card s4">
@@ -469,7 +498,7 @@ td.c, th.c { text-align: center; }
       <p>Le piège devient grave quand l'IA réunit <strong>trois ingrédients</strong> en même temps.
         Active-les un par un et regarde ce que fait l'IA avec l'e-mail piégé de Claire.</p>
       <div class="sim">
-        <div class="sim-col">
+        <div class="sim-col stick">
           <div class="msg-me"><span class="who">Ta demande</span>« Résume mes nouveaux e-mails et traite les urgences. »</div>
           <div class="switches">
             <label class="sw" for="iPriv"><span><i class="fa-solid fa-lock" aria-hidden="true"></i> L'IA a accès à mes données : boîte mail, dossiers clients</span><input type="checkbox" id="iPriv" checked></label>
@@ -511,20 +540,20 @@ td.c, th.c { text-align: center; }
       <p>Ton assistant traite tes e-mails. Avant chaque action, il te demande la permission.
         Certaines demandes viennent de toi. D'autres viennent d'un ordre caché. <strong>Lis bien : à qui ? quoi ? combien ?</strong></p>
       <div class="gard">
-        <div class="gard-col">
+        <div class="gard-col stick">
           <div class="msg-me"><span class="who">Ta demande</span>« Lis mes nouveaux e-mails. Envoie le devis île des Pins à Claire Lefèvre. Range les factures de mars dans le dossier Compta. »</div>
           <div class="ask-card" id="gardCard" tabindex="-1"></div>
         </div>
         <div class="gard-col">
           <div class="bar-label">Tes décisions</div>
-          <ol class="log" id="gardLog" aria-live="polite"></ol>
+          <ol class="log" id="gardLog" aria-live="polite" data-empty="Tes décisions s'affichent ici, une par une."></ol>
           <div class="result" id="gardResult" aria-live="polite"></div>
         </div>
       </div>
       <p class="small muted">Exemple fabriqué pour comprendre. Les noms et les adresses sont inventés.</p>
     </section>
 
-    <section class="card s2">
+    <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-toolbox"></i></span><h2>Les 3 ingrédients dans tes outils</h2></div>
       <div class="tbl-wrap">
         <table>
@@ -542,21 +571,13 @@ td.c, th.c { text-align: center; }
       <p class="small muted">Un connecteur ou Cowork peut ajouter <span role="img" aria-label="l'accès à tes données"><i class="fa-solid fa-lock"></i></span> et <span role="img" aria-label="le droit d'agir seule"><i class="fa-solid fa-bolt"></i></span> (voir la fiche 4). Plus l'IA a de pouvoir, plus ce qu'elle lit compte.</p>
     </section>
 
-    <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-trowel-bricks"></i></span><h2>Pourquoi on ne répare pas ça ?</h2></div>
-      <p>Les fabricants entraînent les IA à repérer ces pièges. Ça marche de mieux en mieux.</p>
-      <p><strong>Mais aucune IA ne résiste à 100 %.</strong> Les pirates inventent sans cesse de nouvelles façons d'écrire leurs ordres.</p>
-      <p>C'est comme le hameçonnage par e-mail : les filtres en arrêtent beaucoup, mais un message piégé passe parfois.</p>
-      <p>La meilleure protection : <strong>limiter ce que l'IA peut faire seule</strong>, et garder la main sur les actions importantes.</p>
-    </section>
-
-    <section class="card s2">
+    <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span><h2>Mes réflexes anti-piège</h2></div>
       <div class="meter">
         <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 6</span></div>
         <div class="track"><div class="fill" id="chkFill"></div></div>
       </div>
-      <div class="check" id="check">
+      <div class="check cols" id="check">
         <label><input type="checkbox"><span>Je donne à l'IA le moins d'accès possible. La lecture seule, si ça suffit.</span></label>
         <label><input type="checkbox"><span>Je garde la permission avant tout envoi, paiement ou suppression.</span></label>
         <label><input type="checkbox"><span>Je lis vraiment la demande : destinataire, pièce jointe, montant.</span></label>
@@ -564,6 +585,14 @@ td.c, th.c { text-align: center; }
         <label><input type="checkbox"><span>Je ne réunis pas les 3 ingrédients sans surveiller.</span></label>
         <label><input type="checkbox"><span>Si l'IA fait quelque chose de bizarre, j'arrête tout et je préviens.</span></label>
       </div>
+    </section>
+
+    <section class="card s2">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-trowel-bricks"></i></span><h2>Pourquoi on ne répare pas ça ?</h2></div>
+      <p>Les fabricants entraînent les IA à repérer ces pièges. Ça marche de mieux en mieux.</p>
+      <p><strong>Mais aucune IA ne résiste à 100 %.</strong> Les pirates inventent sans cesse de nouvelles façons d'écrire leurs ordres.</p>
+      <p>C'est comme le hameçonnage par e-mail : les filtres en arrêtent beaucoup, mais un message piégé passe parfois.</p>
+      <p>La meilleure protection : <strong>limiter ce que l'IA peut faire seule</strong>, et garder la main sur les actions importantes.</p>
     </section>
 
     <section class="card s2 retenir">
@@ -694,13 +723,31 @@ function ask(box, { q, options, a, why, onShow, good = "{circle-check} Bravo ! "
   return { reset() { pick = null; shown = false; paint(); } };
 }
 
+// Zones floutées : un message dit comment les débloquer. Renvoie la fonction qui les débloque.
+function lockZones(zones, tip = "{lock} Réponds d'abord à la question") {
+  const locks = [].concat(zones).map((z) => {
+    const t = h("span", "lock-tip");
+    t.append(h("span", "", tip));
+    z.classList.add("locked");
+    z.inert = true;
+    z.append(t);
+    // Si la page redessine la zone, le message revient.
+    const mo = new MutationObserver(() => { if (!t.isConnected) z.append(t); });
+    mo.observe(z, { childList: true });
+    return [z, t, mo];
+  });
+  return () => locks.forEach(([z, t, mo]) => {
+    mo.disconnect();
+    t.remove();
+    z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false;
+  });
+}
+
 // Devine d'abord : les zones « lock » restent floues tant qu'on n'a pas répondu.
 function guess(box, { lock, q, ...opts }) {
-  const zones = [].concat(lock);
-  zones.forEach((z) => { z.classList.add("locked"); z.inert = true; });
+  const unlock = lockZones(lock);
   box.classList.add("guess");
-  return ask(box, { ...opts, q: "{circle-question} Devine d'abord : " + q, good: "{circle-check} Bien vu ! ", bad: "{face-surprise} Surprise ! ",
-    onShow() { zones.forEach((z) => { z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false; }); } });
+  return ask(box, { ...opts, q: "{circle-question} Devine d'abord : " + q, good: "{circle-check} Bien vu ! ", bad: "{face-surprise} Surprise ! ", onShow: unlock });
 }
 
 // Pluie d'icônes aux couleurs des 6 fiches
@@ -855,14 +902,16 @@ function countWords(H) {
   return { seen, all: H.read.reduce((n, [t]) => n + words(t), 0) };
 }
 hide = initSeg($("#segHide"), (v) => { hide = v; renderHide(); });
-$("#xray").addEventListener("change", renderHide);
+// Ce que lit l'IA se dévoile quand on allume la lampe
+const unlockAi = lockZones([$("#aiPane"), $("#hideStats")], "{lightbulb} Allume d'abord la lampe");
+$("#xray").addEventListener("change", () => { if ($("#xray").checked) unlockAi(); renderHide(); });
 {
   const { seen, all } = countWords(HIDE.mail);
   guess($("#hideGuess"), {
-    q: "l'e-mail de Claire a l'air normal. Combien de mots te sont cachés dedans ?",
+    q: "cet e-mail de Claire a l'air normal. Combien de mots te sont cachés dedans ?",
     options: [["0", "Aucun : tout est visible"], ["10", "Une dizaine"], ["30", "Plus de 30"]], a: "30",
     why: `${all - seen} mots cachés, presque autant que les ${seen} mots que tu vois. Allume la lampe pour les lire.`,
-    lock: [$("#hideCtl"), $("#lampSw"), $("#aiPane"), $("#hideStats")],
+    lock: [$("#lampSw"), $("#hideCtl")],
   });
 }
 

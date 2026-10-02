@@ -52,3 +52,20 @@ Chaque page charge la version SVG + JS depuis cdnjs (`solid.min.js` et `fontawes
 - Dans le HTML : `<i class="fa-solid fa-coins" aria-hidden="true"></i>`.
 - Dans le JS : écrire `{coins}` dans le texte, puis l'afficher avec `rich(el, texte)` ou `h(tag, classe, texte)`. Exemple : `rich(el, "{circle-check} Bravo !")`. Pour un attribut (`aria-label`…), `plain(texte)` retire les icônes.
 - Une fois l'icône affichée, le `<i>` devient un `<svg class="svg-inline--fa fa-coins">` : en CSS, cibler `.fa-coins` ou `.svg-inline--fa`, pas `.fa-solid`.
+
+### Zones floutées
+
+« Devine d'abord » floute la suite tant qu'on n'a pas répondu. Chaque zone floutée affiche « Réponds d'abord à la question ».
+Dans la fiche 6, « Ce que l'IA lit » attend en plus qu'on allume la lampe.
+
+### Tests et mise en ligne
+
+```bash
+npm install
+npx playwright install chromium
+npm test
+```
+
+Les tests Playwright ouvrent chaque page sur bureau et sur téléphone. Ils vérifient les icônes, la marque Skazy Formation, la mise en page, les zones floutées et les jeux.
+
+`npm run deploy` relance les tests, puis pousse sur `main` et sur `gh-pages` (le site GitHub Pages). Les consignes complètes pour les agents sont dans [AGENTS.md](AGENTS.md).

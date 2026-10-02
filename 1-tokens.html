@@ -193,6 +193,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
+/* Mise en page : bandeau « À retenir », réflexes sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
+.retenir.s4 ul { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 16px 24px; }
+.check.cols { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+@media (min-width: 901px) { .stick { position: sticky; top: 16px; align-self: start; } }
+[data-empty]:empty::before {
+  content: attr(data-empty); display: block; padding: 14px 16px; border-radius: 12px;
+  border: 2px dashed var(--line); color: var(--muted); font-weight: 700; font-size: .95rem;
+}
+
 /* Skazy Formation : logo en haut, mention en bas (même bloc dans chaque fiche) */
 .brand { margin-bottom: 16px; }
 .brand a { display: inline-flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; color: var(--fg); text-decoration: none; border-radius: 10px; }
@@ -210,8 +219,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 /* Parcours : devine d'abord, défi final, badge, mode atelier (même bloc dans chaque fiche) */
 .guess { background: var(--surface-2); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; box-shadow: inset 4px 0 0 var(--accent); }
 .guess p, .qi p { font-weight: 700; overflow-wrap: anywhere; }
-.locked { filter: blur(7px); opacity: .5; user-select: none; }
-.unlocking { transition: filter .5s ease, opacity .5s ease; }
+.guess { max-width: 760px; }
+.locked { position: relative; user-select: none; }
+.locked > :not(.lock-tip) { filter: blur(7px); opacity: .5; }
+.unlocking > * { transition: filter .5s ease, opacity .5s ease; }
+.lock-tip { position: absolute; inset: 0; z-index: 2; display: flex; justify-content: center; align-items: flex-start; padding: 8px; pointer-events: none; }
+.lock-tip span {
+  background: var(--surface); color: var(--fg); border: 2px solid var(--accent); border-radius: 99px;
+  padding: 6px 14px; font-weight: 700; font-size: .9rem; text-align: center; box-shadow: 0 6px 20px rgb(0 0 0 / .3);
+}
 .quiz { display: grid; gap: 12px; }
 .challenge .quiz { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 900px) { .challenge .quiz { grid-template-columns: minmax(0, 1fr); } }
@@ -264,7 +280,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 }
 .tok:nth-child(3n+2) { background: color-mix(in oklab, var(--accent) 45%, var(--surface)); color: var(--fg); }
 .tok:nth-child(3n) { background: transparent; color: var(--accent-text); box-shadow: inset 0 0 0 2px var(--accent); }
-.examples { display: grid; gap: 10px; }
+.examples { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); }
 .ex { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface-2); border-radius: 12px; }
 .ex code { font-family: var(--font-body); font-weight: 700; overflow-wrap: anywhere; }
 .ex .n { font-family: var(--font-display); color: var(--accent-text); white-space: nowrap; }
@@ -278,7 +294,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .status.warn { box-shadow: inset 4px 0 0 var(--warn); }
 .status.squeeze { box-shadow: inset 4px 0 0 var(--accent); }
 
-.stack-wrap { position: relative; }
+.stack-wrap { position: relative; margin-bottom: 18px; }
 .stack { display: flex; height: 30px; border-radius: 10px; overflow: hidden; background: var(--surface-2); }
 .stack span { height: 100%; transition: width .45s ease; }
 .c-sys { background: var(--muted); }
@@ -286,7 +302,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .c-over { background: repeating-linear-gradient(45deg, var(--bad) 0 8px, color-mix(in oklab, var(--bad) 45%, var(--surface)) 8px 16px); }
 .c-sum { background: repeating-linear-gradient(45deg, var(--warn) 0 6px, color-mix(in oklab, var(--warn) 40%, var(--surface)) 6px 12px); }
 .limit { position: absolute; top: -6px; bottom: -6px; width: 3px; background: var(--fg); border-radius: 2px; transition: left .45s ease; }
-.limit::after { content: "limite"; position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-size: .75rem; font-weight: 700; color: var(--fg); }
+.limit::after { content: "limite"; position: absolute; top: calc(100% + 2px); left: 50%; transform: translateX(-50%); font-size: .75rem; font-weight: 700; color: var(--fg); }
 .bar-label { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; margin-bottom: 8px; flex-wrap: wrap; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: .9rem; color: var(--muted); }
 .legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; }
@@ -354,7 +370,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       </div>
     </section>
 
-    <section class="card s3">
+    <section class="card s2">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-pen"></i></span><h2>Écris une phrase</h2></div>
       <p class="muted">Regarde comment l'IA la découpe en morceaux.</p>
       <label class="ctl" for="txt">Ton texte
@@ -370,7 +386,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <p class="small muted">Découpage simplifié pour l'exemple. Le vrai découpage change un peu selon le modèle.</p>
     </section>
 
-    <section class="card s1">
+    <section class="card s2">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-ruler"></i></span><h2>Court ou long ?</h2></div>
       <div id="tokGuess"></div>
       <p>Un mot court = 1 token.</p>
@@ -385,7 +401,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         les consignes, toutes tes questions, toutes ses réponses, puis ta nouvelle question. Tout ce qu'elle relit, ce sont des <strong>tokens d'entrée</strong>, et ils se paient.</p>
       <div id="convGuess"></div>
       <div class="mem" id="convMem">
-        <div class="controls">
+        <div class="controls stick">
           <div class="ctl">
             <div class="ctl-row"><label for="nSend">Messages envoyés</label><span class="ctl-val" id="vSend">8</span></div>
             <input type="range" id="nSend" min="1" max="40" value="8">
@@ -437,7 +453,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-briefcase"></i></span><h2>Jeu : ta journée en 4 moments</h2><span class="pill" id="dayScore">0 / 3</span></div>
       <p>Tu travailles avec l'IA toute la journée. À chaque moment, choisis : <strong>continuer</strong> la même conversation, ou en ouvrir une <strong>nouvelle</strong> ?</p>
       <div class="mem">
-        <div class="controls">
+        <div class="controls stick">
           <div class="day-card" id="dayCard" tabindex="-1"></div>
           <ol class="day-log" id="dayLog" aria-live="polite"></ol>
         </div>
@@ -460,7 +476,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <p>L'IA a une mémoire de taille fixe. On l'appelle la <strong>fenêtre de contexte</strong>.
         Toute la conversation doit tenir dedans. Si elle déborde, l'IA fait un résumé : c'est la <strong>compression</strong>.</p>
       <div class="mem">
-        <div class="controls">
+        <div class="controls stick">
           <div class="ctl">
             <div class="ctl-row"><label for="nMsg">Nombre de messages</label><span class="ctl-val" id="vMsg">300</span></div>
             <input type="range" id="nMsg" min="1" max="400" value="300">
@@ -672,13 +688,31 @@ function ask(box, { q, options, a, why, onShow, good = "{circle-check} Bravo ! "
   return { reset() { pick = null; shown = false; paint(); } };
 }
 
+// Zones floutées : un message dit comment les débloquer. Renvoie la fonction qui les débloque.
+function lockZones(zones, tip = "{lock} Réponds d'abord à la question") {
+  const locks = [].concat(zones).map((z) => {
+    const t = h("span", "lock-tip");
+    t.append(h("span", "", tip));
+    z.classList.add("locked");
+    z.inert = true;
+    z.append(t);
+    // Si la page redessine la zone, le message revient.
+    const mo = new MutationObserver(() => { if (!t.isConnected) z.append(t); });
+    mo.observe(z, { childList: true });
+    return [z, t, mo];
+  });
+  return () => locks.forEach(([z, t, mo]) => {
+    mo.disconnect();
+    t.remove();
+    z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false;
+  });
+}
+
 // Devine d'abord : les zones « lock » restent floues tant qu'on n'a pas répondu.
 function guess(box, { lock, q, ...opts }) {
-  const zones = [].concat(lock);
-  zones.forEach((z) => { z.classList.add("locked"); z.inert = true; });
+  const unlock = lockZones(lock);
   box.classList.add("guess");
-  return ask(box, { ...opts, q: "{circle-question} Devine d'abord : " + q, good: "{circle-check} Bien vu ! ", bad: "{face-surprise} Surprise ! ",
-    onShow() { zones.forEach((z) => { z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false; }); } });
+  return ask(box, { ...opts, q: "{circle-question} Devine d'abord : " + q, good: "{circle-check} Bien vu ! ", bad: "{face-surprise} Surprise ! ", onShow: unlock });
 }
 
 // Pluie d'icônes aux couleurs des 6 fiches

@@ -193,6 +193,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
+/* Mise en page : bandeau « À retenir », réflexes sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
+.retenir.s4 ul { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 16px 24px; }
+.check.cols { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+@media (min-width: 901px) { .stick { position: sticky; top: 16px; align-self: start; } }
+[data-empty]:empty::before {
+  content: attr(data-empty); display: block; padding: 14px 16px; border-radius: 12px;
+  border: 2px dashed var(--line); color: var(--muted); font-weight: 700; font-size: .95rem;
+}
+
 /* Skazy Formation : logo en haut, mention en bas (même bloc dans chaque fiche) */
 .brand { margin-bottom: 16px; }
 .brand a { display: inline-flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; color: var(--fg); text-decoration: none; border-radius: 10px; }
@@ -210,8 +219,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 /* Parcours : devine d'abord, défi final, badge, mode atelier (même bloc dans chaque fiche) */
 .guess { background: var(--surface-2); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; box-shadow: inset 4px 0 0 var(--accent); }
 .guess p, .qi p { font-weight: 700; overflow-wrap: anywhere; }
-.locked { filter: blur(7px); opacity: .5; user-select: none; }
-.unlocking { transition: filter .5s ease, opacity .5s ease; }
+.guess { max-width: 760px; }
+.locked { position: relative; user-select: none; }
+.locked > :not(.lock-tip) { filter: blur(7px); opacity: .5; }
+.unlocking > * { transition: filter .5s ease, opacity .5s ease; }
+.lock-tip { position: absolute; inset: 0; z-index: 2; display: flex; justify-content: center; align-items: flex-start; padding: 8px; pointer-events: none; }
+.lock-tip span {
+  background: var(--surface); color: var(--fg); border: 2px solid var(--accent); border-radius: 99px;
+  padding: 6px 14px; font-weight: 700; font-size: .9rem; text-align: center; box-shadow: 0 6px 20px rgb(0 0 0 / .3);
+}
 .quiz { display: grid; gap: 12px; }
 .challenge .quiz { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 900px) { .challenge .quiz { grid-template-columns: minmax(0, 1fr); } }
@@ -258,8 +274,13 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root { --accent: #FF6B00; }
 
 .switches { display: grid; gap: 8px; }
-.ring-box { display: grid; place-items: center; gap: 10px; text-align: center; }
-.ring { width: min(190px, 100%); height: auto; }
+/* Le labo : réglages à gauche, effets à droite */
+.lab { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 28px; }
+@media (max-width: 900px) { .lab { grid-template-columns: minmax(0, 1fr); } }
+.lab-col { display: grid; gap: 18px; align-content: start; }
+.lab-part { display: grid; gap: 12px; }
+.lab h3 .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
+.ring { width: 150px; height: auto; flex: none; }
 .ring .bg { fill: none; stroke: var(--surface-2); stroke-width: 14; }
 .ring .fg { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset .5s ease, stroke .3s; transform: rotate(-90deg); transform-origin: 60px 60px; }
 .ring .fg.ok { stroke: var(--ok); } .ring .fg.warn { stroke: var(--warn); } .ring .fg.bad { stroke: var(--bad); }
@@ -299,7 +320,14 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .bubble.faded { opacity: .6; }
 .check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
 .set-wrap { display: grid; gap: 16px; }
-.ring-wrap { display: grid; place-items: center; gap: 10px; width: 100%; }
+.ring-wrap { display: flex; align-items: center; gap: 12px 24px; flex-wrap: wrap; }
+
+/* Pourquoi elle invente : 3 étapes */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .steps { grid-template-columns: minmax(0, 1fr); } }
+.step { background: var(--surface-2); border-radius: 16px; padding: 16px; display: grid; gap: 8px; align-content: start; }
+.step .n { font-family: var(--font-display); background: var(--accent); color: var(--on-accent); width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; }
+.step p { font-weight: 700; }
 
 /* Jeu : surligne ce qu'il faut vérifier */
 .hl-game { display: grid; gap: 14px; }
@@ -344,64 +372,70 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       </div>
     </section>
 
-    <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span><h2>Tes réglages</h2></div>
-      <div id="riskGuess"></div>
-      <div class="set-wrap" id="riskSet">
-      <div class="ctl">
-        <div class="ctl-row"><label for="level">Ma question porte sur…</label></div>
-        <span class="ctl-val" id="vLevel"></span>
-        <input type="range" id="level" min="0" max="4" step="1" value="3">
-        <div class="ctl-ends"><span>Un fait très connu</span><span>Un fait très récent</span></div>
-      </div>
-      <div class="switches">
-        <label class="sw" for="doc"><span><i class="fa-solid fa-paperclip" aria-hidden="true"></i> Je donne un document</span><input type="checkbox" id="doc"></label>
-        <label class="sw" for="web"><span><i class="fa-solid fa-globe" aria-hidden="true"></i> La recherche web est activée</span><input type="checkbox" id="web"></label>
-        <label class="sw" for="idk"><span><i class="fa-solid fa-hand" aria-hidden="true"></i> J'autorise « je ne sais pas »</span><input type="checkbox" id="idk"></label>
-        <label class="sw" for="src"><span><i class="fa-solid fa-link" aria-hidden="true"></i> Je demande les sources</span><input type="checkbox" id="src"></label>
-      </div>
-      <div class="ctl">
-        <div class="ctl-row"><label for="crea">Ce que je demande</label><span class="ctl-val" id="vCrea"></span></div>
-        <input type="range" id="crea" min="0" max="100" value="30">
-        <div class="ctl-ends"><span>Des faits précis</span><span>De l'imagination</span></div>
-      </div>
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span><h2>Teste le risque d'invention</h2></div>
+      <div class="lab">
+        <div class="lab-col stick">
+          <div id="riskGuess"></div>
+          <h3>Tes réglages</h3>
+          <div class="set-wrap" id="riskSet">
+            <div class="ctl">
+              <div class="ctl-row"><label for="level">Ma question porte sur…</label></div>
+              <span class="ctl-val" id="vLevel"></span>
+              <input type="range" id="level" min="0" max="4" step="1" value="3">
+              <div class="ctl-ends"><span>Un fait très connu</span><span>Un fait très récent</span></div>
+            </div>
+            <div class="switches">
+              <label class="sw" for="doc"><span><i class="fa-solid fa-paperclip" aria-hidden="true"></i> Je donne un document</span><input type="checkbox" id="doc"></label>
+              <label class="sw" for="web"><span><i class="fa-solid fa-globe" aria-hidden="true"></i> La recherche web est activée</span><input type="checkbox" id="web"></label>
+              <label class="sw" for="idk"><span><i class="fa-solid fa-hand" aria-hidden="true"></i> J'autorise « je ne sais pas »</span><input type="checkbox" id="idk"></label>
+              <label class="sw" for="src"><span><i class="fa-solid fa-link" aria-hidden="true"></i> Je demande les sources</span><input type="checkbox" id="src"></label>
+            </div>
+            <div class="ctl">
+              <div class="ctl-row"><label for="crea">Ce que je demande</label><span class="ctl-val" id="vCrea"></span></div>
+              <input type="range" id="crea" min="0" max="100" value="30">
+              <div class="ctl-ends"><span>Des faits précis</span><span>De l'imagination</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="lab-col">
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-bell" aria-hidden="true"></i> Risque d'invention</h3>
+            <div class="ring-wrap" id="ringWrap">
+              <svg class="ring" viewBox="0 0 120 120" role="img" aria-labelledby="ringLabel">
+                <title id="ringLabel">Risque d'invention</title>
+                <circle class="bg" cx="60" cy="60" r="50"></circle>
+                <circle class="fg" id="ringFg" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="314.16"></circle>
+                <text id="ringTxt" x="60" y="64" text-anchor="middle">0 %</text>
+                <text class="sub" x="60" y="80" text-anchor="middle">de risque</text>
+              </svg>
+              <span class="pill" id="riskPill" aria-live="polite"></span>
+            </div>
+          </div>
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-comments" aria-hidden="true"></i> Exemple de réponse</h3>
+            <p class="question" id="question"></p>
+            <div class="bubble" id="answer" aria-live="polite"></div>
+            <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Vrai ou vérifiable</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> À vérifier</span><span><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Inventé</span></div>
+            <p class="small muted">Exemple fabriqué pour comprendre. Les noms et les dates sont inventés.</p>
+          </div>
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-arrow-trend-down" aria-hidden="true"></i> Ce qui change le risque</h3>
+            <p class="muted">Pour ta question. Les barres orange sont activées.</p>
+            <div class="levers" id="levers"></div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="card s1 ring-box">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-bell"></i></span><h2>Risque d'invention</h2></div>
-      <div class="ring-wrap" id="ringWrap">
-      <svg class="ring" viewBox="0 0 120 120" role="img" aria-labelledby="ringLabel">
-        <title id="ringLabel">Risque d'invention</title>
-        <circle class="bg" cx="60" cy="60" r="50"></circle>
-        <circle class="fg" id="ringFg" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="314.16"></circle>
-        <text id="ringTxt" x="60" y="64" text-anchor="middle">0 %</text>
-        <text class="sub" x="60" y="80" text-anchor="middle">de risque</text>
-      </svg>
-      <span class="pill" id="riskPill" aria-live="polite"></span>
-      </div>
-    </section>
-
-    <section class="card s1">
+    <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-circle-question"></i></span><h2>Pourquoi elle invente ?</h2></div>
-      <p>L'IA devine le mot qui vient le plus souvent après.</p>
-      <p>Si elle ne sait pas, elle devine quand même.</p>
-      <p>La réponse a l'air sûre. <strong>Mais elle peut être fausse.</strong></p>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><p>L'IA devine le mot qui vient le plus souvent après.</p></div>
+        <div class="step"><span class="n">2</span><p>Si elle ne sait pas, elle devine quand même.</p></div>
+        <div class="step"><span class="n">3</span><p>La réponse a l'air sûre. <strong>Mais elle peut être fausse.</strong></p></div>
+      </div>
       <p class="small muted">Le risque est plus grand pour les sujets rares, locaux ou très récents.</p>
-    </section>
-
-    <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-comments"></i></span><h2>Exemple de réponse</h2></div>
-      <p class="question" id="question"></p>
-      <div class="bubble" id="answer" aria-live="polite"></div>
-      <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Vrai ou vérifiable</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> À vérifier</span><span><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Inventé</span></div>
-      <p class="small muted">Exemple fabriqué pour comprendre. Les noms et les dates sont inventés.</p>
-    </section>
-
-    <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-arrow-trend-down"></i></span><h2>Ce qui change le risque</h2></div>
-      <p class="muted">Pour ta question. Les barres orange sont activées.</p>
-      <div class="levers" id="levers"></div>
     </section>
 
     <section class="card s4">
@@ -460,13 +494,13 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         Pour un vrai voyage, vérifie les règles d'entrée sur le site officiel du pays.</p>
     </section>
 
-    <section class="card s2">
+    <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span><h2>Mes réflexes anti-bobards</h2></div>
       <div class="meter">
         <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 8</span></div>
         <div class="track"><div class="fill" id="chkFill"></div></div>
       </div>
-      <div class="check" id="check">
+      <div class="check cols" id="check">
         <label><input type="checkbox" id="c1"><span>Je demande d'où vient l'information.</span></label>
         <label><input type="checkbox" id="c2"><span>Je vérifie les chiffres, les dates et les noms.</span></label>
         <label><input type="checkbox" id="c3"><span>Je donne mes propres documents.</span></label>
@@ -478,7 +512,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       </div>
     </section>
 
-    <section class="card s2 retenir">
+    <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
         <li><span>L'IA peut inventer des faits, des chiffres ou des noms. Ça s'appelle une hallucination.</span></li>
@@ -612,13 +646,31 @@ function ask(box, { q, options, a, why, onShow, good = "{circle-check} Bravo ! "
   return { reset() { pick = null; shown = false; paint(); } };
 }
 
+// Zones floutées : un message dit comment les débloquer. Renvoie la fonction qui les débloque.
+function lockZones(zones, tip = "{lock} Réponds d'abord à la question") {
+  const locks = [].concat(zones).map((z) => {
+    const t = h("span", "lock-tip");
+    t.append(h("span", "", tip));
+    z.classList.add("locked");
+    z.inert = true;
+    z.append(t);
+    // Si la page redessine la zone, le message revient.
+    const mo = new MutationObserver(() => { if (!t.isConnected) z.append(t); });
+    mo.observe(z, { childList: true });
+    return [z, t, mo];
+  });
+  return () => locks.forEach(([z, t, mo]) => {
+    mo.disconnect();
+    t.remove();
+    z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false;
+  });
+}
+
 // Devine d'abord : les zones « lock » restent floues tant qu'on n'a pas répondu.
 function guess(box, { lock, q, ...opts }) {
-  const zones = [].concat(lock);
-  zones.forEach((z) => { z.classList.add("locked"); z.inert = true; });
+  const unlock = lockZones(lock);
   box.classList.add("guess");
-  return ask(box, { ...opts, q: "{circle-question} Devine d'abord : " + q, good: "{circle-check} Bien vu ! ", bad: "{face-surprise} Surprise ! ",
-    onShow() { zones.forEach((z) => { z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false; }); } });
+  return ask(box, { ...opts, q: "{circle-question} Devine d'abord : " + q, good: "{circle-check} Bien vu ! ", bad: "{face-surprise} Surprise ! ", onShow: unlock });
 }
 
 // Pluie d'icônes aux couleurs des 6 fiches
