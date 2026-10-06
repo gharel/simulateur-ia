@@ -5,11 +5,11 @@
 <!-- La page a déjà ses thèmes clair et sombre : les modes nuit forcés (Dark Reader, mode nuit de Brave) ne doivent pas changer ses couleurs. -->
 <meta name="color-scheme" content="light dark">
 <meta name="darkreader-lock">
-<title>Comprendre l'IA en 6 fiches</title>
+<title>Comprendre l'IA en 8 fiches</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="description" content="6 fiches interactives et faciles à lire pour comprendre l'IA : tokens, modèles, hallucinations, outils, prix et sécurité.">
+<meta name="description" content="8 fiches interactives et faciles à lire pour comprendre l'IA : tokens, mémoire, modèles, hallucinations, complaisance, sécurité, outils et prix.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
@@ -54,14 +54,17 @@ body {
 .fiche:hover { transform: translateY(-4px); }
 .fiche:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
 .wide { grid-column: span 6; background: var(--surface); border: 1px solid var(--line); }
+.fiche.half { grid-column: span 3; }
+.part { grid-column: 1 / -1; display: grid; gap: 2px; margin-top: 12px; }
+.part h2 { font-size: 1.35rem; }
 @media (max-width: 900px) {
   .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero, .wide { grid-column: span 2; }
-  .fiche { grid-column: span 1; }
+  .fiche, .fiche.half { grid-column: span 1; }
 }
 @media (max-width: 640px) {
   .bento { grid-template-columns: minmax(0, 1fr); }
-  .hero, .fiche, .wide { grid-column: span 1; }
+  .hero, .fiche, .fiche.half, .wide { grid-column: span 1; }
   .card { padding: 18px; }
 }
 h1, h2 { font-family: var(--font-display); font-weight: 400; line-height: 1.02; margin: 0; text-wrap: balance; }
@@ -135,7 +138,7 @@ p { margin: 0; max-width: 60ch; }
 }
 .license::before {
   content: ""; position: absolute; inset: 0 0 auto 0; height: 10px;
-  background: linear-gradient(90deg, #C6FF00 0 16.66%, #FF2E93 0 33.33%, #FF6B00 0 50%, #00E5FF 0 66.66%, #B14EFF 0 83.33%, #FFE600 0);
+  background: linear-gradient(90deg, #C6FF00 0 12.5%, #4DA3FF 0 25%, #FF2E93 0 37.5%, #FF6B00 0 50%, #FF9AD5 0 62.5%, #FFE600 0 75%, #00E5FF 0 87.5%, #B14EFF 0);
 }
 .license.locked .lic-body { filter: blur(3px); opacity: .55; }
 .lic-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; flex-wrap: wrap; }
@@ -147,7 +150,7 @@ p { margin: 0; max-width: 60ch; }
 .lic-fields dt { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #55556B; padding-top: 4px; }
 .lic-fields dd { margin: 0; font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; }
 .lic-fields dd.name { font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; line-height: 1.1; }
-.lic-badges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.lic-badges { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 @media (max-width: 640px) { .lic-badges { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .lic-badges div { border: 1.5px solid #D9D9E5; border-radius: 12px; padding: 8px 10px; display: grid; gap: 2px; font-size: .82rem; font-weight: 700; line-height: 1.25; }
 .lic-badges b { font-size: 1.4rem; }
@@ -188,52 +191,69 @@ p { margin: 0; max-width: 60ch; }
   </header>
   <div class="bento">
     <section class="card hero">
-      <span class="eyebrow">Fiches interactives · Facile à lire · Environ 1 h 15 en tout</span>
-      <h1>Comprendre l'IA<br>en 6 fiches</h1>
+      <span class="eyebrow">Fiches interactives · Facile à lire · Environ 1 h 30 en tout</span>
+      <h1>Comprendre l'IA<br>en 8 fiches</h1>
       <p class="lead">Des fiches courtes à manipuler. Bouge les curseurs, joue aux mini-jeux, réussis le défi final de chaque fiche.</p>
-      <p>Chaque défi réussi te donne un badge. Avec les 6 badges, tu gagnes ton <strong>permis de conduire l'IA</strong>.</p>
+      <p>Chaque défi réussi te donne un badge. Avec les 8 badges, tu gagnes ton <strong>permis de conduire l'IA</strong>.</p>
       <div class="progress">
         <div class="track" id="track" aria-hidden="true"></div>
-        <strong id="progTxt" aria-live="polite">0 badge sur 6</strong>
+        <strong id="progTxt" aria-live="polite">0 badge sur 8</strong>
       </div>
       <div><a class="btn main" id="goOn" href="1-tokens.html"><i class="fa-solid fa-play" aria-hidden="true"></i> Commencer par la fiche 1</a></div>
     </section>
 
-    <a class="card fiche" href="1-tokens.html" style="--accent:#C6FF00" data-n="1">
+    <div class="part"><span class="eyebrow">Partie 1</span><h2>Comprendre comment elle marche</h2></div>
+    <a class="card fiche" href="1-tokens.html" style="--accent:#C6FF00" data-id="tokens">
       <span class="eyebrow">Fiche 1</span>
       <h2>Le Sac à Tokens</h2>
-      <p>L'IA lit des petits morceaux de texte : les tokens. Et chaque message relit toute la conversation.</p>
-      <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="15"></span></span>
+      <p>L'IA lit des petits morceaux de texte : les tokens. Regarde comment elle découpe tes phrases.</p>
+      <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="10"></span></span>
     </a>
-    <a class="card fiche" href="2-modele-effort.html" style="--accent:#FF2E93" data-n="2">
+    <a class="card fiche" href="2-memoire.html" style="--accent:#4DA3FF" data-id="memoire">
       <span class="eyebrow">Fiche 2</span>
+      <h2>La Mémoire qui Déborde</h2>
+      <p>À chaque message, l'IA relit toute la conversation. Et quand sa mémoire est pleine, elle oublie.</p>
+      <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="10"></span></span>
+    </a>
+    <a class="card fiche" href="3-modele-effort.html" style="--accent:#FF2E93" data-id="cerveau">
+      <span class="eyebrow">Fiche 3</span>
       <h2>Le Bon Cerveau</h2>
       <p>Une petite tâche n'a pas besoin d'un expert. Choisis le bon modèle et le bon effort.</p>
       <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="10"></span></span>
     </a>
-    <a class="card fiche" href="3-hallucinations.html" style="--accent:#FF6B00" data-n="3">
-      <span class="eyebrow">Fiche 3</span>
-      <h2>Le Détecteur de Bobards</h2>
-      <p>Parfois, l'IA invente. Parfois, elle te donne raison trop vite. Apprends à le repérer.</p>
-      <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="15"></span></span>
-    </a>
-    <a class="card fiche" href="4-boite-outils.html" style="--accent:#00E5FF" data-n="4">
+
+    <div class="part"><span class="eyebrow">Partie 2</span><h2>Repérer les pièges</h2></div>
+    <a class="card fiche" href="4-hallucinations.html" style="--accent:#FF6B00" data-id="bobards">
       <span class="eyebrow">Fiche 4</span>
-      <h2>La Boîte à Outils Claude</h2>
-      <p>Chat, Cowork ou Code ? Projet, Skill ou Connecteur ? Trouve le bon outil.</p>
+      <h2>Le Détecteur de Bobards</h2>
+      <p>Parfois, l'IA invente une réponse qui a l'air vraie. Apprends à la repérer.</p>
       <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="10"></span></span>
     </a>
-    <a class="card fiche" href="5-forfait-api.html" style="--accent:#B14EFF" data-n="5">
+    <a class="card fiche" href="5-complaisance.html" style="--accent:#FF9AD5" data-id="complaisance">
       <span class="eyebrow">Fiche 5</span>
-      <h2>Forfait ou Compteur ?</h2>
-      <p>Payer un prix fixe chaque mois, ou payer à chaque token ? Fais le calcul.</p>
+      <h2>L'IA qui Dit Oui</h2>
+      <p>L'IA a tendance à te donner raison. Apprends à lui demander un vrai avis.</p>
       <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="10"></span></span>
     </a>
-    <a class="card fiche" href="6-message-piege.html" style="--accent:#FFE600" data-n="6">
+    <a class="card fiche" href="6-message-piege.html" style="--accent:#FFE600" data-id="piege">
       <span class="eyebrow">Fiche 6</span>
       <h2>Le Message Piégé</h2>
       <p>Un e-mail ou une page web peut cacher des ordres. Apprends à ne pas laisser l'IA obéir à un inconnu.</p>
       <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="15"></span></span>
+    </a>
+
+    <div class="part"><span class="eyebrow">Partie 3</span><h2>Agir avec l'IA</h2></div>
+    <a class="card fiche half" href="7-boite-outils.html" style="--accent:#00E5FF" data-id="outils">
+      <span class="eyebrow">Fiche 7</span>
+      <h2>La Boîte à Outils Claude</h2>
+      <p>Chat, Cowork ou Code ? Projet, Skill ou Connecteur ? Trouve le bon outil.</p>
+      <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="10"></span></span>
+    </a>
+    <a class="card fiche half" href="8-forfait-api.html" style="--accent:#B14EFF" data-id="forfait">
+      <span class="eyebrow">Fiche 8</span>
+      <h2>Forfait ou Compteur ?</h2>
+      <p>Payer un prix fixe chaque mois, ou payer à chaque token ? Fais le calcul.</p>
+      <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="10"></span></span>
     </a>
 
     <section class="card wide" id="permis">
@@ -252,7 +272,7 @@ p { margin: 0; max-width: 60ch; }
           <div class="lic-body">
             <div class="lic-top">
               <div>
-                <div class="lic-kicker">Comprendre l'IA en 6 fiches</div>
+                <div class="lic-kicker">Comprendre l'IA en 8 fiches</div>
                 <div class="lic-title">Permis de conduire l'IA</div>
               </div>
               <span class="lic-photo" aria-hidden="true"><i class="fa-solid fa-graduation-cap"></i></span>
@@ -282,7 +302,7 @@ p { margin: 0; max-width: 60ch; }
     </div>
     <div class="modes-help">
       <span><strong>Mode atelier</strong> : pour animer un groupe. Le texte est plus gros. Dans les quiz, un clic choisit la réponse du groupe, puis « Révéler » montre la correction.</span>
-      <span><strong>Mode démonstration</strong> : pour présenter. Rien n'est flou, tout se voit sans répondre aux questions « Devine d'abord ». Le permis se voit aussi, sans les 6 badges.</span>
+      <span><strong>Mode démonstration</strong> : pour présenter. Rien n'est flou, tout se voit sans répondre aux questions « Devine d'abord ». Le permis se voit aussi, sans les 8 badges.</span>
       <span>Les deux modes restent actifs d'une fiche à l'autre. Adresses directes : <code>index.html?atelier=1</code> et <code>index.html?demo=1</code></span>
     </div>
     <span class="brand-foot">Une ressource Skazy Formation : <a href="https://formation.skazy.nc/" target="_blank" rel="noopener">formation.skazy.nc</a></span>
@@ -294,15 +314,39 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
 // Parcours : même stockage et même mode atelier que dans les fiches
-const BADGES = { 1: ["{coins}", "Maître des tokens"], 2: ["{brain}", "Bon Cerveau"], 3: ["{user-secret}", "Détective anti-bobards"], 4: ["{toolbox}", "As de la boîte à outils"], 5: ["{calculator}", "Pro du budget"], 6: ["{shield-halved}", "Gardien anti-piège"] };
-const FILES = { 1: "1-tokens.html", 2: "2-modele-effort.html", 3: "3-hallucinations.html", 4: "4-boite-outils.html", 5: "5-forfait-api.html", 6: "6-message-piege.html" };
-const COLORS = { 1: "#C6FF00", 2: "#FF2E93", 3: "#FF6B00", 4: "#00E5FF", 5: "#B14EFF", 6: "#FFE600" };
+const BADGES = {
+  tokens: ["{coins}", "Maître des tokens"], memoire: ["{memory}", "As de la mémoire"], cerveau: ["{brain}", "Bon Cerveau"],
+  bobards: ["{user-secret}", "Détective anti-bobards"], complaisance: ["{scale-balanced}", "Esprit critique"], piege: ["{shield-halved}", "Gardien anti-piège"],
+  outils: ["{toolbox}", "As de la boîte à outils"], forfait: ["{calculator}", "Pro du budget"],
+};
+const FILES = {
+  tokens: "1-tokens.html", memoire: "2-memoire.html", cerveau: "3-modele-effort.html", bobards: "4-hallucinations.html",
+  complaisance: "5-complaisance.html", piege: "6-message-piege.html", outils: "7-boite-outils.html", forfait: "8-forfait-api.html",
+};
+const COLORS = {
+  tokens: "#C6FF00", memoire: "#4DA3FF", cerveau: "#FF2E93", bobards: "#FF6B00",
+  complaisance: "#FF9AD5", piege: "#FFE600", outils: "#00E5FF", forfait: "#B14EFF",
+};
+const IDS = Object.keys(BADGES), COUNT = IDS.length, MAX_STARS = COUNT * 3;
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch {} },
   del(k) { try { localStorage.removeItem(k); } catch {} },
 };
-function loadProgress() { try { return JSON.parse(store.get("ia6:progress")) || {}; } catch { return {}; } }
+// Progression : { tokens: 3, memoire: 2, … }. Le parcours en 6 fiches la rangeait par numéro :
+// on la convertit une fois, comme dans les fiches. Une fiche coupée en deux donne ses deux badges.
+const OLD_FICHES = { 1: ["tokens", "memoire"], 2: ["cerveau"], 3: ["bobards", "complaisance"], 4: ["outils"], 5: ["forfait"], 6: ["piege"] };
+function loadProgress() {
+  let p;
+  try { p = JSON.parse(store.get("ia6:progress")) || {}; } catch { return {}; }
+  if (Object.keys(p).some((k) => OLD_FICHES[k])) {
+    const q = {};
+    for (const [k, v] of Object.entries(p)) for (const id of OLD_FICHES[k] || [k]) q[id] = Math.max(q[id] || 0, v);
+    store.set("ia6:progress", JSON.stringify(q));
+    p = q;
+  }
+  return p;
+}
 // Modes atelier et démonstration : l'adresse (?atelier=1, ?demo=0…) a le dernier mot, sinon le choix gardé dans ce navigateur.
 function mode(key) {
   const v = new URLSearchParams(location.search).get(key);
@@ -328,47 +372,47 @@ const link = (f) => f + (MODE_QUERY ? "?" + MODE_QUERY : "");
 
 function render() {
   const p = loadProgress();
-  const won = Object.keys(BADGES).filter((n) => p[n] > 0);
-  const total = Object.values(p).reduce((a, b) => a + b, 0);
+  const won = IDS.filter((id) => p[id] > 0);
+  const total = IDS.reduce((s, id) => s + (p[id] || 0), 0);
 
-  $("#track").replaceChildren(...Object.keys(BADGES).map((n) => {
+  $("#track").replaceChildren(...IDS.map((id) => {
     const s = document.createElement("span");
-    s.style.background = p[n] ? COLORS[n] : "";
+    s.style.background = p[id] ? COLORS[id] : "";
     return s;
   }));
-  $("#progTxt").textContent = `${won.length} badge${won.length > 1 ? "s" : ""} sur 6` + (won.length ? ` · ${total} étoile${total > 1 ? "s" : ""} sur 18` : "");
+  $("#progTxt").textContent = `${won.length} badge${won.length > 1 ? "s" : ""} sur ${COUNT}` + (won.length ? ` · ${total} étoile${total > 1 ? "s" : ""} sur ${MAX_STARS}` : "");
 
-  const next = Object.keys(BADGES).find((n) => !p[n]);
+  const next = IDS.find((id) => !p[id]);
   const go = $("#goOn");
-  if (!won.length) { rich(go, "{play} Commencer par la fiche 1"); go.href = link(FILES[1]); }
-  else if (next) { rich(go, `{play} Continuer : fiche ${next}`); go.href = link(FILES[next]); }
+  if (!won.length) { rich(go, "{play} Commencer par la fiche 1"); go.href = link(FILES[IDS[0]]); }
+  else if (next) { rich(go, `{play} Continuer : fiche ${IDS.indexOf(next) + 1}`); go.href = link(FILES[next]); }
   else { rich(go, "{graduation-cap} Voir mon permis"); go.href = "#permis"; }
 
   $$(".fiche").forEach((a) => {
-    const n = a.dataset.n, [ic, name] = BADGES[n];
+    const n = a.dataset.id, [ic, name] = BADGES[n];
     let b = $(".fbadge", a);
     if (!b) { b = document.createElement("span"); b.className = "fbadge"; b.setAttribute("aria-hidden", "true"); rich(b, ic); a.append(b); }
     b.classList.toggle("won", p[n] > 0);
     const meta = $(".fmeta", a);
     rich(meta, `{clock} ${meta.dataset.min} min`);
     if (p[n]) meta.append(" · ", ...starIcons(p[n]));
-    a.setAttribute("aria-label", `Fiche ${n} : ${$("h2", a).textContent}. ${p[n] ? `Badge « ${name} » gagné, ${p[n]} étoile${p[n] > 1 ? "s" : ""} sur 3.` : "Badge pas encore gagné."}`);
+    a.setAttribute("aria-label", `Fiche ${IDS.indexOf(n) + 1} : ${$("h2", a).textContent}. ${p[n] ? `Badge « ${name} » gagné, ${p[n]} étoile${p[n] > 1 ? "s" : ""} sur 3.` : "Badge pas encore gagné."}`);
   });
 
   // Le permis
-  const done = won.length === 6, left = 6 - won.length;
-  // En mode démonstration, le permis se voit, mais on ne l'imprime qu'avec les 6 badges.
+  const done = won.length === COUNT, left = COUNT - won.length;
+  // En mode démonstration, le permis se voit, mais on ne l'imprime qu'avec tous les badges.
   $("#license").classList.toggle("locked", !done && !DEMO);
   $("#licLock").hidden = done || DEMO;
   rich($("#licLock span"), `{lock} Encore ${left} badge${left > 1 ? "s" : ""}`);
   $("#licHint").textContent = done
-    ? "Bravo ! Tu as les 6 badges. Écris ton prénom, puis imprime ton permis."
-    : `Réussis le défi final de chaque fiche pour gagner son badge. Il te manque ${left} badge${left > 1 ? "s" : ""} sur 6.`;
+    ? `Bravo ! Tu as les ${COUNT} badges. Écris ton prénom, puis imprime ton permis.`
+    : `Réussis le défi final de chaque fiche pour gagner son badge. Il te manque ${left} badge${left > 1 ? "s" : ""} sur ${COUNT}.`;
   $("#licName").disabled = !done;
   $("#licPrint").disabled = !done;
   $("#licWho").textContent = (done && $("#licName").value.trim()) || "…";
   $("#licDate").textContent = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-  rich($("#licLevel"), total >= 18 ? "{star} Expert : 18 étoiles sur 18" : `${total} étoile${total > 1 ? "s" : ""} sur 18`);
+  rich($("#licLevel"), total >= MAX_STARS ? `{star} Expert : ${MAX_STARS} étoiles sur ${MAX_STARS}` : `${total} étoile${total > 1 ? "s" : ""} sur ${MAX_STARS}`);
   $("#licBadges").replaceChildren(...Object.entries(BADGES).map(([n, [ic, name]]) => {
     const d = document.createElement("div");
     if (!p[n]) d.className = "off";

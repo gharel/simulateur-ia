@@ -437,7 +437,7 @@ td.c, th.c { text-align: center; }
     <section class="card hero s4">
       <div class="hero-grid">
         <div class="ctl">
-          <span class="eyebrow">Comprendre l'IA · Fiche 6 sur 6</span>
+          <span class="eyebrow">Comprendre l'IA · Fiche 6 sur 8</span>
           <h1>Le Message<br>Piégé</h1>
           <p class="lead">Un e-mail ou une page web peut cacher des ordres. Si l'IA les lit, elle peut obéir à un inconnu.</p>
         </div>
@@ -458,7 +458,7 @@ td.c, th.c { text-align: center; }
         <div class="step"><span class="n">3</span><strong>L'IA suit l'ordre caché</strong><p>Elle le prend pour une consigne. Elle obéit au pirate, pas à toi.</p></div>
       </div>
       <h3>Pourquoi elle se fait avoir ?</h3>
-      <p>Pour l'IA, tout est du texte. Ses consignes, ta demande et l'e-mail arrivent à la suite, dans le même fil de tokens (voir la fiche 1).
+      <p>Pour l'IA, tout est du texte. Ses consignes, ta demande et l'e-mail arrivent à la suite, dans le même fil de tokens (voir « Le Sac à Tokens »).
         Rien ne dit clairement : <strong>« ceci est une info, pas un ordre »</strong>.</p>
       <div class="flow" aria-label="Le fil de texte que lit l'IA">
         <span class="f-sys">Tu es l'assistant de l'agence.</span>
@@ -630,14 +630,14 @@ td.c, th.c { text-align: center; }
       <button type="button" class="btn reveal" id="defiReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Rejouer le défi</button>
     </section>
 
-    <a class="card s4 next" href="index.html#permis">
-      <span class="ctl"><span class="eyebrow">C'était la dernière fiche</span><strong><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Voir mon permis IA</strong></span>
+    <a class="card s4 next" href="7-boite-outils.html">
+      <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>7 · La Boîte à Outils Claude</strong></span>
       <span class="emo" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
     </a>
 
   </div>
   <footer class="foot">
-    <nav class="series" aria-label="Les 6 fiches"><strong>Comprendre l’IA en 6 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-modele-effort.html">2 Modèle et effort</a><a href="3-hallucinations.html">3 Hallucinations</a><a href="4-boite-outils.html">4 Les outils Claude</a><a href="5-forfait-api.html">5 Forfait ou API</a><a aria-current="page">6 Message piégé</a></nav>
+    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a aria-current="page">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils Claude</a><a href="8-forfait-api.html">8 Forfait ou API</a></nav>
     <span>Exemples fabriqués pour comprendre. Les noms, adresses et chiffres sont inventés. Les risques sont des estimations, pas des mesures.</span>
     <span>L'idée des « 3 ingrédients » vient du chercheur Simon Willison, qui parle de « lethal trifecta ».</span>
     <div class="modes">
@@ -667,14 +667,31 @@ function initSeg(el, onChange) {
   return cur.dataset.v;
 }
 
-const FICHE = 6;
+const FICHE = "piege";
 // Parcours : progression gardée dans ce navigateur, mode atelier, devine d'abord, défi final (même bloc dans chaque fiche)
-const BADGES = { 1: ["{coins}", "Maître des tokens"], 2: ["{brain}", "Bon Cerveau"], 3: ["{user-secret}", "Détective anti-bobards"], 4: ["{toolbox}", "As de la boîte à outils"], 5: ["{calculator}", "Pro du budget"], 6: ["{shield-halved}", "Gardien anti-piège"] };
+const BADGES = {
+  tokens: ["{coins}", "Maître des tokens"], memoire: ["{memory}", "As de la mémoire"], cerveau: ["{brain}", "Bon Cerveau"],
+  bobards: ["{user-secret}", "Détective anti-bobards"], complaisance: ["{scale-balanced}", "Esprit critique"], piege: ["{shield-halved}", "Gardien anti-piège"],
+  outils: ["{toolbox}", "As de la boîte à outils"], forfait: ["{calculator}", "Pro du budget"],
+};
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch {} },
 };
-function loadProgress() { try { return JSON.parse(store.get("ia6:progress")) || {}; } catch { return {}; } }
+// Progression : { tokens: 3, memoire: 2, … }. Le parcours en 6 fiches la rangeait par numéro :
+// on la convertit une fois. Une fiche coupée en deux donne ses deux badges.
+const OLD_FICHES = { 1: ["tokens", "memoire"], 2: ["cerveau"], 3: ["bobards", "complaisance"], 4: ["outils"], 5: ["forfait"], 6: ["piege"] };
+function loadProgress() {
+  let p;
+  try { p = JSON.parse(store.get("ia6:progress")) || {}; } catch { return {}; }
+  if (Object.keys(p).some((k) => OLD_FICHES[k])) {
+    const q = {};
+    for (const [k, v] of Object.entries(p)) for (const id of OLD_FICHES[k] || [k]) q[id] = Math.max(q[id] || 0, v);
+    store.set("ia6:progress", JSON.stringify(q));
+    p = q;
+  }
+  return p;
+}
 function saveProgress(n, stars) {
   const p = loadProgress();
   p[n] = Math.max(p[n] || 0, stars);
@@ -777,8 +794,8 @@ function guess(box, { lock, q, ...opts }) {
   return ask(box, { ...opts, q: "{circle-question} Devine d'abord : " + q, good: "{circle-check} Bien vu ! ", bad: "{face-surprise} Surprise ! ", onShow: unlock });
 }
 
-// Pluie d'icônes aux couleurs des 6 fiches
-const CONFETTI_COLORS = ["#C6FF00", "#FF2E93", "#FF6B00", "#00E5FF", "#B14EFF", "#FFE600"];
+// Pluie d'icônes aux couleurs des fiches
+const CONFETTI_COLORS = ["#C6FF00", "#4DA3FF", "#FF2E93", "#FF6B00", "#FF9AD5", "#FFE600", "#00E5FF", "#B14EFF"];
 function confetti(ic) {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const box = h("div", "confetti");
@@ -787,7 +804,7 @@ function confetti(ic) {
     const s = h("span", "", ["{trophy}", "{star}", ic, "{wand-magic-sparkles}"][i % 4]);
     s.style.left = Math.random() * 96 + "%";
     s.style.animationDelay = Math.random() * 0.7 + "s";
-    s.style.color = CONFETTI_COLORS[i % 6];
+    s.style.color = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
     box.append(s);
   }
   document.body.append(box);

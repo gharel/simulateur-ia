@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- La page a déjà ses thèmes clair et sombre : les modes nuit forcés (Dark Reader, mode nuit de Brave) ne doivent pas changer ses couleurs. -->
+<meta name="color-scheme" content="light dark">
+<meta name="darkreader-lock">
+<title>Le Bon Cerveau</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/js/solid.min.js" integrity="sha512-T7EGedkSB4ewtlSHpcmpJm6FQMnxZzLYhAYRPk6n4zF30ap1uJrPuXX98A3SYMwv04/ZVTOfbF89Oa6dIJyljw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/js/fontawesome.min.js" integrity="sha512-WgR61jcssTjrH2a2vWm5JiWaEy1kmFIE5G0ybjKB0UEDzygVCebYW4eP2p96XmJWXA0zk/sNhbCfb09Wx39t4A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+/* Bento : grille de 4 colonnes. Une carte « hero » pleine couleur, les autres en cartes sombres. */
+:root {
+  --bg: #0B0B12;
+  --surface: #15151F;
+  --surface-2: #1F1F2C;
+  --line: #2B2B3C;
+  --fg: #F3F3F8;
+  --muted: #A6A6BA;
+  --ok: #3DDC84;
+  --warn: #FFC233;
+  --bad: #FF5C5C;
+  --on-accent: #0B0B12;
+  --accent-text: var(--accent);
+  --font-display: "Archivo Black", "Arial Black", Impact, system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", Roboto, system-ui, sans-serif;
+  --radius: 22px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
+    --fg: #12121A; --muted: #55556B; --ok: #0C6B3B; --warn: #8A5A00; --bad: #A61E1E;
+    --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
+  --fg: #12121A; --muted: #55556B; --ok: #0C6B3B; --warn: #8A5A00; --bad: #A61E1E;
+  --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 18px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; }
+.bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 24px; min-width: 0; display: flex; flex-direction: column; gap: 16px;
+}
+.s2 { grid-column: span 2; } .s3 { grid-column: span 3; } .s4 { grid-column: span 4; }
+@media (max-width: 900px) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .s1, .s3, .s4 { grid-column: span 2; }
+  .s2 { grid-column: span 1; }
+}
+@media (max-width: 640px) {
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .s1, .s2, .s3, .s4 { grid-column: span 1; }
+  .card { padding: 18px; }
+}
+
+/* Hero : la couleur dominante */
+.hero { background: var(--accent); color: var(--on-accent); border: none; }
+.hero .eyebrow { color: var(--on-accent); }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; align-items: end; }
+@media (max-width: 760px) { .hero-grid { grid-template-columns: minmax(0, 1fr); } }
+.word-card {
+  background: color-mix(in oklab, #FFFFFF 18%, transparent);
+  border: 2px solid var(--on-accent); border-radius: 18px; padding: 18px;
+  display: grid; gap: 6px;
+}
+.word-card strong { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1; }
+.word-card p { font-weight: 700; }
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.02; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h1 { font-size: clamp(2.7rem, 8vw, 5.6rem); text-transform: uppercase; letter-spacing: -.02em; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.15rem; }
+.eyebrow { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.lead { font-size: 1.3rem; font-weight: 700; line-height: 1.35; max-width: 34ch; margin: 0; }
+p { margin: 0; max-width: 65ch; }
+.muted { color: var(--muted); }
+.small { font-size: .9rem; }
+.big { font-family: var(--font-display); font-size: clamp(2.3rem, 5vw, 3.4rem); line-height: 1; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.emo { font-size: 1.6rem; line-height: 1; color: var(--accent-text); }
+
+/* Réglages */
+.ctl { display: grid; gap: 10px; font-weight: 700; }
+.ctl-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.ctl-val { font-family: var(--font-display); color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.ctl-ends { display: flex; justify-content: space-between; gap: 12px; font-size: .85rem; color: var(--muted); font-weight: 400; }
+input[type="range"] {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 12px; margin: 8px 0;
+  border-radius: 99px; cursor: pointer;
+  background: linear-gradient(to right, var(--accent) var(--p, 50%), var(--surface-2) var(--p, 50%));
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--fg); border: 5px solid var(--accent); box-shadow: 0 0 0 4px var(--bg);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--fg); border: 5px solid var(--accent); box-shadow: 0 0 0 4px var(--bg);
+}
+textarea, input[type="number"], input[type="text"] {
+  width: 100%; background: var(--surface-2); color: var(--fg);
+  border: 2px solid var(--line); border-radius: 14px; padding: 12px 14px; font: inherit;
+}
+textarea { resize: vertical; min-height: 96px; }
+textarea:focus, input[type="number"]:focus, input[type="text"]:focus { border-color: var(--accent); outline: none; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.seg { display: flex; flex-wrap: wrap; gap: 6px; background: var(--surface-2); padding: 5px; border-radius: 14px; }
+.seg button {
+  flex: 1 1 auto; border: 0; background: transparent; color: var(--fg); font: inherit; font-weight: 700;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer; min-height: 44px;
+}
+.seg button:hover { background: var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.sw {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 12px 14px; background: var(--surface-2); border-radius: 14px; cursor: pointer; font-weight: 700;
+}
+.sw input {
+  -webkit-appearance: none; appearance: none; flex: none; margin: 0;
+  width: 54px; height: 30px; border-radius: 99px; background: var(--line);
+  position: relative; cursor: pointer; transition: background .2s;
+}
+.sw input::after {
+  content: ""; position: absolute; top: 4px; left: 4px; width: 22px; height: 22px;
+  border-radius: 50%; background: var(--fg); transition: transform .2s;
+}
+.sw input:checked { background: var(--accent); }
+.sw input:checked::after { transform: translateX(24px); background: var(--on-accent); }
+
+.btn {
+  border: 2px solid var(--line); background: var(--surface-2); color: var(--fg);
+  font: inherit; font-weight: 700; padding: 10px 16px; border-radius: 12px; cursor: pointer; min-height: 44px;
+}
+.btn:hover { border-color: var(--accent); }
+
+/* Jauges */
+.meter { display: grid; gap: 6px; }
+.meter-top { display: flex; justify-content: space-between; gap: 12px; font-weight: 700; }
+.track { height: 16px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.fill { height: 100%; width: 0; border-radius: 99px; background: var(--accent); transition: width .45s ease; }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 99px;
+  font-weight: 700; font-size: .95rem; background: var(--surface-2); color: var(--fg);
+}
+.pill.ok { background: color-mix(in oklab, var(--ok) 18%, transparent); color: var(--ok); }
+.pill.warn { background: color-mix(in oklab, var(--warn) 18%, transparent); color: var(--warn); }
+.pill.bad { background: color-mix(in oklab, var(--bad) 18%, transparent); color: var(--bad); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
+.stat { background: var(--surface-2); border-radius: 16px; padding: 14px; display: grid; gap: 2px; }
+.stat b { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; line-height: 1.05; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.stat span { font-size: .9rem; color: var(--muted); }
+
+/* À retenir */
+.retenir { background: var(--surface-2); }
+.retenir ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; counter-reset: r; }
+.retenir li { counter-increment: r; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: start; font-weight: 700; }
+.retenir li::before {
+  content: counter(r); font-family: var(--font-display); background: var(--accent); color: var(--on-accent);
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .95rem;
+}
+
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.foot { margin-top: 28px; display: grid; gap: 6px; color: var(--muted); font-size: .9rem; }
+.foot strong { color: var(--fg); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+.series { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.series a { color: var(--fg); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--accent); }
+.series a:hover { color: var(--accent-text); }
+.series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
+
+/* Mise en page : bandeau « À retenir », réflexes sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
+.retenir.s4 ul { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 16px 24px; }
+.check.cols { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+@media (min-width: 901px) { .stick { position: sticky; top: 16px; align-self: start; } }
+[data-empty]:empty::before {
+  content: attr(data-empty); display: block; padding: 14px 16px; border-radius: 12px;
+  border: 2px dashed var(--line); color: var(--muted); font-weight: 700; font-size: .95rem;
+}
+
+/* Skazy Formation : logo en haut, mention en bas (même bloc dans chaque fiche) */
+.brand { margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.brand a { display: inline-flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; color: var(--fg); text-decoration: none; border-radius: 10px; }
+.brand-logo { display: block; width: 109px; height: 36px; flex: none; }
+.brand-url { font-size: .85rem; font-weight: 700; color: var(--muted); padding-left: 14px; border-left: 2px solid var(--line); }
+.brand a:hover .brand-url { color: var(--fg); }
+.brand-foot a { color: var(--fg); font-weight: 700; }
+.brand .home {
+  flex: none; gap: 8px; padding: 8px 14px; min-height: 44px; border: 2px solid var(--line); border-radius: 12px;
+  background: var(--surface); font-weight: 700; font-size: .95rem;
+}
+.brand .home:hover { border-color: var(--accent); }
+@media (max-width: 480px) { .brand-url { display: none; } }
+.modes { display: flex; flex-wrap: wrap; gap: 8px; }
+.modes-help { display: grid; gap: 4px; max-width: 80ch; }
+
+/* Icônes Font Awesome : couleur des icônes d'état */
+.fa-circle-check { color: var(--ok); }
+.fa-circle-xmark { color: var(--bad); }
+.fa-triangle-exclamation { color: var(--warn); }
+.hero .emo, .next .svg-inline--fa, .seg button[aria-pressed="true"] .svg-inline--fa { color: inherit; }
+
+/* Parcours : devine d'abord, défi final, badge, mode atelier (même bloc dans chaque fiche) */
+.guess { background: var(--surface-2); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; box-shadow: inset 4px 0 0 var(--accent); }
+.guess p, .qi p { font-weight: 700; overflow-wrap: anywhere; }
+.guess { max-width: 760px; }
+.locked { position: relative; user-select: none; }
+.locked > :not(.lock-tip) { filter: blur(7px); opacity: .5; }
+.unlocking > * { transition: filter .5s ease, opacity .5s ease; }
+.lock-tip { position: absolute; inset: 0; z-index: 2; display: flex; justify-content: center; align-items: flex-start; padding: 8px; pointer-events: none; }
+.lock-tip span {
+  background: var(--surface); color: var(--fg); border: 2px solid var(--accent); border-radius: 99px;
+  padding: 6px 14px; font-weight: 700; font-size: .9rem; text-align: center; box-shadow: 0 6px 20px rgb(0 0 0 / .3);
+}
+.quiz { display: grid; gap: 12px; }
+.challenge .quiz { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 900px) { .challenge .quiz { grid-template-columns: minmax(0, 1fr); } }
+.qi { background: var(--surface-2); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; }
+.qbtns { display: flex; flex-wrap: wrap; gap: 6px; }
+.qbtns button {
+  flex: 1 1 auto; border: 2px solid var(--line); background: var(--surface); color: var(--fg);
+  font: inherit; font-weight: 700; font-size: .9rem; padding: 8px 10px; border-radius: 10px; cursor: pointer; min-height: 44px;
+}
+.qbtns button:hover { border-color: var(--accent); }
+.qbtns button.picked { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 22%, var(--surface)); }
+.qbtns button.right { border-color: var(--ok); background: color-mix(in oklab, var(--ok) 18%, var(--surface)); }
+.qbtns button.wrong { border-color: var(--bad); background: color-mix(in oklab, var(--bad) 18%, var(--surface)); }
+.qfb { font-size: .95rem; }
+.qfb:empty, .result:empty { display: none; }
+.reveal { justify-self: start; align-self: flex-start; }
+.challenge { border: 2px solid var(--accent); }
+.prize { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.prize-txt { display: grid; gap: 2px; flex: 1 1 220px; }
+.badge {
+  flex: none; width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 2.2rem;
+  background: var(--surface-2); filter: grayscale(1); opacity: .55; transition: transform .4s ease, filter .4s, opacity .4s;
+}
+.badge.won { background: var(--accent); color: var(--on-accent); filter: none; opacity: 1; transform: rotate(-10deg) scale(1.05); }
+.stars { font-size: 1.6rem; letter-spacing: .08em; color: var(--warn); }
+.star-off { opacity: .3; }
+.result { padding: 14px 16px; border-radius: 14px; font-weight: 700; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
+.next {
+  background: var(--accent); color: var(--on-accent); border: none; text-decoration: none;
+  flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; transition: transform .2s ease;
+}
+.next:hover { transform: translateY(-3px); }
+.next:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+.next .eyebrow { color: var(--on-accent); }
+.next strong { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 4vw, 2.2rem); line-height: 1.05; }
+.next .emo { font-size: 2.4rem; color: inherit; }
+.foot .btn { justify-self: start; }
+.confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+.confetti span { position: absolute; top: -48px; font-size: 1.8rem; animation: fall 2.2s cubic-bezier(.3, .6, .6, 1) forwards; }
+@keyframes fall { to { transform: translateY(115vh) rotate(600deg); } }
+:root[data-mode="atelier"] body { font-size: 21px; }
+:root[data-mode="atelier"] .wrap { max-width: 1440px; }
+
+:root { --accent: #FF2E93; }
+
+.models { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .models { grid-template-columns: minmax(0, 1fr); } }
+.model {
+  text-align: left; border: 2px solid var(--line); background: var(--surface-2); color: var(--fg);
+  font: inherit; border-radius: 16px; padding: 16px; cursor: pointer; display: grid; gap: 6px; align-content: start;
+}
+.model:hover { border-color: var(--accent); }
+.model[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.model .nm { font-family: var(--font-display); font-size: 1.35rem; line-height: 1.05; }
+.model .tg { font-weight: 700; }
+.model .ds { font-size: .92rem; opacity: .85; }
+.model .ic { font-size: 1.5rem; line-height: 1; color: var(--accent-text); }
+.model[aria-pressed="true"] .ic { color: inherit; }
+
+.results { display: grid; gap: 16px; }
+.verdict { display: grid; gap: 12px; align-content: start; }
+.verdict .pill { font-size: 1.05rem; padding: 10px 14px; justify-self: start; }
+.reco { background: var(--surface-2); border-radius: 14px; padding: 14px; font-weight: 700; }
+.reco b { color: var(--accent-text); }
+.disabled-note { font-size: .9rem; color: var(--warn); font-weight: 700; }
+input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
+.steps { display: flex; justify-content: space-between; font-size: .8rem; color: var(--muted); font-weight: 700; }
+.analogy { display: grid; gap: 10px; }
+.analogy div { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 10px; align-items: center; }
+.analogy span:first-child { font-size: 1.7rem; text-align: center; }
+
+/* Jeu : mission budget */
+.mis { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
+@media (max-width: 900px) { .mis { grid-template-columns: minmax(0, 1fr); } }
+.mis-col { display: grid; gap: 14px; align-content: start; }
+.mis-card { background: var(--surface-2); border-radius: 16px; padding: 18px; display: grid; gap: 14px; box-shadow: inset 4px 0 0 var(--accent); }
+.mis-card .seg { background: var(--surface); }
+.mis-task { font-family: var(--font-display); font-size: 1.4rem; line-height: 1.15; }
+.mis-play { display: grid; gap: 14px; }
+.mis-play[hidden] { display: none; }
+.mis-card .btn { justify-self: start; }
+.btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.seg.off { opacity: .45; pointer-events: none; }
+.log { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.log li { padding: 10px 12px; border-radius: 10px; background: var(--surface-2); font-weight: 700; font-size: .95rem; }
+.log li.ok { box-shadow: inset 4px 0 0 var(--ok); }
+.log li.warn { box-shadow: inset 4px 0 0 var(--warn); }
+.log li.bad { box-shadow: inset 4px 0 0 var(--bad); }
+</style>
+
+<main class="wrap">
+  <header class="brand">
+    <a class="home" href="index.html"><i class="fa-solid fa-house" aria-hidden="true"></i> Accueil</a>
+    <a href="https://formation.skazy.nc/" target="_blank" rel="noopener" aria-label="Skazy Formation : formation.skazy.nc, nouvel onglet">
+      <svg class="brand-logo" viewBox="0 0 218 72" aria-hidden="true" focusable="false"><path fill-rule="evenodd" fill="currentColor" d="m202.4 1.4h15.3l-16 52.6q-1.1 3.5-3 6.3c-1.3 1.9-2.9 3.5-4.7 4.8-1.8 1.4-3.8 2.4-6 3.1-2.2 0.7-4.5 1.1-6.9 1.1-3 0-5.9-0.6-8.7-1.7v-14.4c2.8 1 5.1 1.5 7 1.5 3.7 0 5.6-2 6-6.2l-13.4-37v0.1l-21.3 25.3h26.7l3.9 11.6h-51.8c-3.1 0-5 0.1-6.3-0.8-1.6-1.1-2.6-2.8-3.1-4.9l-0.4-1.7c-2.1 2.7-4.5 4.7-7.2 6.1q-4 2.1-8.7 2.1c-2.3 0-4.5-0.4-6.5-1.2-2-0.8-3.7-1.9-5.2-3.2-1.4-1.4-2.6-3-3.4-4.8q-1.2-2.8-1.2-6c0-2.4 0.5-4.5 1.5-6.5q1.5-3 4.2-5.1c1.8-1.4 3.9-2.5 6.4-3.3 2.5-0.8 5.2-1.2 8.2-1.2 3.8 0 6.9 0.6 9.4 1.8v-1.4c0-2.2-0.6-3.8-1.9-4.9-1.3-1.1-3.3-1.6-6.2-1.6-2.7 0-5.1 0.4-7.4 1.3-2.2 0.9-4.6 2.1-7.1 3.8l-4.9-10.5c6.2-4 13.2-6 21.1-6 7.5 0 13.3 1.7 17.3 5 4.1 3.4 6.1 8.3 6.1 15v9.1c0 1.6 0.2 2.7 0.7 3.3 0.3 0.5 1.2 1.3 2.7 0l16.9-19.9h-20v-11.6h51.5l9 32.6 7.4-32.7zm-84.9 30.5v-3.3q-1.5-0.6-3.3-0.9c-1.2-0.3-2.3-0.4-3.2-0.4-2.1 0-3.8 0.5-5.2 1.5-1.4 1-2.1 2.3-2.1 3.8 0 1.3 0.6 2.4 1.6 3.2 1.1 0.8 2.4 1.2 4 1.2 1 0 2-0.2 3.1-0.5 1-0.3 2-0.8 2.8-1.3 0.7-0.5 1.2-1 1.6-1.6 0.4-0.5 0.6-1.1 0.6-1.7zm-94.6 18.2c-4.2 0.1-8.3-0.4-12.4-1.6-4.1-1.2-7.5-3.1-10.4-5.6l5.6-10.6c3.1 1.9 6 3.4 8.8 4.4 2.8 1 5.4 1.5 7.7 1.4q3.6-0.2 3.6-2.4 0-1.4-1.5-2.1c-1-0.6-2.8-1.2-5.6-1.9-3.4-0.9-6.3-1.7-8.6-2.6-2.3-0.9-4.2-1.8-5.7-2.9-1.5-1-2.5-2.2-3.2-3.5-0.7-1.3-1-2.9-1.1-4.7-0.1-2.4 0.3-4.7 1.2-6.8 0.9-2.1 2.2-3.9 3.9-5.5 1.7-1.6 3.7-2.8 6.1-3.7q3.6-1.4 7.8-1.5c3.5-0.1 6.9 0.2 10.1 1 3.2 0.8 6.5 2.5 9.8 5.2l-6.2 10.6c-3-1.8-5.6-3.1-7.6-3.9-2-0.8-3.9-1.1-5.7-1-1 0-1.9 0.3-2.5 0.7-0.7 0.4-1 1.1-0.9 1.9 0 0.9 0.5 1.6 1.5 2.2 1 0.5 2.9 1.1 5.8 1.8 3.5 0.8 6.5 1.6 8.9 2.6 2.4 0.9 4.3 1.9 5.8 3.1 1.5 1.1 2.5 2.4 3.2 3.9 0.7 1.5 1 3.2 1.1 5.1 0.1 2.5-0.3 4.7-1.1 6.7-0.8 2-2.1 3.7-3.8 5.2-1.7 1.5-3.7 2.6-6.2 3.4-2.5 0.6-5.3 1-8.4 1.1z"/><path fill="currentColor" d="m72.5 49.3l-10.9-17.5-3.5 3.8v13.7h-17.3v-49.2h17.3v19l12.9-17.8h18.3l-16.5 21 18.2 27z"/><path fill-rule="evenodd" fill="#00997A" d="m21.6 53.6v0.6h3.6v5h-3.6v11.8h-5.7v-11.8h-2.2v-5h2.2v-0.6c0-3.4 1.8-6.3 5.5-6.3 1.1 0 2.7 0.2 3.8 0.6v4.4c-0.6-0.2-1.2-0.4-1.8-0.4-1.5 0.1-1.8 1.2-1.8 1.7zm4.7 9c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm18.9-9.2l-0.9 5.7c-0.2 0-0.6-0.1-0.9-0.1-1.7 0-4.1 0.7-4.1 5.2v6.8h-5.7v-16.8h5.2l0.3 2c1.8-2 4.1-2.7 6.1-2.8zm28.8 8.5v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.9 0-2.8 1.3-2.8 3.2v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.8 0-2.8 1.3-2.8 3.2v9.1h-5.7v-16.8h5.2l0.2 1.3c1.2-1.2 2.9-1.9 5-1.9 2 0 3.9 0.6 5 2.8 1.2-1.7 3.2-2.8 5.8-2.8 3.3 0 6.3 1.6 6.3 8.3zm20.9-7.7v16.8h-5.2l-0.3-1.7c-1.2 1.5-3.1 2.3-5.3 2.3-5.1 0-8.4-4.2-8.4-9 0-5 3.5-9 8.4-9 2.2 0 4.1 0.8 5.3 2.3l0.3-1.7zm-5.7 8.3c0-2.4-1.8-3.8-3.9-3.8-2.3 0-4 1.8-4 3.9 0 2 1.6 3.9 4 3.9 2.3 0 3.9-1.7 3.9-4zm9.4 2.8v-6.2h-2.4v-4.5h0.5c1.5 0 2.4-0.8 2.4-2.3v-1.7h5.1v3.5h3.4v5h-3.4v5.9c0 1.2 0.7 1.7 1.7 1.7 0.5 0 1.2-0.2 1.7-0.3v4.3c-0.9 0.4-2.5 0.6-3.6 0.6-4.1 0-5.4-2.8-5.4-6zm11.1-15.5c0-1.6 1.4-2.8 3.2-2.8 1.8 0 3.2 1.3 3.2 2.8 0 1.5-1.3 2.8-3.2 2.8-1.9 0-3.2-1.3-3.2-2.8zm0.3 4.4h5.7v16.8h-5.7zm7.7 8.4c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm23.7-0.7v9.1h-5.7v-9.1c0-2.3-1-3.2-2.7-3.2-1.8 0-2.9 1.3-2.9 3.2v9.1h-5.7v-16.8h5.2l0.2 1.5c1.3-1.2 3-2 5.2-2 3.2-0.1 6.4 1.5 6.4 8.2z"/></svg>
+      <span class="brand-url">formation.skazy.nc <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+    </a>
+  </header>
+  <div class="bento">
+
+    <section class="card hero s4">
+      <div class="hero-grid">
+        <div class="ctl">
+          <span class="eyebrow">Comprendre l'IA · Fiche 3 sur 8</span>
+          <h1>Le Bon<br>Cerveau</h1>
+          <p class="lead">Une petite tâche n'a pas besoin d'un expert. Choisis le bon modèle et le bon effort.</p>
+        </div>
+        <div class="word-card">
+          <span class="eyebrow">Les mots à connaître</span>
+          <strong>Modèle</strong>
+          <p>Le « cerveau » de l'IA. Il y en a des petits et des grands.</p>
+          <strong>Effort</strong>
+          <p>Le temps que l'IA prend pour réfléchir avant de répondre.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card s3">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-1"></i></span><h2>Choisis un modèle</h2></div>
+      <div class="models" id="models" role="group" aria-label="Modèle">
+        <button type="button" class="model" data-v="haiku" aria-pressed="false">
+          <span class="ic" aria-hidden="true"><i class="fa-solid fa-person-running"></i></span><span class="nm">Haiku 4.5</span>
+          <span class="tg">Le stagiaire rapide</span><span class="ds">Très rapide, pas cher. Pour les tâches simples.</span>
+        </button>
+        <button type="button" class="model" data-v="sonnet" aria-pressed="true">
+          <span class="ic" aria-hidden="true"><i class="fa-solid fa-user-tie"></i></span><span class="nm">Sonnet 5.5</span>
+          <span class="tg">Le collègue efficace</span><span class="ds">Bon en tout. Le choix du quotidien.</span>
+        </button>
+        <button type="button" class="model" data-v="opus" aria-pressed="false">
+          <span class="ic" aria-hidden="true"><i class="fa-solid fa-flask"></i></span><span class="nm">Opus 5.5</span>
+          <span class="tg">L'expert</span><span class="ds">Le plus fort. Plus lent et plus cher.</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="card s1">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-2"></i></span><h2>Règle l'effort</h2></div>
+      <div class="ctl">
+        <div class="ctl-row"><label for="effort">Effort</label><span class="ctl-val" id="vEffort">Moyen</span></div>
+        <input type="range" id="effort" min="0" max="4" step="1" value="1">
+        <div class="ctl-ends" aria-hidden="true"><span>Bas</span><span>Max</span></div>
+      </div>
+      <p class="small" id="effortTxt"></p>
+      <p class="disabled-note" id="haikuNote" hidden>Haiku n'a pas ce réglage. Il répond toujours vite.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-3"></i></span><h2>Choisis ta tâche</h2></div>
+      <div class="seg" id="segTask" role="group" aria-label="Tâche">
+        <button type="button" data-v="0" aria-pressed="false"><i class="fa-solid fa-pen" aria-hidden="true"></i> Corriger une faute</button>
+        <button type="button" data-v="1" aria-pressed="false"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Résumer un e-mail</button>
+        <button type="button" data-v="2" aria-pressed="true"><i class="fa-solid fa-file-lines" aria-hidden="true"></i> Écrire un rapport</button>
+        <button type="button" data-v="3" aria-pressed="false"><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i> Créer une appli</button>
+        <button type="button" data-v="4" aria-pressed="false"><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i> Problème très difficile</button>
+      </div>
+    </section>
+
+    <section class="card s3">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-chart-column"></i></span><h2>Le résultat</h2></div>
+      <div class="results">
+        <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-bolt" aria-hidden="true"></i> Vitesse</span><span id="tSpeed"></span></div><div class="track"><div class="fill" id="bSpeed"></div></div></div>
+        <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> Qualité</span><span id="tQual"></span></div><div class="track"><div class="fill" id="bQual"></div></div></div>
+        <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-sack-dollar" aria-hidden="true"></i> Coût</span><span id="tCost"></span></div><div class="track"><div class="fill" id="bCost"></div></div></div>
+        <div class="stats">
+          <div class="stat"><b id="sTime">–</b><span>temps de réponse</span></div>
+          <div class="stat"><b id="sThink">–</b><span>tokens de réflexion</span></div>
+          <div class="stat"><b id="sPrice">–</b><span>prix de la tâche (API)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card s1 verdict">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-tag"></i></span><h2>Verdict</h2></div>
+      <span class="pill" id="verdict" aria-live="polite"></span>
+      <p id="verdictTxt"></p>
+      <div class="reco" id="reco"></div>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-sack-dollar"></i></span><h2>Jeu : mission budget</h2><span class="pill" id="misScore">0 / 5</span></div>
+      <p>5 tâches arrivent l'une après l'autre. Pour chacune, choisis un modèle et un effort, puis lance.
+        <strong>Réussis chaque tâche en dépensant le moins possible.</strong> Si c'est raté, tu paies quand même, et tu recommences.</p>
+      <div class="mis">
+        <div class="mis-col stick">
+          <div class="mis-card" id="misCard" tabindex="-1">
+            <span class="eyebrow" id="misStep"></span>
+            <span class="mis-task" id="misTask"></span>
+            <span class="small" id="misNeed"></span>
+            <div class="mis-play" id="misPlay">
+              <div class="ctl">
+                <span>Modèle</span>
+                <div class="seg" id="misModel" role="group" aria-label="Modèle pour la mission">
+                  <button type="button" data-v="haiku" aria-pressed="false"><i class="fa-solid fa-person-running" aria-hidden="true"></i> Haiku</button>
+                  <button type="button" data-v="sonnet" aria-pressed="true"><i class="fa-solid fa-user-tie" aria-hidden="true"></i> Sonnet</button>
+                  <button type="button" data-v="opus" aria-pressed="false"><i class="fa-solid fa-flask" aria-hidden="true"></i> Opus</button>
+                </div>
+              </div>
+              <div class="ctl">
+                <span>Effort</span>
+                <div class="seg" id="misEffort" role="group" aria-label="Effort pour la mission">
+                  <button type="button" data-v="0" aria-pressed="false">Bas</button>
+                  <button type="button" data-v="1" aria-pressed="true">Moyen</button>
+                  <button type="button" data-v="2" aria-pressed="false">Haut</button>
+                  <button type="button" data-v="3" aria-pressed="false">Très haut</button>
+                  <button type="button" data-v="4" aria-pressed="false">Max</button>
+                </div>
+              </div>
+              <button type="button" class="btn go" id="misGo"><i class="fa-solid fa-rocket" aria-hidden="true"></i> Lancer la tâche</button>
+            </div>
+            <button type="button" class="btn" id="misAgain" hidden><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Rejouer</button>
+          </div>
+        </div>
+        <div class="mis-col">
+          <div class="stats">
+            <div class="stat"><b id="misSpent">0 $</b><span>dépensé</span></div>
+            <div class="stat"><b id="misMin">0 $</b><span>le moins cher possible</span></div>
+          </div>
+          <ol class="log" id="misLog" aria-live="polite" data-empty="Tes résultats s'affichent ici, tâche après tâche."></ol>
+          <div class="result" id="misResult" aria-live="polite"></div>
+        </div>
+      </div>
+      <p class="small muted">Prix pour une tâche, avec les tarifs de l'API. La qualité est une estimation pour comprendre.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></span><h2>Les 3 modèles en bref</h2></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Modèle</th><th>Pour quoi ?</th><th class="num">Mémoire</th><th class="num">Prix API*</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Haiku 4.5</strong></td><td>Tâches simples, gros volumes</td><td class="num">200 000</td><td class="num">1 $ / 5 $</td></tr>
+            <tr><td><strong>Sonnet 5.5</strong></td><td>Le quotidien : écrire, analyser, coder</td><td class="num">1 million</td><td class="num">2 $ / 10 $</td></tr>
+            <tr><td><strong>Opus 5.5</strong></td><td>Les tâches dures et longues</td><td class="num">1 million</td><td class="num">4 $ / 20 $</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">* Prix pour 1 million de tokens : lus / écrits. Tarifs publics de l'API, septembre 2026. Il existe aussi Fable, encore plus puissant (10 $ / 50 $).</p>
+    </section>
+
+    <section class="card s4 retenir">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
+      <ul>
+        <li><span>Gros modèle = plus intelligent, mais plus lent et plus cher.</span></li>
+        <li><span>Plus d'effort = l'IA réfléchit plus longtemps. Utile pour les tâches difficiles.</span></li>
+        <li><span>Pour une tâche simple, un petit modèle avec peu d'effort suffit.</span></li>
+      </ul>
+    </section>
+
+    <section class="card s4 challenge" id="defi">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-flag-checkered"></i></span><h2>Défi final</h2><span class="pill" id="defiScore"></span></div>
+      <div class="prize">
+        <span class="badge" id="badge" aria-hidden="true"></span>
+        <div class="prize-txt"><strong id="badgeName"></strong><span class="small muted" id="badgeTxt"></span></div>
+        <span class="stars" id="stars"></span>
+      </div>
+      <div class="quiz" id="defiQuiz"></div>
+      <div class="result" id="defiResult" aria-live="polite"></div>
+      <button type="button" class="btn reveal" id="defiReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Rejouer le défi</button>
+    </section>
+
+    <a class="card s4 next" href="4-hallucinations.html">
+      <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>4 · Le Détecteur de Bobards</strong></span>
+      <span class="emo" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+    </a>
+
+  </div>
+  <footer class="foot">
+    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a aria-current="page">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils Claude</a><a href="8-forfait-api.html">8 Forfait ou API</a></nav>
+    <span>Vitesse, qualité et temps sont des estimations pour comprendre, pas des mesures. Les prix sont les tarifs publics de l'API.</span>
+    <div class="modes">
+      <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
+      <button type="button" class="btn" id="demoBtn" aria-pressed="false"><i class="fa-solid fa-lock-open" aria-hidden="true"></i> Mode démonstration : non</button>
+    </div>
+    <div class="modes-help">
+      <span><strong>Mode atelier</strong> : pour animer un groupe. Le texte est plus gros. Dans les quiz, un clic choisit la réponse du groupe, puis « Révéler » montre la correction.</span>
+      <span><strong>Mode démonstration</strong> : pour présenter. Rien n'est flou, tout se voit sans répondre aux questions « Devine d'abord ».</span>
+      <span>Les deux modes restent actifs d'une fiche à l'autre.</span>
+    </div>
+    <span class="brand-foot">Une ressource Skazy Formation : <a href="https://formation.skazy.nc/" target="_blank" rel="noopener">formation.skazy.nc</a></span>
+  </footer>
+</main>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const fmt = (n, d = 0) => n.toLocaleString("fr-FR", { maximumFractionDigits: d, minimumFractionDigits: d });
+function paintRange(r) {
+  r.style.setProperty("--p", ((r.value - r.min) / (r.max - r.min)) * 100 + "%");
+}
+function initRanges() {
+  $$('input[type="range"]').forEach((r) => { r.addEventListener("input", () => paintRange(r)); paintRange(r); });
+}
+// Groupe de boutons à choix unique : <div class="seg" data-name="x"><button data-v="..">
+function initSeg(el, onChange) {
+  const btns = $$("button", el);
+  btns.forEach((b) => b.addEventListener("click", () => {
+    btns.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    onChange(b.dataset.v);
+  }));
+  const cur = btns.find((b) => b.getAttribute("aria-pressed") === "true") || btns[0];
+  return cur.dataset.v;
+}
+
+const FICHE = "cerveau";
+// Parcours : progression gardée dans ce navigateur, mode atelier, devine d'abord, défi final (même bloc dans chaque fiche)
+const BADGES = {
+  tokens: ["{coins}", "Maître des tokens"], memoire: ["{memory}", "As de la mémoire"], cerveau: ["{brain}", "Bon Cerveau"],
+  bobards: ["{user-secret}", "Détective anti-bobards"], complaisance: ["{scale-balanced}", "Esprit critique"], piege: ["{shield-halved}", "Gardien anti-piège"],
+  outils: ["{toolbox}", "As de la boîte à outils"], forfait: ["{calculator}", "Pro du budget"],
+};
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+// Progression : { tokens: 3, memoire: 2, … }. Le parcours en 6 fiches la rangeait par numéro :
+// on la convertit une fois. Une fiche coupée en deux donne ses deux badges.
+const OLD_FICHES = { 1: ["tokens", "memoire"], 2: ["cerveau"], 3: ["bobards", "complaisance"], 4: ["outils"], 5: ["forfait"], 6: ["piege"] };
+function loadProgress() {
+  let p;
+  try { p = JSON.parse(store.get("ia6:progress")) || {}; } catch { return {}; }
+  if (Object.keys(p).some((k) => OLD_FICHES[k])) {
+    const q = {};
+    for (const [k, v] of Object.entries(p)) for (const id of OLD_FICHES[k] || [k]) q[id] = Math.max(q[id] || 0, v);
+    store.set("ia6:progress", JSON.stringify(q));
+    p = q;
+  }
+  return p;
+}
+function saveProgress(n, stars) {
+  const p = loadProgress();
+  p[n] = Math.max(p[n] || 0, stars);
+  store.set("ia6:progress", JSON.stringify(p));
+}
+// Modes atelier et démonstration : l'adresse (?atelier=1, ?demo=0…) a le dernier mot, sinon le choix gardé dans ce navigateur.
+function mode(key) {
+  const v = new URLSearchParams(location.search).get(key);
+  if (v !== null) store.set("ia6:" + key, v === "0" ? "0" : "1");
+  return v !== null ? v !== "0" : store.get("ia6:" + key) === "1";
+}
+const ATELIER = mode("atelier"), DEMO = mode("demo");
+if (ATELIER) document.documentElement.dataset.mode = "atelier";
+
+// Icônes Font Awesome. Dans un texte, « {nom} » devient l'icône fa-nom : "{circle-check} Bravo !"
+function icon(name, cls) {
+  const i = document.createElement("i");
+  i.className = "fa-solid fa-" + name + (cls ? " " + cls : "");
+  i.setAttribute("aria-hidden", "true");
+  return i;
+}
+function rich(el, text) {
+  el.replaceChildren(...String(text).split(/\{([a-z0-9-]+)\}/).map((s, k) => (k % 2 ? icon(s) : s)).filter((s) => s !== ""));
+  return el;
+}
+// Le même texte sans les icônes, pour les attributs (aria-label…)
+const plain = (text) => String(text).replace(/\{[a-z0-9-]+\}\s*/g, "");
+function h(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) rich(e, text);
+  return e;
+}
+function btn(label, cls = "") { const b = h("button", cls, label); b.type = "button"; return b; }
+const starIcons = (n) => [1, 2, 3].map((k) => icon("star", k > n ? "star-off" : ""));
+
+// Une question à choix. En mode atelier, un clic choisit et « Révéler » corrige : le groupe répond d'abord.
+function ask(box, { q, options, a, why, onShow, good = "{circle-check} Bravo ! ", bad = "{circle-xmark} Pas tout à fait. " }) {
+  let pick = null, shown = false;
+  const group = h("div", "qbtns");
+  group.setAttribute("role", "group");
+  group.setAttribute("aria-label", plain(q));
+  const bs = options.map(([v, label]) => {
+    const b = btn(label);
+    b.addEventListener("click", () => { pick = v; if (ATELIER && !shown) paint(); else show(); });
+    group.append(b);
+    return [v, b];
+  });
+  const rev = btn("{eye} Révéler la réponse", "btn reveal");
+  rev.addEventListener("click", show);
+  const fb = h("span", "qfb");
+  fb.setAttribute("aria-live", "polite");
+  function show() {
+    const first = !shown, refocus = document.activeElement === rev;
+    shown = true;
+    paint();
+    if (refocus) bs.find(([v]) => v === pick)[1].focus();
+    if (onShow) onShow(pick === a, first);
+  }
+  function paint() {
+    for (const [v, b] of bs) {
+      b.setAttribute("aria-pressed", String(v === pick));
+      b.classList.toggle("picked", !shown && v === pick);
+      b.classList.toggle("right", shown && v === a);
+      b.classList.toggle("wrong", shown && v === pick && v !== a);
+    }
+    rev.hidden = shown || pick === null;
+    rich(fb, shown ? (pick === a ? good : bad) + (typeof why === "function" ? why() : why) : "");
+  }
+  box.replaceChildren(h("p", "", q), group, rev, fb);
+  paint();
+  return { reset() { pick = null; shown = false; paint(); } };
+}
+
+// Zones floutées : un message dit comment les débloquer. Renvoie la fonction qui les débloque.
+function lockZones(zones, tip = "{lock} Réponds d'abord à la question") {
+  if (DEMO) return () => {};
+  const locks = [].concat(zones).map((z) => {
+    const t = h("span", "lock-tip");
+    t.append(h("span", "", tip));
+    z.classList.add("locked");
+    z.inert = true;
+    z.append(t);
+    // Si la page redessine la zone, le message revient.
+    const mo = new MutationObserver(() => { if (!t.isConnected) z.append(t); });
+    mo.observe(z, { childList: true });
+    return [z, t, mo];
+  });
+  return () => locks.forEach(([z, t, mo]) => {
+    mo.disconnect();
+    t.remove();
+    z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false;
+  });
+}
+
+// Devine d'abord : les zones « lock » restent floues tant qu'on n'a pas répondu.
+function guess(box, { lock, q, ...opts }) {
+  const unlock = lockZones(lock);
+  box.classList.add("guess");
+  return ask(box, { ...opts, q: "{circle-question} Devine d'abord : " + q, good: "{circle-check} Bien vu ! ", bad: "{face-surprise} Surprise ! ", onShow: unlock });
+}
+
+// Pluie d'icônes aux couleurs des fiches
+const CONFETTI_COLORS = ["#C6FF00", "#4DA3FF", "#FF2E93", "#FF6B00", "#FF9AD5", "#FFE600", "#00E5FF", "#B14EFF"];
+function confetti(ic) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const box = h("div", "confetti");
+  box.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < 28; i++) {
+    const s = h("span", "", ["{trophy}", "{star}", ic, "{wand-magic-sparkles}"][i % 4]);
+    s.style.left = Math.random() * 96 + "%";
+    s.style.animationDelay = Math.random() * 0.7 + "s";
+    s.style.color = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+    box.append(s);
+  }
+  document.body.append(box);
+  setTimeout(() => box.remove(), 3200);
+}
+
+// Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.
+function initDefi(items, options) {
+  const [ic, name] = BADGES[FICHE];
+  const total = items.length, firsts = new Map();
+  let record = loadProgress()[FICHE] || 0;
+  const box = $("#defiQuiz");
+  const asks = items.map((it, i) => {
+    const d = h("div", "qi");
+    box.append(d);
+    return ask(d, { ...it, q: `${i + 1}. ${it.q}`, options: it.options || options,
+      onShow(ok, first) { if (first) { firsts.set(i, ok); update(); } } });
+  });
+  function paintBadge() {
+    $("#badge").classList.toggle("won", record > 0);
+    $("#stars").replaceChildren(...(record ? starIcons(record) : []));
+    $("#stars").setAttribute("aria-label", record ? `Meilleur score : ${record} étoile${record > 1 ? "s" : ""} sur 3` : "");
+    $("#badgeTxt").textContent = record
+      ? "Badge gagné ! Rejoue quand tu veux pour améliorer ton score."
+      : `Réponds aux ${total} questions pour gagner ce badge. Seule ta 1re réponse compte pour les étoiles.`;
+  }
+  function update() {
+    $("#defiReset").hidden = false;
+    const good = [...firsts.values()].filter(Boolean).length;
+    $("#defiScore").textContent = `${good} / ${total}`;
+    if (firsts.size < total) return;
+    const stars = good === total ? 3 : good === total - 1 ? 2 : 1;
+    record = Math.max(record, stars);
+    saveProgress(FICHE, stars);
+    paintBadge();
+    rich($("#defiResult"), stars === 3
+      ? `{trophy} ${good} sur ${total} du premier coup ! Tu gagnes le badge ${ic} « ${name} » avec 3 étoiles.`
+      : `{trophy} ${good} sur ${total} du premier coup. Tu gagnes le badge ${ic} « ${name} » avec ${stars} étoile${stars > 1 ? "s" : ""} sur 3. Rejoue pour viser 3 étoiles !`);
+    confetti(ic);
+  }
+  rich($("#badge"), ic);
+  rich($("#badgeName"), `${ic} Badge « ${name} »`);
+  $("#defiScore").textContent = `0 / ${total}`;
+  $("#defiReset").addEventListener("click", () => {
+    firsts.clear();
+    asks.forEach((a) => a.reset());
+    $("#defiScore").textContent = `0 / ${total}`;
+    $("#defiResult").textContent = "";
+    $("#defiReset").hidden = true;
+  });
+  $("#defiReset").hidden = true;
+  paintBadge();
+}
+
+// Boutons des modes, en bas de page. Atelier : texte plus gros, réponses révélées par l'animateur.
+// Démonstration : rien n'est flou. Le choix suit d'une fiche à l'autre.
+(function initModes() {
+  const MODES = { atelier: [ATELIER, "{chalkboard-user} Mode atelier : "], demo: [DEMO, "{lock-open} Mode démonstration : "] };
+  for (const [key, [on, label]] of Object.entries(MODES)) {
+    const b = $("#" + key + "Btn");
+    rich(b, label + (on ? "oui" : "non"));
+    b.setAttribute("aria-pressed", String(on));
+    b.addEventListener("click", () => {
+      store.set("ia6:" + key, on ? "0" : "1");
+      const q = new URLSearchParams(location.search);
+      q.set(key, on ? "0" : "1");
+      location.search = q;
+    });
+  }
+  const q = [ATELIER && "atelier=1", DEMO && "demo=1"].filter(Boolean).join("&");
+  if (q) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?" + q + "$1"); });
+})();
+
+
+const MODELS = {
+  haiku:  { name: "Haiku 4.5",  speed: 95, quality: 52, inP: 1, outP: 5,  tps: 160, effort: false },
+  sonnet: { name: "Sonnet 5.5", speed: 72, quality: 76, inP: 2, outP: 10, tps: 90,  effort: true },
+  opus:   { name: "Opus 5.5",   speed: 50, quality: 88, inP: 4, outP: 20, tps: 60,  effort: true },
+};
+const EFFORT = [
+  { name: "Bas",       q: -10, think: 0.2, sp: 10,  txt: "L'IA répond presque tout de suite. Elle réfléchit très peu." },
+  { name: "Moyen",     q: 0,   think: 1,   sp: 0,   txt: "L'IA réfléchit un peu avant de répondre. Bon équilibre." },
+  { name: "Haut",      q: 5,   think: 2,   sp: -12, txt: "L'IA prend son temps. Elle vérifie son travail." },
+  { name: "Très haut", q: 8,   think: 3.5, sp: -22, txt: "L'IA réfléchit longtemps. Utile pour coder ou les longues tâches." },
+  { name: "Max",       q: 10,  think: 6,   sp: -32, txt: "L'IA réfléchit au maximum. Pour les problèmes très difficiles." },
+];
+const TASKS = [
+  { name: "corriger une faute",          ic: "{pen}",           need: 35, out: 100,   think: 200 },
+  { name: "résumer un e-mail",           ic: "{envelope}",      need: 50, out: 250,   think: 500 },
+  { name: "écrire un rapport",           ic: "{file-lines}",    need: 70, out: 3000,  think: 3000 },
+  { name: "créer une appli",             ic: "{mobile-screen}", need: 84, out: 20000, think: 15000 },
+  { name: "résoudre un problème difficile", ic: "{puzzle-piece}", need: 92, out: 4000, think: 30000 },
+];
+const INPUT = 2000;
+const st = { model: "sonnet", effort: 1, task: 2 };
+
+function evaluate(mk, e, t) {
+  const m = MODELS[mk], task = TASKS[t];
+  const lvl = m.effort ? EFFORT[e] : { q: 0, think: 0, sp: 0 };
+  const quality = Math.min(99, m.quality + lvl.q);
+  const thinkTok = Math.round(task.think * lvl.think);
+  const outTok = task.out + thinkTok;
+  const secs = outTok / m.tps + 1;
+  const price = (INPUT * m.inP + outTok * m.outP) / 1e6;
+  const speed = Math.max(5, Math.min(100, m.speed + lvl.sp));
+  return { quality, thinkTok, secs, price, speed };
+}
+function timeTxt(s) {
+  if (s < 60) return "≈ " + Math.max(1, Math.round(s)) + " s";
+  if (s < 3600) return "≈ " + Math.round(s / 60) + " min";
+  return "≈ " + fmt(s / 3600, 1) + " h";
+}
+function priceTxt(p) {
+  if (p < 0.001) return "< 0,001 $";
+  if (p < 0.1) return fmt(p, 3) + " $";
+  return fmt(p, 2) + " $";
+}
+function verdictOf(r, need) {
+  if (r.quality < need) return { cls: "bad", lab: "{triangle-exclamation} Pas assez fort", txt: "Le résultat risque d'être moyen. Prends un modèle plus fort ou monte l'effort." };
+  if (r.quality - need > 22) return { cls: "warn", lab: "{money-bill-wave} Trop puissant", txt: "Ça marche, mais tu attends et tu paies pour rien. Un plus petit modèle suffit." };
+  return { cls: "ok", lab: "{circle-check} Bon choix", txt: "Ce réglage est adapté à la tâche." };
+}
+function best(t) {
+  let pick = null;
+  for (const mk of Object.keys(MODELS)) {
+    const levels = MODELS[mk].effort ? [0, 1, 2, 3, 4] : [0];
+    for (const e of levels) {
+      const r = evaluate(mk, e, t);
+      if (r.quality >= TASKS[t].need && (!pick || r.price < pick.r.price)) pick = { mk, e, r };
+    }
+  }
+  return pick;
+}
+
+function render() {
+  const m = MODELS[st.model];
+  const r = evaluate(st.model, st.effort, st.task);
+  const task = TASKS[st.task];
+  const slider = $("#effort");
+  slider.disabled = !m.effort;
+  $("#haikuNote").hidden = m.effort;
+  $("#vEffort").textContent = m.effort ? EFFORT[st.effort].name : "–";
+  $("#effortTxt").textContent = m.effort ? EFFORT[st.effort].txt : "";
+
+  // Le coût est comparé au réglage le plus cher pour cette tâche (Opus, effort max).
+  const maxPrice = evaluate("opus", 4, st.task).price;
+  const costPct = Math.max(3, (r.price / maxPrice) * 100);
+  $("#bSpeed").style.width = r.speed + "%";
+  $("#bQual").style.width = r.quality + "%";
+  $("#bCost").style.width = costPct + "%";
+  $("#tSpeed").textContent = r.speed >= 80 ? "très rapide" : r.speed >= 55 ? "rapide" : r.speed >= 35 ? "lent" : "très lent";
+  $("#tQual").textContent = r.quality + " / 100 · il faut " + task.need;
+  $("#tCost").textContent = costPct < 15 ? "petit" : costPct < 45 ? "moyen" : "élevé";
+  $("#sTime").textContent = timeTxt(r.secs);
+  $("#sThink").textContent = fmt(r.thinkTok);
+  $("#sPrice").textContent = priceTxt(r.price);
+
+  const v = verdictOf(r, task.need);
+  const pill = $("#verdict");
+  pill.className = "pill " + v.cls;
+  rich(pill, v.lab);
+  $("#verdictTxt").textContent = v.txt;
+  const b = best(st.task);
+  $("#reco").innerHTML = b
+    ? `Le moins cher qui réussit à <b>${task.name}</b> : <b>${MODELS[b.mk].name}</b>${MODELS[b.mk].effort ? `, effort <b>${EFFORT[b.e].name}</b>` : ""} (${priceTxt(b.r.price)}).`
+    : "Aucun réglage ne suffit. Découpe la tâche en petits morceaux.";
+}
+
+$$("#models .model").forEach((btn) => btn.addEventListener("click", () => {
+  $$("#models .model").forEach((x) => x.setAttribute("aria-pressed", String(x === btn)));
+  st.model = btn.dataset.v; render();
+}));
+$("#effort").addEventListener("input", (e) => { st.effort = +e.target.value; render(); });
+st.task = +initSeg($("#segTask"), (v) => { st.task = +v; render(); });
+initRanges();
+render();
+
+// Jeu : mission budget. Une tâche compte « au meilleur prix » si elle est réussie du premier coup, à moins de 1,25 fois le minimum.
+const TASK_LABELS = $$("#segTask button").map((b, k) => `${TASKS[k].ic} ${b.textContent.trim()}`);
+const mis = { k: 0, model: "sonnet", effort: 1, tries: 0, spent: 0, min: 0, good: 0 };
+const cfgName = (mk, e) => MODELS[mk].name + (MODELS[mk].effort ? `, effort ${EFFORT[e].name.toLowerCase()}` : "");
+function renderMission() {
+  const done = mis.k === TASKS.length;
+  $("#misScore").textContent = `${mis.good} / ${TASKS.length}`;
+  $("#misSpent").textContent = mis.spent ? priceTxt(mis.spent) : "0 $";
+  $("#misMin").textContent = mis.min ? priceTxt(mis.min) : "0 $";
+  $("#misPlay").hidden = done;
+  $("#misAgain").hidden = !done;
+  $("#misEffort").classList.toggle("off", !MODELS[mis.model].effort);
+  if (done) {
+    $("#misStep").textContent = "Mission terminée";
+    rich($("#misTask"), `{flag-checkered} ${mis.good} tâche${mis.good > 1 ? "s" : ""} sur ${TASKS.length} au meilleur prix`);
+    $("#misNeed").textContent = "";
+    rich($("#misResult"), (mis.good === TASKS.length ? "{trophy} Parfait ! " : "") +
+      `Tu as dépensé ${priceTxt(mis.spent)}. Le minimum était ${priceTxt(mis.min)}. ` +
+      "{lightbulb} Le savais-tu ? Pour créer une appli, Opus en effort moyen coûte moins cher que Sonnet en effort max : un modèle plus fort a besoin de moins réfléchir.");
+    if (mis.good === TASKS.length) confetti("{sack-dollar}");
+    return;
+  }
+  $("#misStep").textContent = `Tâche ${mis.k + 1} sur ${TASKS.length}` + (mis.tries ? ` · essai ${mis.tries + 1}` : "");
+  rich($("#misTask"), TASK_LABELS[mis.k]);
+  $("#misNeed").textContent = `Il faut une qualité d'au moins ${TASKS[mis.k].need} sur 100.`;
+  $("#misResult").textContent = "";
+}
+function launchMission() {
+  const t = TASKS[mis.k], r = evaluate(mis.model, mis.effort, mis.k), b = best(mis.k);
+  mis.spent += r.price;
+  const ok = r.quality >= t.need, ratio = r.price / b.r.price;
+  const head = `${TASK_LABELS[mis.k]} · ${cfgName(mis.model, mis.effort)} · ${priceTxt(r.price)} : `;
+  let li;
+  if (!ok) {
+    li = h("li", "bad", head + `{circle-xmark} raté ! Qualité ${r.quality}, il fallait ${t.need}. Tu paies quand même. Essaie plus fort.`);
+    mis.tries++;
+  } else {
+    const top = ratio <= 1.25;
+    if (top && !mis.tries) mis.good++;
+    li = h("li", top ? "ok" : "warn", head + (top
+      ? (mis.tries ? "{circle-check} réussi, au bon prix cette fois." : "{bullseye} réussi au meilleur prix !")
+      : `{circle-check} réussi, mais ${fmt(ratio, ratio < 10 ? 1 : 0)} fois plus cher que nécessaire. Le moins cher : ${cfgName(b.mk, b.e)} (${priceTxt(b.r.price)}).`));
+    mis.min += b.r.price;
+    mis.k++;
+    mis.tries = 0;
+  }
+  $("#misLog").append(li);
+  renderMission();
+}
+mis.model = initSeg($("#misModel"), (v) => { mis.model = v; renderMission(); });
+mis.effort = +initSeg($("#misEffort"), (v) => { mis.effort = +v; });
+$("#misGo").addEventListener("click", launchMission);
+$("#misAgain").addEventListener("click", () => {
+  Object.assign(mis, { k: 0, tries: 0, spent: 0, min: 0, good: 0 });
+  $("#misLog").replaceChildren();
+  renderMission();
+  $("#misCard").focus();
+});
+renderMission();
+
+// Défi final
+initDefi([
+  { q: "Tu veux corriger les fautes d'un e-mail. Quel modèle ?", a: "haiku",
+    options: [["haiku", "{person-running} Haiku"], ["sonnet", "{user-tie} Sonnet"], ["opus", "{flask} Opus"]],
+    why: "Une tâche simple : le stagiaire rapide suffit. Il est rapide et pas cher." },
+  { q: "Ton appli a un bug très difficile à trouver. Que choisis-tu ?", a: "opus",
+    options: [["haiku", "Haiku"], ["sonnet", "Sonnet, effort moyen"], ["opus", "Opus, effort haut"]],
+    why: "Une tâche dure : l'expert, avec du temps pour réfléchir." },
+  { q: "Tu dois résumer 500 avis clients, chaque jour.", a: "haiku",
+    options: [["haiku", "Haiku"], ["opus", "Opus, effort max"]],
+    why: "Une tâche simple, en gros volume : Haiku coûte 4 fois moins cher qu'Opus, et il va plus vite." },
+  { q: "Monter l'effort, ça veut dire…", a: "think",
+    options: [["fast", "L'IA répond plus vite"], ["think", "L'IA réfléchit plus longtemps"], ["model", "On change de modèle"]],
+    why: "Plus d'effort = plus de tokens de réflexion. Plus lent et plus cher, mais utile pour les tâches difficiles." },
+]);
+</script>

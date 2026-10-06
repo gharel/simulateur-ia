@@ -1,7 +1,7 @@
 // Contrôles sur le texte des fichiers, sans navigateur.
 const fs = require("fs");
 const { test, expect } = require("@playwright/test");
-const { ROOT, FICHES, PAGES, SKAZY, PICTO, read } = require("./site");
+const { ROOT, FICHES, PAGES, MOVED, SKAZY, PICTO, read } = require("./site");
 
 test("aucun emoji dans les pages et la documentation", () => {
   const files = fs.readdirSync(ROOT).filter((f) => /\.(html|md)$/.test(f));
@@ -21,7 +21,7 @@ const BLOCKS = {
   "boutons des modes et leur explication": (t) => t.slice(t.indexOf('<div class="modes">'), t.indexOf("</div>", t.indexOf('<div class="modes-help">')) + 6),
 };
 for (const [name, cut] of Object.entries(BLOCKS)) {
-  test(`bloc commun identique dans les 6 fiches : ${name}`, () => {
+  test(`bloc commun identique dans les ${FICHES.length} fiches : ${name}`, () => {
     const ref = cut(read(FICHES[0]));
     expect(ref.length).toBeGreaterThan(200);
     for (const f of FICHES.slice(1)) expect(cut(read(f)), f).toBe(ref);
@@ -69,5 +69,26 @@ test("Font Awesome chargé depuis cdnjs avec contrôle d'intégrité", () => {
   for (const f of PAGES) {
     const scripts = read(f).match(/<script defer src="https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/font-awesome\/[^"]+" integrity="sha512-[^"]+"/g) || [];
     expect(scripts.length, f).toBe(2);
+  }
+});
+
+test("chaque fiche donne son numéro, le menu de toutes les fiches et le lien vers la suivante", () => {
+  const n = FICHES.length;
+  FICHES.forEach((f, i) => {
+    const t = read(f);
+    expect(t, f).toContain(`Comprendre l'IA · Fiche ${i + 1} sur ${n}`);
+    const nav = (t.match(/<nav class="series"[^>]*>.*?<\/nav>/) || [""])[0];
+    expect(nav.match(/href="\d-[^"]+\.html"/g), f).toEqual(FICHES.filter((g) => g !== f).map((g) => `href="${g}"`));
+    expect(t, f).toContain(`<a class="card s4 next" href="${FICHES[i + 1] || "index.html#permis"}">`);
+  });
+  // L'accueil a une carte par fiche, dans le même ordre.
+  expect(read("index.html").match(/<a class="card fiche[^"]*" href="([^"]+)"/g).map((a) => a.match(/href="([^"]+)"/)[1])).toEqual(FICHES);
+});
+
+test("chaque ancienne adresse renvoie vers une fiche qui existe", () => {
+  for (const [old, to] of Object.entries(MOVED)) {
+    expect(FICHES, old).toContain(to);
+    expect(read(old), old).toContain(`location.replace("${to}" + location.search + location.hash)`);
+    expect(read(old), old).toContain(`<meta http-equiv="refresh" content="0; url=${to}">`);
   }
 });

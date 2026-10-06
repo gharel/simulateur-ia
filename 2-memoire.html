@@ -423,7 +423,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     <section class="card hero s4">
       <div class="hero-grid">
         <div class="ctl">
-          <span class="eyebrow">Comprendre l'IA · Fiche 1 sur 8</span>
+          <span class="eyebrow">Comprendre l'IA · Fiche 2 sur 8</span>
           <h1>Le Sac<br>à Tokens</h1>
           <p class="lead">L'IA ne lit pas des mots. Elle lit des petits morceaux de texte : les tokens.</p>
         </div>
@@ -675,14 +675,14 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <button type="button" class="btn reveal" id="defiReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Rejouer le défi</button>
     </section>
 
-    <a class="card s4 next" href="2-memoire.html">
-      <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>2 · La Mémoire qui Déborde</strong></span>
+    <a class="card s4 next" href="3-modele-effort.html">
+      <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>3 · Le Bon Cerveau</strong></span>
       <span class="emo" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
     </a>
 
   </div>
   <footer class="foot">
-    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a aria-current="page">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils Claude</a><a href="8-forfait-api.html">8 Forfait ou API</a></nav>
+    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a aria-current="page">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils Claude</a><a href="8-forfait-api.html">8 Forfait ou API</a></nav>
     <span>Chiffres arrondis, pour comprendre. Ce ne sont pas des mesures exactes.</span>
     <div class="modes">
       <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
@@ -718,7 +718,7 @@ function initSeg(el, onChange) {
   return cur.dataset.v;
 }
 
-const FICHE = "tokens";
+const FICHE = "memoire";
 // Parcours : progression gardée dans ce navigateur, mode atelier, devine d'abord, défi final (même bloc dans chaque fiche)
 const BADGES = {
   tokens: ["{coins}", "Maître des tokens"], memoire: ["{memory}", "As de la mémoire"], cerveau: ["{brain}", "Bon Cerveau"],

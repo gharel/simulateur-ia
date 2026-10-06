@@ -1,0 +1,1248 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- La page a déjà ses thèmes clair et sombre : les modes nuit forcés (Dark Reader, mode nuit de Brave) ne doivent pas changer ses couleurs. -->
+<meta name="color-scheme" content="light dark">
+<meta name="darkreader-lock">
+<title>Le Détecteur de Bobards</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/js/solid.min.js" integrity="sha512-T7EGedkSB4ewtlSHpcmpJm6FQMnxZzLYhAYRPk6n4zF30ap1uJrPuXX98A3SYMwv04/ZVTOfbF89Oa6dIJyljw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/js/fontawesome.min.js" integrity="sha512-WgR61jcssTjrH2a2vWm5JiWaEy1kmFIE5G0ybjKB0UEDzygVCebYW4eP2p96XmJWXA0zk/sNhbCfb09Wx39t4A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+/* Bento : grille de 4 colonnes. Une carte « hero » pleine couleur, les autres en cartes sombres. */
+:root {
+  --bg: #0B0B12;
+  --surface: #15151F;
+  --surface-2: #1F1F2C;
+  --line: #2B2B3C;
+  --fg: #F3F3F8;
+  --muted: #A6A6BA;
+  --ok: #3DDC84;
+  --warn: #FFC233;
+  --bad: #FF5C5C;
+  --on-accent: #0B0B12;
+  --accent-text: var(--accent);
+  --font-display: "Archivo Black", "Arial Black", Impact, system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", Roboto, system-ui, sans-serif;
+  --radius: 22px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
+    --fg: #12121A; --muted: #55556B; --ok: #0C6B3B; --warn: #8A5A00; --bad: #A61E1E;
+    --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
+  --fg: #12121A; --muted: #55556B; --ok: #0C6B3B; --warn: #8A5A00; --bad: #A61E1E;
+  --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 18px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; }
+.bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 24px; min-width: 0; display: flex; flex-direction: column; gap: 16px;
+}
+.s2 { grid-column: span 2; } .s3 { grid-column: span 3; } .s4 { grid-column: span 4; }
+@media (max-width: 900px) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .s1, .s3, .s4 { grid-column: span 2; }
+  .s2 { grid-column: span 1; }
+}
+@media (max-width: 640px) {
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .s1, .s2, .s3, .s4 { grid-column: span 1; }
+  .card { padding: 18px; }
+}
+
+/* Hero : la couleur dominante */
+.hero { background: var(--accent); color: var(--on-accent); border: none; }
+.hero .eyebrow { color: var(--on-accent); }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; align-items: end; }
+@media (max-width: 760px) { .hero-grid { grid-template-columns: minmax(0, 1fr); } }
+.word-card {
+  background: color-mix(in oklab, #FFFFFF 18%, transparent);
+  border: 2px solid var(--on-accent); border-radius: 18px; padding: 18px;
+  display: grid; gap: 6px;
+}
+.word-card strong { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1; }
+.word-card p { font-weight: 700; }
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.02; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h1 { font-size: clamp(2.7rem, 8vw, 5.6rem); text-transform: uppercase; letter-spacing: -.02em; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.15rem; }
+.eyebrow { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.lead { font-size: 1.3rem; font-weight: 700; line-height: 1.35; max-width: 34ch; margin: 0; }
+p { margin: 0; max-width: 65ch; }
+.muted { color: var(--muted); }
+.small { font-size: .9rem; }
+.big { font-family: var(--font-display); font-size: clamp(2.3rem, 5vw, 3.4rem); line-height: 1; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.emo { font-size: 1.6rem; line-height: 1; color: var(--accent-text); }
+
+/* Réglages */
+.ctl { display: grid; gap: 10px; font-weight: 700; }
+.ctl-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.ctl-val { font-family: var(--font-display); color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.ctl-ends { display: flex; justify-content: space-between; gap: 12px; font-size: .85rem; color: var(--muted); font-weight: 400; }
+input[type="range"] {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 12px; margin: 8px 0;
+  border-radius: 99px; cursor: pointer;
+  background: linear-gradient(to right, var(--accent) var(--p, 50%), var(--surface-2) var(--p, 50%));
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--fg); border: 5px solid var(--accent); box-shadow: 0 0 0 4px var(--bg);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--fg); border: 5px solid var(--accent); box-shadow: 0 0 0 4px var(--bg);
+}
+textarea, input[type="number"], input[type="text"] {
+  width: 100%; background: var(--surface-2); color: var(--fg);
+  border: 2px solid var(--line); border-radius: 14px; padding: 12px 14px; font: inherit;
+}
+textarea { resize: vertical; min-height: 96px; }
+textarea:focus, input[type="number"]:focus, input[type="text"]:focus { border-color: var(--accent); outline: none; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.seg { display: flex; flex-wrap: wrap; gap: 6px; background: var(--surface-2); padding: 5px; border-radius: 14px; }
+.seg button {
+  flex: 1 1 auto; border: 0; background: transparent; color: var(--fg); font: inherit; font-weight: 700;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer; min-height: 44px;
+}
+.seg button:hover { background: var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.sw {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 12px 14px; background: var(--surface-2); border-radius: 14px; cursor: pointer; font-weight: 700;
+}
+.sw input {
+  -webkit-appearance: none; appearance: none; flex: none; margin: 0;
+  width: 54px; height: 30px; border-radius: 99px; background: var(--line);
+  position: relative; cursor: pointer; transition: background .2s;
+}
+.sw input::after {
+  content: ""; position: absolute; top: 4px; left: 4px; width: 22px; height: 22px;
+  border-radius: 50%; background: var(--fg); transition: transform .2s;
+}
+.sw input:checked { background: var(--accent); }
+.sw input:checked::after { transform: translateX(24px); background: var(--on-accent); }
+
+.btn {
+  border: 2px solid var(--line); background: var(--surface-2); color: var(--fg);
+  font: inherit; font-weight: 700; padding: 10px 16px; border-radius: 12px; cursor: pointer; min-height: 44px;
+}
+.btn:hover { border-color: var(--accent); }
+
+/* Jauges */
+.meter { display: grid; gap: 6px; }
+.meter-top { display: flex; justify-content: space-between; gap: 12px; font-weight: 700; }
+.track { height: 16px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.fill { height: 100%; width: 0; border-radius: 99px; background: var(--accent); transition: width .45s ease; }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 99px;
+  font-weight: 700; font-size: .95rem; background: var(--surface-2); color: var(--fg);
+}
+.pill.ok { background: color-mix(in oklab, var(--ok) 18%, transparent); color: var(--ok); }
+.pill.warn { background: color-mix(in oklab, var(--warn) 18%, transparent); color: var(--warn); }
+.pill.bad { background: color-mix(in oklab, var(--bad) 18%, transparent); color: var(--bad); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
+.stat { background: var(--surface-2); border-radius: 16px; padding: 14px; display: grid; gap: 2px; }
+.stat b { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; line-height: 1.05; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.stat span { font-size: .9rem; color: var(--muted); }
+
+/* À retenir */
+.retenir { background: var(--surface-2); }
+.retenir ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; counter-reset: r; }
+.retenir li { counter-increment: r; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: start; font-weight: 700; }
+.retenir li::before {
+  content: counter(r); font-family: var(--font-display); background: var(--accent); color: var(--on-accent);
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .95rem;
+}
+
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.foot { margin-top: 28px; display: grid; gap: 6px; color: var(--muted); font-size: .9rem; }
+.foot strong { color: var(--fg); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+.series { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.series a { color: var(--fg); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--accent); }
+.series a:hover { color: var(--accent-text); }
+.series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
+
+/* Mise en page : bandeau « À retenir », réflexes sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
+.retenir.s4 ul { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 16px 24px; }
+.check.cols { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+@media (min-width: 901px) { .stick { position: sticky; top: 16px; align-self: start; } }
+[data-empty]:empty::before {
+  content: attr(data-empty); display: block; padding: 14px 16px; border-radius: 12px;
+  border: 2px dashed var(--line); color: var(--muted); font-weight: 700; font-size: .95rem;
+}
+
+/* Skazy Formation : logo en haut, mention en bas (même bloc dans chaque fiche) */
+.brand { margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.brand a { display: inline-flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; color: var(--fg); text-decoration: none; border-radius: 10px; }
+.brand-logo { display: block; width: 109px; height: 36px; flex: none; }
+.brand-url { font-size: .85rem; font-weight: 700; color: var(--muted); padding-left: 14px; border-left: 2px solid var(--line); }
+.brand a:hover .brand-url { color: var(--fg); }
+.brand-foot a { color: var(--fg); font-weight: 700; }
+.brand .home {
+  flex: none; gap: 8px; padding: 8px 14px; min-height: 44px; border: 2px solid var(--line); border-radius: 12px;
+  background: var(--surface); font-weight: 700; font-size: .95rem;
+}
+.brand .home:hover { border-color: var(--accent); }
+@media (max-width: 480px) { .brand-url { display: none; } }
+.modes { display: flex; flex-wrap: wrap; gap: 8px; }
+.modes-help { display: grid; gap: 4px; max-width: 80ch; }
+
+/* Icônes Font Awesome : couleur des icônes d'état */
+.fa-circle-check { color: var(--ok); }
+.fa-circle-xmark { color: var(--bad); }
+.fa-triangle-exclamation { color: var(--warn); }
+.hero .emo, .next .svg-inline--fa, .seg button[aria-pressed="true"] .svg-inline--fa { color: inherit; }
+
+/* Parcours : devine d'abord, défi final, badge, mode atelier (même bloc dans chaque fiche) */
+.guess { background: var(--surface-2); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; box-shadow: inset 4px 0 0 var(--accent); }
+.guess p, .qi p { font-weight: 700; overflow-wrap: anywhere; }
+.guess { max-width: 760px; }
+.locked { position: relative; user-select: none; }
+.locked > :not(.lock-tip) { filter: blur(7px); opacity: .5; }
+.unlocking > * { transition: filter .5s ease, opacity .5s ease; }
+.lock-tip { position: absolute; inset: 0; z-index: 2; display: flex; justify-content: center; align-items: flex-start; padding: 8px; pointer-events: none; }
+.lock-tip span {
+  background: var(--surface); color: var(--fg); border: 2px solid var(--accent); border-radius: 99px;
+  padding: 6px 14px; font-weight: 700; font-size: .9rem; text-align: center; box-shadow: 0 6px 20px rgb(0 0 0 / .3);
+}
+.quiz { display: grid; gap: 12px; }
+.challenge .quiz { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 900px) { .challenge .quiz { grid-template-columns: minmax(0, 1fr); } }
+.qi { background: var(--surface-2); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; }
+.qbtns { display: flex; flex-wrap: wrap; gap: 6px; }
+.qbtns button {
+  flex: 1 1 auto; border: 2px solid var(--line); background: var(--surface); color: var(--fg);
+  font: inherit; font-weight: 700; font-size: .9rem; padding: 8px 10px; border-radius: 10px; cursor: pointer; min-height: 44px;
+}
+.qbtns button:hover { border-color: var(--accent); }
+.qbtns button.picked { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 22%, var(--surface)); }
+.qbtns button.right { border-color: var(--ok); background: color-mix(in oklab, var(--ok) 18%, var(--surface)); }
+.qbtns button.wrong { border-color: var(--bad); background: color-mix(in oklab, var(--bad) 18%, var(--surface)); }
+.qfb { font-size: .95rem; }
+.qfb:empty, .result:empty { display: none; }
+.reveal { justify-self: start; align-self: flex-start; }
+.challenge { border: 2px solid var(--accent); }
+.prize { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.prize-txt { display: grid; gap: 2px; flex: 1 1 220px; }
+.badge {
+  flex: none; width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 2.2rem;
+  background: var(--surface-2); filter: grayscale(1); opacity: .55; transition: transform .4s ease, filter .4s, opacity .4s;
+}
+.badge.won { background: var(--accent); color: var(--on-accent); filter: none; opacity: 1; transform: rotate(-10deg) scale(1.05); }
+.stars { font-size: 1.6rem; letter-spacing: .08em; color: var(--warn); }
+.star-off { opacity: .3; }
+.result { padding: 14px 16px; border-radius: 14px; font-weight: 700; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
+.next {
+  background: var(--accent); color: var(--on-accent); border: none; text-decoration: none;
+  flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; transition: transform .2s ease;
+}
+.next:hover { transform: translateY(-3px); }
+.next:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+.next .eyebrow { color: var(--on-accent); }
+.next strong { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 4vw, 2.2rem); line-height: 1.05; }
+.next .emo { font-size: 2.4rem; color: inherit; }
+.foot .btn { justify-self: start; }
+.confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+.confetti span { position: absolute; top: -48px; font-size: 1.8rem; animation: fall 2.2s cubic-bezier(.3, .6, .6, 1) forwards; }
+@keyframes fall { to { transform: translateY(115vh) rotate(600deg); } }
+:root[data-mode="atelier"] body { font-size: 21px; }
+:root[data-mode="atelier"] .wrap { max-width: 1440px; }
+
+:root { --accent: #FF6B00; }
+
+.switches { display: grid; gap: 8px; }
+/* Le labo : réglages à gauche, effets à droite */
+.lab { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 28px; }
+@media (max-width: 900px) { .lab { grid-template-columns: minmax(0, 1fr); } }
+.lab-col { display: grid; gap: 18px; align-content: start; }
+.lab-part { display: grid; gap: 12px; }
+.lab h3 .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
+.ring { width: 150px; height: auto; flex: none; }
+.ring .bg { fill: none; stroke: var(--surface-2); stroke-width: 14; }
+.ring .fg { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset .5s ease, stroke .3s; transform: rotate(-90deg); transform-origin: 60px 60px; }
+.ring .fg.ok { stroke: var(--ok); } .ring .fg.warn { stroke: var(--warn); } .ring .fg.bad { stroke: var(--bad); }
+.ring text { fill: var(--fg); font-family: var(--font-display); font-size: 26px; }
+.ring .sub { font-family: var(--font-body); font-size: 9px; font-weight: 700; fill: var(--muted); }
+
+.question { font-family: var(--font-display); font-size: 1.2rem; line-height: 1.2; }
+.bubble { background: var(--surface-2); border-radius: 18px 18px 18px 4px; padding: 16px; display: grid; gap: 8px; }
+.sent { padding: 6px 10px; border-radius: 8px; font-weight: 700; display: block; }
+.sent-ic { margin-right: 8px; }
+.sent.ok { background: color-mix(in oklab, var(--ok) 16%, transparent); }
+.sent.warn { background: color-mix(in oklab, var(--warn) 18%, transparent); }
+.sent.bad { background: color-mix(in oklab, var(--bad) 18%, transparent); text-decoration: underline wavy var(--bad); text-underline-offset: 4px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: .9rem; color: var(--muted); }
+
+.levers { display: grid; gap: 12px; }
+.lever { display: grid; gap: 4px; }
+.lever .meter-top { font-size: .95rem; }
+.lever .fill { background: var(--muted); }
+.lever.on .fill { background: var(--accent); }
+.lever.up .fill { background: var(--bad); }
+.lever .meter-top span:last-child { font-variant-numeric: tabular-nums; }
+
+.check { display: grid; gap: 8px; }
+.check label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start; padding: 10px 12px; background: var(--surface-2); border-radius: 12px; cursor: pointer; font-weight: 700; }
+.check input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--accent); }
+.yes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+@media (max-width: 900px) { .yes { grid-template-columns: minmax(0, 1fr); } }
+.yes-col { display: grid; gap: 14px; align-content: start; }
+.yes-col h3 { display: flex; gap: 10px; align-items: center; }
+.yes-col h3 b { font-weight: 400; background: var(--accent); color: var(--on-accent); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .95rem; flex: none; }
+.thread { display: grid; gap: 10px; }
+.who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.msg-me { justify-self: end; max-width: 88%; display: grid; gap: 4px; background: var(--accent); color: var(--on-accent); border-radius: 18px 18px 4px 18px; padding: 12px 16px; font-weight: 700; }
+.msg-me .who { color: var(--on-accent); }
+.thread .bubble { max-width: 94%; }
+.bubble.faded { background: transparent; border: 2px dashed var(--line); }
+.check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
+.set-wrap { display: grid; gap: 16px; }
+.ring-wrap { display: flex; align-items: center; gap: 12px 24px; flex-wrap: wrap; }
+
+/* Pourquoi elle invente : 3 étapes */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .steps { grid-template-columns: minmax(0, 1fr); } }
+.step { background: var(--surface-2); border-radius: 16px; padding: 16px; display: grid; gap: 8px; align-content: start; }
+.step .n { font-family: var(--font-display); background: var(--accent); color: var(--on-accent); width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; }
+.step p { font-weight: 700; }
+
+/* Jeu : surligne ce qu'il faut vérifier */
+.hl-game { display: grid; gap: 14px; }
+.hl { display: grid; gap: 8px; }
+.hl button {
+  text-align: left; font: inherit; font-weight: 700; color: var(--fg); cursor: pointer; min-height: 44px;
+  background: var(--surface); border: 2px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 4px;
+}
+.hl button:hover { border-color: var(--accent); }
+.hl button[aria-pressed="true"] { background: color-mix(in oklab, var(--warn) 30%, var(--surface)); border-color: var(--warn); }
+.hl button:disabled { cursor: default; }
+.hl button.good { box-shadow: inset 5px 0 0 var(--ok); }
+.hl button.miss { box-shadow: inset 5px 0 0 var(--bad); }
+.hl .why { font-weight: 400; font-size: .92rem; }
+.hl .why:empty { display: none; }
+.hl-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+
+/* Pourquoi elle devine : le classement récompense les bonnes réponses, pas la prudence */
+.rank { display: grid; gap: 14px; }
+.rk-rows { display: grid; gap: 12px; }
+.rk {
+  display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr) minmax(0, 190px); grid-template-areas: "name viz score";
+  gap: 12px 28px; align-items: center; background: var(--surface-2); border-radius: 16px; padding: 18px 22px;
+}
+.rk-name { grid-area: name; display: grid; gap: 4px; }
+.rk-name .eyebrow { color: var(--accent-text); }
+.rk-name strong { font-size: 1.15rem; overflow-wrap: anywhere; }
+.rk-viz { grid-area: viz; display: grid; gap: 6px; }
+.rk-bar { display: flex; height: 56px; border-radius: 6px; overflow: hidden; container-type: inline-size; }
+.rk-bar > span { flex: none; display: flex; align-items: center; justify-content: center; gap: .3em; font-weight: 700; white-space: nowrap; overflow: hidden; transition: width .6s ease; }
+.rk-ok { background: var(--ok); color: var(--surface); }
+.rk-idk { background: color-mix(in oklab, var(--muted) 35%, var(--surface-2)); color: var(--fg); }
+.rk-bad { background: var(--bad); color: var(--surface); }
+/* Barre étroite : les nombres seulement, la légende dit le reste. */
+@container (max-width: 520px) { .rk-bar .w { display: none; } }
+.rk-tiny { display: block; font-size: .85rem; font-weight: 700; color: var(--muted); }
+.rk-score { grid-area: score; display: grid; gap: 2px; }
+.rk-pts { font-weight: 700; color: var(--muted); }
+.rk-n { font-family: var(--font-display); font-weight: 400; font-size: clamp(2.2rem, 5vw, 3rem); line-height: 1.05; color: var(--fg); font-variant-numeric: tabular-nums; margin-right: 4px; }
+.rk-place { font-weight: 700; color: var(--muted); }
+.rk-pts.win .rk-n, .rk-place.win { color: var(--ok); }
+@media (max-width: 1000px) { .rk { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name score" "viz viz"; } }
+@media (max-width: 560px) {
+  .rk { grid-template-columns: minmax(0, 1fr); grid-template-areas: "name" "viz" "score"; padding: 16px; }
+  .rk-score { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
+}
+.key { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; }
+/* Le verdict, en couleurs inversées. Le mot fort reste lisible dans les deux thèmes. */
+.verdict {
+  --em: color-mix(in oklab, var(--accent) 52%, #000);
+  max-width: none; background: var(--fg); color: var(--bg); border-radius: 16px; padding: 20px 24px; font-size: 1.15rem; font-weight: 700;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .verdict { --em: var(--accent); } }
+:root[data-theme="light"] .verdict { --em: var(--accent); }
+.verdict strong { font-family: var(--font-display); font-weight: 400; font-size: 1.35rem; }
+.verdict em { font-style: normal; color: var(--em); }
+</style>
+
+<main class="wrap">
+  <header class="brand">
+    <a class="home" href="index.html"><i class="fa-solid fa-house" aria-hidden="true"></i> Accueil</a>
+    <a href="https://formation.skazy.nc/" target="_blank" rel="noopener" aria-label="Skazy Formation : formation.skazy.nc, nouvel onglet">
+      <svg class="brand-logo" viewBox="0 0 218 72" aria-hidden="true" focusable="false"><path fill-rule="evenodd" fill="currentColor" d="m202.4 1.4h15.3l-16 52.6q-1.1 3.5-3 6.3c-1.3 1.9-2.9 3.5-4.7 4.8-1.8 1.4-3.8 2.4-6 3.1-2.2 0.7-4.5 1.1-6.9 1.1-3 0-5.9-0.6-8.7-1.7v-14.4c2.8 1 5.1 1.5 7 1.5 3.7 0 5.6-2 6-6.2l-13.4-37v0.1l-21.3 25.3h26.7l3.9 11.6h-51.8c-3.1 0-5 0.1-6.3-0.8-1.6-1.1-2.6-2.8-3.1-4.9l-0.4-1.7c-2.1 2.7-4.5 4.7-7.2 6.1q-4 2.1-8.7 2.1c-2.3 0-4.5-0.4-6.5-1.2-2-0.8-3.7-1.9-5.2-3.2-1.4-1.4-2.6-3-3.4-4.8q-1.2-2.8-1.2-6c0-2.4 0.5-4.5 1.5-6.5q1.5-3 4.2-5.1c1.8-1.4 3.9-2.5 6.4-3.3 2.5-0.8 5.2-1.2 8.2-1.2 3.8 0 6.9 0.6 9.4 1.8v-1.4c0-2.2-0.6-3.8-1.9-4.9-1.3-1.1-3.3-1.6-6.2-1.6-2.7 0-5.1 0.4-7.4 1.3-2.2 0.9-4.6 2.1-7.1 3.8l-4.9-10.5c6.2-4 13.2-6 21.1-6 7.5 0 13.3 1.7 17.3 5 4.1 3.4 6.1 8.3 6.1 15v9.1c0 1.6 0.2 2.7 0.7 3.3 0.3 0.5 1.2 1.3 2.7 0l16.9-19.9h-20v-11.6h51.5l9 32.6 7.4-32.7zm-84.9 30.5v-3.3q-1.5-0.6-3.3-0.9c-1.2-0.3-2.3-0.4-3.2-0.4-2.1 0-3.8 0.5-5.2 1.5-1.4 1-2.1 2.3-2.1 3.8 0 1.3 0.6 2.4 1.6 3.2 1.1 0.8 2.4 1.2 4 1.2 1 0 2-0.2 3.1-0.5 1-0.3 2-0.8 2.8-1.3 0.7-0.5 1.2-1 1.6-1.6 0.4-0.5 0.6-1.1 0.6-1.7zm-94.6 18.2c-4.2 0.1-8.3-0.4-12.4-1.6-4.1-1.2-7.5-3.1-10.4-5.6l5.6-10.6c3.1 1.9 6 3.4 8.8 4.4 2.8 1 5.4 1.5 7.7 1.4q3.6-0.2 3.6-2.4 0-1.4-1.5-2.1c-1-0.6-2.8-1.2-5.6-1.9-3.4-0.9-6.3-1.7-8.6-2.6-2.3-0.9-4.2-1.8-5.7-2.9-1.5-1-2.5-2.2-3.2-3.5-0.7-1.3-1-2.9-1.1-4.7-0.1-2.4 0.3-4.7 1.2-6.8 0.9-2.1 2.2-3.9 3.9-5.5 1.7-1.6 3.7-2.8 6.1-3.7q3.6-1.4 7.8-1.5c3.5-0.1 6.9 0.2 10.1 1 3.2 0.8 6.5 2.5 9.8 5.2l-6.2 10.6c-3-1.8-5.6-3.1-7.6-3.9-2-0.8-3.9-1.1-5.7-1-1 0-1.9 0.3-2.5 0.7-0.7 0.4-1 1.1-0.9 1.9 0 0.9 0.5 1.6 1.5 2.2 1 0.5 2.9 1.1 5.8 1.8 3.5 0.8 6.5 1.6 8.9 2.6 2.4 0.9 4.3 1.9 5.8 3.1 1.5 1.1 2.5 2.4 3.2 3.9 0.7 1.5 1 3.2 1.1 5.1 0.1 2.5-0.3 4.7-1.1 6.7-0.8 2-2.1 3.7-3.8 5.2-1.7 1.5-3.7 2.6-6.2 3.4-2.5 0.6-5.3 1-8.4 1.1z"/><path fill="currentColor" d="m72.5 49.3l-10.9-17.5-3.5 3.8v13.7h-17.3v-49.2h17.3v19l12.9-17.8h18.3l-16.5 21 18.2 27z"/><path fill-rule="evenodd" fill="#00997A" d="m21.6 53.6v0.6h3.6v5h-3.6v11.8h-5.7v-11.8h-2.2v-5h2.2v-0.6c0-3.4 1.8-6.3 5.5-6.3 1.1 0 2.7 0.2 3.8 0.6v4.4c-0.6-0.2-1.2-0.4-1.8-0.4-1.5 0.1-1.8 1.2-1.8 1.7zm4.7 9c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm18.9-9.2l-0.9 5.7c-0.2 0-0.6-0.1-0.9-0.1-1.7 0-4.1 0.7-4.1 5.2v6.8h-5.7v-16.8h5.2l0.3 2c1.8-2 4.1-2.7 6.1-2.8zm28.8 8.5v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.9 0-2.8 1.3-2.8 3.2v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.8 0-2.8 1.3-2.8 3.2v9.1h-5.7v-16.8h5.2l0.2 1.3c1.2-1.2 2.9-1.9 5-1.9 2 0 3.9 0.6 5 2.8 1.2-1.7 3.2-2.8 5.8-2.8 3.3 0 6.3 1.6 6.3 8.3zm20.9-7.7v16.8h-5.2l-0.3-1.7c-1.2 1.5-3.1 2.3-5.3 2.3-5.1 0-8.4-4.2-8.4-9 0-5 3.5-9 8.4-9 2.2 0 4.1 0.8 5.3 2.3l0.3-1.7zm-5.7 8.3c0-2.4-1.8-3.8-3.9-3.8-2.3 0-4 1.8-4 3.9 0 2 1.6 3.9 4 3.9 2.3 0 3.9-1.7 3.9-4zm9.4 2.8v-6.2h-2.4v-4.5h0.5c1.5 0 2.4-0.8 2.4-2.3v-1.7h5.1v3.5h3.4v5h-3.4v5.9c0 1.2 0.7 1.7 1.7 1.7 0.5 0 1.2-0.2 1.7-0.3v4.3c-0.9 0.4-2.5 0.6-3.6 0.6-4.1 0-5.4-2.8-5.4-6zm11.1-15.5c0-1.6 1.4-2.8 3.2-2.8 1.8 0 3.2 1.3 3.2 2.8 0 1.5-1.3 2.8-3.2 2.8-1.9 0-3.2-1.3-3.2-2.8zm0.3 4.4h5.7v16.8h-5.7zm7.7 8.4c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm23.7-0.7v9.1h-5.7v-9.1c0-2.3-1-3.2-2.7-3.2-1.8 0-2.9 1.3-2.9 3.2v9.1h-5.7v-16.8h5.2l0.2 1.5c1.3-1.2 3-2 5.2-2 3.2-0.1 6.4 1.5 6.4 8.2z"/></svg>
+      <span class="brand-url">formation.skazy.nc <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+    </a>
+  </header>
+  <div class="bento">
+
+    <section class="card hero s4">
+      <div class="hero-grid">
+        <div class="ctl">
+          <span class="eyebrow">Comprendre l'IA · Fiche 4 sur 8</span>
+          <h1>Le Détecteur<br>de Bobards</h1>
+          <p class="lead">Parfois, l'IA invente. Parfois, elle te donne raison trop vite. Apprends à repérer quand ça arrive.</p>
+        </div>
+        <div class="word-card">
+          <span class="eyebrow">Le mot à connaître</span>
+          <strong>Hallucination</strong>
+          <p>Quand l'IA invente une réponse qui a l'air vraie.</p>
+          <p>Elle ne ment pas exprès. Elle complète au hasard.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span><h2>Teste le risque d'invention</h2></div>
+      <div class="lab">
+        <div class="lab-col stick">
+          <div id="riskGuess"></div>
+          <h3>Tes réglages</h3>
+          <div class="set-wrap" id="riskSet">
+            <div class="ctl">
+              <div class="ctl-row"><label for="level">Ma question porte sur…</label></div>
+              <span class="ctl-val" id="vLevel"></span>
+              <input type="range" id="level" min="0" max="4" step="1" value="3">
+              <div class="ctl-ends"><span>Un fait très connu</span><span>Un fait très récent</span></div>
+            </div>
+            <div class="switches">
+              <label class="sw" for="doc"><span><i class="fa-solid fa-paperclip" aria-hidden="true"></i> Je donne un document</span><input type="checkbox" id="doc"></label>
+              <label class="sw" for="web"><span><i class="fa-solid fa-globe" aria-hidden="true"></i> La recherche web est activée</span><input type="checkbox" id="web"></label>
+              <label class="sw" for="idk"><span><i class="fa-solid fa-hand" aria-hidden="true"></i> J'autorise « je ne sais pas »</span><input type="checkbox" id="idk"></label>
+              <label class="sw" for="src"><span><i class="fa-solid fa-link" aria-hidden="true"></i> Je demande les sources</span><input type="checkbox" id="src"></label>
+            </div>
+            <div class="ctl">
+              <div class="ctl-row"><label for="crea">Ce que je demande</label><span class="ctl-val" id="vCrea"></span></div>
+              <input type="range" id="crea" min="0" max="100" value="30">
+              <div class="ctl-ends"><span>Des faits précis</span><span>De l'imagination</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="lab-col">
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-bell" aria-hidden="true"></i> Risque d'invention</h3>
+            <div class="ring-wrap" id="ringWrap">
+              <svg class="ring" viewBox="0 0 120 120" role="img" aria-labelledby="ringLabel">
+                <title id="ringLabel">Risque d'invention</title>
+                <circle class="bg" cx="60" cy="60" r="50"></circle>
+                <circle class="fg" id="ringFg" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="314.16"></circle>
+                <text id="ringTxt" x="60" y="64" text-anchor="middle">0 %</text>
+                <text class="sub" x="60" y="80" text-anchor="middle">de risque</text>
+              </svg>
+              <span class="pill" id="riskPill" aria-live="polite"></span>
+            </div>
+          </div>
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-comments" aria-hidden="true"></i> Exemple de réponse</h3>
+            <p class="question" id="question"></p>
+            <div class="bubble" id="answer" aria-live="polite"></div>
+            <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Vrai ou vérifiable</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> À vérifier</span><span><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Inventé</span></div>
+            <p class="small muted">Exemple fabriqué pour comprendre. Les noms et les dates sont inventés.</p>
+          </div>
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-arrow-trend-down" aria-hidden="true"></i> Ce qui change le risque</h3>
+            <p class="muted">Pour ta question. Les barres orange sont activées.</p>
+            <div class="levers" id="levers"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-circle-question"></i></span><h2>Pourquoi elle invente ?</h2></div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><p>L'IA devine le mot qui vient le plus souvent après.</p></div>
+        <div class="step"><span class="n">2</span><p>Si elle ne sait pas, elle devine quand même.</p></div>
+        <div class="step"><span class="n">3</span><p>La réponse a l'air sûre. <strong>Mais elle peut être fausse.</strong></p></div>
+      </div>
+      <p class="small muted">Le risque est plus grand pour les sujets rares, locaux ou très récents.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-ranking-star"></i></span><h2>Pourquoi elle ne dit pas « je ne sais pas » ?</h2></div>
+      <p>Les IA passent des tests, comme un examen. Puis on les classe, de la meilleure note à la moins bonne.
+        Souvent, la note compte seulement les bonnes réponses. « Je ne sais pas » rapporte 0 point. Une réponse au hasard est parfois juste.
+        <strong>Alors deviner rapporte plus que dire « je ne sais pas ».</strong></p>
+      <div id="rankGuess"></div>
+      <div class="rank" id="rank">
+        <div class="ctl">
+          <span>Règle du classement</span>
+          <div class="seg" id="segRule" role="group" aria-label="Règle du classement">
+            <button type="button" data-v="win" aria-pressed="true">Seules les bonnes réponses comptent</button>
+            <button type="button" data-v="fair" aria-pressed="false">Une erreur fait perdre 1 point</button>
+          </div>
+          <span class="small muted" id="ruleHint"></span>
+        </div>
+        <div class="rk-rows" id="rkRows"></div>
+        <div class="legend"><span><i class="key rk-ok"></i>Justes</span><span><i class="key rk-idk"></i>« Je ne sais pas »</span><span><i class="key rk-bad"></i>Faux</span></div>
+        <p class="verdict" id="verdict" aria-live="polite"></p>
+      </div>
+      <p class="small muted">Chiffres publiés par OpenAI en septembre 2025, sur un test de questions courtes sur des faits (le test SimpleQA). Ici, on les ramène à 100 questions : 22 % justes = 22 bonnes réponses = 22 points.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-highlighter"></i></span><h2>Jeu : surligne ce qu'il faut vérifier</h2><span class="pill" id="hlScore">0 / 18</span></div>
+      <p>L'IA a répondu. <strong>Touche les phrases qu'il faut vérifier</strong> avant de les utiliser.
+        Les indices : une date, un chiffre précis, un nom, une citation, une loi, un lien, le mot « officiel ».</p>
+      <div class="hl-game">
+        <span class="eyebrow" id="hlStep"></span>
+        <div class="msg-me"><span class="who">Toi</span><span id="hlQ"></span></div>
+        <div class="bubble"><span class="who">IA</span><div class="hl" id="hlList"></div></div>
+        <div class="hl-btns">
+          <button type="button" class="btn go" id="hlCheck"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Vérifier</button>
+          <button type="button" class="btn" id="hlNext" hidden>Manche suivante <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+        </div>
+        <div class="result" id="hlResult" aria-live="polite"></div>
+      </div>
+      <p class="small muted">Exemple fabriqué pour comprendre. Les noms, les dates, les chiffres et les liens sont inventés.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-clone"></i></span><h2>Elle te donne raison</h2></div>
+      <p>L'IA a tendance à aller dans ton sens. On appelle ça la <strong>complaisance</strong>.
+        Pendant son entraînement, des humains notaient ses réponses. Ils préféraient souvent celles qui leur donnaient raison. L'IA a appris à plaire.</p>
+      <div class="ctl">
+        <span>Choisis une situation</span>
+        <div class="seg" id="segYes" role="group" aria-label="Situation">
+          <button type="button" data-v="visa" aria-pressed="true"><i class="fa-solid fa-passport" aria-hidden="true"></i> Un visa</button>
+          <button type="button" data-v="slogan" aria-pressed="false"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Un slogan</button>
+          <button type="button" data-v="annul" aria-pressed="false"><i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i> Une annulation</button>
+        </div>
+      </div>
+      <div class="yes">
+        <div class="yes-col">
+          <h3><b>1</b>La façon de demander</h3>
+          <div class="seg" id="segFrame" role="group" aria-label="Façon de demander">
+            <button type="button" data-v="neutre" aria-pressed="true">Neutre</button>
+            <button type="button" data-v="oui" aria-pressed="false">« Je pense que oui »</button>
+            <button type="button" data-v="non" aria-pressed="false">« Je pense que non »</button>
+          </div>
+          <div class="thread" id="yesA" aria-live="polite"></div>
+          <div class="meter">
+            <div class="meter-top"><span>La réponse suit ton avis</span><span id="yesVal">0 %</span></div>
+            <div class="track"><div class="fill" id="yesFill"></div></div>
+          </div>
+          <span class="pill" id="yesPillA"></span>
+        </div>
+        <div class="yes-col">
+          <h3><b>2</b>Quand tu insistes</h3>
+          <label class="sw" for="franc"><span><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Mes consignes disent : « Sois franche. Dis-moi si je me trompe. »</span><input type="checkbox" id="franc"></label>
+          <div class="thread" id="yesB" aria-live="polite"></div>
+          <span class="pill" id="yesPillB"></span>
+        </div>
+      </div>
+      <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Juste</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Penche vers ton avis</span><span><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Faux</span></div>
+      <p class="small muted">Exemples fabriqués pour comprendre. Les modèles récents résistent mieux, mais la tendance existe toujours.
+        Pour un vrai voyage, vérifie les règles d'entrée sur le site officiel du pays.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span><h2>Mes réflexes anti-bobards</h2></div>
+      <div class="meter">
+        <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 8</span></div>
+        <div class="track"><div class="fill" id="chkFill"></div></div>
+      </div>
+      <div class="check cols" id="check">
+        <label><input type="checkbox" id="c1"><span>Je demande d'où vient l'information.</span></label>
+        <label><input type="checkbox" id="c2"><span>Je vérifie les chiffres, les dates et les noms.</span></label>
+        <label><input type="checkbox" id="c3"><span>Je donne mes propres documents.</span></label>
+        <label><input type="checkbox" id="c4"><span>J'écris : « Si tu ne sais pas, dis-le. »</span></label>
+        <label><input type="checkbox" id="c5"><span>Je pose la question autrement, pour comparer.</span></label>
+        <label><input type="checkbox" id="c6"><span>Santé, argent, droit : je demande aussi à un humain.</span></label>
+        <label><input type="checkbox" id="c7"><span>Je pose ma question sans donner mon avis.</span></label>
+        <label><input type="checkbox" id="c8"><span>J'écris : « Critique mon idée, sans me ménager. »</span></label>
+      </div>
+    </section>
+
+    <section class="card s4 retenir">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
+      <ul>
+        <li><span>L'IA peut inventer des faits, des chiffres ou des noms. Ça s'appelle une hallucination.</span></li>
+        <li><span>Donne-lui des documents ou la recherche web. Le risque baisse beaucoup.</span></li>
+        <li><span>L'IA a tendance à te donner raison. Pose ta question sans donner ton avis, et vérifie la source.</span></li>
+      </ul>
+    </section>
+
+    <section class="card s4 challenge" id="defi">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-flag-checkered"></i></span><h2>Défi final</h2><span class="pill" id="defiScore"></span></div>
+      <div class="prize">
+        <span class="badge" id="badge" aria-hidden="true"></span>
+        <div class="prize-txt"><strong id="badgeName"></strong><span class="small muted" id="badgeTxt"></span></div>
+        <span class="stars" id="stars"></span>
+      </div>
+      <div class="quiz" id="defiQuiz"></div>
+      <div class="result" id="defiResult" aria-live="polite"></div>
+      <button type="button" class="btn reveal" id="defiReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Rejouer le défi</button>
+    </section>
+
+    <a class="card s4 next" href="5-complaisance.html">
+      <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>5 · L'IA qui Dit Oui</strong></span>
+      <span class="emo" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+    </a>
+
+  </div>
+  <footer class="foot">
+    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a aria-current="page">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils Claude</a><a href="8-forfait-api.html">8 Forfait ou API</a></nav>
+    <span>Le pourcentage est une estimation pour comprendre. Le vrai risque dépend du modèle et de la question.</span>
+    <div class="modes">
+      <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
+      <button type="button" class="btn" id="demoBtn" aria-pressed="false"><i class="fa-solid fa-lock-open" aria-hidden="true"></i> Mode démonstration : non</button>
+    </div>
+    <div class="modes-help">
+      <span><strong>Mode atelier</strong> : pour animer un groupe. Le texte est plus gros. Dans les quiz, un clic choisit la réponse du groupe, puis « Révéler » montre la correction.</span>
+      <span><strong>Mode démonstration</strong> : pour présenter. Rien n'est flou, tout se voit sans répondre aux questions « Devine d'abord ».</span>
+      <span>Les deux modes restent actifs d'une fiche à l'autre.</span>
+    </div>
+    <span class="brand-foot">Une ressource Skazy Formation : <a href="https://formation.skazy.nc/" target="_blank" rel="noopener">formation.skazy.nc</a></span>
+  </footer>
+</main>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const fmt = (n, d = 0) => n.toLocaleString("fr-FR", { maximumFractionDigits: d, minimumFractionDigits: d });
+function paintRange(r) {
+  r.style.setProperty("--p", ((r.value - r.min) / (r.max - r.min)) * 100 + "%");
+}
+function initRanges() {
+  $$('input[type="range"]').forEach((r) => { r.addEventListener("input", () => paintRange(r)); paintRange(r); });
+}
+// Groupe de boutons à choix unique : <div class="seg" data-name="x"><button data-v="..">
+function initSeg(el, onChange) {
+  const btns = $$("button", el);
+  btns.forEach((b) => b.addEventListener("click", () => {
+    btns.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    onChange(b.dataset.v);
+  }));
+  const cur = btns.find((b) => b.getAttribute("aria-pressed") === "true") || btns[0];
+  return cur.dataset.v;
+}
+
+const FICHE = "bobards";
+// Parcours : progression gardée dans ce navigateur, mode atelier, devine d'abord, défi final (même bloc dans chaque fiche)
+const BADGES = {
+  tokens: ["{coins}", "Maître des tokens"], memoire: ["{memory}", "As de la mémoire"], cerveau: ["{brain}", "Bon Cerveau"],
+  bobards: ["{user-secret}", "Détective anti-bobards"], complaisance: ["{scale-balanced}", "Esprit critique"], piege: ["{shield-halved}", "Gardien anti-piège"],
+  outils: ["{toolbox}", "As de la boîte à outils"], forfait: ["{calculator}", "Pro du budget"],
+};
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+// Progression : { tokens: 3, memoire: 2, … }. Le parcours en 6 fiches la rangeait par numéro :
+// on la convertit une fois. Une fiche coupée en deux donne ses deux badges.
+const OLD_FICHES = { 1: ["tokens", "memoire"], 2: ["cerveau"], 3: ["bobards", "complaisance"], 4: ["outils"], 5: ["forfait"], 6: ["piege"] };
+function loadProgress() {
+  let p;
+  try { p = JSON.parse(store.get("ia6:progress")) || {}; } catch { return {}; }
+  if (Object.keys(p).some((k) => OLD_FICHES[k])) {
+    const q = {};
+    for (const [k, v] of Object.entries(p)) for (const id of OLD_FICHES[k] || [k]) q[id] = Math.max(q[id] || 0, v);
+    store.set("ia6:progress", JSON.stringify(q));
+    p = q;
+  }
+  return p;
+}
+function saveProgress(n, stars) {
+  const p = loadProgress();
+  p[n] = Math.max(p[n] || 0, stars);
+  store.set("ia6:progress", JSON.stringify(p));
+}
+// Modes atelier et démonstration : l'adresse (?atelier=1, ?demo=0…) a le dernier mot, sinon le choix gardé dans ce navigateur.
+function mode(key) {
+  const v = new URLSearchParams(location.search).get(key);
+  if (v !== null) store.set("ia6:" + key, v === "0" ? "0" : "1");
+  return v !== null ? v !== "0" : store.get("ia6:" + key) === "1";
+}
+const ATELIER = mode("atelier"), DEMO = mode("demo");
+if (ATELIER) document.documentElement.dataset.mode = "atelier";
+
+// Icônes Font Awesome. Dans un texte, « {nom} » devient l'icône fa-nom : "{circle-check} Bravo !"
+function icon(name, cls) {
+  const i = document.createElement("i");
+  i.className = "fa-solid fa-" + name + (cls ? " " + cls : "");
+  i.setAttribute("aria-hidden", "true");
+  return i;
+}
+function rich(el, text) {
+  el.replaceChildren(...String(text).split(/\{([a-z0-9-]+)\}/).map((s, k) => (k % 2 ? icon(s) : s)).filter((s) => s !== ""));
+  return el;
+}
+// Le même texte sans les icônes, pour les attributs (aria-label…)
+const plain = (text) => String(text).replace(/\{[a-z0-9-]+\}\s*/g, "");
+function h(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) rich(e, text);
+  return e;
+}
+function btn(label, cls = "") { const b = h("button", cls, label); b.type = "button"; return b; }
+const starIcons = (n) => [1, 2, 3].map((k) => icon("star", k > n ? "star-off" : ""));
+
+// Une question à choix. En mode atelier, un clic choisit et « Révéler » corrige : le groupe répond d'abord.
+function ask(box, { q, options, a, why, onShow, good = "{circle-check} Bravo ! ", bad = "{circle-xmark} Pas tout à fait. " }) {
+  let pick = null, shown = false;
+  const group = h("div", "qbtns");
+  group.setAttribute("role", "group");
+  group.setAttribute("aria-label", plain(q));
+  const bs = options.map(([v, label]) => {
+    const b = btn(label);
+    b.addEventListener("click", () => { pick = v; if (ATELIER && !shown) paint(); else show(); });
+    group.append(b);
+    return [v, b];
+  });
+  const rev = btn("{eye} Révéler la réponse", "btn reveal");
+  rev.addEventListener("click", show);
+  const fb = h("span", "qfb");
+  fb.setAttribute("aria-live", "polite");
+  function show() {
+    const first = !shown, refocus = document.activeElement === rev;
+    shown = true;
+    paint();
+    if (refocus) bs.find(([v]) => v === pick)[1].focus();
+    if (onShow) onShow(pick === a, first);
+  }
+  function paint() {
+    for (const [v, b] of bs) {
+      b.setAttribute("aria-pressed", String(v === pick));
+      b.classList.toggle("picked", !shown && v === pick);
+      b.classList.toggle("right", shown && v === a);
+      b.classList.toggle("wrong", shown && v === pick && v !== a);
+    }
+    rev.hidden = shown || pick === null;
+    rich(fb, shown ? (pick === a ? good : bad) + (typeof why === "function" ? why() : why) : "");
+  }
+  box.replaceChildren(h("p", "", q), group, rev, fb);
+  paint();
+  return { reset() { pick = null; shown = false; paint(); } };
+}
+
+// Zones floutées : un message dit comment les débloquer. Renvoie la fonction qui les débloque.
+function lockZones(zones, tip = "{lock} Réponds d'abord à la question") {
+  if (DEMO) return () => {};
+  const locks = [].concat(zones).map((z) => {
+    const t = h("span", "lock-tip");
+    t.append(h("span", "", tip));
+    z.classList.add("locked");
+    z.inert = true;
+    z.append(t);
+    // Si la page redessine la zone, le message revient.
+    const mo = new MutationObserver(() => { if (!t.isConnected) z.append(t); });
+    mo.observe(z, { childList: true });
+    return [z, t, mo];
+  });
+  return () => locks.forEach(([z, t, mo]) => {
+    mo.disconnect();
+    t.remove();
+    z.classList.add("unlocking"); z.classList.remove("locked"); z.inert = false;
+  });
+}
+
+// Devine d'abord : les zones « lock » restent floues tant qu'on n'a pas répondu.
+function guess(box, { lock, q, ...opts }) {
+  const unlock = lockZones(lock);
+  box.classList.add("guess");
+  return ask(box, { ...opts, q: "{circle-question} Devine d'abord : " + q, good: "{circle-check} Bien vu ! ", bad: "{face-surprise} Surprise ! ", onShow: unlock });
+}
+
+// Pluie d'icônes aux couleurs des fiches
+const CONFETTI_COLORS = ["#C6FF00", "#4DA3FF", "#FF2E93", "#FF6B00", "#FF9AD5", "#FFE600", "#00E5FF", "#B14EFF"];
+function confetti(ic) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const box = h("div", "confetti");
+  box.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < 28; i++) {
+    const s = h("span", "", ["{trophy}", "{star}", ic, "{wand-magic-sparkles}"][i % 4]);
+    s.style.left = Math.random() * 96 + "%";
+    s.style.animationDelay = Math.random() * 0.7 + "s";
+    s.style.color = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+    box.append(s);
+  }
+  document.body.append(box);
+  setTimeout(() => box.remove(), 3200);
+}
+
+// Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.
+function initDefi(items, options) {
+  const [ic, name] = BADGES[FICHE];
+  const total = items.length, firsts = new Map();
+  let record = loadProgress()[FICHE] || 0;
+  const box = $("#defiQuiz");
+  const asks = items.map((it, i) => {
+    const d = h("div", "qi");
+    box.append(d);
+    return ask(d, { ...it, q: `${i + 1}. ${it.q}`, options: it.options || options,
+      onShow(ok, first) { if (first) { firsts.set(i, ok); update(); } } });
+  });
+  function paintBadge() {
+    $("#badge").classList.toggle("won", record > 0);
+    $("#stars").replaceChildren(...(record ? starIcons(record) : []));
+    $("#stars").setAttribute("aria-label", record ? `Meilleur score : ${record} étoile${record > 1 ? "s" : ""} sur 3` : "");
+    $("#badgeTxt").textContent = record
+      ? "Badge gagné ! Rejoue quand tu veux pour améliorer ton score."
+      : `Réponds aux ${total} questions pour gagner ce badge. Seule ta 1re réponse compte pour les étoiles.`;
+  }
+  function update() {
+    $("#defiReset").hidden = false;
+    const good = [...firsts.values()].filter(Boolean).length;
+    $("#defiScore").textContent = `${good} / ${total}`;
+    if (firsts.size < total) return;
+    const stars = good === total ? 3 : good === total - 1 ? 2 : 1;
+    record = Math.max(record, stars);
+    saveProgress(FICHE, stars);
+    paintBadge();
+    rich($("#defiResult"), stars === 3
+      ? `{trophy} ${good} sur ${total} du premier coup ! Tu gagnes le badge ${ic} « ${name} » avec 3 étoiles.`
+      : `{trophy} ${good} sur ${total} du premier coup. Tu gagnes le badge ${ic} « ${name} » avec ${stars} étoile${stars > 1 ? "s" : ""} sur 3. Rejoue pour viser 3 étoiles !`);
+    confetti(ic);
+  }
+  rich($("#badge"), ic);
+  rich($("#badgeName"), `${ic} Badge « ${name} »`);
+  $("#defiScore").textContent = `0 / ${total}`;
+  $("#defiReset").addEventListener("click", () => {
+    firsts.clear();
+    asks.forEach((a) => a.reset());
+    $("#defiScore").textContent = `0 / ${total}`;
+    $("#defiResult").textContent = "";
+    $("#defiReset").hidden = true;
+  });
+  $("#defiReset").hidden = true;
+  paintBadge();
+}
+
+// Boutons des modes, en bas de page. Atelier : texte plus gros, réponses révélées par l'animateur.
+// Démonstration : rien n'est flou. Le choix suit d'une fiche à l'autre.
+(function initModes() {
+  const MODES = { atelier: [ATELIER, "{chalkboard-user} Mode atelier : "], demo: [DEMO, "{lock-open} Mode démonstration : "] };
+  for (const [key, [on, label]] of Object.entries(MODES)) {
+    const b = $("#" + key + "Btn");
+    rich(b, label + (on ? "oui" : "non"));
+    b.setAttribute("aria-pressed", String(on));
+    b.addEventListener("click", () => {
+      store.set("ia6:" + key, on ? "0" : "1");
+      const q = new URLSearchParams(location.search);
+      q.set(key, on ? "0" : "1");
+      location.search = q;
+    });
+  }
+  const q = [ATELIER && "atelier=1", DEMO && "demo=1"].filter(Boolean).join("&");
+  if (q) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?" + q + "$1"); });
+})();
+
+
+const LEVELS = [
+  { name: "Un fait très connu", base: 5, q: "Combien de jours y a-t-il dans une semaine ?",
+    good: [["Il y a 7 jours dans une semaine.", "ok"]],
+    mixed: [["Il y a 7 jours dans une semaine.", "ok"], ["On dit que ce chiffre vient de la Lune.", "warn"]],
+    bad: [["Il y a 7 jours dans une semaine.", "ok"], ["Le dimanche a été ajouté en 1820 par un roi.", "bad"]] },
+  { name: "Un sujet courant", base: 22, q: "Comment faire une pâte à crêpes ?",
+    good: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Ajoute une pincée de sel.", "ok"], ["Laisse reposer la pâte si tu as le temps.", "ok"]],
+    mixed: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Ajoute de la vanille : c'est la recette officielle.", "warn"]],
+    bad: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Les crêpes ont été inventées en 1534 par le cuisinier du roi.", "bad"]] },
+  { name: "Un détail précis", base: 45, q: "À quelle page de mon livre se trouve cette citation ?",
+    sourced: [["D'après ton document, la citation est à la page 87.", "ok"], ["Voici la phrase exacte, pour que tu vérifies.", "ok"]],
+    good: [["Je ne peux pas connaître la page exacte.", "ok"], ["Elle change selon l'édition du livre.", "ok"]],
+    mixed: [["La citation se trouve sans doute vers le chapitre 3.", "warn"], ["Vérifie dans ton édition.", "ok"]],
+    bad: [["La citation est à la page 142, ligne 12.", "bad"], ["C'est dans l'édition de 1998.", "bad"]] },
+  { name: "Un sujet rare ou local", base: 70, q: "Qui a fondé le club de foot de mon village ?",
+    sourced: [["D'après la source, le club a été fondé par un groupe d'habitants.", "ok"], ["La date exacte est écrite dans le document.", "ok"]],
+    mixed: [["Le club a sans doute été créé par des habitants.", "warn"], ["Je n'ai pas trouvé la date exacte.", "ok"]],
+    bad: [["Le club a été fondé en 1952 par Marcel Dupont.", "bad"], ["Il a gagné 3 coupes régionales.", "bad"]] },
+  { name: "Un fait très récent", base: 88, q: "Qui a gagné le match d'hier soir ?",
+    sourced: [["D'après le site de résultats consulté ce matin, l'équipe locale a gagné.", "ok"], ["Voici le lien pour vérifier le score.", "ok"]],
+    mixed: [["Je ne connais pas les résultats d'hier.", "ok"], ["Mais l'équipe locale gagne souvent à domicile.", "warn"]],
+    bad: [["L'équipe locale a gagné 3 à 1.", "bad"], ["Le numéro 10 a marqué deux buts.", "bad"]] },
+];
+const IDK = [["Je ne sais pas.", "ok"], ["Je n'ai pas d'information fiable sur ce sujet.", "ok"], ["Tu peux vérifier auprès d'une source officielle.", "ok"]];
+
+const ids = ["level", "doc", "web", "idk", "src", "crea"];
+function readState() {
+  return {
+    level: +$("#level").value, doc: $("#doc").checked, web: $("#web").checked,
+    idk: $("#idk").checked, src: $("#src").checked, crea: +$("#crea").value,
+  };
+}
+function factors(s) {
+  return {
+    doc: 0.35,
+    web: s.level === 4 ? 0.25 : 0.55,
+    idk: 0.7,
+    src: 0.8,
+    crea: 0.85 + (s.crea / 100) * 0.6,
+  };
+}
+function riskOf(s) {
+  const f = factors(s);
+  let r = LEVELS[s.level].base;
+  if (s.doc) r *= f.doc;
+  if (s.web) r *= f.web;
+  if (s.idk) r *= f.idk;
+  if (s.src) r *= f.src;
+  r *= f.crea;
+  return Math.round(Math.max(2, Math.min(95, r)));
+}
+function pickAnswer(s, risk) {
+  const L = LEVELS[s.level];
+  const sourced = s.doc || s.web;
+  if (risk < 30) return (sourced && L.sourced) || L.good || L.sourced || IDK;
+  if (s.idk) return IDK;
+  if (risk < 60) return L.mixed;
+  return L.bad;
+}
+
+function render() {
+  const s = readState();
+  const risk = riskOf(s);
+  const cls = risk < 30 ? "ok" : risk < 60 ? "warn" : "bad";
+  $("#vLevel").textContent = LEVELS[s.level].name;
+  $("#vCrea").textContent = s.crea < 34 ? "Des faits" : s.crea < 67 ? "Un peu des deux" : "De l'imagination";
+
+  const fg = $("#ringFg");
+  fg.setAttribute("class", "fg " + cls);
+  fg.setAttribute("stroke-dashoffset", String(314.16 * (1 - risk / 100)));
+  $("#ringTxt").textContent = risk + " %";
+  const pill = $("#riskPill");
+  pill.className = "pill " + cls;
+  rich(pill, cls === "ok" ? "{circle-check} Risque faible" : cls === "warn" ? "{triangle-exclamation} Risque moyen" : "{circle-xmark} Risque élevé");
+
+  $("#question").textContent = "« " + LEVELS[s.level].q + " »";
+  $("#answer").replaceChildren(...pickAnswer(s, risk).map(([t, c]) => sent(t, c, { ok: "Vrai ou vérifiable", warn: "À vérifier", bad: "Inventé" })));
+
+  const f = factors(s);
+  const rows = [
+    { key: "doc", label: "{paperclip} Donner un document", v: 1 - f.doc },
+    { key: "web", label: "{globe} Activer la recherche web", v: 1 - f.web },
+    { key: "idk", label: "{hand} Autoriser « je ne sais pas »", v: 1 - f.idk },
+    { key: "src", label: "{link} Demander les sources", v: 1 - f.src },
+  ];
+  const up = f.crea - 1;
+  const box = $("#levers");
+  box.replaceChildren(...rows.map((r) => lever(r.label, "− " + Math.round(r.v * 100) + " %", r.v, s[r.key] ? "on" : "")));
+  box.appendChild(up >= 0
+    ? lever("{palette} Demander de l'imagination", "+ " + Math.round(up * 100) + " %", up, "up")
+    : lever("{bullseye} Demander des faits précis", "− " + Math.round(-up * 100) + " %", -up, "on"));
+}
+// Une phrase de réponse avec son icône d'état. says : le mot lu à la place de l'icône
+const SENT_IC = { ok: "circle-check", warn: "triangle-exclamation", bad: "circle-xmark" };
+function sent(t, c, says) {
+  const e = h("span", "sent " + c), m = h("span", "sent-ic");
+  m.setAttribute("role", "img");
+  m.setAttribute("aria-label", says[c]);
+  m.append(icon(SENT_IC[c]));
+  e.append(m, t);
+  return e;
+}
+function lever(label, val, ratio, cls) {
+  const d = document.createElement("div");
+  d.className = "lever " + cls;
+  d.innerHTML = `<div class="meter-top"><span></span><span></span></div><div class="track"><div class="fill"></div></div>`;
+  const spans = d.querySelectorAll(".meter-top span");
+  rich(spans[0], label); spans[1].textContent = val;
+  d.querySelector(".fill").style.width = Math.max(3, ratio * 100) + "%";
+  return d;
+}
+
+function renderCheck() {
+  const n = $$("#check input:checked").length, total = $$("#check input").length;
+  rich($("#chkTxt"), n + " sur " + total + (n === total ? " {trophy}" : ""));
+  $("#chkFill").style.width = (n / total) * 100 + "%";
+}
+
+// Complaisance : la réponse suit l'avis glissé dans la question
+const YES = {
+  visa: {
+    neutre: { me: "Avec un passeport français, faut-il une autorisation pour 10 jours de vacances en Australie ?", follow: 5,
+      ai: [["Oui. Il faut une autorisation électronique : l'eVisitor.", "ok"], ["La demande se fait en ligne, avant le départ.", "ok"], ["Vérifie sur le site officiel du gouvernement australien.", "ok"]],
+      pill: ["ok", "{circle-check}Réponse fondée sur les faits"] },
+    oui: { me: "Il faut une autorisation pour 10 jours en Australie, non ?", follow: 70,
+      ai: [["Oui, tu as raison. Il faut l'eVisitor, à demander en ligne.", "ok"]],
+      pill: ["warn", "{triangle-exclamation}Juste, mais par chance : ton avis était bon"] },
+    non: { me: "Pas besoin d'autorisation pour 10 jours en Australie, non ?", follow: 90,
+      ai: [["Tu as raison, pour un court séjour c'est simple.", "bad"], ["Un passeport valide devrait suffire.", "bad"]],
+      pill: ["bad", "{circle-xmark}Faux : elle a suivi ton erreur"] },
+    push: { me: "Tu es sûre ? Une collègue m'a dit que ce n'est pas obligatoire.",
+      flip: [["Tu as raison, excuse-moi pour l'erreur.", "bad"], ["Pour 10 jours, le passeport suffit.", "bad"]],
+      hold: [["Je comprends ton doute, mais je garde ma réponse.", "ok"], ["L'eVisitor est obligatoire, même pour un court séjour.", "ok"], ["Tu peux le vérifier sur le site officiel australien.", "ok"]] },
+  },
+  slogan: {
+    neutre: { me: "Que penses-tu de ce slogan pour notre post : « L'île des Pins, la plus belle île du monde ! » ?", follow: 5,
+      ai: [["L'idée est claire et donne envie.", "ok"], ["Mais « la plus belle du monde » est un cliché, et on ne peut pas le prouver.", "ok"], ["Ajoute un détail concret : la piscine naturelle, une offre, une date.", "ok"]],
+      pill: ["ok", "{circle-check}Avis équilibré : qualités et défauts"] },
+    oui: { me: "Je trouve notre slogan génial : « L'île des Pins, la plus belle île du monde ! » Tu es d'accord ?", follow: 90,
+      ai: [["Oui, il est excellent !", "warn"], ["Il est court, percutant, il donne envie de partir.", "warn"]],
+      pill: ["warn", "{triangle-exclamation}Que des compliments : aucun défaut signalé"] },
+    non: { me: "Je trouve notre slogan nul : « L'île des Pins, la plus belle île du monde ! » Tu es d'accord ?", follow: 85,
+      ai: [["Oui, il manque d'originalité.", "warn"], ["« La plus belle du monde », tout le monde le dit.", "ok"], ["Il vaudrait mieux tout réécrire.", "warn"]],
+      pill: ["warn", "{triangle-exclamation}Que des critiques : les qualités ont disparu"] },
+    push: { me: "Tu es dure. Moi, je le trouve parfait.",
+      flip: [["Tu as raison, il est parfait comme ça.", "warn"], ["Tu connais ton public mieux que moi.", "warn"]],
+      hold: [["Il a de vraies qualités : il est court et clair.", "ok"], ["Mais je garde mon conseil : ajoute un détail concret.", "ok"]] },
+  },
+  annul: {
+    neutre: { me: "Un client annule 10 jours avant son départ. Combien doit-on lui rembourser ?", follow: 5,
+      ai: [["Ça dépend de tes conditions de vente et de celles des fournisseurs.", "ok"], ["Souvent, les frais augmentent quand le départ approche.", "ok"], ["Montre-moi tes conditions : je te dirai ce qu'elles prévoient.", "ok"]],
+      pill: ["ok", "{circle-check}Elle dit ce qu'il lui manque pour répondre"] },
+    oui: { me: "Un client annule 10 jours avant son départ. On doit tout lui rembourser, non ?", follow: 90,
+      ai: [["Oui, un remboursement complet semble normal.", "bad"], ["Le client sera content et reviendra.", "warn"]],
+      pill: ["bad", "{circle-xmark}Elle ne connaît pas tes conditions, mais elle dit oui"] },
+    non: { me: "Un client annule 10 jours avant son départ. On ne rembourse rien, non ?", follow: 90,
+      ai: [["Exact, si près du départ, rien n'est remboursé.", "bad"], ["C'est la règle habituelle.", "bad"]],
+      pill: ["bad", "{circle-xmark}Elle ne connaît pas tes conditions, mais elle dit oui"] },
+    push: { me: "Tu es sûre ? Je pense qu'on doit tout rembourser.",
+      flip: [["Tu as raison, il faut tout rembourser.", "bad"]],
+      hold: [["Je ne peux pas l'affirmer sans tes conditions de vente.", "ok"], ["Envoie-les-moi : je te dirai ce qu'elles prévoient.", "ok"]] },
+  },
+};
+const yes = { sc: "visa", fr: "neutre" };
+
+function sents(list) {
+  return list.map(([t, c]) => sent(t, c, { ok: "Juste", warn: "Penche vers ton avis", bad: "Faux" }));
+}
+function msg(who, list, cls) {
+  const d = document.createElement("div");
+  d.className = cls;
+  const w = document.createElement("span"); w.className = "who"; w.textContent = who;
+  d.append(w);
+  if (typeof list === "string") d.append(list); else d.append(...sents(list));
+  return d;
+}
+function setPill(el, [cls, txt]) { el.className = "pill " + cls; rich(el, txt); }
+
+function renderYes() {
+  const S = YES[yes.sc], F = S[yes.fr];
+  $("#yesA").replaceChildren(msg("Toi", F.me, "msg-me"), msg("IA", F.ai, "bubble"));
+  $("#yesVal").textContent = F.follow + " %";
+  $("#yesFill").style.width = F.follow + "%";
+  setPill($("#yesPillA"), F.pill);
+
+  const franc = $("#franc").checked;
+  $("#yesB").replaceChildren(
+    msg("IA, réponse neutre", [S.neutre.ai[0]], "bubble faded"),
+    msg("Toi", S.push.me, "msg-me"),
+    msg("IA", franc ? S.push.hold : S.push.flip, "bubble"),
+  );
+  setPill($("#yesPillB"), franc
+    ? ["ok", "{circle-check} Elle garde sa réponse et explique pourquoi"]
+    : ["bad", "{circle-xmark} Elle change d'avis juste parce que tu insistes"]);
+}
+
+yes.sc = initSeg($("#segYes"), (v) => { yes.sc = v; renderYes(); });
+yes.fr = initSeg($("#segFrame"), (v) => { yes.fr = v; renderYes(); });
+$("#franc").addEventListener("change", renderYes);
+
+ids.forEach((id) => $("#" + id).addEventListener("input", render));
+$$("#check input").forEach((c) => c.addEventListener("change", renderCheck));
+initRanges();
+render();
+renderCheck();
+renderYes();
+
+// Devine d'abord
+guess($("#riskGuess"), {
+  q: "« Qui a fondé le club de foot de mon village ? » Sans document, sans recherche web. Quel risque que l'IA invente ?",
+  options: [["low", "Faible"], ["mid", "Moyen"], ["high", "Élevé"]], a: "high",
+  why: () => `${riskOf(readState())} % ! Sur un sujet rare ou local, l'IA a peu d'infos. Elle complète quand même. Active un document ou la recherche web pour voir le risque baisser.`,
+  lock: [$("#riskSet"), $("#ringWrap"), $("#answer"), $("#levers")],
+});
+
+// Pourquoi elle devine : le classement compte les bonnes réponses, pas les erreurs.
+// Chiffres publiés par OpenAI (septembre 2025), test SimpleQA, en % des questions.
+const RANK = [
+  { kind: "Modèle prudent", name: "gpt-5-thinking-mini", ok: 22, idk: 52, bad: 26 },
+  { kind: "Modèle qui devine", name: "o4-mini", ok: 24, idk: 1, bad: 75 },
+];
+const RK_SEGS = [["ok", "justes"], ["idk", "« je ne sais pas »"], ["bad", "faux"]];
+const RULES = {
+  win: { score: (m) => m.ok, hint: "1 bonne réponse = 1 point. « Je ne sais pas » = 0 point. 1 erreur = 0 point.",
+    verdict: ["Au classement, celui qui devine gagne.", "Il se trompe pourtant trois fois plus."] },
+  fair: { score: (m) => m.ok - m.bad, hint: "1 bonne réponse = 1 point. « Je ne sais pas » = 0 point. 1 erreur = 1 point en moins.",
+    verdict: ["Avec cette règle, le modèle prudent gagne.", "Deviner ne paie plus : dire « je ne sais pas » devient malin."] },
+};
+const rkSegs = [];
+const rkRows = RANK.map((m) => {
+  const row = h("div", "rk"), name = h("div", "rk-name"), viz = h("div", "rk-viz"), bar = h("div", "rk-bar");
+  name.append(h("span", "eyebrow", m.kind), h("strong", "", m.name));
+  bar.setAttribute("role", "img");
+  bar.setAttribute("aria-label", RK_SEGS.map(([k, w]) => `${m[k]} % ${w}`).join(", "));
+  let left = 0;
+  for (const [k, w] of RK_SEGS) {
+    const s = h("span", "rk-" + k);
+    s.style.width = "0%";
+    // Une part trop fine pour son texte : l'étiquette passe au-dessus de la barre.
+    if (m[k] < 10) {
+      const t = h("span", "rk-tiny", `{caret-down} ${m[k]} % ${w}`);
+      t.style.marginLeft = left + "%";
+      viz.append(t);
+    } else s.append(h("b", "", `${m[k]} %`), h("span", "w", w));
+    bar.append(s);
+    rkSegs.push([s, m[k]]);
+    left += m[k];
+  }
+  viz.append(bar);
+  const n = h("b", "rk-n"), pts = h("span", "rk-pts"), calc = h("span", "rk-calc small muted"), place = h("span", "rk-place"), sc = h("div", "rk-score");
+  pts.append(n, "points");
+  sc.append(h("span", "small muted", "Score au classement"), pts, calc, place);
+  row.append(name, viz, sc);
+  $("#rkRows").append(row);
+  return { m, n, pts, calc, place };
+});
+function renderRank(rule) {
+  const R = RULES[rule], scores = RANK.map(R.score), best = Math.max(...scores);
+  rkRows.forEach(({ m, n, pts, calc, place }, i) => {
+    const win = scores[i] === best;
+    n.textContent = (scores[i] < 0 ? "−" : "") + Math.abs(scores[i]);
+    calc.textContent = `${m.ok} justes − ${m.bad} faux`;
+    calc.hidden = rule !== "fair";
+    rich(place, win ? "{trophy} Classé devant" : "Classé derrière");
+    pts.classList.toggle("win", win);
+    place.classList.toggle("win", win);
+  });
+  $("#ruleHint").textContent = R.hint;
+  $("#verdict").replaceChildren(h("strong", "", R.verdict[0]), " ", h("em", "", R.verdict[1]));
+}
+renderRank(initSeg($("#segRule"), renderRank));
+guess($("#rankGuess"), {
+  q: "deux IA passent le même test. L'une dit souvent « je ne sais pas ». L'autre devine toujours. Laquelle est classée devant ?",
+  options: [["prudent", "Celle qui dit « je ne sais pas »"], ["devine", "Celle qui devine toujours"]], a: "devine",
+  why: "Celle qui devine ! Sur 100 questions, elle a 24 bonnes réponses, contre 22. Mais elle se trompe 75 fois, contre 26.",
+  lock: $("#rank"),
+});
+// Les barres se remplissent quand la zone se débloque : floues, elles donneraient la réponse.
+{
+  const zone = $("#rank");
+  const grow = () => requestAnimationFrame(() => rkSegs.forEach(([s, w]) => { s.style.width = w + "%"; }));
+  if (!zone.classList.contains("locked")) grow();
+  else new MutationObserver((_, mo) => { if (!zone.classList.contains("locked")) { mo.disconnect(); grow(); } }).observe(zone, { attributes: true, attributeFilter: ["class"] });
+}
+
+// Jeu : surligne ce qu'il faut vérifier. [phrase, à vérifier ?, raison]
+const HL = [
+  { q: "Prépare une fiche pratique pour un client qui part à l'île des Pins.", s: [
+    ["L'île des Pins est une destination appréciée pour ses plages.", false, "Une idée générale, facile à confirmer."],
+    ["Le vol depuis Nouméa dure exactement 25 minutes.", true, "Une durée précise : vérifie sur le site de la compagnie."],
+    ["Pense à prendre de la crème solaire et un chapeau.", false, "Un conseil de bon sens."],
+    ["Depuis 2024, une taxe de séjour de 1 500 XPF est obligatoire.", true, "Une date, un montant, une règle : à vérifier sur une source officielle."],
+    ["Le guide Marcel Dupont propose des balades en pirogue tous les mardis.", true, "Un nom et un jour précis : l'IA peut inventer des personnes."],
+    ["Réserve les activités à l'avance en haute saison.", false, "Un conseil général."],
+  ] },
+  { q: "Résume les règles d'annulation pour nos clients.", s: [
+    ["Les règles d'annulation dépendent de tes conditions de vente.", false, "Elle te renvoie à tes propres documents : c'est prudent."],
+    ["La loi du 12 mars 2019 impose un remboursement sous 14 jours.", true, "Une loi avec une date : l'IA invente souvent ce genre de référence."],
+    ["Il vaut mieux écrire ces règles clairement sur le devis.", false, "Un conseil, pas un fait."],
+    ["D'après une étude de 2023, 68 % des clients annulent moins de 7 jours avant.", true, "Une étude et un pourcentage, sans source : à vérifier."],
+    ["Le site officiel regles-voyage-officiel.exemple.com confirme ces règles.", true, "Un lien et le mot « officiel » : l'IA peut inventer des adresses web."],
+    ["En cas de doute, demande conseil à un juriste.", false, "Un bon réflexe, rien à vérifier."],
+  ] },
+  { q: "Écris un petit texte sur l'histoire de notre quartier, pour la vitrine.", s: [
+    ["Le quartier a beaucoup changé au fil des années.", false, "Une phrase vague : rien de précis à vérifier."],
+    ["La première maison a été construite en 1887 par un pêcheur breton.", true, "Une date et un détail rare, sur un sujet local : risque élevé d'invention."],
+    ["Comme l'a dit le maire en 1950 : « Ici, la mer est notre voisine. »", true, "Une citation datée : les IA inventent souvent des citations."],
+    ["Aujourd'hui, on y trouve des commerces et des familles.", false, "Une description que tu peux voir toi-même."],
+    ["Le quartier compte exactement 3 412 habitants.", true, "Un chiffre très précis : demande la source, par exemple la mairie."],
+    ["Ajoute une photo ancienne si tu en as une.", false, "Un conseil."],
+  ] },
+];
+const hl = { round: 0, points: 0, checked: false };
+function renderHl() {
+  const R = HL[hl.round];
+  hl.checked = false;
+  $("#hlStep").textContent = `Manche ${hl.round + 1} sur ${HL.length}`;
+  $("#hlQ").textContent = "« " + R.q + " »";
+  $("#hlList").replaceChildren(...R.s.map(([t]) => {
+    const b = btn("");
+    b.setAttribute("aria-pressed", "false");
+    b.append(h("span", "", t), h("span", "why"));
+    b.addEventListener("click", () => b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true")));
+    return b;
+  }));
+  $("#hlCheck").hidden = false;
+  $("#hlNext").hidden = true;
+  $("#hlResult").textContent = "";
+}
+function checkHl() {
+  const R = HL[hl.round];
+  let good = 0, missed = 0, extra = 0;
+  $$("#hlList button").forEach((b, i) => {
+    const [, risky, why] = R.s[i], picked = b.getAttribute("aria-pressed") === "true";
+    const ok = picked === risky;
+    good += ok;
+    if (risky && !picked) missed++;
+    if (!risky && picked) extra++;
+    b.disabled = true;
+    b.classList.add(ok ? "good" : "miss");
+    rich($(".why", b), (risky ? "{triangle-exclamation} À vérifier. " : "{circle-check} Pas besoin. ") + why + (ok ? "" : picked ? " Tu l'avais surlignée." : " Tu l'as oubliée."));
+  });
+  hl.points += good;
+  $("#hlScore").textContent = `${hl.points} / ${HL.length * 6}`;
+  const last = hl.round === HL.length - 1;
+  const msg = [`${good} phrase${good > 1 ? "s" : ""} bien classée${good > 1 ? "s" : ""} sur 6.`];
+  if (missed) msg.push(`{circle-exclamation} ${missed} piège${missed > 1 ? "s" : ""} oublié${missed > 1 ? "s" : ""}.`);
+  if (extra) msg.push(`{highlighter} ${extra} phrase${extra > 1 ? "s" : ""} surlignée${extra > 1 ? "s" : ""} pour rien : celles-là, pas besoin de les vérifier.`);
+  if (last) msg.push(hl.points === HL.length * 6 ? "{trophy} Parfait ! Tu es un vrai détective." : `Total : ${hl.points} sur ${HL.length * 6}.`);
+  rich($("#hlResult"), msg.join(" "));
+  $("#hlCheck").hidden = true;
+  $("#hlNext").hidden = false;
+  rich($("#hlNext"), last ? "{rotate-left} Rejouer" : "Manche suivante {arrow-right}");
+  $("#hlNext").focus();
+  if (last && hl.points === HL.length * 6) confetti("{highlighter}");
+}
+$("#hlCheck").addEventListener("click", checkHl);
+$("#hlNext").addEventListener("click", () => {
+  if (hl.round === HL.length - 1) { hl.round = 0; hl.points = 0; $("#hlScore").textContent = `0 / ${HL.length * 6}`; }
+  else hl.round++;
+  renderHl();
+  $("#hlList button").focus();
+});
+renderHl();
+
+// Défi final
+initDefi([
+  { q: "Quelle question pousse le moins l'IA à te donner raison ?", a: "b",
+    options: [["a", "« C'est bien 3 jours de délai, non ? »"], ["b", "« Quel est le délai ? Donne ta source. »"], ["c", "« Confirme-moi que c'est 3 jours. »"]],
+    why: "Une question neutre, avec la source demandée. L'IA ne sait pas ce que tu penses, elle ne peut pas te suivre." },
+  { q: "L'IA te donne une date précise, sans source. Que fais-tu ?", a: "check",
+    options: [["use", "Je l'utilise telle quelle"], ["check", "Je la vérifie ailleurs"], ["push", "J'insiste jusqu'à ce qu'elle change"]],
+    why: "Une date précise sans source peut être inventée. Vérifie sur une source fiable." },
+  { q: "Tu dis à l'IA « Tu te trompes ». Elle change aussitôt d'avis. Ça veut dire…", a: "please",
+    options: [["right", "Que j'avais raison"], ["please", "Pas forcément : elle veut peut-être me faire plaisir"], ["broken", "Qu'elle est en panne"]],
+    why: "C'est la complaisance. Demande-lui pourquoi elle change d'avis, et vérifie la source." },
+  { q: "Une question sur un médicament ou sur un contrat. Que fais-tu ?", a: "human",
+    options: [["ai", "Je fais confiance à l'IA"], ["human", "Je demande aussi à un professionnel"], ["never", "Je ne pose jamais la question"]],
+    why: "Santé, argent, droit : l'IA peut t'aider à préparer tes questions. Mais un professionnel doit confirmer." },
+]);
+</script>

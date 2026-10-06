@@ -1,6 +1,6 @@
 // On joue avec les pages : clics partout, défi final, permis.
 const { test, expect } = require("@playwright/test");
-const { PAGES, FICHES, NO_PROBLEM, open, iconsReady, displayProblems, playEverything } = require("./site");
+const { PAGES, FICHES, MOVED, NO_PROBLEM, url, open, iconsReady, displayProblems, playEverything } = require("./site");
 const { contrastIssues } = require("./contrast");
 
 for (const f of PAGES) {
@@ -14,25 +14,26 @@ for (const f of PAGES) {
   }
 }
 
-for (const [n, f] of FICHES.entries()) {
+for (const f of FICHES) {
   test(`${f} : finir le défi donne le badge`, async ({ page }) => {
     await open(page, f);
     for (const q of await page.locator("#defiQuiz .qi").all()) await q.locator(".qbtns button").first().click();
     await expect(page.locator("#badge")).toHaveClass(/won/);
     await expect(page.locator("#defiResult")).not.toBeEmpty();
     await expect(page.locator("#stars svg")).toHaveCount(3);
-    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("ia6:progress")));
-    expect(saved[n + 1]).toBeGreaterThan(0);
+    // La progression est rangée sous le nom de la fiche (const FICHE dans la page).
+    const [id, saved] = await page.evaluate(() => [FICHE, JSON.parse(localStorage.getItem("ia6:progress"))]);
+    expect(saved[id]).toBeGreaterThan(0);
   });
 }
 
-test.describe("1-tokens.html : l'IA relit tout, à chaque message", () => {
+test.describe("2-memoire.html : l'IA relit tout, à chaque message", () => {
   for (const colorScheme of ["dark", "light"]) {
     test(`l'animation va jusqu'au bout, lisible à chaque étape (thème ${colorScheme === "dark" ? "sombre" : "clair"})`, async ({ page, isMobile }) => {
       test.skip(isMobile && colorScheme === "light", "mêmes couleurs que sur bureau");
       // Sans animation, chaque étape se joue tout de suite.
       await page.emulateMedia({ reducedMotion: "reduce", colorScheme });
-      await open(page, "1-tokens.html");
+      await open(page, "2-memoire.html");
       const next = page.locator("#rpNext");
       for (let step = 1; step <= 6; step++) {
         await next.click();
@@ -54,8 +55,8 @@ test.describe("1-tokens.html : l'IA relit tout, à chaque message", () => {
   }
 });
 
-test("3-hallucinations.html : changer la règle du classement change le gagnant", async ({ page }) => {
-  await open(page, "3-hallucinations.html");
+test("4-hallucinations.html : changer la règle du classement change le gagnant", async ({ page }) => {
+  await open(page, "4-hallucinations.html");
   await page.locator("#rankGuess .qbtns button").first().click();
   const leader = () => page.locator(".rk:has(.rk-place.win) .rk-name strong");
   await expect(leader()).toHaveText("o4-mini");
@@ -65,7 +66,7 @@ test("3-hallucinations.html : changer la règle du classement change le gagnant"
 });
 
 test.describe("mode démonstration", () => {
-  for (const f of ["1-tokens.html", "3-hallucinations.html", "6-message-piege.html"]) {
+  for (const f of FICHES) {
     test(`${f} : rien n'est flou`, async ({ page }) => {
       await open(page, f, "?demo=1");
       await expect(page.locator(".locked")).toHaveCount(0);
@@ -94,14 +95,39 @@ test.describe("mode démonstration", () => {
   });
 });
 
-test("index.html : le permis se débloque avec les 6 badges", async ({ page }) => {
+test("index.html : le permis se débloque avec tous les badges", async ({ page }) => {
   await open(page, "index.html");
   await expect(page.locator("#licLock")).toBeVisible();
-  await page.evaluate(() => localStorage.setItem("ia6:progress", JSON.stringify({ 1: 3, 2: 3, 3: 2, 4: 3, 5: 1, 6: 3 })));
+  await page.evaluate(() => localStorage.setItem("ia6:progress", JSON.stringify(
+    { tokens: 3, memoire: 2, cerveau: 3, bobards: 2, complaisance: 3, piege: 3, outils: 1, forfait: 3 })));
   await page.reload({ waitUntil: "networkidle" });
   await iconsReady(page);
   await expect(page.locator("#licLock")).toBeHidden();
   await expect(page.locator("#licPrint")).toBeEnabled();
   await expect(page.locator("#license .brand-logo")).toBeVisible();
-  await expect(page.locator("#licBadges .st svg")).toHaveCount(18);
+  await expect(page.locator("#licBadges .st svg")).toHaveCount(FICHES.length * 3);
+  await expect(page.locator("#progTxt")).toHaveText(`${FICHES.length} badges sur ${FICHES.length} · 20 étoiles sur ${FICHES.length * 3}`);
+});
+
+test("une progression du parcours en 6 fiches est convertie : on garde ses badges et son permis", async ({ page }) => {
+  await open(page, "index.html");
+  await page.evaluate(() => localStorage.setItem("ia6:progress", JSON.stringify({ 1: 3, 2: 3, 3: 2, 4: 3, 5: 1, 6: 3 })));
+  await page.reload({ waitUntil: "networkidle" });
+  await iconsReady(page);
+  await expect(page.locator("#licLock")).toBeHidden();
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("ia6:progress")));
+  // Une fiche coupée en deux donne ses deux badges.
+  expect(saved).toEqual({ tokens: 3, memoire: 3, cerveau: 3, bobards: 2, complaisance: 2, outils: 3, forfait: 1, piege: 3 });
+  // Même conversion quand on arrive directement sur une fiche.
+  await page.evaluate(() => localStorage.setItem("ia6:progress", JSON.stringify({ 3: 2 })));
+  await open(page, "5-complaisance.html");
+  await expect(page.locator("#badge")).toHaveClass(/won/);
+});
+
+test("une ancienne adresse ouvre la bonne fiche, en gardant le mode", async ({ page }) => {
+  for (const [old, to] of Object.entries(MOVED)) {
+    await page.goto(url(old) + "?demo=1");
+    await page.waitForURL((u) => u.pathname.endsWith("/" + to) && u.search === "?demo=1");
+    await expect(page.locator("#demoBtn"), old).toContainText("oui");
+  }
 });
