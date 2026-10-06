@@ -357,6 +357,57 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .conv-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-weight: 700; font-size: .9rem; }
 .conv-top span:last-child { color: var(--accent-text); font-variant-numeric: tabular-nums; }
 .conv .track { height: 18px; }
+.dot.sys { width: 23px; background: var(--muted); }
+
+/* Animation : ce que tu vois, ce que l'IA relit à chaque envoi */
+.btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.status.bad { box-shadow: inset 4px 0 0 var(--bad); }
+.replay { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 16px; }
+.rp-col { display: grid; grid-template-rows: auto 1fr; gap: 10px; min-width: 0; }
+.rp-col h3 { display: flex; align-items: center; gap: 8px; }
+.rp-col h3 .svg-inline--fa { color: var(--accent-text); }
+.chat, .ai-read { display: flex; flex-direction: column; gap: 8px; min-height: 260px; padding: 14px; border-radius: 16px; }
+/* Comme sur un téléphone : la conversation défile, le dernier message reste visible. */
+.chat { background: var(--surface-2); max-height: 600px; overflow-y: auto; }
+.cb.lost { outline: 3px dashed var(--bad); outline-offset: 3px; }
+.ai-read { border: 2px dashed var(--line); }
+.cb { max-width: 88%; display: grid; gap: 2px; padding: 8px 12px; font-weight: 700; animation: pop .3s ease both; }
+.cb.me { align-self: flex-end; background: var(--accent); color: var(--on-accent); border-radius: 16px 16px 4px 16px; }
+.cb.ai { align-self: flex-start; background: var(--surface); border-radius: 16px 16px 16px 4px; }
+.cb.go { animation: sent .8s ease; }
+.cb .who, .rl .who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.cb.me .who { color: var(--on-accent); }
+.typing { display: flex; gap: 5px; padding: 14px 16px; }
+.typing span { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); animation: bounce 1s ease infinite; }
+.typing span:nth-child(2) { animation-delay: .15s; }
+.typing span:nth-child(3) { animation-delay: .3s; }
+.rp-arrow { display: grid; justify-items: center; align-content: center; gap: 8px; max-width: 120px; text-align: center; font-size: .85rem; font-weight: 700; color: var(--muted); }
+.rp-ic { font-size: 2rem; color: var(--accent-text); }
+.rp-ic.go { animation: nudge .8s ease; }
+@media (max-width: 760px) {
+  .replay { grid-template-columns: minmax(0, 1fr); }
+  .rp-arrow { justify-self: center; max-width: none; }
+  .chat { max-height: 360px; }
+  .rp-ic .svg-inline--fa { transform: rotate(90deg); }
+}
+.rl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 7px 10px; border-radius: 10px; background: var(--surface-2); font-weight: 700; font-size: .95rem; animation: pop .25s ease both; transform-origin: top; }
+.rl .n { font-size: .8rem; color: var(--accent-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rl .t { grid-column: 1 / -1; }
+.rl.sys { box-shadow: inset 4px 0 0 var(--muted); }
+.rl.old { box-shadow: inset 4px 0 0 color-mix(in oklab, var(--accent) 50%, var(--surface)); }
+.rl.new { box-shadow: inset 4px 0 0 var(--accent); }
+.rl.sum { box-shadow: inset 4px 0 0 var(--warn); outline: 2px dashed var(--warn); outline-offset: -2px; }
+.rl.scan { outline: 2px solid var(--accent-text); outline-offset: -2px; }
+.rl.squash { animation: squash .45s ease forwards; }
+.rl-zone { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-top: 4px; }
+.rl-zone.mid { color: var(--warn); }
+.rp-empty, .rp-foot { font-weight: 700; font-size: .95rem; color: var(--muted); }
+.rp-empty { margin: auto 0; text-align: center; max-width: none; }
+@keyframes pop { from { transform: translateY(10px) scale(.95); } }
+@keyframes sent { 40% { transform: translateX(8px); box-shadow: 0 0 0 3px var(--accent-text); } }
+@keyframes nudge { 40% { transform: scale(1.35); } }
+@keyframes bounce { 30% { transform: translateY(-5px); } }
+@keyframes squash { to { transform: scaleY(0); } }
 </style>
 
 <main class="wrap">
@@ -411,9 +462,42 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span><h2>Chaque message renvoie toute la conversation</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span><h2>L'IA relit tout, à chaque message</h2></div>
       <p>L'IA ne se souvient de rien entre deux messages. À chaque envoi, elle reçoit à nouveau <strong>toute la conversation depuis le début</strong> :
-        les consignes, toutes tes questions, toutes ses réponses, puis ta nouvelle question. Tout ce qu'elle relit, ce sont des <strong>tokens d'entrée</strong>, et ils se paient.</p>
+        ses consignes, tes messages et ses réponses. Envoie les messages un par un, et regarde ce qu'elle lit.</p>
+      <div class="btns">
+        <button type="button" class="btn go" id="rpNext"></button>
+        <button type="button" class="btn" id="rpReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Recommencer</button>
+      </div>
+      <div class="status" id="rpStatus" aria-live="polite"></div>
+      <div class="replay">
+        <div class="rp-col">
+          <h3><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i> Ce que tu vois</h3>
+          <div class="chat" id="rpChat" data-empty="Ta conversation va s'afficher ici."></div>
+        </div>
+        <div class="rp-arrow" aria-hidden="true"><span class="rp-ic" id="rpArrow"><i class="fa-solid fa-arrow-right"></i></span><span>À chaque envoi, tout repart</span></div>
+        <div class="rp-col">
+          <h3><i class="fa-solid fa-robot" aria-hidden="true"></i> Ce que l'IA lit</h3>
+          <div class="ai-read" id="rpRead"></div>
+        </div>
+      </div>
+      <div>
+        <div class="bar-label"><span>Tokens lus à chaque envoi</span><span class="muted" id="rpTot"></span></div>
+        <div class="stair" id="rpBars" data-empty="Envoie un message pour voir les tokens lus."></div>
+      </div>
+      <div class="legend">
+        <span><i class="b-sys"></i>Consignes</span>
+        <span><i class="b-old"></i>Messages d'avant, relus</span>
+        <span><i class="b-new"></i>Nouveau message</span>
+        <span><i class="c-sum"></i>Résumé du milieu</span>
+      </div>
+      <p class="small muted">Les consignes sont le texte que l'IA reçoit avant ta conversation. Tu ne les vois pas, mais elle les relit à chaque fois. Dans la vraie vie, elles font souvent des milliers de tokens.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></span><h2>Plus c'est long, plus ça coûte</h2></div>
+      <p>Tout ce que l'IA relit, ce sont des <strong>tokens d'entrée</strong>, et ils se paient.
+        À chaque envoi, elle relit les consignes, toutes tes questions, toutes ses réponses, puis ta nouvelle question.</p>
       <div id="convGuess"></div>
       <div class="mem" id="convMem">
         <div class="controls stick">
@@ -489,7 +573,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>La mémoire de travail de l'IA</h2></div>
       <p>L'IA a une mémoire de taille fixe. On l'appelle la <strong>fenêtre de contexte</strong>.
-        Toute la conversation doit tenir dedans. Si elle déborde, l'IA fait un résumé : c'est la <strong>compression</strong>.</p>
+        Toute la conversation doit tenir dedans. Si elle déborde, l'IA fait un résumé : c'est la <strong>compression</strong>.
+        Elle garde le début (ses consignes) et la fin (les derniers messages). <strong>Le milieu devient un court résumé, et ses détails se perdent.</strong></p>
       <div class="mem">
         <div class="controls stick">
           <div class="ctl">
@@ -537,14 +622,14 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           <div class="legend">
             <span><i class="c-sys"></i>Consignes de départ</span>
             <span><i class="c-msg"></i>Messages gardés en entier</span>
-            <span><i class="c-sum"></i>Résumé des vieux messages</span>
+            <span><i class="c-sum"></i>Résumé du milieu</span>
             <span><i class="c-over"></i>Ça déborde</span>
           </div>
 
           <div class="status" id="status" aria-live="polite"></div>
 
           <div class="ctl">
-            <span class="small muted">Chaque carré = 1 message. Les carrés vides sont résumés.</span>
+            <span class="small muted">Le gris = les consignes. Chaque carré = 1 message. Les carrés vides, au milieu, sont résumés.</span>
             <div class="dots" id="dots" aria-hidden="true"></div>
           </div>
         </div>
@@ -573,7 +658,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <ul>
         <li><span>L'IA lit et écrit en tokens. Un token = un petit bout de mot.</span></li>
         <li><span>Chaque message renvoie toute la conversation. Plus elle est longue, plus chaque nouveau message coûte cher.</span></li>
-        <li><span>Sa mémoire a une taille fixe. Quand elle est pleine, l'IA résume le début et oublie des détails.</span></li>
+        <li><span>Sa mémoire a une taille fixe. Quand elle est pleine, l'IA garde le début et la fin, et résume le milieu. Les détails du milieu se perdent.</span></li>
         <li><span>Pour un nouveau sujet, ouvre une nouvelle conversation. C'est plus rapide, moins cher et plus précis.</span></li>
       </ul>
     </section>
@@ -911,7 +996,7 @@ function renderMem() {
   const st = $("#status");
   if (compress) {
     st.className = "status squeeze";
-    rich(st, `{compress} Compression ! Les ${fmt(n - kept)} premiers messages deviennent un court résumé. L'IA garde l'essentiel, mais elle oublie des détails.`);
+    rich(st, `{compress} Compression ! L'IA garde le début (ses consignes) et la fin (les ${fmt(kept)} derniers messages). Les ${fmt(n - kept)} messages du milieu deviennent un court résumé : leurs détails se perdent.`);
   } else if (fill > 0.7) {
     st.className = "status warn";
     rich(st, "{triangle-exclamation} La mémoire est presque pleine. Bientôt, l'IA devra résumer le début.");
@@ -922,6 +1007,7 @@ function renderMem() {
 
   const dots = $("#dots");
   const frag = document.createDocumentFragment();
+  frag.appendChild(h("span", "dot sys"));
   for (let i = 0; i < n; i++) {
     const d = document.createElement("span");
     d.className = i < n - kept ? "dot old" : "dot";
@@ -996,10 +1082,150 @@ $("#btnSend").addEventListener("click", () => setSend(conv.n + 1));
 $("#btnReset").addEventListener("click", () => setSend(1));
 conv.per = +initSeg($("#segSend"), (v) => { conv.per = +v; renderConv(); });
 
+// Animation : à chaque envoi, l'IA reçoit toute la conversation depuis le début, puis elle oublie tout.
+// Après le 4e envoi, la mémoire est pleine : le milieu devient un résumé, et un détail se perd.
+const RP_SYS = "Tu es un assistant poli. Réponds en français.";
+const RP = [
+  ["Bonjour !", "Bonjour ! Comment puis-je t'aider ?"],
+  ["Ça va ?", "Ça va, et toi ?"],
+  ["Que peux-tu me proposer ce week-end ? Je n'aime pas le bateau.", "Une balade au parc de la Rivière Bleue, ou un pique-nique à l'Anse Vata."],
+  ["Super ! Et pour dimanche ?", "Une randonnée au mont Dzumac, par exemple."],
+  ["Une autre idée ?", "Une journée au phare Amédée, en bateau !"],
+];
+const RP_SUM = "Il a dit bonjour. Il cherche une sortie pour le week-end.";
+const RP_MID = 3; // les 3 premiers échanges forment le milieu, résumé par la compression
+const RP_LOST = 2; // l'échange qui contient « Je n'aime pas le bateau »
+const RP_STEPS = [0, 1, 2, 3, "cmp", 4];
+const RP_CLS = { sys: "b-sys", old: "b-old", new: "b-new", sum: "c-sum" };
+const ntok = (t) => tokenize(t).length;
+const rpPast = (from, to) => RP.slice(from, to).flatMap(([me, ai]) => [{ kind: "old", who: "Toi", t: me }, { kind: "old", who: "IA", t: ai }]);
+// Ce que l'IA lit à l'envoi k : consignes, échanges d'avant (ou leur résumé), nouveau message.
+function rpPacket(k) {
+  const before = k > RP_MID ? [{ kind: "sum", who: "Résumé du milieu", t: RP_SUM }, ...rpPast(RP_MID, k)] : rpPast(0, k);
+  return [{ kind: "sys", who: "Consignes", t: RP_SYS }, ...before, { kind: "new", who: "Toi · nouveau message", t: RP[k][0] }];
+}
+const rpSize = (lines) => lines.reduce((s, l) => s + ntok(l.t), 0);
+const RP_MAX = Math.max(...RP.map((_, k) => rpSize(rpPacket(k))));
+const rp = { step: 0, gen: 0, read: 0, wrote: 0 };
+const rpWait = (ms) => new Promise((ok) => setTimeout(ok, matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : ms));
+
+function rpBubble(cls, who, t) { const b = h("div", "cb " + cls); b.append(h("span", "who", who), h("span", "", t)); return b; }
+function rpPost(el) { const chat = $("#rpChat"); chat.append(el); chat.scrollTop = chat.scrollHeight; }
+function rpLine({ kind, who, t }) {
+  const d = h("div", "rl " + kind), n = ntok(t);
+  d.append(h("span", "who", who), h("span", "n", `${n} token${n > 1 ? "s" : ""}`), h("span", "t", t));
+  return d;
+}
+function rpSay(cls, text) { const st = $("#rpStatus"); st.className = "status " + cls; rich(st, text); }
+function rpBar(k, lines) {
+  const row = h("div", "srow"), bar = h("div", "sbar");
+  bar.append(...lines.map((l) => block(RP_CLS[l.kind], pct(ntok(l.t), RP_MAX))));
+  row.append(h("span", "", `Envoi ${k + 1}`), bar, h("span", "sn", fmt(rpSize(lines))));
+  $("#rpBars").append(row);
+  $("#rpTot").textContent = `${fmt(rp.read)} tokens lus, ${fmt(rp.wrote)} écrits par toi`;
+}
+
+// L'IA lit le paquet ligne par ligne. Renvoie false si on a recommencé entre-temps.
+async function rpScan(lines, gen) {
+  const box = $("#rpRead");
+  box.replaceChildren();
+  let prev = null;
+  for (const l of lines) {
+    const el = rpLine(l);
+    if (prev) prev.classList.remove("scan");
+    el.classList.add("scan");
+    box.append(el);
+    prev = el;
+    await rpWait(300);
+    if (gen !== rp.gen) return false;
+  }
+  prev.classList.remove("scan");
+  return true;
+}
+
+async function rpSend(k, gen) {
+  const [me, ai] = RP[k], lines = rpPacket(k), chat = $("#rpChat"), last = k === RP.length - 1;
+  rpPost(rpBubble("me", "Toi", me));
+  // Toute la conversation part vers l'IA, pas seulement le dernier message.
+  for (const el of [...$$(".cb", chat), $("#rpArrow")]) { el.classList.remove("go"); void el.offsetWidth; el.classList.add("go"); }
+  rpSay("squeeze", `{paper-plane} Envoi ${k + 1} : ton appli envoie à l'IA toute la conversation, depuis le début.`);
+  $("#rpRead").replaceChildren(h("p", "rp-empty", "{eraser} L'IA ne se souvient de rien. Elle reçoit tout…"));
+  await rpWait(900);
+  if (gen !== rp.gen || !(await rpScan(lines, gen))) return;
+  rp.read += rpSize(lines);
+  rp.wrote += ntok(me);
+  rpBar(k, lines);
+  const typing = h("div", "cb ai typing");
+  typing.append(h("span"), h("span"), h("span"));
+  rpPost(typing);
+  await rpWait(900);
+  if (gen !== rp.gen) return;
+  typing.remove();
+  rpPost(rpBubble("ai", "IA", ai));
+  const n = fmt(rpSize(lines));
+  if (last) {
+    $$(".cb.me", chat)[RP_LOST].classList.add("lost");
+    rpSay("bad", "{triangle-exclamation} L'IA propose du bateau ! « Je n'aime pas le bateau » était au milieu de la conversation. Le résumé l'a perdu.");
+    return;
+  }
+  $("#rpRead").append(h("p", "rp-foot", "{eraser} Après sa réponse, l'IA oublie tout."));
+  rpSay("ok", k === 0
+    ? `{circle-check} Envoi 1 : l'IA a lu ses consignes et ton message, soit ${n} tokens. Puis elle a tout oublié.`
+    : `{rotate} Envoi ${k + 1} : l'IA a tout relu depuis le début, soit ${n} tokens. Puis elle a encore tout oublié.`);
+}
+
+// La mémoire est pleine : début et fin gardés, le milieu devient un court résumé.
+async function rpCompress(gen) {
+  const box = $("#rpRead");
+  const zone = (cls, t) => h("p", "rl-zone " + cls, t);
+  const mid = rpPast(0, RP_MID).map(rpLine), zMid = zone("mid", "{compress} Milieu : va être résumé");
+  box.replaceChildren(zone("", "Début : gardé"), rpLine({ kind: "sys", who: "Consignes", t: RP_SYS }), zMid, ...mid,
+    zone("", "Fin : gardée"), ...rpPast(RP_MID, RP_MID + 1).map(rpLine));
+  rpSay("warn", "{forward} Plus tard : la conversation a duré des heures. La mémoire de l'IA est pleine.");
+  await rpWait(1600);
+  if (gen !== rp.gen) return;
+  mid.forEach((el, i) => { el.style.animationDelay = i * 90 + "ms"; el.classList.add("squash"); });
+  await rpWait(500 + mid.length * 90);
+  if (gen !== rp.gen) return;
+  mid[0].before(rpLine({ kind: "sum", who: "Résumé du milieu", t: RP_SUM }));
+  mid.forEach((el) => el.remove());
+  rich(zMid, "{compress} Milieu : résumé, des détails se perdent");
+  rpSay("warn", "{compress} Compression : l'IA garde le début (ses consignes) et la fin (le dernier échange). Le milieu devient un court résumé. Toi, tu vois toujours toute la conversation.");
+}
+
+function rpButton() {
+  const s = RP_STEPS[rp.step], b = $("#rpNext");
+  b.hidden = s === undefined;
+  b.disabled = false;
+  if (s !== undefined) rich(b, s === "cmp" ? "{forward} Plus tard : la mémoire est pleine" : `{paper-plane} Envoyer : « ${RP[s][0]} »`);
+}
+function rpReset() {
+  rp.gen++;
+  rp.step = rp.read = rp.wrote = 0;
+  $("#rpChat").replaceChildren();
+  $("#rpRead").replaceChildren(h("p", "rp-empty", "{eraser} Mémoire vide. L'IA ne connaît pas encore ta conversation."));
+  $("#rpBars").replaceChildren();
+  $("#rpTot").textContent = "";
+  rpSay("", "{hand-pointer} Clique sur « Envoyer » pour commencer la conversation.");
+  rpButton();
+}
+$("#rpNext").addEventListener("click", async () => {
+  const s = RP_STEPS[rp.step], gen = rp.gen;
+  $("#rpNext").disabled = true;
+  rich($("#rpNext"), "{hourglass-half} Regarde ce que fait l'IA…");
+  await (s === "cmp" ? rpCompress(gen) : rpSend(s, gen));
+  if (gen !== rp.gen) return;
+  rp.step++;
+  rpButton();
+  if ($("#rpNext").hidden) $("#rpReset").focus();
+});
+$("#rpReset").addEventListener("click", rpReset);
+rpReset();
+
 // Devine d'abord
 guess($("#tokGuess"), {
   q: "combien de tokens pour « anticonstitutionnellement » ?",
-  options: [["1", "1"], ["3", "3"], ["7", "7"]], a: "7",
+  options: [["3", "3"], ["7", "7"], ["9", "9"]], a: "7",
   why: "7 tokens. Un mot long et rare est coupé en plusieurs morceaux.",
   lock: $("#examples"),
 });
@@ -1108,7 +1334,7 @@ initDefi([
     why: "L'IA relit les 50 messages d'avant. Elle lit beaucoup plus de tokens." },
   { q: "La mémoire de l'IA est pleine. Que se passe-t-il ?", a: "sum",
     options: [["stop", "Elle s'arrête net"], ["sum", "Elle résume le début"], ["all", "Elle garde tout"]],
-    why: "C'est la compression : un court résumé remplace les vieux messages. L'IA oublie des détails." },
+    why: "C'est la compression : l'IA garde le début et la fin, et un court résumé remplace le milieu. Les détails du milieu se perdent." },
   { q: "Tu colles un document de 50 pages au début de la conversation. Ensuite…", a: "each",
     options: [["once", "L'IA le lit une seule fois"], ["each", "L'IA le relit à chaque message"], ["free", "Il ne compte pas"]],
     why: "Le document fait partie de la conversation. Chaque nouveau message le relit, et ça se paie." },

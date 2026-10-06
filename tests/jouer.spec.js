@@ -1,6 +1,7 @@
 // On joue avec les pages : clics partout, défi final, permis.
 const { test, expect } = require("@playwright/test");
 const { PAGES, FICHES, NO_PROBLEM, open, iconsReady, displayProblems, playEverything } = require("./site");
+const { contrastIssues } = require("./contrast");
 
 for (const f of PAGES) {
   for (const query of ["", "?atelier=1"]) {
@@ -24,6 +25,44 @@ for (const [n, f] of FICHES.entries()) {
     expect(saved[n + 1]).toBeGreaterThan(0);
   });
 }
+
+test.describe("1-tokens.html : l'IA relit tout, à chaque message", () => {
+  for (const colorScheme of ["dark", "light"]) {
+    test(`l'animation va jusqu'au bout, lisible à chaque étape (thème ${colorScheme === "dark" ? "sombre" : "clair"})`, async ({ page, isMobile }) => {
+      test.skip(isMobile && colorScheme === "light", "mêmes couleurs que sur bureau");
+      // Sans animation, chaque étape se joue tout de suite.
+      await page.emulateMedia({ reducedMotion: "reduce", colorScheme });
+      await open(page, "1-tokens.html");
+      const next = page.locator("#rpNext");
+      for (let step = 1; step <= 6; step++) {
+        await next.click();
+        // L'étape est finie quand le bouton revient (ou disparaît, à la fin).
+        await page.waitForFunction(() => { const b = document.querySelector("#rpNext"); return b.hidden || !b.disabled; });
+        await iconsReady(page);
+        expect(await contrastIssues(page), `étape ${step}`).toEqual([]);
+      }
+      await expect(next).toBeHidden();
+      await expect(page.locator("#rpBars .srow")).toHaveCount(5);
+      // Après la compression, le milieu est un résumé : « Je n'aime pas le bateau » n'est plus lu.
+      await expect(page.locator("#rpRead .rl.sum")).toHaveCount(1);
+      await expect(page.locator("#rpRead")).not.toContainText("bateau");
+      await expect(page.locator("#rpChat .cb.lost")).toContainText("Je n'aime pas le bateau");
+      await page.locator("#rpReset").click();
+      await expect(page.locator("#rpChat .cb")).toHaveCount(0);
+      await expect(next).toBeEnabled();
+    });
+  }
+});
+
+test("3-hallucinations.html : changer la règle du classement change le gagnant", async ({ page }) => {
+  await open(page, "3-hallucinations.html");
+  await page.locator("#rankGuess .qbtns button").first().click();
+  const leader = () => page.locator(".rk:has(.rk-place.win) .rk-name strong");
+  await expect(leader()).toHaveText("o4-mini");
+  await page.locator('#segRule button[data-v="fair"]').click();
+  await expect(leader()).toHaveText("gpt-5-thinking-mini");
+  await expect(page.locator(".rk-n")).toHaveText(["−4", "−51"]);
+});
 
 test.describe("mode démonstration", () => {
   for (const f of ["1-tokens.html", "3-hallucinations.html", "6-message-piege.html"]) {

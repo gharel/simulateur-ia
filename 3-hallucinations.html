@@ -359,6 +359,46 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .hl .why:empty { display: none; }
 .hl-btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+
+/* Pourquoi elle devine : le classement récompense les bonnes réponses, pas la prudence */
+.rank { display: grid; gap: 14px; }
+.rk-rows { display: grid; gap: 12px; }
+.rk {
+  display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr) minmax(0, 190px); grid-template-areas: "name viz score";
+  gap: 12px 28px; align-items: center; background: var(--surface-2); border-radius: 16px; padding: 18px 22px;
+}
+.rk-name { grid-area: name; display: grid; gap: 4px; }
+.rk-name .eyebrow { color: var(--accent-text); }
+.rk-name strong { font-size: 1.15rem; overflow-wrap: anywhere; }
+.rk-viz { grid-area: viz; display: grid; gap: 6px; }
+.rk-bar { display: flex; height: 56px; border-radius: 6px; overflow: hidden; container-type: inline-size; }
+.rk-bar > span { flex: none; display: flex; align-items: center; justify-content: center; gap: .3em; font-weight: 700; white-space: nowrap; overflow: hidden; transition: width .6s ease; }
+.rk-ok { background: var(--ok); color: var(--surface); }
+.rk-idk { background: color-mix(in oklab, var(--muted) 35%, var(--surface-2)); color: var(--fg); }
+.rk-bad { background: var(--bad); color: var(--surface); }
+/* Barre étroite : les nombres seulement, la légende dit le reste. */
+@container (max-width: 520px) { .rk-bar .w { display: none; } }
+.rk-tiny { display: block; font-size: .85rem; font-weight: 700; color: var(--muted); }
+.rk-score { grid-area: score; display: grid; gap: 2px; }
+.rk-pts { font-weight: 700; color: var(--muted); }
+.rk-n { font-family: var(--font-display); font-weight: 400; font-size: clamp(2.2rem, 5vw, 3rem); line-height: 1.05; color: var(--fg); font-variant-numeric: tabular-nums; margin-right: 4px; }
+.rk-place { font-weight: 700; color: var(--muted); }
+.rk-pts.win .rk-n, .rk-place.win { color: var(--ok); }
+@media (max-width: 1000px) { .rk { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name score" "viz viz"; } }
+@media (max-width: 560px) {
+  .rk { grid-template-columns: minmax(0, 1fr); grid-template-areas: "name" "viz" "score"; padding: 16px; }
+  .rk-score { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
+}
+.key { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; }
+/* Le verdict, en couleurs inversées. Le mot fort reste lisible dans les deux thèmes. */
+.verdict {
+  --em: color-mix(in oklab, var(--accent) 52%, #000);
+  max-width: none; background: var(--fg); color: var(--bg); border-radius: 16px; padding: 20px 24px; font-size: 1.15rem; font-weight: 700;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .verdict { --em: var(--accent); } }
+:root[data-theme="light"] .verdict { --em: var(--accent); }
+.verdict strong { font-family: var(--font-display); font-weight: 400; font-size: 1.35rem; }
+.verdict em { font-style: normal; color: var(--em); }
 </style>
 
 <main class="wrap">
@@ -451,6 +491,28 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <div class="step"><span class="n">3</span><p>La réponse a l'air sûre. <strong>Mais elle peut être fausse.</strong></p></div>
       </div>
       <p class="small muted">Le risque est plus grand pour les sujets rares, locaux ou très récents.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-ranking-star"></i></span><h2>Pourquoi elle ne dit pas « je ne sais pas » ?</h2></div>
+      <p>Les IA passent des tests, comme un examen. Puis on les classe, de la meilleure note à la moins bonne.
+        Souvent, la note compte seulement les bonnes réponses. « Je ne sais pas » rapporte 0 point. Une réponse au hasard est parfois juste.
+        <strong>Alors deviner rapporte plus que dire « je ne sais pas ».</strong></p>
+      <div id="rankGuess"></div>
+      <div class="rank" id="rank">
+        <div class="ctl">
+          <span>Règle du classement</span>
+          <div class="seg" id="segRule" role="group" aria-label="Règle du classement">
+            <button type="button" data-v="win" aria-pressed="true">Seules les bonnes réponses comptent</button>
+            <button type="button" data-v="fair" aria-pressed="false">Une erreur fait perdre 1 point</button>
+          </div>
+          <span class="small muted" id="ruleHint"></span>
+        </div>
+        <div class="rk-rows" id="rkRows"></div>
+        <div class="legend"><span><i class="key rk-ok"></i>Justes</span><span><i class="key rk-idk"></i>« Je ne sais pas »</span><span><i class="key rk-bad"></i>Faux</span></div>
+        <p class="verdict" id="verdict" aria-live="polite"></p>
+      </div>
+      <p class="small muted">Chiffres publiés par OpenAI en septembre 2025, sur un test de questions courtes sur des faits (le test SimpleQA). Ici, on les ramène à 100 questions : 22 % justes = 22 bonnes réponses = 22 points.</p>
     </section>
 
     <section class="card s4">
@@ -1000,6 +1062,76 @@ guess($("#riskGuess"), {
   why: () => `${riskOf(readState())} % ! Sur un sujet rare ou local, l'IA a peu d'infos. Elle complète quand même. Active un document ou la recherche web pour voir le risque baisser.`,
   lock: [$("#riskSet"), $("#ringWrap"), $("#answer"), $("#levers")],
 });
+
+// Pourquoi elle devine : le classement compte les bonnes réponses, pas les erreurs.
+// Chiffres publiés par OpenAI (septembre 2025), test SimpleQA, en % des questions.
+const RANK = [
+  { kind: "Modèle prudent", name: "gpt-5-thinking-mini", ok: 22, idk: 52, bad: 26 },
+  { kind: "Modèle qui devine", name: "o4-mini", ok: 24, idk: 1, bad: 75 },
+];
+const RK_SEGS = [["ok", "justes"], ["idk", "« je ne sais pas »"], ["bad", "faux"]];
+const RULES = {
+  win: { score: (m) => m.ok, hint: "1 bonne réponse = 1 point. « Je ne sais pas » = 0 point. 1 erreur = 0 point.",
+    verdict: ["Au classement, celui qui devine gagne.", "Il se trompe pourtant trois fois plus."] },
+  fair: { score: (m) => m.ok - m.bad, hint: "1 bonne réponse = 1 point. « Je ne sais pas » = 0 point. 1 erreur = 1 point en moins.",
+    verdict: ["Avec cette règle, le modèle prudent gagne.", "Deviner ne paie plus : dire « je ne sais pas » devient malin."] },
+};
+const rkSegs = [];
+const rkRows = RANK.map((m) => {
+  const row = h("div", "rk"), name = h("div", "rk-name"), viz = h("div", "rk-viz"), bar = h("div", "rk-bar");
+  name.append(h("span", "eyebrow", m.kind), h("strong", "", m.name));
+  bar.setAttribute("role", "img");
+  bar.setAttribute("aria-label", RK_SEGS.map(([k, w]) => `${m[k]} % ${w}`).join(", "));
+  let left = 0;
+  for (const [k, w] of RK_SEGS) {
+    const s = h("span", "rk-" + k);
+    s.style.width = "0%";
+    // Une part trop fine pour son texte : l'étiquette passe au-dessus de la barre.
+    if (m[k] < 10) {
+      const t = h("span", "rk-tiny", `{caret-down} ${m[k]} % ${w}`);
+      t.style.marginLeft = left + "%";
+      viz.append(t);
+    } else s.append(h("b", "", `${m[k]} %`), h("span", "w", w));
+    bar.append(s);
+    rkSegs.push([s, m[k]]);
+    left += m[k];
+  }
+  viz.append(bar);
+  const n = h("b", "rk-n"), pts = h("span", "rk-pts"), calc = h("span", "rk-calc small muted"), place = h("span", "rk-place"), sc = h("div", "rk-score");
+  pts.append(n, "points");
+  sc.append(h("span", "small muted", "Score au classement"), pts, calc, place);
+  row.append(name, viz, sc);
+  $("#rkRows").append(row);
+  return { m, n, pts, calc, place };
+});
+function renderRank(rule) {
+  const R = RULES[rule], scores = RANK.map(R.score), best = Math.max(...scores);
+  rkRows.forEach(({ m, n, pts, calc, place }, i) => {
+    const win = scores[i] === best;
+    n.textContent = (scores[i] < 0 ? "−" : "") + Math.abs(scores[i]);
+    calc.textContent = `${m.ok} justes − ${m.bad} faux`;
+    calc.hidden = rule !== "fair";
+    rich(place, win ? "{trophy} Classé devant" : "Classé derrière");
+    pts.classList.toggle("win", win);
+    place.classList.toggle("win", win);
+  });
+  $("#ruleHint").textContent = R.hint;
+  $("#verdict").replaceChildren(h("strong", "", R.verdict[0]), " ", h("em", "", R.verdict[1]));
+}
+renderRank(initSeg($("#segRule"), renderRank));
+guess($("#rankGuess"), {
+  q: "deux IA passent le même test. L'une dit souvent « je ne sais pas ». L'autre devine toujours. Laquelle est classée devant ?",
+  options: [["prudent", "Celle qui dit « je ne sais pas »"], ["devine", "Celle qui devine toujours"]], a: "devine",
+  why: "Celle qui devine ! Sur 100 questions, elle a 24 bonnes réponses, contre 22. Mais elle se trompe 75 fois, contre 26.",
+  lock: $("#rank"),
+});
+// Les barres se remplissent quand la zone se débloque : floues, elles donneraient la réponse.
+{
+  const zone = $("#rank");
+  const grow = () => requestAnimationFrame(() => rkSegs.forEach(([s, w]) => { s.style.width = w + "%"; }));
+  if (!zone.classList.contains("locked")) grow();
+  else new MutationObserver((_, mo) => { if (!zone.classList.contains("locked")) { mo.disconnect(); grow(); } }).observe(zone, { attributes: true, attributeFilter: ["class"] });
+}
 
 // Jeu : surligne ce qu'il faut vérifier. [phrase, à vérifier ?, raison]
 const HL = [
