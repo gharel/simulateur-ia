@@ -37,54 +37,58 @@
 * { box-sizing: border-box; }
 body {
   margin: 0; background: var(--bg); color: var(--fg);
-  font-family: var(--font-body); font-size: 18px; line-height: 1.5;
+  font-family: var(--font-body); font-size: 18px; line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
-.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; }
-.bento { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; }
+.bento { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px; }
 .card {
-  border-radius: var(--radius); padding: 24px; min-width: 0;
-  display: flex; flex-direction: column; gap: 12px;
+  border-radius: var(--radius); padding: 28px 28px 24px; min-width: 0;
+  display: flex; flex-direction: column; gap: 14px;
 }
-.hero { grid-column: span 6; background: var(--surface); border: 1px solid var(--line); }
+.hero { grid-column: span 6; background: var(--surface); border: 1px solid var(--line); padding: 32px; gap: 20px; }
+.hero .lead + p { margin-top: -8px; }
+.hero > .eyebrow, .wide > .eyebrow { margin-bottom: -8px; }
 .fiche {
   grid-column: span 2; background: var(--accent); color: var(--on-accent);
   text-decoration: none; transition: transform .2s ease; position: relative;
 }
 .fiche:hover { transform: translateY(-4px); }
 .fiche:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
-.wide { grid-column: span 6; background: var(--surface); border: 1px solid var(--line); }
+.wide { grid-column: span 6; background: var(--surface); border: 1px solid var(--line); padding: 32px; gap: 20px; }
 .fiche.half { grid-column: span 3; }
-.part { grid-column: 1 / -1; display: grid; gap: 2px; margin-top: 12px; }
+/* Le titre d'une partie colle à ses fiches, loin de la partie d'avant. */
+.part { grid-column: 1 / -1; display: grid; gap: 4px; margin-top: 24px; margin-bottom: -6px; }
 .part h2 { font-size: 1.35rem; }
 @media (max-width: 900px) {
-  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
   .hero, .wide { grid-column: span 2; }
   .fiche, .fiche.half { grid-column: span 1; }
 }
 @media (max-width: 640px) {
-  .bento { grid-template-columns: minmax(0, 1fr); }
+  .bento { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .hero, .fiche, .fiche.half, .wide { grid-column: span 1; }
-  .card { padding: 18px; }
+  .card, .hero, .wide { padding: 24px 20px; }
+  .part { margin-top: 16px; margin-bottom: 0; }
 }
-h1, h2 { font-family: var(--font-display); font-weight: 400; line-height: 1.02; margin: 0; text-wrap: balance; }
-h1 { font-size: clamp(2.5rem, 7vw, 5rem); text-transform: uppercase; letter-spacing: -.02em; }
+h1, h2 { font-family: var(--font-display); font-weight: 400; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.5rem, 7vw, 5rem); line-height: 1.02; text-transform: uppercase; letter-spacing: -.02em; }
 h2 { font-size: 1.6rem; }
 p { margin: 0; max-width: 60ch; }
-.eyebrow { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.eyebrow { font-size: .78rem; font-weight: 700; line-height: 1.4; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
 .fiche .eyebrow { color: var(--on-accent); }
-.lead { font-size: 1.3rem; font-weight: 700; line-height: 1.35; }
-.fiche p { font-weight: 700; }
-.go { margin-top: auto; font-weight: 700; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-.foot { margin-top: 28px; color: var(--muted); font-size: .9rem; display: grid; gap: 10px; }
+.lead { font-size: 1.3rem; font-weight: 700; line-height: 1.45; }
+.fiche p { font-weight: 700; line-height: 1.5; }
+.go { margin-top: auto; padding-top: 10px; font-weight: 700; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.foot { margin-top: 48px; color: var(--muted); font-size: .9rem; line-height: 1.55; display: grid; gap: 16px; }
 .foot .btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .foot strong { color: var(--fg); }
 .foot code { white-space: nowrap; }
-.small { font-size: .9rem; }
+.small { font-size: .9rem; line-height: 1.55; }
 .muted { color: var(--muted); }
 
 /* Skazy Formation : logo en haut, mention en bas (même bloc dans chaque fiche) */
-.brand { margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.brand { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .brand a { display: inline-flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; color: var(--fg); text-decoration: none; border-radius: 10px; }
 .brand-logo { display: block; width: 109px; height: 36px; flex: none; }
 .brand-url { font-size: .85rem; font-weight: 700; color: var(--muted); padding-left: 14px; border-left: 2px solid var(--line); }
@@ -97,7 +101,7 @@ p { margin: 0; max-width: 60ch; }
 .brand .home:hover { border-color: var(--accent); }
 @media (max-width: 480px) { .brand-url { display: none; } }
 .modes { display: flex; flex-wrap: wrap; gap: 8px; }
-.modes-help { display: grid; gap: 4px; max-width: 80ch; }
+.modes-help { display: grid; gap: 8px; max-width: 80ch; }
 
 /* Parcours */
 .btn {
@@ -122,10 +126,10 @@ p { margin: 0; max-width: 60ch; }
 .star-off { opacity: .3; }
 
 /* Le permis */
-.lic-zone { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 24px; align-items: center; }
+.lic-zone { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 32px 48px; align-items: center; }
 @media (max-width: 900px) { .lic-zone { grid-template-columns: minmax(0, 1fr); } }
-.lic-side { display: grid; gap: 14px; align-content: start; }
-.lic-side label { display: grid; gap: 6px; font-weight: 700; }
+.lic-side { display: grid; gap: 20px; align-content: start; }
+.lic-side label { display: grid; gap: 8px; font-weight: 700; }
 .lic-side input {
   width: 100%; background: var(--surface-2); color: var(--fg); border: 2px solid var(--line);
   border-radius: 14px; padding: 12px 14px; font: inherit;
