@@ -945,9 +945,9 @@ $("#xray").addEventListener("change", () => { if ($("#xray").checked) unlockAi()
 {
   const { seen, all } = countWords(HIDE.mail);
   guess($("#hideGuess"), {
-    q: "cet e-mail de Claire a l'air normal. Combien de mots te sont cachés dedans ?",
-    options: [["0", "Aucun : tout est visible"], ["10", "Une dizaine"], ["30", "Plus de 30"]], a: "30",
-    why: `${all - seen} mots cachés, presque autant que les ${seen} mots que tu vois. Allume la lampe pour les lire.`,
+    q: "cet e-mail de Claire a l'air normal. Y a-t-il un texte caché dedans ?",
+    options: [["non", "Non, tout est visible"], ["oui", "Oui, un texte est caché"]], a: "oui",
+    why: `Il y a ${all - seen} mots cachés, ${all - seen > seen ? "plus" : "presque autant"} que les ${seen} mots que tu vois. Allume la lampe pour les lire.`,
     lock: [$("#lampSw"), $("#hideCtl")],
   });
 }
