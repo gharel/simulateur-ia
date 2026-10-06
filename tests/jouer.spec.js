@@ -55,6 +55,23 @@ test.describe("2-memoire.html : l'IA relit tout, à chaque message", () => {
   }
 });
 
+test("1-tokens.html : le compte est bon se gagne en 3 manches", async ({ page }) => {
+  await open(page, "1-tokens.html");
+  // « oui » fait 1 token : une phrase de N « oui » fait N tokens.
+  for (const goal of [5, 12, 20]) {
+    await page.locator("#cbTxt").fill(Array(goal).fill("oui").join(" "));
+    await page.locator("#cbCheck").click();
+    await expect(page.locator("#cbResult")).toContainText("Le compte est bon");
+    await page.locator("#cbNext").click();
+  }
+  // « Rejouer » repart de la manche 1. Un mot long fait plusieurs tokens : 7 au lieu de 5.
+  await expect(page.locator("#cbScore")).toHaveText("0 / 3");
+  await page.locator("#cbTxt").fill("anticonstitutionnellement");
+  await page.locator("#cbCheck").click();
+  await expect(page.locator("#cbResult")).toContainText("2 de trop");
+  await expect(page.locator("#cbToks .tok")).toHaveCount(7);
+});
+
 test("4-hallucinations.html : changer la règle du classement change le gagnant", async ({ page }) => {
   await open(page, "4-hallucinations.html");
   await page.locator("#rankGuess .qbtns button").first().click();

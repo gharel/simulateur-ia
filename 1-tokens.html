@@ -288,6 +288,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root { --accent: #C6FF00; }
 
 .tokens { display: flex; flex-wrap: wrap; gap: 6px; min-height: 48px; align-content: flex-start; }
+.tokens:empty { min-height: 0; }
 .tok {
   white-space: pre; padding: 4px 8px; border-radius: 8px; font-weight: 700; font-size: 1.05rem;
   background: var(--accent); color: var(--on-accent);
@@ -298,116 +299,13 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .ex { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface-2); border-radius: 12px; }
 .ex code { font-family: var(--font-body); font-weight: 700; overflow-wrap: anywhere; }
 .ex .n { font-family: var(--font-display); color: var(--accent-text); white-space: nowrap; }
-
-.mem { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 28px; }
-@media (max-width: 900px) { .mem { grid-template-columns: minmax(0, 1fr); } }
-.controls { display: grid; gap: 20px; align-content: start; }
-.viz { display: grid; gap: 18px; align-content: start; }
-.status { padding: 14px 16px; border-radius: 14px; font-weight: 700; background: var(--surface-2); }
-.status.ok { box-shadow: inset 4px 0 0 var(--ok); }
-.status.warn { box-shadow: inset 4px 0 0 var(--warn); }
-.status.squeeze { box-shadow: inset 4px 0 0 var(--accent); }
-
-.stack-wrap { position: relative; margin-bottom: 18px; }
-.stack { display: flex; height: 30px; border-radius: 10px; overflow: hidden; background: var(--surface-2); }
-.stack span { height: 100%; transition: width .45s ease; }
-.c-sys { background: var(--muted); }
-.c-msg { background: var(--accent); }
-.c-over { background: repeating-linear-gradient(45deg, var(--bad) 0 8px, color-mix(in oklab, var(--bad) 45%, var(--surface)) 8px 16px); }
-.c-sum { background: repeating-linear-gradient(45deg, var(--warn) 0 6px, color-mix(in oklab, var(--warn) 40%, var(--surface)) 6px 12px); }
-.limit { position: absolute; top: -6px; bottom: -6px; width: 3px; background: var(--fg); border-radius: 2px; transition: left .45s ease; }
-.limit::after { content: "limite"; position: absolute; top: calc(100% + 2px); left: 50%; transform: translateX(-50%); font-size: .75rem; font-weight: 700; color: var(--fg); }
-.bar-label { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; margin-bottom: 8px; flex-wrap: wrap; }
-.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: .9rem; color: var(--muted); }
-.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; }
-
 .btns { display: flex; flex-wrap: wrap; gap: 8px; }
-.stair { display: grid; gap: 8px; }
-.srow { display: grid; grid-template-columns: 70px minmax(0, 1fr) 84px; gap: 10px; align-items: center; font-weight: 700; font-size: .9rem; }
-.srow .sn { text-align: right; font-variant-numeric: tabular-nums; color: var(--accent-text); }
-.srow.gap { color: var(--muted); font-size: 1.2rem; line-height: 1; }
-.sbar { display: flex; height: 22px; overflow: hidden; }
-.sbar span { height: 100%; flex: none; box-shadow: inset -2px 0 0 var(--surface); transition: width .45s ease; }
-.sbar span:first-child { border-radius: 5px 0 0 5px; }
-.sbar span:last-child { border-radius: 0 5px 5px 0; box-shadow: none; }
-.b-sys { background: var(--muted); }
-.b-old { background: color-mix(in oklab, var(--accent) 50%, var(--surface)); }
-.b-new { background: var(--accent); }
-.bars { display: flex; align-items: flex-end; gap: 2px; height: 150px; border-bottom: 2px solid var(--line); }
-.bars span { flex: 1 1 0; min-width: 0; border-radius: 4px 4px 0 0; background: color-mix(in oklab, var(--accent) 50%, var(--surface)); transition: height .3s ease; }
-.bars span:last-child { background: var(--accent); }
-.bars-ends { display: flex; justify-content: space-between; gap: 10px; font-size: .85rem; color: var(--muted); margin-top: 6px; }
-
-.dots { display: flex; flex-wrap: wrap; gap: 3px; }
-.dot { width: 10px; height: 10px; border-radius: 3px; background: var(--accent); }
-.dot.old { background: transparent; box-shadow: inset 0 0 0 1.5px var(--warn); }
-
-/* Jeu : ta journée */
-.day-card { background: var(--surface-2); border-radius: 16px; padding: 18px; display: grid; gap: 12px; box-shadow: inset 4px 0 0 var(--accent); }
-.day-card .q { font-family: var(--font-display); font-size: 1.2rem; line-height: 1.2; }
-.day-card .btns .btn { flex: 1 1 200px; }
-.day-card > .btn { justify-self: start; }
-.day-log { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.day-log li { padding: 10px 12px; border-radius: 10px; background: var(--surface-2); font-weight: 700; font-size: .95rem; }
-.day-log li.ok { box-shadow: inset 4px 0 0 var(--ok); }
-.day-log li.bad { box-shadow: inset 4px 0 0 var(--bad); }
-.day-log li.start { box-shadow: inset 4px 0 0 var(--muted); }
-.convs { display: grid; gap: 10px; }
-.conv { display: grid; gap: 4px; }
-.conv-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-weight: 700; font-size: .9rem; }
-.conv-top span:last-child { color: var(--accent-text); font-variant-numeric: tabular-nums; }
-.conv .track { height: 18px; }
-.dot.sys { width: 23px; background: var(--muted); }
-
-/* Animation : ce que tu vois, ce que l'IA relit à chaque envoi */
 .btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-.status.bad { box-shadow: inset 4px 0 0 var(--bad); }
-.replay { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 16px; }
-.rp-col { display: grid; grid-template-rows: auto 1fr; gap: 10px; min-width: 0; }
-.rp-col h3 { display: flex; align-items: center; gap: 8px; }
-.rp-col h3 .svg-inline--fa { color: var(--accent-text); }
-.chat, .ai-read { display: flex; flex-direction: column; gap: 8px; min-height: 260px; padding: 14px; border-radius: 16px; }
-/* Comme sur un téléphone : la conversation défile, le dernier message reste visible. */
-.chat { background: var(--surface-2); max-height: 600px; overflow-y: auto; }
-.cb.lost { outline: 3px dashed var(--bad); outline-offset: 3px; }
-.ai-read { border: 2px dashed var(--line); }
-.cb { max-width: 88%; display: grid; gap: 2px; padding: 8px 12px; font-weight: 700; animation: pop .3s ease both; }
-.cb.me { align-self: flex-end; background: var(--accent); color: var(--on-accent); border-radius: 16px 16px 4px 16px; }
-.cb.ai { align-self: flex-start; background: var(--surface); border-radius: 16px 16px 16px 4px; }
-.cb.go { animation: sent .8s ease; }
-.cb .who, .rl .who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
-.cb.me .who { color: var(--on-accent); }
-.typing { display: flex; gap: 5px; padding: 14px 16px; }
-.typing span { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); animation: bounce 1s ease infinite; }
-.typing span:nth-child(2) { animation-delay: .15s; }
-.typing span:nth-child(3) { animation-delay: .3s; }
-.rp-arrow { display: grid; justify-items: center; align-content: center; gap: 8px; max-width: 120px; text-align: center; font-size: .85rem; font-weight: 700; color: var(--muted); }
-.rp-ic { font-size: 2rem; color: var(--accent-text); }
-.rp-ic.go { animation: nudge .8s ease; }
-@media (max-width: 760px) {
-  .replay { grid-template-columns: minmax(0, 1fr); }
-  .rp-arrow { justify-self: center; max-width: none; }
-  .chat { max-height: 360px; }
-  .rp-ic .svg-inline--fa { transform: rotate(90deg); }
-}
-.rl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 7px 10px; border-radius: 10px; background: var(--surface-2); font-weight: 700; font-size: .95rem; animation: pop .25s ease both; transform-origin: top; }
-.rl .n { font-size: .8rem; color: var(--accent-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.rl .t { grid-column: 1 / -1; }
-.rl.sys { box-shadow: inset 4px 0 0 var(--muted); }
-.rl.old { box-shadow: inset 4px 0 0 color-mix(in oklab, var(--accent) 50%, var(--surface)); }
-.rl.new { box-shadow: inset 4px 0 0 var(--accent); }
-.rl.sum { box-shadow: inset 4px 0 0 var(--warn); outline: 2px dashed var(--warn); outline-offset: -2px; }
-.rl.scan { outline: 2px solid var(--accent-text); outline-offset: -2px; }
-.rl.squash { animation: squash .45s ease forwards; }
-.rl-zone { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-top: 4px; }
-.rl-zone.mid { color: var(--warn); }
-.rp-empty, .rp-foot { font-weight: 700; font-size: .95rem; color: var(--muted); }
-.rp-empty { margin: auto 0; text-align: center; max-width: none; }
-@keyframes pop { from { transform: translateY(10px) scale(.95); } }
-@keyframes sent { 40% { transform: translateX(8px); box-shadow: 0 0 0 3px var(--accent-text); } }
-@keyframes nudge { 40% { transform: scale(1.35); } }
-@keyframes bounce { 30% { transform: translateY(-5px); } }
-@keyframes squash { to { transform: scaleY(0); } }
+
+/* Jeu : le compte est bon */
+.cb-game { display: grid; gap: 14px; max-width: 760px; }
+.cb-goal { display: grid; gap: 2px; padding: 14px 16px; border-radius: 14px; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
+.cb-goal strong { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; line-height: 1.2; }
 </style>
 
 <main class="wrap">
@@ -462,181 +360,25 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span><h2>L'IA relit tout, à chaque message</h2></div>
-      <p>L'IA ne se souvient de rien entre deux messages. À chaque envoi, elle reçoit à nouveau <strong>toute la conversation depuis le début</strong> :
-        ses consignes, tes messages et ses réponses. Envoie les messages un par un, et regarde ce qu'elle lit.</p>
-      <div class="btns">
-        <button type="button" class="btn go" id="rpNext"></button>
-        <button type="button" class="btn" id="rpReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Recommencer</button>
-      </div>
-      <div class="status" id="rpStatus" aria-live="polite"></div>
-      <div class="replay">
-        <div class="rp-col">
-          <h3><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i> Ce que tu vois</h3>
-          <div class="chat" id="rpChat" data-empty="Ta conversation va s'afficher ici."></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></span><h2>Jeu : le compte est bon</h2><span class="pill" id="cbScore">0 / 3</span></div>
+      <p>Écris une phrase qui fait <strong>exactement</strong> le bon nombre de tokens. Puis vérifie.</p>
+      <p class="small muted">Astuce : un mot court fait 1 token. Un mot long en fait plusieurs. La ponctuation compte aussi.</p>
+      <div class="cb-game">
+        <div class="cb-goal"><span class="eyebrow" id="cbStep"></span><strong id="cbWhat"></strong></div>
+        <label class="ctl" for="cbTxt">Ta phrase
+          <textarea id="cbTxt" rows="2"></textarea>
+        </label>
+        <div class="btns">
+          <button type="button" class="btn go" id="cbCheck"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Vérifier</button>
+          <button type="button" class="btn" id="cbSkip"><i class="fa-solid fa-forward" aria-hidden="true"></i> Je passe</button>
+          <button type="button" class="btn go" id="cbNext" hidden></button>
         </div>
-        <div class="rp-arrow" aria-hidden="true"><span class="rp-ic" id="rpArrow"><i class="fa-solid fa-arrow-right"></i></span><span>À chaque envoi, tout repart</span></div>
-        <div class="rp-col">
-          <h3><i class="fa-solid fa-robot" aria-hidden="true"></i> Ce que l'IA lit</h3>
-          <div class="ai-read" id="rpRead"></div>
-        </div>
-      </div>
-      <div>
-        <div class="bar-label"><span>Tokens lus à chaque envoi</span><span class="muted" id="rpTot"></span></div>
-        <div class="stair" id="rpBars" data-empty="Envoie un message pour voir les tokens lus."></div>
-      </div>
-      <div class="legend">
-        <span><i class="b-sys"></i>Consignes</span>
-        <span><i class="b-old"></i>Messages d'avant, relus</span>
-        <span><i class="b-new"></i>Nouveau message</span>
-        <span><i class="c-sum"></i>Résumé du milieu</span>
-      </div>
-      <p class="small muted">Les consignes sont le texte que l'IA reçoit avant ta conversation. Tu ne les vois pas, mais elle les relit à chaque fois. Dans la vraie vie, elles font souvent des milliers de tokens.</p>
-    </section>
-
-    <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></span><h2>Plus c'est long, plus ça coûte</h2></div>
-      <p>Tout ce que l'IA relit, ce sont des <strong>tokens d'entrée</strong>, et ils se paient.
-        À chaque envoi, elle relit les consignes, toutes tes questions, toutes ses réponses, puis ta nouvelle question.</p>
-      <div id="convGuess"></div>
-      <div class="mem" id="convMem">
-        <div class="controls stick">
-          <div class="ctl">
-            <div class="ctl-row"><label for="nSend">Messages envoyés</label><span class="ctl-val" id="vSend">8</span></div>
-            <input type="range" id="nSend" min="1" max="40" value="8">
-            <div class="ctl-ends"><span>1 message</span><span>40 messages</span></div>
-          </div>
-          <div class="btns">
-            <button type="button" class="btn" id="btnSend"><i class="fa-solid fa-plus" aria-hidden="true"></i> Envoyer un message</button>
-            <button type="button" class="btn" id="btnReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Recommencer</button>
-          </div>
-          <div class="ctl">
-            <span>Taille d'un échange</span>
-            <div class="seg" id="segSend" role="group" aria-label="Taille d'un échange">
-              <button type="button" data-v="150" aria-pressed="false">Court</button>
-              <button type="button" data-v="800" aria-pressed="true">Moyen</button>
-              <button type="button" data-v="5000" aria-pressed="false">Avec un document</button>
-            </div>
-            <span class="small muted">Un échange = ta question + la réponse de l'IA.</span>
-          </div>
-          <div class="stats">
-            <div class="stat"><b id="sLast">0</b><span>tokens relus pour ce message</span></div>
-            <div class="stat"><b id="sCum">0</b><span>tokens lus en tout</span></div>
-            <div class="stat"><b id="sMult">×1</b><span>par rapport au texte écrit</span></div>
-          </div>
-        </div>
-
-        <div class="viz">
-          <div>
-            <div class="bar-label"><span>Ce que l'IA relit à chaque envoi</span></div>
-            <div class="stair" id="stair" aria-hidden="true"></div>
-          </div>
-          <div class="legend">
-            <span><i class="b-sys"></i>Consignes de départ</span>
-            <span><i class="b-old"></i>Anciens échanges, relus</span>
-            <span><i class="b-new"></i>Nouvelle question</span>
-          </div>
-          <div>
-            <div class="bar-label"><span>Tokens lus, envoi après envoi</span><span class="muted" id="lBars"></span></div>
-            <div class="bars" id="bars" aria-hidden="true"></div>
-            <div class="bars-ends"><span>1er envoi</span><span id="lBarsEnd"></span></div>
-          </div>
-          <div class="status" id="convStatus" aria-live="polite"></div>
-          <p class="small muted">Les spécialistes disent que ça grimpe de façon « quadratique » : 2 fois plus de messages, c'est environ 4 fois plus de tokens lus.
-            Certains services gardent le début de la conversation en cache : la relecture coûte alors moins cher, mais elle remplit quand même la mémoire.</p>
-        </div>
+        <div class="tokens" id="cbToks" aria-hidden="true"></div>
+        <div class="result" id="cbResult" aria-live="polite"></div>
       </div>
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-briefcase"></i></span><h2>Jeu : ta journée en 4 moments</h2><span class="pill" id="dayScore">0 / 3</span></div>
-      <p>Tu travailles avec l'IA toute la journée. À chaque moment, choisis : <strong>continuer</strong> la même conversation, ou en ouvrir une <strong>nouvelle</strong> ?</p>
-      <div class="mem">
-        <div class="controls stick">
-          <div class="day-card" id="dayCard" tabindex="-1"></div>
-          <ol class="day-log" id="dayLog" aria-live="polite"></ol>
-        </div>
-        <div class="viz">
-          <div class="stats">
-            <div class="stat"><b id="dayTok">0</b><span>tokens lus aujourd'hui</span></div>
-            <div class="stat"><b id="dayConvN">1</b><span>conversations ouvertes</span></div>
-          </div>
-          <div>
-            <div class="bar-label"><span>Tes conversations</span><span class="muted">tokens relus au dernier message</span></div>
-            <div class="convs" id="dayConvs"></div>
-          </div>
-          <div class="result" id="dayResult" aria-live="polite"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>La mémoire de travail de l'IA</h2></div>
-      <p>L'IA a une mémoire de taille fixe. On l'appelle la <strong>fenêtre de contexte</strong>.
-        Toute la conversation doit tenir dedans. Si elle déborde, l'IA fait un résumé : c'est la <strong>compression</strong>.
-        Elle garde le début (ses consignes) et la fin (les derniers messages). <strong>Le milieu devient un court résumé, et ses détails se perdent.</strong></p>
-      <div class="mem">
-        <div class="controls stick">
-          <div class="ctl">
-            <div class="ctl-row"><label for="nMsg">Nombre de messages</label><span class="ctl-val" id="vMsg">300</span></div>
-            <input type="range" id="nMsg" min="1" max="400" value="300">
-            <div class="ctl-ends"><span>1 message</span><span>400 messages</span></div>
-          </div>
-          <div class="ctl">
-            <span>Taille d'un message</span>
-            <div class="seg" id="segPer" role="group" aria-label="Taille d'un message">
-              <button type="button" data-v="150" aria-pressed="false">Court</button>
-              <button type="button" data-v="800" aria-pressed="true">Moyen</button>
-              <button type="button" data-v="5000" aria-pressed="false">Avec un document</button>
-            </div>
-            <span class="small muted" id="perHint">≈ 800 tokens par message (question + réponse)</span>
-          </div>
-          <div class="ctl">
-            <span>Taille de la mémoire</span>
-            <div class="seg" id="segWin" role="group" aria-label="Taille de la mémoire">
-              <button type="button" data-v="200000" aria-pressed="true">200 000 tokens</button>
-              <button type="button" data-v="1000000" aria-pressed="false">1 million</button>
-            </div>
-            <span class="small muted">200 000 tokens ≈ un gros roman. 1 million ≈ 5 romans.</span>
-          </div>
-        </div>
-
-        <div class="viz">
-          <div class="stats">
-            <div class="stat"><b id="sFill">0 %</b><span>mémoire remplie</span></div>
-            <div class="stat"><b id="sAfter">–</b><span>après compression</span></div>
-            <div class="stat"><b id="sReread">0</b><span>tokens relus à chaque nouveau message</span></div>
-          </div>
-
-          <div>
-            <div class="bar-label"><span>Sans compression</span><span class="muted" id="lRaw"></span></div>
-            <div class="stack-wrap">
-              <div class="stack"><span class="c-sys" id="rSys"></span><span class="c-msg" id="rMsg"></span><span class="c-over" id="rOver"></span></div>
-              <div class="limit" id="rLimit"></div>
-            </div>
-          </div>
-          <div>
-            <div class="bar-label"><span>Avec compression</span><span class="muted" id="lCmp"></span></div>
-            <div class="stack"><span class="c-sys" id="cSys"></span><span class="c-sum" id="cSum"></span><span class="c-msg" id="cMsg"></span></div>
-          </div>
-          <div class="legend">
-            <span><i class="c-sys"></i>Consignes de départ</span>
-            <span><i class="c-msg"></i>Messages gardés en entier</span>
-            <span><i class="c-sum"></i>Résumé du milieu</span>
-            <span><i class="c-over"></i>Ça déborde</span>
-          </div>
-
-          <div class="status" id="status" aria-live="polite"></div>
-
-          <div class="ctl">
-            <span class="small muted">Le gris = les consignes. Chaque carré = 1 message. Les carrés vides, au milieu, sont résumés.</span>
-            <div class="dots" id="dots" aria-hidden="true"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card s2">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-book"></i></span><h2>Ça fait combien de tokens ?</h2></div>
       <div class="tbl-wrap">
         <table>
@@ -650,16 +392,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           </tbody>
         </table>
       </div>
-      <p class="small muted">Ordres de grandeur pour un texte en français.</p>
+      <p class="small muted">Ordres de grandeur pour un texte en français. 200 000 tokens, c'est la taille de la mémoire de beaucoup d'IA (voir la fiche suivante).</p>
     </section>
 
-    <section class="card s2 retenir">
+    <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
-        <li><span>L'IA lit et écrit en tokens. Un token = un petit bout de mot.</span></li>
-        <li><span>Chaque message renvoie toute la conversation. Plus elle est longue, plus chaque nouveau message coûte cher.</span></li>
-        <li><span>Sa mémoire a une taille fixe. Quand elle est pleine, l'IA garde le début et la fin, et résume le milieu. Les détails du milieu se perdent.</span></li>
-        <li><span>Pour un nouveau sujet, ouvre une nouvelle conversation. C'est plus rapide, moins cher et plus précis.</span></li>
+        <li><span>L'IA lit et écrit en tokens. Un token = un petit bout de mot, souvent 3 ou 4 lettres.</span></li>
+        <li><span>Un mot court = 1 token. Un mot long ou rare = plusieurs tokens. La ponctuation compte aussi.</span></li>
+        <li><span>Tout se compte en tokens : ce que l'IA lit, ce qu'elle écrit, et ce que ça coûte.</span></li>
       </ul>
     </section>
 
@@ -951,13 +692,14 @@ function tokenize(text) {
   return out;
 }
 
+const tokChips = (toks) => toks.map((s) => { const e = document.createElement("span"); e.className = "tok"; e.textContent = s; return e; });
 const txt = $("#txt");
 function renderText() {
   const t = txt.value;
   const toks = tokenize(t);
   const words = (t.match(/[\p{L}\p{N}][\p{L}\p{M}\p{N}'’-]*/gu) || []).length;
   const box = $("#toks");
-  box.replaceChildren(...toks.slice(0, 400).map((s) => { const e = document.createElement("span"); e.className = "tok"; e.textContent = s; return e; }));
+  box.replaceChildren(...tokChips(toks.slice(0, 400)));
   $("#sWords").textContent = fmt(words);
   $("#sToks").textContent = fmt(toks.length);
   $("#sChars").textContent = fmt([...t].length);
@@ -973,272 +715,6 @@ $("#examples").replaceChildren(...["chat", "maison", "incroyable", "anticonstitu
   return d;
 }));
 
-// Mémoire de travail
-const SYS = 2000;
-const mem = { n: 300, per: 800, W: 200000 };
-const PER_HINT = { 150: "≈ 150 tokens par message (petite question, petite réponse)", 800: "≈ 800 tokens par message (question + réponse)", 5000: "≈ 5 000 tokens par message (on colle un document)" };
-const pct = (a, b) => (a / b) * 100 + "%";
-
-function renderMem() {
-  const { n, per, W } = mem;
-  const msgs = n * per;
-  const used = SYS + msgs;
-  const fill = used / W;
-  const compress = used > 0.95 * W;
-
-  $("#vMsg").textContent = fmt(n);
-  $("#perHint").textContent = PER_HINT[per];
-  $("#sFill").textContent = fmt(fill * 100) + " %";
-  $("#lRaw").textContent = fmt(used) + " tokens";
-
-  const scale = Math.max(used, W);
-  $("#rSys").style.width = pct(SYS, scale);
-  $("#rMsg").style.width = pct(Math.min(msgs, W - SYS), scale);
-  $("#rOver").style.width = pct(Math.max(0, used - W), scale);
-  $("#rLimit").style.left = `calc(${pct(W, scale)} - 2px)`;
-
-  let kept = n, summary = 0;
-  if (compress) {
-    summary = Math.max(2000, Math.round(0.02 * W));
-    kept = Math.max(1, Math.floor((0.4 * W) / per));
-  }
-  const after = SYS + summary + kept * per;
-  $("#cSys").style.width = pct(SYS, W);
-  $("#cSum").style.width = pct(summary, W);
-  $("#cMsg").style.width = pct(kept * per, W);
-  $("#sAfter").textContent = compress ? fmt((after / W) * 100) + " %" : "–";
-  $("#lCmp").textContent = compress ? fmt(after) + " tokens" : "pas nécessaire";
-  $("#sReread").textContent = fmt(compress ? after : Math.min(used, W));
-
-  const st = $("#status");
-  if (compress) {
-    st.className = "status squeeze";
-    rich(st, `{compress} Compression ! L'IA garde le début (ses consignes) et la fin (les ${fmt(kept)} derniers messages). Les ${fmt(n - kept)} messages du milieu deviennent un court résumé : leurs détails se perdent.`);
-  } else if (fill > 0.7) {
-    st.className = "status warn";
-    rich(st, "{triangle-exclamation} La mémoire est presque pleine. Bientôt, l'IA devra résumer le début.");
-  } else {
-    st.className = "status ok";
-    rich(st, "{circle-check} Tout tient dans la mémoire. L'IA se souvient de chaque message.");
-  }
-
-  const dots = $("#dots");
-  const frag = document.createDocumentFragment();
-  frag.appendChild(h("span", "dot sys"));
-  for (let i = 0; i < n; i++) {
-    const d = document.createElement("span");
-    d.className = i < n - kept ? "dot old" : "dot";
-    frag.appendChild(d);
-  }
-  dots.replaceChildren(frag);
-}
-
-$("#nMsg").addEventListener("input", (e) => { mem.n = +e.target.value; renderMem(); });
-mem.per = +initSeg($("#segPer"), (v) => { mem.per = +v; renderMem(); });
-mem.W = +initSeg($("#segWin"), (v) => { mem.W = +v; renderMem(); });
-
-// Conversation qui s'allonge : chaque envoi relit tout l'historique
-const conv = { n: 8, per: 800 };
-const qOf = (per) => Math.round(per * 0.3);
-const inputAt = (i, per) => SYS + (i - 1) * per + qOf(per);
-const cumTo = (n, per) => { let s = 0; for (let i = 1; i <= n; i++) s += inputAt(i, per); return s; };
-
-function block(cls, w) { const s = document.createElement("span"); s.className = cls; s.style.width = w; return s; }
-function stairRow(i, per, max) {
-  const row = document.createElement("div"); row.className = "srow";
-  const lab = document.createElement("span"); lab.textContent = `Envoi ${i}`;
-  const bar = document.createElement("div"); bar.className = "sbar";
-  bar.append(block("b-sys", pct(SYS, max)));
-  for (let k = 1; k < i; k++) bar.append(block("b-old", pct(per, max)));
-  bar.append(block("b-new", pct(qOf(per), max)));
-  const val = document.createElement("span"); val.className = "sn"; val.textContent = fmt(inputAt(i, per));
-  row.append(lab, bar, val);
-  return row;
-}
-
-function renderConv() {
-  const { n, per } = conv;
-  const last = inputAt(n, per);
-  const cum = cumTo(n, per);
-  const written = SYS + n * per;
-
-  $("#vSend").textContent = fmt(n);
-  $("#sLast").textContent = fmt(last);
-  $("#sCum").textContent = fmt(cum);
-  $("#sMult").textContent = "×" + fmt(cum / written, 1);
-
-  const rows = n <= 7 ? Array.from({ length: n }, (_, k) => k + 1) : [1, 2, 3, 0, n - 1, n];
-  $("#stair").replaceChildren(...rows.map((i) => {
-    if (i) return stairRow(i, per, last);
-    const g = document.createElement("div"); g.className = "srow gap"; g.append(h("span"), h("span", "", "{ellipsis-vertical}"));
-    return g;
-  }));
-
-  $("#bars").replaceChildren(...Array.from({ length: n }, (_, k) => {
-    const s = document.createElement("span"); s.style.height = pct(inputAt(k + 1, per), last); return s;
-  }));
-  $("#lBars").textContent = `dernier : ${fmt(last)}`;
-  $("#lBarsEnd").textContent = n > 1 ? `${n}e envoi` : "";
-
-  const c2 = cumTo(2 * n, per);
-  let msg = `{chart-line} Avec ${fmt(2 * n)} messages au lieu de ${fmt(n)}, l'IA lirait ${fmt(c2)} tokens en tout : ×${fmt(c2 / cum, 1)}, pas ×2.`;
-  if (n > 10) {
-    const split = Math.floor(n / 10) * cumTo(10, per) + cumTo(n % 10, per);
-    msg += ` {lightbulb} En ouvrant une nouvelle conversation tous les 10 messages : ${fmt(split)} tokens (−${fmt((1 - split / cum) * 100)} %).`;
-  }
-  if (last > 200000) msg += " {triangle-exclamation} La conversation dépasse 200 000 tokens : l'IA doit compresser (voir plus bas).";
-  const st = $("#convStatus");
-  st.className = "status " + (last > 200000 ? "warn" : n > 10 ? "squeeze" : "ok");
-  rich(st, msg);
-}
-
-const nSend = $("#nSend");
-function setSend(v) { conv.n = Math.min(+nSend.max, Math.max(1, v)); nSend.value = conv.n; paintRange(nSend); renderConv(); }
-nSend.addEventListener("input", () => setSend(+nSend.value));
-$("#btnSend").addEventListener("click", () => setSend(conv.n + 1));
-$("#btnReset").addEventListener("click", () => setSend(1));
-conv.per = +initSeg($("#segSend"), (v) => { conv.per = +v; renderConv(); });
-
-// Animation : à chaque envoi, l'IA reçoit toute la conversation depuis le début, puis elle oublie tout.
-// Après le 4e envoi, la mémoire est pleine : le milieu devient un résumé, et un détail se perd.
-const RP_SYS = "Tu es un assistant poli. Réponds en français.";
-const RP = [
-  ["Bonjour !", "Bonjour ! Comment puis-je t'aider ?"],
-  ["Ça va ?", "Ça va, et toi ?"],
-  ["Que peux-tu me proposer ce week-end ? Je n'aime pas le bateau.", "Une balade au parc de la Rivière Bleue, ou un pique-nique à l'Anse Vata."],
-  ["Super ! Et pour dimanche ?", "Une randonnée au mont Dzumac, par exemple."],
-  ["Une autre idée ?", "Une journée au phare Amédée, en bateau !"],
-];
-const RP_SUM = "Il a dit bonjour. Il cherche une sortie pour le week-end.";
-const RP_MID = 3; // les 3 premiers échanges forment le milieu, résumé par la compression
-const RP_LOST = 2; // l'échange qui contient « Je n'aime pas le bateau »
-const RP_STEPS = [0, 1, 2, 3, "cmp", 4];
-const RP_CLS = { sys: "b-sys", old: "b-old", new: "b-new", sum: "c-sum" };
-const ntok = (t) => tokenize(t).length;
-const rpPast = (from, to) => RP.slice(from, to).flatMap(([me, ai]) => [{ kind: "old", who: "Toi", t: me }, { kind: "old", who: "IA", t: ai }]);
-// Ce que l'IA lit à l'envoi k : consignes, échanges d'avant (ou leur résumé), nouveau message.
-function rpPacket(k) {
-  const before = k > RP_MID ? [{ kind: "sum", who: "Résumé du milieu", t: RP_SUM }, ...rpPast(RP_MID, k)] : rpPast(0, k);
-  return [{ kind: "sys", who: "Consignes", t: RP_SYS }, ...before, { kind: "new", who: "Toi · nouveau message", t: RP[k][0] }];
-}
-const rpSize = (lines) => lines.reduce((s, l) => s + ntok(l.t), 0);
-const RP_MAX = Math.max(...RP.map((_, k) => rpSize(rpPacket(k))));
-const rp = { step: 0, gen: 0, read: 0, wrote: 0 };
-const rpWait = (ms) => new Promise((ok) => setTimeout(ok, matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : ms));
-
-function rpBubble(cls, who, t) { const b = h("div", "cb " + cls); b.append(h("span", "who", who), h("span", "", t)); return b; }
-function rpPost(el) { const chat = $("#rpChat"); chat.append(el); chat.scrollTop = chat.scrollHeight; }
-function rpLine({ kind, who, t }) {
-  const d = h("div", "rl " + kind), n = ntok(t);
-  d.append(h("span", "who", who), h("span", "n", `${n} token${n > 1 ? "s" : ""}`), h("span", "t", t));
-  return d;
-}
-function rpSay(cls, text) { const st = $("#rpStatus"); st.className = "status " + cls; rich(st, text); }
-function rpBar(k, lines) {
-  const row = h("div", "srow"), bar = h("div", "sbar");
-  bar.append(...lines.map((l) => block(RP_CLS[l.kind], pct(ntok(l.t), RP_MAX))));
-  row.append(h("span", "", `Envoi ${k + 1}`), bar, h("span", "sn", fmt(rpSize(lines))));
-  $("#rpBars").append(row);
-  $("#rpTot").textContent = `${fmt(rp.read)} tokens lus, ${fmt(rp.wrote)} écrits par toi`;
-}
-
-// L'IA lit le paquet ligne par ligne. Renvoie false si on a recommencé entre-temps.
-async function rpScan(lines, gen) {
-  const box = $("#rpRead");
-  box.replaceChildren();
-  let prev = null;
-  for (const l of lines) {
-    const el = rpLine(l);
-    if (prev) prev.classList.remove("scan");
-    el.classList.add("scan");
-    box.append(el);
-    prev = el;
-    await rpWait(300);
-    if (gen !== rp.gen) return false;
-  }
-  prev.classList.remove("scan");
-  return true;
-}
-
-async function rpSend(k, gen) {
-  const [me, ai] = RP[k], lines = rpPacket(k), chat = $("#rpChat"), last = k === RP.length - 1;
-  rpPost(rpBubble("me", "Toi", me));
-  // Toute la conversation part vers l'IA, pas seulement le dernier message.
-  for (const el of [...$$(".cb", chat), $("#rpArrow")]) { el.classList.remove("go"); void el.offsetWidth; el.classList.add("go"); }
-  rpSay("squeeze", `{paper-plane} Envoi ${k + 1} : ton appli envoie à l'IA toute la conversation, depuis le début.`);
-  $("#rpRead").replaceChildren(h("p", "rp-empty", "{eraser} L'IA ne se souvient de rien. Elle reçoit tout…"));
-  await rpWait(900);
-  if (gen !== rp.gen || !(await rpScan(lines, gen))) return;
-  rp.read += rpSize(lines);
-  rp.wrote += ntok(me);
-  rpBar(k, lines);
-  const typing = h("div", "cb ai typing");
-  typing.append(h("span"), h("span"), h("span"));
-  rpPost(typing);
-  await rpWait(900);
-  if (gen !== rp.gen) return;
-  typing.remove();
-  rpPost(rpBubble("ai", "IA", ai));
-  const n = fmt(rpSize(lines));
-  if (last) {
-    $$(".cb.me", chat)[RP_LOST].classList.add("lost");
-    rpSay("bad", "{triangle-exclamation} L'IA propose du bateau ! « Je n'aime pas le bateau » était au milieu de la conversation. Le résumé l'a perdu.");
-    return;
-  }
-  $("#rpRead").append(h("p", "rp-foot", "{eraser} Après sa réponse, l'IA oublie tout."));
-  rpSay("ok", k === 0
-    ? `{circle-check} Envoi 1 : l'IA a lu ses consignes et ton message, soit ${n} tokens. Puis elle a tout oublié.`
-    : `{rotate} Envoi ${k + 1} : l'IA a tout relu depuis le début, soit ${n} tokens. Puis elle a encore tout oublié.`);
-}
-
-// La mémoire est pleine : début et fin gardés, le milieu devient un court résumé.
-async function rpCompress(gen) {
-  const box = $("#rpRead");
-  const zone = (cls, t) => h("p", "rl-zone " + cls, t);
-  const mid = rpPast(0, RP_MID).map(rpLine), zMid = zone("mid", "{compress} Milieu : va être résumé");
-  box.replaceChildren(zone("", "Début : gardé"), rpLine({ kind: "sys", who: "Consignes", t: RP_SYS }), zMid, ...mid,
-    zone("", "Fin : gardée"), ...rpPast(RP_MID, RP_MID + 1).map(rpLine));
-  rpSay("warn", "{forward} Plus tard : la conversation a duré des heures. La mémoire de l'IA est pleine.");
-  await rpWait(1600);
-  if (gen !== rp.gen) return;
-  mid.forEach((el, i) => { el.style.animationDelay = i * 90 + "ms"; el.classList.add("squash"); });
-  await rpWait(500 + mid.length * 90);
-  if (gen !== rp.gen) return;
-  mid[0].before(rpLine({ kind: "sum", who: "Résumé du milieu", t: RP_SUM }));
-  mid.forEach((el) => el.remove());
-  rich(zMid, "{compress} Milieu : résumé, des détails se perdent");
-  rpSay("warn", "{compress} Compression : l'IA garde le début (ses consignes) et la fin (le dernier échange). Le milieu devient un court résumé. Toi, tu vois toujours toute la conversation.");
-}
-
-function rpButton() {
-  const s = RP_STEPS[rp.step], b = $("#rpNext");
-  b.hidden = s === undefined;
-  b.disabled = false;
-  if (s !== undefined) rich(b, s === "cmp" ? "{forward} Plus tard : la mémoire est pleine" : `{paper-plane} Envoyer : « ${RP[s][0]} »`);
-}
-function rpReset() {
-  rp.gen++;
-  rp.step = rp.read = rp.wrote = 0;
-  $("#rpChat").replaceChildren();
-  $("#rpRead").replaceChildren(h("p", "rp-empty", "{eraser} Mémoire vide. L'IA ne connaît pas encore ta conversation."));
-  $("#rpBars").replaceChildren();
-  $("#rpTot").textContent = "";
-  rpSay("", "{hand-pointer} Clique sur « Envoyer » pour commencer la conversation.");
-  rpButton();
-}
-$("#rpNext").addEventListener("click", async () => {
-  const s = RP_STEPS[rp.step], gen = rp.gen;
-  $("#rpNext").disabled = true;
-  rich($("#rpNext"), "{hourglass-half} Regarde ce que fait l'IA…");
-  await (s === "cmp" ? rpCompress(gen) : rpSend(s, gen));
-  if (gen !== rp.gen) return;
-  rp.step++;
-  rpButton();
-  if ($("#rpNext").hidden) $("#rpReset").focus();
-});
-$("#rpReset").addEventListener("click", rpReset);
-rpReset();
-
 // Devine d'abord
 guess($("#tokGuess"), {
   q: "combien de tokens pour « anticonstitutionnellement » ?",
@@ -1246,119 +722,74 @@ guess($("#tokGuess"), {
   why: "7 tokens. Un mot long et rare est coupé en plusieurs morceaux.",
   lock: $("#examples"),
 });
-{
-  const ratio = cumTo(16, 800) / cumTo(8, 800);
-  guess($("#convGuess"), {
-    q: "une conversation a 8 messages. Tu continues jusqu'à 16 messages, 2 fois plus. Combien de tokens l'IA lit-elle en tout ?",
-    options: [["2", "×2"], ["3-4", "Entre ×3 et ×4"], ["10", "×10"]], a: "3-4",
-    why: `×${fmt(ratio, 1)} ! Chaque nouveau message relit tous les anciens. Le total grimpe bien plus vite que le nombre de messages.`,
-    lock: $("#convMem"),
-  });
+// Jeu : le compte est bon. Une phrase qui fait pile le bon nombre de tokens.
+const CB = [[5, "Un petit bonjour"], [12, "Une question à poser à l'IA"], [20, "Un message pour ton équipe"]];
+const cb = { round: 0, won: 0, tries: 0 };
+function cbRound() {
+  const [goal, what] = CB[cb.round];
+  cb.tries = 0;
+  $("#cbStep").textContent = `Manche ${cb.round + 1} sur ${CB.length}`;
+  $("#cbWhat").textContent = `${what}, en ${goal} tokens pile`;
+  $("#cbTxt").value = "";
+  $("#cbTxt").readOnly = false;
+  $("#cbToks").replaceChildren();
+  $("#cbResult").textContent = "";
+  $("#cbCheck").hidden = $("#cbSkip").hidden = false;
+  $("#cbNext").hidden = true;
 }
-
-// Jeu : ta journée. Même sujet : on continue. Nouveau sujet : nouvelle conversation.
-const DAY_PER = 800, REPASTE = 3000;
-const DAY_START = { subject: "{file-lines} Le devis île des Pins", n: 8 };
-const DAY = [
-  { q: "Le client répond à ton devis : il veut changer les dates.", subject: "{file-lines} Le devis, suite", n: 4, same: true,
-    good: "Même sujet : l'IA a besoin du devis pour répondre.",
-    bad: "L'IA ne connaît plus le devis. Tu dois tout lui réexpliquer, et elle risque d'oublier des détails." },
-  { q: "Nouveau sujet : le planning de l'équipe pour la semaine.", subject: "{calendar-days} Le planning", n: 10, same: false,
-    good: "Le planning n'a rien à voir avec le devis. L'IA repart légère.",
-    bad: "L'IA relit tout le devis à chaque message sur le planning. Ça coûte cher, et elle peut mélanger les sujets." },
-  { q: "Nouveau sujet : un e-mail à un fournisseur de bungalows.", subject: "{envelope} L'e-mail au fournisseur", n: 8, same: false,
-    good: "Nouveau sujet, nouvelle conversation. Bien joué !",
-    bad: "L'IA relit le devis et le planning pour écrire un simple e-mail. Que des tokens pour rien." },
-];
-// Tokens lus pour n messages : chaque message relit la base et tous les échanges d'avant.
-const convRead = (c) => c.n * (c.base + qOf(DAY_PER)) + DAY_PER * c.n * (c.n - 1) / 2;
-const convLast = (c) => c.base + (c.n - 1) * DAY_PER + qOf(DAY_PER);
-function simDay(choices) {
-  const convs = [{ subjects: [DAY_START.subject], n: DAY_START.n, base: SYS }];
-  choices.forEach((cont, k) => {
-    const m = DAY[k];
-    if (cont) { const c = convs.at(-1); c.subjects.push(m.subject); c.n += m.n; }
-    else convs.push({ subjects: [m.subject], n: m.n, base: SYS + (m.same ? REPASTE : 0) });
-  });
-  return { convs, total: convs.reduce((s, c) => s + convRead(c), 0) };
+// Fin de manche : gagnée ou passée. Renvoie le texte à ajouter à la dernière manche.
+function cbEnd(ok) {
+  if (ok) cb.won++;
+  $("#cbScore").textContent = `${cb.won} / ${CB.length}`;
+  $("#cbTxt").readOnly = true;
+  $("#cbCheck").hidden = $("#cbSkip").hidden = true;
+  const last = cb.round === CB.length - 1;
+  rich($("#cbNext"), last ? "{rotate-left} Rejouer" : "Manche suivante {arrow-right}");
+  $("#cbNext").hidden = false;
+  $("#cbNext").focus();
+  if (!last) return "";
+  if (cb.won === CB.length) confetti("{bullseye}");
+  return cb.won === CB.length ? " {trophy} 3 manches sur 3 : tu sais compter comme l'IA !" : ` Score : ${cb.won} sur ${CB.length}. Rejoue pour viser 3 sur 3.`;
 }
-let day = [];
-function renderDay() {
-  const k = day.length, card = $("#dayCard");
-  const { convs, total } = simDay(day);
-  const good = day.filter((cont, i) => cont === DAY[i].same).length;
-  $("#dayScore").textContent = `${good} / ${DAY.length}`;
-  $("#dayTok").textContent = fmt(total);
-  $("#dayConvN").textContent = fmt(convs.length);
-  // Même échelle pour tous : la conversation unique de toute la journée.
-  const max = convLast(simDay([true, true, true]).convs[0]);
-  $("#dayConvs").replaceChildren(...convs.map((c) => {
-    const d = h("div", "conv");
-    const top = h("div", "conv-top");
-    top.append(h("span", "", c.subjects.join(" + ") + ` · ${c.n} messages`), h("span", "", fmt(convLast(c))));
-    const tr = h("div", "track"), f = h("div", "fill");
-    f.style.width = (convLast(c) / max) * 100 + "%";
-    tr.append(f);
-    d.append(top, tr);
-    return d;
-  }));
-
-  if (k === DAY.length) {
-    const allIn = simDay([true, true, true]).total;
-    const again = btn("{rotate-left} Rejouer", "btn");
-    again.addEventListener("click", () => { day = []; startDay(); renderDay(); $("#dayCard").focus(); });
-    card.replaceChildren(h("span", "q", `{flag-checkered} Journée finie : ${good} bon${good > 1 ? "s" : ""} choix sur ${DAY.length}`), again);
-    rich($("#dayResult"), (good === DAY.length ? "{trophy} Parfait ! " : "") +
-      `L'IA a lu ${fmt(total)} tokens aujourd'hui. Tout dans une seule conversation : ${fmt(allIn)} tokens. ` +
-      "La règle : même sujet, on continue. Nouveau sujet, nouvelle conversation.");
-    if (good === DAY.length) confetti("{briefcase}");
+$("#cbCheck").addEventListener("click", () => {
+  const [goal] = CB[cb.round], toks = tokenize($("#cbTxt").value.trim());
+  if (!toks.length) { rich($("#cbResult"), "{pen} Écris d'abord ta phrase."); return; }
+  cb.tries++;
+  $("#cbToks").replaceChildren(...tokChips(toks));
+  const d = toks.length - goal;
+  if (d) {
+    rich($("#cbResult"), `{circle-xmark} ${toks.length} tokens : ${d < 0 ? `il en manque ${-d}` : `${d} de trop`}. Regarde le découpage, change un mot, puis vérifie encore.`);
     return;
   }
-  $("#dayResult").textContent = "";
-  const m = DAY[k];
-  const cont = btn("{arrow-right} Continuer la conversation", "btn"), fresh = btn("{plus} Nouvelle conversation", "btn");
-  cont.addEventListener("click", () => decideDay(true));
-  fresh.addEventListener("click", () => decideDay(false));
-  const btns = h("div", "btns");
-  btns.append(cont, fresh);
-  card.replaceChildren(h("span", "eyebrow", `Moment ${k + 1} sur ${DAY.length} · ${m.n} messages`), h("span", "q", "« " + m.q + " »"), btns);
-}
-function decideDay(cont) {
-  const m = DAY[day.length];
-  day.push(cont);
-  const ok = cont === m.same;
-  const li = h("li", ok ? "ok" : "bad");
-  li.append(h("strong", "", (cont ? "{arrow-right} Continuer" : "{plus} Nouvelle") + " : "), h("span", "", ok ? "{circle-check} " + m.good : "{circle-xmark} " + m.bad));
-  $("#dayLog").append(li);
-  renderDay();
-  $("#dayCard").focus();
-}
-function startDay() {
-  const li = h("li", "start");
-  li.append(h("strong", "", "{sun} 8 h : "), `tu commences par le devis île des Pins. ${DAY_START.n} messages.`);
-  $("#dayLog").replaceChildren(li);
-}
-startDay();
-renderDay();
+  const end = cbEnd(true);
+  rich($("#cbResult"), `{circle-check} Le compte est bon : ${goal} tokens${cb.tries > 1 ? `, en ${cb.tries} essais` : ", du premier coup"} !` + end);
+});
+$("#cbSkip").addEventListener("click", () => { const end = cbEnd(false); rich($("#cbResult"), "{forward} Manche passée." + end); });
+$("#cbNext").addEventListener("click", () => {
+  if (cb.round === CB.length - 1) { cb.round = cb.won = 0; $("#cbScore").textContent = `0 / ${CB.length}`; }
+  else cb.round++;
+  cbRound();
+  $("#cbTxt").focus();
+});
+// Le découpage affiché ne vaut plus quand on change la phrase.
+$("#cbTxt").addEventListener("input", () => $("#cbToks").replaceChildren());
 
 // Défi final
 initDefi([
-  { q: "Tu as fini ton devis. Tu passes au planning de l'équipe. Que fais-tu ?", a: "new",
-    options: [["new", "{plus} Nouvelle conversation"], ["same", "{arrow-right} Je continue la même"]],
-    why: "Nouveau sujet, nouvelle conversation. L'IA lit moins de tokens et ne mélange pas les sujets." },
-  { q: "Ta conversation a déjà 50 messages. Le 51e message, comparé au 1er…", a: "more",
-    options: [["less", "Coûte moins cher"], ["same", "Coûte pareil"], ["more", "Coûte beaucoup plus"]],
-    why: "L'IA relit les 50 messages d'avant. Elle lit beaucoup plus de tokens." },
-  { q: "La mémoire de l'IA est pleine. Que se passe-t-il ?", a: "sum",
-    options: [["stop", "Elle s'arrête net"], ["sum", "Elle résume le début"], ["all", "Elle garde tout"]],
-    why: "C'est la compression : l'IA garde le début et la fin, et un court résumé remplace le milieu. Les détails du milieu se perdent." },
-  { q: "Tu colles un document de 50 pages au début de la conversation. Ensuite…", a: "each",
-    options: [["once", "L'IA le lit une seule fois"], ["each", "L'IA le relit à chaque message"], ["free", "Il ne compte pas"]],
-    why: "Le document fait partie de la conversation. Chaque nouveau message le relit, et ça se paie." },
+  { q: "Pour l'IA, un token, c'est…", a: "bout",
+    options: [["mot", "Un mot entier"], ["bout", "Un petit morceau de mot"], ["phrase", "Une phrase"]],
+    why: "Un token est un petit morceau de texte, souvent 3 ou 4 lettres. Un mot long en fait plusieurs." },
+  { q: "Ton texte fait 100 mots. Combien de tokens, à peu près ?", a: "130",
+    options: [["50", "50 tokens"], ["130", "130 tokens"], ["1000", "1 000 tokens"]],
+    why: "Un peu plus que de mots : les mots longs comptent pour plusieurs tokens, et la ponctuation aussi." },
+  { q: "Les espaces et la ponctuation…", a: "yes",
+    options: [["yes", "Comptent aussi"], ["no", "Ne comptent pas"]],
+    why: "Un point d'exclamation ou une virgule, c'est aussi un token, ou un bout de token." },
+  { q: "Un roman de 300 pages fait environ…", a: "150k",
+    options: [["1500", "1 500 tokens"], ["150k", "150 000 tokens"], ["15M", "15 millions de tokens"]],
+    why: "Environ 150 000 tokens. Il tient tout juste dans la mémoire de l'IA (voir la fiche suivante)." },
 ]);
 
-initRanges();
 renderText();
-renderMem();
-renderConv();
+cbRound();
 </script>

@@ -5,7 +5,7 @@
 <!-- La page a déjà ses thèmes clair et sombre : les modes nuit forcés (Dark Reader, mode nuit de Brave) ne doivent pas changer ses couleurs. -->
 <meta name="color-scheme" content="light dark">
 <meta name="darkreader-lock">
-<title>Le Sac à Tokens</title>
+<title>La Mémoire qui Déborde</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -285,19 +285,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
-:root { --accent: #C6FF00; }
-
-.tokens { display: flex; flex-wrap: wrap; gap: 6px; min-height: 48px; align-content: flex-start; }
-.tok {
-  white-space: pre; padding: 4px 8px; border-radius: 8px; font-weight: 700; font-size: 1.05rem;
-  background: var(--accent); color: var(--on-accent);
-}
-.tok:nth-child(3n+2) { background: color-mix(in oklab, var(--accent) 45%, var(--surface)); color: var(--fg); }
-.tok:nth-child(3n) { background: transparent; color: var(--accent-text); box-shadow: inset 0 0 0 2px var(--accent); }
-.examples { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); }
-.ex { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface-2); border-radius: 12px; }
-.ex code { font-family: var(--font-body); font-weight: 700; overflow-wrap: anywhere; }
-.ex .n { font-family: var(--font-display); color: var(--accent-text); white-space: nowrap; }
+:root { --accent: #4DA3FF; }
 
 .mem { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 28px; }
 @media (max-width: 900px) { .mem { grid-template-columns: minmax(0, 1fr); } }
@@ -325,7 +313,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .stair { display: grid; gap: 8px; }
 .srow { display: grid; grid-template-columns: 70px minmax(0, 1fr) 84px; gap: 10px; align-items: center; font-weight: 700; font-size: .9rem; }
 .srow .sn { text-align: right; font-variant-numeric: tabular-nums; color: var(--accent-text); }
-.srow.gap { color: var(--muted); font-size: 1.2rem; line-height: 1; }
 .sbar { display: flex; height: 22px; overflow: hidden; }
 .sbar span { height: 100%; flex: none; box-shadow: inset -2px 0 0 var(--surface); transition: width .45s ease; }
 .sbar span:first-child { border-radius: 5px 0 0 5px; }
@@ -424,41 +411,16 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <div class="hero-grid">
         <div class="ctl">
           <span class="eyebrow">Comprendre l'IA · Fiche 2 sur 8</span>
-          <h1>Le Sac<br>à Tokens</h1>
-          <p class="lead">L'IA ne lit pas des mots. Elle lit des petits morceaux de texte : les tokens.</p>
+          <h1>La Mémoire<br>qui Déborde</h1>
+          <p class="lead">L'IA ne se souvient de rien. À chaque message, elle relit toute la conversation. Et sa mémoire a une taille fixe.</p>
         </div>
         <div class="word-card">
           <span class="eyebrow">Le mot à connaître</span>
-          <strong>Token</strong>
-          <p>Un petit morceau de mot. Souvent 3 ou 4 lettres.</p>
-          <p>L'IA compte tout en tokens : ce qu'elle lit, ce qu'elle écrit, ce que ça coûte.</p>
+          <strong>Fenêtre de contexte</strong>
+          <p>La mémoire de travail de l'IA. Tout ce qu'elle lit doit tenir dedans.</p>
+          <p>Quand elle est pleine, l'IA résume. Et elle oublie des détails.</p>
         </div>
       </div>
-    </section>
-
-    <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-pen"></i></span><h2>Écris une phrase</h2></div>
-      <p class="muted">Regarde comment l'IA la découpe en morceaux.</p>
-      <label class="ctl" for="txt">Ton texte
-        <textarea id="txt" rows="3">Bonjour ! Peux-tu m'aider à préparer mon voyage à Nouméa en décembre ?</textarea>
-      </label>
-      <div class="tokens" id="toks" aria-live="polite"></div>
-      <div class="stats">
-        <div class="stat"><b id="sWords">0</b><span>mots</span></div>
-        <div class="stat"><b id="sToks">0</b><span>tokens</span></div>
-        <div class="stat"><b id="sChars">0</b><span>caractères</span></div>
-        <div class="stat"><b id="sRatio">0</b><span>tokens par mot</span></div>
-      </div>
-      <p class="small muted">Découpage simplifié pour l'exemple. Le vrai découpage change un peu selon le modèle.</p>
-    </section>
-
-    <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-ruler"></i></span><h2>Court ou long ?</h2></div>
-      <div id="tokGuess"></div>
-      <p>Un mot court = 1 token.</p>
-      <p>Un mot long = plusieurs tokens.</p>
-      <div class="examples" id="examples"></div>
-      <p class="small muted">Les espaces et la ponctuation comptent aussi.</p>
     </section>
 
     <section class="card s4">
@@ -527,15 +489,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         </div>
 
         <div class="viz">
-          <div>
-            <div class="bar-label"><span>Ce que l'IA relit à chaque envoi</span></div>
-            <div class="stair" id="stair" aria-hidden="true"></div>
-          </div>
-          <div class="legend">
-            <span><i class="b-sys"></i>Consignes de départ</span>
-            <span><i class="b-old"></i>Anciens échanges, relus</span>
-            <span><i class="b-new"></i>Nouvelle question</span>
-          </div>
           <div>
             <div class="bar-label"><span>Tokens lus, envoi après envoi</span><span class="muted" id="lBars"></span></div>
             <div class="bars" id="bars" aria-hidden="true"></div>
@@ -636,28 +589,11 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       </div>
     </section>
 
-    <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-book"></i></span><h2>Ça fait combien de tokens ?</h2></div>
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>Texte</th><th class="num">Tokens</th><th class="num">Tient dans 200 000 ?</th></tr></thead>
-          <tbody>
-            <tr><td>1 SMS</td><td class="num">≈ 30</td><td class="num"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Oui</td></tr>
-            <tr><td>1 e-mail</td><td class="num">≈ 300</td><td class="num"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Oui</td></tr>
-            <tr><td>1 page de livre</td><td class="num">≈ 500</td><td class="num"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Oui</td></tr>
-            <tr><td>1 roman de 300 pages</td><td class="num">≈ 150 000</td><td class="num"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Tout juste</td></tr>
-            <tr><td>Tout le code d'une grosse appli</td><td class="num">1 million et +</td><td class="num"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Non</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="small muted">Ordres de grandeur pour un texte en français.</p>
-    </section>
-
-    <section class="card s2 retenir">
+    <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
-        <li><span>L'IA lit et écrit en tokens. Un token = un petit bout de mot.</span></li>
-        <li><span>Chaque message renvoie toute la conversation. Plus elle est longue, plus chaque nouveau message coûte cher.</span></li>
+        <li><span>L'IA ne se souvient de rien. Chaque message renvoie toute la conversation, depuis le début.</span></li>
+        <li><span>Plus la conversation est longue, plus chaque nouveau message coûte cher.</span></li>
         <li><span>Sa mémoire a une taille fixe. Quand elle est pleine, l'IA garde le début et la fin, et résume le milieu. Les détails du milieu se perdent.</span></li>
         <li><span>Pour un nouveau sujet, ouvre une nouvelle conversation. C'est plus rapide, moins cher et plus précis.</span></li>
       </ul>
@@ -951,28 +887,6 @@ function tokenize(text) {
   return out;
 }
 
-const txt = $("#txt");
-function renderText() {
-  const t = txt.value;
-  const toks = tokenize(t);
-  const words = (t.match(/[\p{L}\p{N}][\p{L}\p{M}\p{N}'’-]*/gu) || []).length;
-  const box = $("#toks");
-  box.replaceChildren(...toks.slice(0, 400).map((s) => { const e = document.createElement("span"); e.className = "tok"; e.textContent = s; return e; }));
-  $("#sWords").textContent = fmt(words);
-  $("#sToks").textContent = fmt(toks.length);
-  $("#sChars").textContent = fmt([...t].length);
-  $("#sRatio").textContent = words ? fmt(toks.length / words, 1) : "0";
-}
-txt.addEventListener("input", renderText);
-
-$("#examples").replaceChildren(...["chat", "maison", "incroyable", "anticonstitutionnellement", "2026", "Nouméa"].map((w) => {
-  const d = document.createElement("div"); d.className = "ex";
-  const n = tokenize(w).length;
-  d.innerHTML = `<code></code><span class="n">${n} token${n > 1 ? "s" : ""}</span>`;
-  d.querySelector("code").textContent = w;
-  return d;
-}));
-
 // Mémoire de travail
 const SYS = 2000;
 const mem = { n: 300, per: 800, W: 200000 };
@@ -1044,18 +958,6 @@ const inputAt = (i, per) => SYS + (i - 1) * per + qOf(per);
 const cumTo = (n, per) => { let s = 0; for (let i = 1; i <= n; i++) s += inputAt(i, per); return s; };
 
 function block(cls, w) { const s = document.createElement("span"); s.className = cls; s.style.width = w; return s; }
-function stairRow(i, per, max) {
-  const row = document.createElement("div"); row.className = "srow";
-  const lab = document.createElement("span"); lab.textContent = `Envoi ${i}`;
-  const bar = document.createElement("div"); bar.className = "sbar";
-  bar.append(block("b-sys", pct(SYS, max)));
-  for (let k = 1; k < i; k++) bar.append(block("b-old", pct(per, max)));
-  bar.append(block("b-new", pct(qOf(per), max)));
-  const val = document.createElement("span"); val.className = "sn"; val.textContent = fmt(inputAt(i, per));
-  row.append(lab, bar, val);
-  return row;
-}
-
 function renderConv() {
   const { n, per } = conv;
   const last = inputAt(n, per);
@@ -1066,13 +968,6 @@ function renderConv() {
   $("#sLast").textContent = fmt(last);
   $("#sCum").textContent = fmt(cum);
   $("#sMult").textContent = "×" + fmt(cum / written, 1);
-
-  const rows = n <= 7 ? Array.from({ length: n }, (_, k) => k + 1) : [1, 2, 3, 0, n - 1, n];
-  $("#stair").replaceChildren(...rows.map((i) => {
-    if (i) return stairRow(i, per, last);
-    const g = document.createElement("div"); g.className = "srow gap"; g.append(h("span"), h("span", "", "{ellipsis-vertical}"));
-    return g;
-  }));
 
   $("#bars").replaceChildren(...Array.from({ length: n }, (_, k) => {
     const s = document.createElement("span"); s.style.height = pct(inputAt(k + 1, per), last); return s;
@@ -1240,12 +1135,6 @@ $("#rpReset").addEventListener("click", rpReset);
 rpReset();
 
 // Devine d'abord
-guess($("#tokGuess"), {
-  q: "combien de tokens pour « anticonstitutionnellement » ?",
-  options: [["3", "3"], ["7", "7"], ["9", "9"]], a: "7",
-  why: "7 tokens. Un mot long et rare est coupé en plusieurs morceaux.",
-  lock: $("#examples"),
-});
 {
   const ratio = cumTo(16, 800) / cumTo(8, 800);
   guess($("#convGuess"), {
@@ -1358,7 +1247,6 @@ initDefi([
 ]);
 
 initRanges();
-renderText();
 renderMem();
 renderConv();
 </script>
