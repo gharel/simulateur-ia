@@ -286,6 +286,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
 :root { --accent: #00E5FF; }
+td.c, th.c { text-align: center; }
 
 .switches { display: grid; gap: 8px; }
 .winner { display: grid; gap: 6px; }
@@ -434,6 +435,26 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <ul id="canList"></ul>
         <p class="ex" id="canEx"></p>
       </div>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-toolbox"></i></span><h2>Les risques de chaque outil</h2></div>
+      <p>Un ordre caché dans un e-mail ou une page web peut piéger l'IA (voir « Le Message Piégé »).
+        Le danger grandit quand l'IA réunit trois ingrédients : <strong>tes données</strong>, <strong>un contenu venu de l'extérieur</strong>, et <strong>le droit d'agir seule</strong>.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Usage</th><th class="c"><span role="img" aria-label="Mes données"><i class="fa-solid fa-lock"></i></span></th><th class="c"><span role="img" aria-label="Contenu extérieur"><i class="fa-solid fa-inbox"></i></span></th><th class="c"><span role="img" aria-label="Peut agir"><i class="fa-solid fa-bolt"></i></span></th><th>Risque</th></tr></thead>
+          <tbody>
+            <tr><td>Chat : tu écris toi-même ton texte</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td><span class="pill ok">Très faible</span></td></tr>
+            <tr><td>Chat : tu colles un e-mail ou un PDF reçu</td><td class="c">–</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill ok">Faible</span></td></tr>
+            <tr><td>Chat avec la recherche web</td><td class="c">–</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill ok">Faible</span></td></tr>
+            <tr><td>Assistant branché sur ta boîte mail, en lecture seule</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill warn">Moyen</span></td></tr>
+            <tr><td>Agent qui lit tes e-mails et répond seul</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td><span class="pill bad">Élevé</span></td></tr>
+            <tr><td>Agent qui navigue sur le web avec tes comptes connectés</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td><span class="pill bad">Élevé</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">Un connecteur ou Cowork peut ajouter <span role="img" aria-label="l'accès à tes données"><i class="fa-solid fa-lock"></i></span> et <span role="img" aria-label="le droit d'agir seule"><i class="fa-solid fa-bolt"></i></span>. Plus l'IA a de pouvoir, plus ce qu'elle lit compte.</p>
     </section>
 
     <section class="card s4 retenir">

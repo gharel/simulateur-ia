@@ -410,7 +410,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .ask-card > .btn { justify-self: start; }
 
 /* Tableau, réflexes */
-td.c, th.c { text-align: center; }
 .check { display: grid; gap: 8px; }
 .check label {
   display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start;
@@ -544,7 +543,8 @@ td.c, th.c { text-align: center; }
             <div class="bar-label">Ce que fait l'IA, étape par étape</div>
             <ol class="log" id="log"></ol>
           </div>
-          <p class="small muted">On montre le pire cas. Les modèles récents repèrent souvent ce genre de piège, mais pas à chaque fois.</p>
+          <p class="small muted">On montre le pire cas. Les modèles récents repèrent souvent ce genre de piège, mais aucune IA n'y résiste à 100 % : les pirates inventent sans cesse de nouveaux ordres cachés.
+            La meilleure protection : <strong>limiter ce que l'IA peut faire seule</strong>, et garder la main sur les actions importantes.</p>
         </div>
       </div>
     </section>
@@ -568,24 +568,6 @@ td.c, th.c { text-align: center; }
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-toolbox"></i></span><h2>Les 3 ingrédients dans tes outils</h2></div>
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>Usage</th><th class="c"><span role="img" aria-label="Mes données"><i class="fa-solid fa-lock"></i></span></th><th class="c"><span role="img" aria-label="Contenu extérieur"><i class="fa-solid fa-inbox"></i></span></th><th class="c"><span role="img" aria-label="Peut agir"><i class="fa-solid fa-bolt"></i></span></th><th>Risque</th></tr></thead>
-          <tbody>
-            <tr><td>Chat : tu écris toi-même ton texte</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td><span class="pill ok">Très faible</span></td></tr>
-            <tr><td>Chat : tu colles un e-mail ou un PDF reçu</td><td class="c">–</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill ok">Faible</span></td></tr>
-            <tr><td>Chat avec la recherche web</td><td class="c">–</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill ok">Faible</span></td></tr>
-            <tr><td>Assistant branché sur ta boîte mail, en lecture seule</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill warn">Moyen</span></td></tr>
-            <tr><td>Agent qui lit tes e-mails et répond seul</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td><span class="pill bad">Élevé</span></td></tr>
-            <tr><td>Agent qui navigue sur le web avec tes comptes connectés</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td><span class="pill bad">Élevé</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="small muted">Un connecteur ou Cowork peut ajouter <span role="img" aria-label="l'accès à tes données"><i class="fa-solid fa-lock"></i></span> et <span role="img" aria-label="le droit d'agir seule"><i class="fa-solid fa-bolt"></i></span> (voir la fiche 4). Plus l'IA a de pouvoir, plus ce qu'elle lit compte.</p>
-    </section>
-
-    <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span><h2>Mes réflexes anti-piège</h2></div>
       <div class="meter">
         <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 6</span></div>
@@ -601,15 +583,7 @@ td.c, th.c { text-align: center; }
       </div>
     </section>
 
-    <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-trowel-bricks"></i></span><h2>Pourquoi on ne répare pas ça ?</h2></div>
-      <p>Les fabricants entraînent les IA à repérer ces pièges. Ça marche de mieux en mieux.</p>
-      <p><strong>Mais aucune IA ne résiste à 100 %.</strong> Les pirates inventent sans cesse de nouvelles façons d'écrire leurs ordres.</p>
-      <p>C'est comme le hameçonnage par e-mail : les filtres en arrêtent beaucoup, mais un message piégé passe parfois.</p>
-      <p>La meilleure protection : <strong>limiter ce que l'IA peut faire seule</strong>, et garder la main sur les actions importantes.</p>
-    </section>
-
-    <section class="card s2 retenir">
+    <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
         <li><span>Pour l'IA, tout est du texte. Un ordre caché dans un e-mail ou une page web peut la piéger.</span></li>
@@ -619,7 +593,7 @@ td.c, th.c { text-align: center; }
     </section>
 
     <section class="card s4 challenge" id="defi">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-flag-checkered"></i></span><h2>Défi final : piège ou pas ?</h2><span class="pill" id="defiScore">0 / 5</span></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-flag-checkered"></i></span><h2>Défi final : piège ou pas ?</h2><span class="pill" id="defiScore">0 / 4</span></div>
       <div class="prize">
         <span class="badge" id="badge" aria-hidden="true"></span>
         <div class="prize-txt"><strong id="badgeName"></strong><span class="small muted" id="badgeTxt"></span></div>
@@ -1118,8 +1092,6 @@ const QUIZ = [
     why: "Le PDF peut cacher un ordre. Mais l'IA ne peut rien faire seule : vérifie surtout le résumé." },
   { q: "Ton assistant trie ta boîte mail et répond seul aux clients.", a: "bad",
     why: "Les 3 ingrédients sont réunis : tes données, des e-mails d'inconnus, et l'envoi sans toi." },
-  { q: "Un agent compare des hôtels sur le web et réserve avec la carte de l'agence.", a: "bad",
-    why: "Une page web piégée peut le pousser à réserver ailleurs, ou à donner les infos de la carte." },
   { q: "L'IA lit ta boîte mail et te prépare des brouillons. C'est toi qui les envoies.", a: "warn",
     why: "Tes données et des e-mails extérieurs sont réunis. Tu gardes l'envoi, mais méfie-toi des liens et relis chaque brouillon." },
 ];
