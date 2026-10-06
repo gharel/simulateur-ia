@@ -1,31 +1,45 @@
-# Comprendre l'IA en 6 fiches
+# Comprendre l'IA en 8 fiches
 
-6 fiches interactives, écrites en FALC (Facile À Lire et à Comprendre), pour expliquer l'IA à un public non technique.
+8 fiches interactives, écrites en FALC (Facile À Lire et à Comprendre), pour expliquer l'IA à un public non technique. Elles vont de « je comprends » à « je choisis mon outil et mon budget ».
 
-1. **Le Sac à Tokens** : tokens, conversation relue à chaque message, fenêtre de contexte et compression
-2. **Le Bon Cerveau** : choisir le modèle et l'effort
-3. **Le Détecteur de Bobards** : les hallucinations, pourquoi l'IA devine au lieu de dire « je ne sais pas », et la complaisance
-4. **La Boîte à Outils Claude** : Chat, Cowork, Code, Projets, Skills, Connecteurs
-5. **Forfait ou Compteur ?** : abonnement ou paiement à l'usage
+**Partie 1 · Comprendre comment elle marche**
+
+1. **Le Sac à Tokens** : les tokens, et comment l'IA découpe le texte
+2. **La Mémoire qui Déborde** : la conversation relue à chaque message, la fenêtre de contexte et la compression
+3. **Le Bon Cerveau** : choisir le modèle et l'effort
+
+**Partie 2 · Repérer les pièges**
+
+4. **Le Détecteur de Bobards** : les hallucinations, et pourquoi l'IA devine au lieu de dire « je ne sais pas »
+5. **L'IA qui Dit Oui** : la complaisance
 6. **Le Message Piégé** : l'injection de prompt et le « trio dangereux »
+
+**Partie 3 · Agir avec l'IA**
+
+7. **La Boîte à Outils Claude** : Chat, Cowork, Code, Projets, Skills, Connecteurs, et les risques de chaque outil
+8. **Forfait ou Compteur ?** : abonnement ou paiement à l'usage
 
 ## Jouer
 
 Chaque fiche contient :
 
 - **un mini-jeu** avec un objectif :
-  - fiche 1 : Ta journée en 4 moments ;
-  - fiche 2 : Mission budget ;
-  - fiche 3 : Surligne ce qu'il faut vérifier ;
-  - fiche 4 : Les missions de la cuisine ;
-  - fiche 5 : Fais ton pari ;
-  - fiche 6 : Le gardien des permissions.
+  - fiche 1 : Le compte est bon ;
+  - fiche 2 : Ta journée en 4 moments ;
+  - fiche 3 : Mission budget ;
+  - fiche 4 : Surligne ce qu'il faut vérifier ;
+  - fiche 5 : Pose ta question sans donner ton avis ;
+  - fiche 6 : Le gardien des permissions ;
+  - fiche 7 : Les missions de la cuisine ;
+  - fiche 8 : Fais ton pari.
 - **des questions « Devine d'abord »** : on répond avant de voir le résultat.
 - **un défi final** : seule la 1re réponse compte. Il donne un badge et de 1 à 3 étoiles.
 
-Avec les 6 badges, l'accueil délivre un **permis de conduire l'IA** à imprimer.
+Avec les 8 badges, l'accueil délivre un **permis de conduire l'IA** à imprimer.
 
-La progression reste dans le navigateur (`localStorage`). Le bouton « Effacer ma progression » de l'accueil la remet à zéro.
+La progression reste dans le navigateur (`localStorage`), rangée par nom de fiche (`tokens`, `memoire`…). Le bouton « Effacer ma progression » de l'accueil la remet à zéro.
+
+Le parcours avait d'abord 6 fiches. Une progression de cette époque est convertie toute seule : une fiche coupée en deux donne ses deux badges. Les anciennes adresses (`2-modele-effort.html`, `3-hallucinations.html`, `4-boite-outils.html`, `5-forfait-api.html`) renvoient vers la nouvelle fiche.
 
 ## Mode atelier et mode démonstration
 
@@ -34,7 +48,7 @@ Les deux boutons sont en bas de chaque page, avec une courte explication. Le mod
 - **Mode atelier**, pour animer un groupe : le bouton « Mode atelier », ou l'adresse `index.html?atelier=1`.
   Le texte est plus gros. Dans les quiz, un clic choisit la réponse du groupe, puis « Révéler » affiche la correction.
 - **Mode démonstration**, pour présenter : le bouton « Mode démonstration », ou l'adresse `index.html?demo=1`.
-  Rien n'est flou : tout se voit sans répondre aux questions « Devine d'abord ». Sur l'accueil, le permis se voit aussi, mais on ne l'imprime qu'avec les 6 badges.
+  Rien n'est flou : tout se voit sans répondre aux questions « Devine d'abord ». Sur l'accueil, le permis se voit aussi, mais on ne l'imprime qu'avec les 8 badges.
 
 Pour enlever un mode : le même bouton, ou l'adresse avec `=0` (par exemple `?demo=0`).
 
@@ -50,7 +64,7 @@ Le logo est un SVG intégré dans la page : le mot « skazy » prend la couleur 
 
 Pages HTML statiques, sans étape de build. Ouvrir `index.html`.
 
-Chaque fiche est autonome : CSS et JS sont dans le fichier. Le bloc « Parcours » (défi, badges, mode atelier) est le même dans les 6 fiches. Si tu le modifies, modifie-le partout. Le bandeau Skazy Formation aussi.
+Chaque fiche est autonome : CSS et JS sont dans le fichier. Le bloc « Parcours » (défi, badges, mode atelier) est le même dans les 8 fiches. Si tu le modifies, modifie-le partout. Le bandeau Skazy Formation aussi.
 
 ### Icônes
 

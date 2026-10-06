@@ -1,7 +1,7 @@
 {
   "name": "simulateur-ia",
   "private": true,
-  "description": "Comprendre l'IA en 6 fiches : pages statiques et leurs tests",
+  "description": "Comprendre l'IA en 8 fiches : pages statiques et leurs tests",
   "scripts": {
     "test": "playwright test",
     "deploy": "npm test && git push origin HEAD:gh-pages && git push origin HEAD:main"
