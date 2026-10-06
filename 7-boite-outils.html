@@ -5,7 +5,7 @@
 <!-- La page a déjà ses thèmes clair et sombre : les modes nuit forcés (Dark Reader, mode nuit de Brave) ne doivent pas changer ses couleurs. -->
 <meta name="color-scheme" content="light dark">
 <meta name="darkreader-lock">
-<title>La Boîte à Outils Claude</title>
+<title>La Boîte à Outils de l'IA</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -287,6 +287,9 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
 :root { --accent: #00E5FF; }
 td.c, th.c { text-align: center; }
+.noms thead th { width: 36%; }
+.noms thead th:first-child { width: 28%; }
+.noms tbody th { padding-top: 20px; }
 
 .switches { display: grid; gap: 8px; }
 .sw .lbl { display: grid; gap: 2px; }
@@ -300,7 +303,7 @@ td.c, th.c { text-align: center; }
 .lab h3 .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
 .set-wrap { display: grid; gap: 16px; }
 
-/* Le bon prompt : ton message, puis la réponse de Claude */
+/* Le bon prompt : ton message, puis la réponse de l'IA */
 .who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
 .msg-me { justify-self: end; max-width: 88%; display: grid; gap: 4px; background: var(--accent); color: var(--on-accent); border-radius: 18px 18px 4px 18px; padding: 12px 16px; font-weight: 700; }
 .msg-me .who { color: var(--on-accent); }
@@ -313,7 +316,7 @@ td.c, th.c { text-align: center; }
 .out { display: grid; gap: 12px; justify-items: start; }
 .out > .bubble { justify-self: stretch; }
 
-/* Une seule appli : Chat + Cowork = Claude */
+/* Répondre ou agir : l'exemple de Claude (Chat + Cowork) */
 .merge { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; font-weight: 700; }
 .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 12px; background: var(--surface-2); }
 .chip.new { background: var(--accent); color: var(--on-accent); font-family: var(--font-display); font-weight: 400; font-size: 1.3rem; }
@@ -369,22 +372,24 @@ td.c, th.c { text-align: center; }
       <div class="hero-grid">
         <div class="ctl">
           <span class="eyebrow">Comprendre l'IA · Fiche 7 sur 8</span>
-          <h1>La Boîte<br>à Outils Claude</h1>
-          <p class="lead">Écris un bon prompt. Puis donne à Claude les bons outils.</p>
+          <h1>La Boîte<br>à Outils<br>de l'IA</h1>
+          <p class="lead">Écris un bon prompt. Puis donne à l'IA les bons outils.</p>
         </div>
         <div class="word-card">
           <span class="eyebrow">En résumé</span>
           <strong>3 morceaux</strong>
           <p>pour un bon prompt : contexte, action, objectif.</p>
           <strong>3 outils</strong>
-          <p>pour aider Claude : Projet, Skill, Connecteur.</p>
+          <p>pour aider l'IA : Projet, Skill, Connecteur.</p>
+          <strong>Claude ou ChatGPT ?</strong>
+          <p>Les mêmes outils, avec d'autres noms. Le tableau est en bas de la fiche.</p>
         </div>
       </div>
     </section>
 
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-pen-to-square"></i></span><h2>Le bon prompt : contexte, action, objectif</h2></div>
-      <p>Un <strong>prompt</strong>, c'est le message que tu écris à l'IA. Ce que tu ne dis pas, Claude le devine. Et il peut se tromper (voir « Le Détecteur de Bobards »).</p>
+      <p>Un <strong>prompt</strong>, c'est le message que tu écris à l'IA. Ce que tu ne dis pas, l'IA le devine. Et elle peut se tromper (voir « Le Détecteur de Bobards »).</p>
       <div id="promptGuess"></div>
       <div class="lab">
         <div class="lab-col">
@@ -396,7 +401,7 @@ td.c, th.c { text-align: center; }
               <label class="sw" for="ppObj"><span class="lbl"><span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> L'objectif</span><small>Le but, et le résultat que tu veux.</small></span><input type="checkbox" id="ppObj"></label>
             </div>
             <div class="meter">
-              <div class="meter-top"><span>Ce que Claude doit deviner</span><span id="ppVal"></span></div>
+              <div class="meter-top"><span>Ce que l'IA doit deviner</span><span id="ppVal"></span></div>
               <div class="track"><div class="fill" id="ppFill"></div></div>
             </div>
           </div>
@@ -411,10 +416,10 @@ td.c, th.c { text-align: center; }
             <div class="msg-me" id="ppPrompt" aria-live="polite"></div>
           </div>
           <div class="lab-part">
-            <h3><i class="fa-solid fa-envelope" aria-hidden="true"></i> La réponse de Claude</h3>
+            <h3><i class="fa-solid fa-envelope" aria-hidden="true"></i> La réponse de l'IA</h3>
             <div class="out" id="ppOut">
               <div class="bubble" id="ppAnswer" aria-live="polite"></div>
-              <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Vient de ton prompt</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Deviné par Claude</span></div>
+              <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Vient de ton prompt</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Deviné par l'IA</span></div>
               <span class="pill" id="ppPill"></span>
             </div>
           </div>
@@ -424,19 +429,20 @@ td.c, th.c { text-align: center; }
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-arrows-to-circle"></i></span><h2>Une seule appli : Claude</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-arrows-to-circle"></i></span><h2>Répondre ou agir</h2></div>
       <div class="lab">
         <div class="lab-col">
+          <p>Une IA peut <strong>répondre</strong> dans la conversation. Elle peut aussi <strong>agir</strong> : faire une tâche en plusieurs étapes, sur tes fichiers. On parle alors d'un <strong>agent</strong>.</p>
           <div class="merge">
             <span class="chip"><i class="fa-solid fa-comments" aria-hidden="true"></i> Chat</span>
             <span aria-hidden="true">+</span>
             <span class="chip"><i class="fa-solid fa-handshake" aria-hidden="true"></i> Cowork</span>
             <span class="to"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i><span class="chip new">Claude</span></span>
           </div>
-          <p>Avant, il fallait choisir : <strong>Chat</strong> pour parler, <strong>Cowork</strong> pour lui confier une tâche sur tes fichiers. Les deux deviennent une seule appli : <strong>Claude</strong>.</p>
-          <p><strong>Tu n'as plus à choisir.</strong> Tu écris ta demande. Claude voit s'il doit répondre, ou agir en plusieurs étapes.</p>
+          <p>Exemple chez Claude. Avant, il fallait choisir : <strong>Chat</strong> pour parler, <strong>Cowork</strong> pour lui confier une tâche sur tes fichiers. Les deux deviennent une seule appli : <strong>Claude</strong>.</p>
+          <p><strong>Tu n'as plus à choisir.</strong> Tu écris ta demande. L'IA voit si elle doit répondre, ou agir en plusieurs étapes.</p>
           <div class="note">
-            <strong><i class="fa-solid fa-laptop-code" aria-hidden="true"></i>Et Claude Code ?</strong>
+            <strong><i class="fa-solid fa-laptop-code" aria-hidden="true"></i>Et l'agent de code ?</strong>
             <p>Il reste à part. C'est l'outil pour créer ou modifier un logiciel, un site, une appli. Il lit le code, le change et le teste.</p>
           </div>
         </div>
@@ -453,12 +459,12 @@ td.c, th.c { text-align: center; }
           <span class="pill" id="askPill"></span>
         </div>
       </div>
-      <p class="small muted">Annoncé par Anthropic en septembre 2026. Le changement arrive peu à peu : d'abord pour les abonnements Pro et Max, puis Team et Free. Tes conversations, Projets, Skills et Connecteurs sont gardés.</p>
+      <p class="small muted">Chez Claude, annoncé par Anthropic en septembre 2026. Le changement arrive peu à peu : d'abord pour les abonnements Pro et Max, puis Team et Free. Tes conversations, Projets, Skills et Connecteurs sont gardés. Chez ChatGPT, l'agent s'appelle Work : voir le tableau en bas de la fiche.</p>
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-kitchen-set"></i></span><h2>Projet, Skill, Connecteur : la cuisine de Claude</h2><span class="pill" id="kScore">0 / 5</span></div>
-      <p>Claude est le cuisinier. Clique sur une carte pour lui donner un outil. <strong>Pour chaque mission, active les bons outils, puis valide.</strong></p>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-kitchen-set"></i></span><h2>Projet, Skill, Connecteur : la cuisine de l'IA</h2><span class="pill" id="kScore">0 / 5</span></div>
+      <p>L'IA fait la cuisine. Clique sur une carte pour lui donner un outil. <strong>Pour chaque mission, active les bons outils, puis valide.</strong></p>
       <div class="mission" id="kMission" tabindex="-1">
         <span class="eyebrow" id="kStep"></span>
         <span class="task" id="kTask"></span>
@@ -473,23 +479,23 @@ td.c, th.c { text-align: center; }
           <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></span><span class="state">Désactivé</span></span>
           <span class="nm">Projet</span>
           <span class="meta">= le plan de travail avec tes ingrédients</span>
-          <span>Un espace où tu ranges des documents et des consignes, comme ton contexte. Claude les garde pour toutes les conversations du projet.</span>
+          <span>Un espace où tu ranges des documents et des consignes, comme ton contexte. L'IA les garde pour toutes les conversations du projet.</span>
         </button>
         <button type="button" class="piece" data-k="skill" aria-pressed="false">
           <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-scroll"></i></span><span class="state">Désactivé</span></span>
           <span class="nm">Skill</span>
           <span class="meta">= la fiche recette</span>
-          <span>Une méthode écrite une fois. Claude la suit dès que la tâche correspond.</span>
+          <span>Une méthode écrite une fois. L'IA la suit dès que la tâche correspond.</span>
         </button>
         <button type="button" class="piece" data-k="connecteur" aria-pressed="false">
           <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-plug"></i></span><span class="state">Désactivé</span></span>
           <span class="nm">Connecteur</span>
           <span class="meta">= la porte du frigo et du magasin</span>
-          <span>Un branchement vers tes outils : Gmail, Google Drive, agenda, Slack… Claude y lit ou agit, si tu l'autorises. Plus de pouvoir, plus de prudence : voir « Le Message Piégé ».</span>
+          <span>Un branchement vers tes outils : Gmail, Google Drive, agenda, Slack… L'IA y lit ou agit, si tu l'autorises. Plus de pouvoir, plus de prudence : voir « Le Message Piégé ».</span>
         </button>
       </div>
       <div class="can" aria-live="polite">
-        <strong>Avec ça, Claude peut :</strong>
+        <strong>Avec ça, l'IA peut :</strong>
         <ul id="canList"></ul>
         <p class="ex" id="canEx"></p>
       </div>
@@ -505,23 +511,58 @@ td.c, th.c { text-align: center; }
           <tbody>
             <tr><td>Tu écris toi-même ton texte</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td><span class="pill ok">Très faible</span></td></tr>
             <tr><td>Tu colles un e-mail ou un PDF reçu</td><td class="c">–</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill ok">Faible</span></td></tr>
-            <tr><td>Claude cherche sur le web pour toi</td><td class="c">–</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill ok">Faible</span></td></tr>
+            <tr><td>L'IA cherche sur le web pour toi</td><td class="c">–</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill ok">Faible</span></td></tr>
             <tr><td>Assistant branché sur ta boîte mail, en lecture seule</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill warn">Moyen</span></td></tr>
             <tr><td>Agent qui lit tes e-mails et répond seul</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td><span class="pill bad">Élevé</span></td></tr>
             <tr><td>Agent qui navigue sur le web avec tes comptes connectés</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td><span class="pill bad">Élevé</span></td></tr>
           </tbody>
         </table>
       </div>
-      <p class="small muted">Un connecteur, ou Claude qui agit sur tes fichiers, peut ajouter <span role="img" aria-label="l'accès à tes données"><i class="fa-solid fa-lock"></i></span> et <span role="img" aria-label="le droit d'agir seule"><i class="fa-solid fa-bolt"></i></span>.
-        Par défaut, Claude te demande la permission avant d'agir. Un réglage lui permet de continuer sans demander : garde-le pour les tâches sans risque. Plus l'IA a de pouvoir, plus ce qu'elle lit compte.</p>
+      <p class="small muted">Un connecteur, ou un agent qui agit sur tes fichiers, peut ajouter <span role="img" aria-label="l'accès à tes données"><i class="fa-solid fa-lock"></i></span> et <span role="img" aria-label="le droit d'agir seule"><i class="fa-solid fa-bolt"></i></span>.
+        Par défaut, l'IA te demande la permission avant d'agir. Un réglage lui permet de continuer sans demander : garde-le pour les tâches sans risque. Plus l'IA a de pouvoir, plus ce qu'elle lit compte.</p>
+    </section>
+
+    <section class="card s4" id="noms">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-right-left"></i></span><h2>Claude ou ChatGPT : les mêmes outils, d'autres noms</h2></div>
+      <p>Dans les fiches, on utilise des mots qui marchent pour toutes les IA. Voici comment Claude et ChatGPT les appellent.</p>
+      <div class="tbl-wrap">
+        <table class="noms">
+          <thead><tr><th>Dans les fiches</th><th>Chez Claude</th><th>Chez ChatGPT</th></tr></thead>
+          <tbody>
+            <tr><th colspan="3">Les modèles et l'effort · « Le Bon Cerveau »</th></tr>
+            <tr><td><strong>Modèle rapide</strong></td><td>Haiku</td><td>Luna</td></tr>
+            <tr><td><strong>Modèle standard</strong></td><td>Sonnet</td><td>Terra</td></tr>
+            <tr><td><strong>Modèle expert</strong></td><td>Opus</td><td>Sol</td></tr>
+            <tr><td><strong>Modèle le plus puissant</strong></td><td>Fable</td><td>Astra</td></tr>
+            <tr><td><strong>Effort</strong></td><td>Effort (Low à Max)</td><td>Thinking (Instant à Extra High)</td></tr>
+          </tbody>
+          <tbody>
+            <tr><th colspan="3">Les outils · cette fiche</th></tr>
+            <tr><td><strong>Chat</strong></td><td>Chat</td><td>Chat</td></tr>
+            <tr><td><strong>Agent</strong></td><td>Cowork</td><td>Work</td></tr>
+            <tr><td><strong>Agent de code</strong></td><td>Code</td><td>Codex</td></tr>
+            <tr><td><strong>Projet</strong></td><td>Projets</td><td>Projets</td></tr>
+            <tr><td><strong>Skill</strong></td><td>Compétences</td><td>Plugins</td></tr>
+            <tr><td><strong>Connecteur</strong></td><td>Connecteurs</td><td>Apps ou plugins</td></tr>
+          </tbody>
+          <tbody>
+            <tr><th colspan="3">Les forfaits · « Forfait ou Compteur ? »</th></tr>
+            <tr><td><strong>Forfait standard</strong></td><td>Pro</td><td>Plus</td></tr>
+            <tr><td><strong>Gros forfait</strong></td><td>Max</td><td>Pro</td></tr>
+            <tr><td><strong>Forfait d'équipe</strong></td><td>Team, Enterprise</td><td>Business, Enterprise</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">Attention au mot « Pro ». Chez Claude, c'est le forfait standard. Chez ChatGPT, c'est le gros forfait. Anthropic fabrique Claude, OpenAI fabrique ChatGPT. Noms vérifiés en octobre 2026 : ils changent souvent.</p>
     </section>
 
     <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
         <li><span>Un bon prompt = le contexte + une action précise + l'objectif.</span></li>
-        <li><span>Une seule appli, Claude : il répond ou il agit, selon ta demande. Claude Code reste à part, pour créer des logiciels.</span></li>
+        <li><span>L'IA répond, ou elle agit comme un agent, selon ta demande. L'agent de code reste à part, pour créer des logiciels.</span></li>
         <li><span>Projet = ton contexte et tes documents. Skill = ta méthode. Connecteur = un accès à tes autres outils.</span></li>
+        <li><span>Claude, ChatGPT… Chaque IA a ses propres noms, mais les outils se ressemblent.</span></li>
       </ul>
     </section>
 
@@ -544,7 +585,7 @@ td.c, th.c { text-align: center; }
 
   </div>
   <footer class="foot">
-    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a aria-current="page">7 Les outils Claude</a><a href="8-forfait-api.html">8 Forfait ou API</a></nav>
+    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a aria-current="page">7 Les outils de l'IA</a><a href="8-forfait-api.html">8 Forfait ou API</a></nav>
     <span>Les fonctions disponibles changent selon ton abonnement et ton appareil.</span>
     <div class="modes">
       <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
@@ -792,7 +833,7 @@ function initDefi(items, options) {
 })();
 
 
-// Le bon prompt : chaque morceau ajouté remplace une partie que Claude devinait.
+// Le bon prompt : chaque morceau ajouté remplace une partie que l'IA devinait.
 // Pour chaque morceau : ce que tu écris, puis la ligne de la réponse [devinée, venue du prompt].
 const PP = {
   ctx: { icon: "{user}", say: "Je suis Lucie, la secrétaire d'un club de randonnée. J'écris aux 40 membres.",
@@ -804,7 +845,7 @@ const PP = {
 };
 const PP_PILL = [
   ["bad", "{circle-xmark} Un mail passe-partout : à réécrire"],
-  ["warn", "{triangle-exclamation} Claude devine encore : à corriger"],
+  ["warn", "{triangle-exclamation} L'IA devine encore : à corriger"],
   ["warn", "{triangle-exclamation} Presque : il manque un morceau"],
   ["ok", "{circle-check} Prêt : relis-le avant de l'envoyer"],
 ];
@@ -816,7 +857,7 @@ function renderPrompt() {
   $("#ppPrompt").replaceChildren(h("span", "who", "Toi"), ...said.map((s) => h("span", "", s)));
   // La réponse : salutation, sujet, fin, signature.
   const line = (k, i) => { const known = on[k]; return h("span", "sent " + (known ? "ok" : "warn"), (known ? "{circle-check} " : "{triangle-exclamation} ") + PP[k].lines[i][known ? 1 : 0]); };
-  $("#ppAnswer").replaceChildren(h("span", "who", "Claude"), line("ctx", 0), line("act", 0), line("obj", 0), line("ctx", 1));
+  $("#ppAnswer").replaceChildren(h("span", "who", "L'IA"), line("ctx", 0), line("act", 0), line("obj", 0), line("ctx", 1));
   $("#ppVal").textContent = missing ? `${missing} morceau${missing > 1 ? "x" : ""} sur 3` : "rien";
   const fill = $("#ppFill");
   fill.style.width = Math.max(4, (missing / 3) * 100) + "%";
@@ -827,14 +868,14 @@ function renderPrompt() {
 }
 ["#ppCtx", "#ppAct", "#ppObj"].forEach((s) => $(s).addEventListener("change", renderPrompt));
 
-// Une seule appli : Claude voit s'il doit répondre ou agir. Pour un logiciel, c'est Claude Code.
+// Répondre ou agir : l'IA voit ce que demande la tâche. Pour un logiciel, c'est l'agent de code.
 const ASK = {
-  mail: { q: "Aide-moi à écrire un mail délicat à un client.", pill: ["ok", "{comments} Claude répond"],
-    steps: ["Claude voit qu'une réponse suffit.", "Il te propose un mail, dans la conversation.", "Tu le relis, tu le changes, et tu l'envoies toi-même."] },
-  factures: { q: "Range mes 200 factures dans des dossiers, puis fais-en un tableau.", pill: ["warn", "{folder-open} Claude agit, avec ta permission"],
-    steps: ["Claude voit qu'il doit agir sur tes fichiers.", "Tu choisis le dossier qu'il peut ouvrir. Il trie les factures, puis fait le tableau.", "Avant une action importante, il te demande la permission. À la fin, tu vérifies."] },
-  site: { q: "Ajoute une page de réservation au site de l'agence.", pill: ["", "{laptop-code} Pour ça : Claude Code"],
-    steps: ["Il faut lire et changer le code du site.", "C'est le travail de Claude Code, l'outil à part pour créer des logiciels.", "Claude Code change le site, le teste, et te montre ce qu'il a changé."] },
+  mail: { q: "Aide-moi à écrire un mail délicat à un client.", pill: ["ok", "{comments} L'IA répond"],
+    steps: ["L'IA voit qu'une réponse suffit.", "Elle te propose un mail, dans la conversation.", "Tu le relis, tu le changes, et tu l'envoies toi-même."] },
+  factures: { q: "Range mes 200 factures dans des dossiers, puis fais-en un tableau.", pill: ["warn", "{folder-open} L'IA agit, avec ta permission"],
+    steps: ["L'IA voit qu'elle doit agir sur tes fichiers.", "Tu choisis le dossier qu'elle peut ouvrir. Elle trie les factures, puis fait le tableau.", "Avant une action importante, elle te demande la permission. À la fin, tu vérifies."] },
+  site: { q: "Ajoute une page de réservation au site de l'agence.", pill: ["", "{laptop-code} Pour ça : l'agent de code"],
+    steps: ["Il faut lire et changer le code du site.", "C'est le travail de l'agent de code, l'outil à part pour créer des logiciels.", "L'agent de code change le site, le teste, et te montre ce qu'il a changé."] },
 };
 function renderAsk(k) {
   const A = ASK[k], ol = h("ol", "do");
@@ -935,11 +976,11 @@ function nextMissionK() {
 $("#kCheck").addEventListener("click", checkMissionK);
 $("#kNext").addEventListener("click", nextMissionK);
 
-// Devine d'abord : avec « Écris un mail. », Claude devine tout le reste.
+// Devine d'abord : avec « Écris un mail. », l'IA devine tout le reste.
 guess($("#promptGuess"), {
-  q: "Tu écris seulement : « Écris un mail. » Que fait Claude ?",
-  options: [["ask", "Il te pose des questions"], ["guess", "Il écrit un mail, et devine le reste"], ["no", "Il refuse"]], a: "guess",
-  why: "Le plus souvent, il écrit un mail passe-partout. Il devine à qui tu écris, pourquoi, et sur quel ton. Ajoute les 3 morceaux pour voir la différence.",
+  q: "Tu écris seulement : « Écris un mail. » Que fait l'IA ?",
+  options: [["ask", "Elle te pose des questions"], ["guess", "Elle écrit un mail, et devine le reste"], ["no", "Elle refuse"]], a: "guess",
+  why: "Le plus souvent, elle écrit un mail passe-partout. Elle devine à qui tu écris, pourquoi, et sur quel ton. Ajoute les 3 morceaux pour voir la différence.",
   lock: [$("#ppSet"), $("#ppOut")],
 });
 
@@ -947,13 +988,13 @@ guess($("#promptGuess"), {
 const PIECES = [["ctx", "{user} Le contexte"], ["act", "{hand-pointer} L'action"], ["obj", "{bullseye} L'objectif"]];
 initDefi([
   { q: "« Je tiens un petit restaurant à Nouméa. » C'est quel morceau du prompt ?", a: "ctx", options: PIECES,
-    why: "C'est ta situation : qui tu es. Claude n'a plus à le deviner." },
+    why: "C'est ta situation : qui tu es. L'IA n'a plus à le deviner." },
   { q: "« Le but : avoir plus de clients le lundi midi. » C'est quel morceau du prompt ?", a: "obj", options: PIECES,
     why: "C'est le but : ce que tu veux obtenir." },
-  { q: "Claude doit ranger 200 factures de ton ordinateur, puis en faire un tableau. Tu ouvres…", a: "claude",
-    options: [["claude", "{comments} L'appli Claude"], ["cowork", "{handshake} Une appli Cowork à part"], ["code", "{laptop-code} Claude Code"]],
-    why: "Cowork fait maintenant partie de l'appli Claude. Claude voit qu'il doit agir sur tes fichiers, et te demande la permission." },
-  { q: "Tu veux que Claude lise tes e-mails Gmail.", a: "connecteur",
+  { q: "L'IA doit ranger 200 factures de ton ordinateur, puis en faire un tableau. Que fait-elle ?", a: "agent",
+    options: [["chat", "{comments} Elle répond seulement"], ["agent", "{handshake} Elle agit, comme un agent"], ["code", "{laptop-code} Il faut l'agent de code"]],
+    why: "Ranger des fichiers, c'est une tâche en plusieurs étapes : l'IA agit, comme un agent. Elle te demande la permission avant les actions importantes." },
+  { q: "Tu veux que l'IA lise tes e-mails Gmail.", a: "connecteur",
     options: [["projet", "{layer-group} Projet"], ["skill", "{scroll} Skill"], ["connecteur", "{plug} Connecteur"]],
     why: "Il faut un branchement vers Gmail." },
   { q: "Tu écris un mémoire avec 10 PDF et des consignes à garder.", a: "projet",

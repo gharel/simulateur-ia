@@ -16,7 +16,7 @@
 
 **Partie 3 · Agir avec l'IA**
 
-7. **La Boîte à Outils Claude** : le bon prompt (contexte, action précise, objectif), l'appli Claude (Chat et Cowork réunis) et Claude Code, Projets, Skills, Connecteurs, et les risques de chaque outil
+7. **La Boîte à Outils de l'IA** : le bon prompt (contexte, action précise, objectif), répondre ou agir (l'exemple de Claude, qui réunit Chat et Cowork), l'agent de code, Projets, Skills, Connecteurs, les risques de chaque outil, et les noms de ces outils chez Claude et ChatGPT
 8. **Forfait ou Compteur ?** : abonnement ou paiement à l'usage
 
 ## Jouer

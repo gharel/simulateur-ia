@@ -377,9 +377,9 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <div class="ctl">
         <span>Modèle</span>
         <div class="seg" id="segModel" role="group" aria-label="Modèle">
-          <button type="button" data-v="haiku" aria-pressed="false">Haiku</button>
-          <button type="button" data-v="sonnet" aria-pressed="true">Sonnet</button>
-          <button type="button" data-v="opus" aria-pressed="false">Opus</button>
+          <button type="button" data-v="rapide" aria-pressed="false">Rapide</button>
+          <button type="button" data-v="standard" aria-pressed="true">Standard</button>
+          <button type="button" data-v="expert" aria-pressed="false">Expert</button>
         </div>
       </div>
       <label class="sw" for="cache"><span><i class="fa-solid fa-recycle" aria-hidden="true"></i> Mémoire cache (relire coûte moins cher)</span><input type="checkbox" id="cache"></label>
@@ -431,7 +431,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <label for="inP">API : lire 1 million de tokens<span class="unit"><input type="number" id="inP" min="0" step="0.1" value="2"></span></label>
         <label for="outP">API : écrire 1 million de tokens<span class="unit"><input type="number" id="outP" min="0" step="0.1" value="10"></span></label>
       </div>
-      <p class="small muted">Prix API publics de septembre 2026 : Haiku 4.5 = 1 $ / 5 $, Sonnet 5.5 = 2 $ / 10 $, Opus 5.5 = 4 $ / 20 $. Choisir un modèle remplit ces cases. Le prix du forfait est un exemple : vérifie le tarif actuel.</p>
+      <p class="small muted">Exemple avec les prix API publics de Claude, septembre 2026 : modèle rapide = 1 $ / 5 $, standard = 2 $ / 10 $, expert = 4 $ / 20 $. Choisir un modèle remplit ces cases. Le prix du forfait est un exemple : vérifie le tarif actuel.</p>
     </section>
 
     <section class="card s2">
@@ -459,11 +459,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
             <tr><th>Prix</th><td>Fixe chaque mois</td><td>Selon les tokens utilisés</td></tr>
             <tr><th>Limite</th><td>Un quota d'usage par période</td><td>Pas de pause, mais un budget</td></tr>
             <tr><th>Facture</th><td>Toujours la même</td><td>Change chaque mois</td></tr>
-            <tr><th>Comment ?</th><td>Dans l'appli Claude</td><td>Dans tes propres outils ou applis</td></tr>
+            <tr><th>Comment ?</th><td>Dans l'appli de l'IA (Claude, ChatGPT…)</td><td>Dans tes propres outils ou applis</td></tr>
             <tr><th>Pour qui ?</th><td>Particuliers, équipes</td><td>Développeurs, automatisations</td></tr>
           </tbody>
         </table>
       </div>
+      <p class="small muted">Les noms des forfaits chez Claude et chez ChatGPT : voir le tableau de « La Boîte à Outils de l'IA ».</p>
     </section>
 
     <section class="card s4 retenir">
@@ -494,7 +495,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
   </div>
   <footer class="foot">
-    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils Claude</a><a aria-current="page">8 Forfait ou API</a></nav>
+    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils de l'IA</a><a aria-current="page">8 Forfait ou API</a></nav>
     <span>Calcul simplifié pour comprendre. La cache est comptée ici à 10 % du prix de lecture pour 80 % du texte relu.</span>
     <div class="modes">
       <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
@@ -747,7 +748,7 @@ const SIZES = {
   mid:   { inTok: 10000, outTok: 1000, hint: "≈ 10 000 tokens lus et 1 000 écrits. Avec un document ou une longue conversation." },
   long:  { inTok: 60000, outTok: 4000, hint: "≈ 60 000 tokens lus et 4 000 écrits. Du code ou de gros documents." },
 };
-const PRICES = { haiku: [1, 5], sonnet: [2, 10], opus: [4, 20] };
+const PRICES = { rapide: [1, 5], standard: [2, 10], expert: [4, 20] };
 const st = { size: "mid" };
 
 function costPerMsg() {
@@ -858,18 +859,18 @@ render();
 const BET_PLAN = 20;
 const cpmOf = (size, model) => (SIZES[size].inTok * PRICES[model][0] + SIZES[size].outTok * PRICES[model][1]) / 1e6;
 const PROFILES = [
-  { who: "{laptop-code} Tom, développeur. L'appli de réservation qu'il a créée envoie 50 petites questions par jour à l'IA (Sonnet), 22 jours par mois.",
-    perDay: 50, days: 22, size: "short", model: "sonnet", a: "api",
+  { who: "{laptop-code} Tom, développeur. L'appli de réservation qu'il a créée envoie 50 petites questions par jour à l'IA (modèle standard), 22 jours par mois.",
+    perDay: 50, days: 22, size: "short", model: "standard", a: "api",
     why: (api) => `API : ${money(api)} par mois, contre ${BET_PLAN} $ pour le forfait. Et l'API marche dans son appli.` },
-  { who: "{user-tie} Sophie, responsable d'agence. 40 messages moyens par jour dans l'appli Claude (Sonnet), 22 jours par mois.",
-    perDay: 40, days: 22, size: "mid", model: "sonnet", a: "plan",
+  { who: "{user-tie} Sophie, responsable d'agence. 40 messages moyens par jour dans l'appli de l'IA (modèle standard), 22 jours par mois.",
+    perDay: 40, days: 22, size: "mid", model: "standard", a: "plan",
     why: (api) => `Avec l'API, ce serait ${money(api)} par mois. Le forfait coûte moins cher, et la facture ne bouge pas.` },
-  { who: "{flask} Marc, développeur. 80 gros travaux par jour avec Opus, 22 jours par mois.",
-    perDay: 80, days: 22, size: "long", model: "opus", a: "plan",
+  { who: "{flask} Marc, développeur. 80 gros travaux par jour avec le modèle expert, 22 jours par mois.",
+    perDay: 80, days: 22, size: "long", model: "expert", a: "plan",
     why: (api) => `Avec l'API : ${money(api)} par mois ! Le forfait coûte bien moins cher. Mais avec autant de gros travaux, Marc atteindra la limite et devra faire des pauses.` },
-  { who: "{robot} Le robot de l'agence. Un outil qui trie 200 e-mails par jour, tout seul, avec Haiku, 31 jours par mois.",
-    perDay: 200, days: 31, size: "short", model: "haiku", a: "api",
-    why: (api) => `Piège ! Le forfait ne marche que dans l'appli Claude, avec un humain. Un robot passe par l'API : environ ${money(api)} par mois. On peut fixer un plafond de dépense.` },
+  { who: "{robot} Le robot de l'agence. Un outil qui trie 200 e-mails par jour, tout seul, avec le modèle rapide, 31 jours par mois.",
+    perDay: 200, days: 31, size: "short", model: "rapide", a: "api",
+    why: (api) => `Piège ! Le forfait ne marche que dans l'appli de l'IA, avec un humain. Un robot passe par l'API : environ ${money(api)} par mois. On peut fixer un plafond de dépense.` },
 ];
 function applyProfile(P) {
   $(`#segModel button[data-v="${P.model}"]`).click();
@@ -894,7 +895,7 @@ function applyProfile(P) {
         $("#betScore").textContent = `${good} / ${PROFILES.length}`;
         if (firsts.size < PROFILES.length) return;
         rich($("#betResult"), (good === PROFILES.length ? "{trophy} 4 sur 4 ! " : `${good} sur 4. `) +
-          "La règle : petit usage ou outil automatique, l'API. Gros usage dans l'appli Claude, le forfait.");
+          "La règle : petit usage ou outil automatique, l'API. Gros usage dans l'appli de l'IA, le forfait.");
         if (good === PROFILES.length) confetti("{dice}");
       } });
   });
@@ -913,7 +914,7 @@ initDefi([
     why: "L'IA relit toute la conversation à chaque fois. Plus de tokens lus, donc plus cher (voir « La Mémoire qui Déborde »)." },
   { q: "Ton outil interne doit appeler l'IA tout seul, la nuit.", a: "api",
     options: [["plan", "{credit-card} Forfait"], ["api", "{receipt} API"]],
-    why: "Le forfait marche dans l'appli Claude. Un outil automatique passe par l'API." },
+    why: "Le forfait marche dans l'appli de l'IA. Un outil automatique passe par l'API." },
 ]);
 if ("ResizeObserver" in window) {
   let w = 0;

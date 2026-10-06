@@ -369,17 +369,17 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
     <section class="card s3">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-1"></i></span><h2>Choisis un modèle</h2></div>
       <div class="models" id="models" role="group" aria-label="Modèle">
-        <button type="button" class="model" data-v="haiku" aria-pressed="false">
-          <span class="ic" aria-hidden="true"><i class="fa-solid fa-person-running"></i></span><span class="nm">Haiku 4.5</span>
+        <button type="button" class="model" data-v="rapide" aria-pressed="false">
+          <span class="ic" aria-hidden="true"><i class="fa-solid fa-person-running"></i></span><span class="nm">Rapide</span>
           <span class="tg">Le stagiaire rapide</span><span class="ds">Très rapide, pas cher. Pour les tâches simples.</span>
         </button>
-        <button type="button" class="model" data-v="sonnet" aria-pressed="true">
-          <span class="ic" aria-hidden="true"><i class="fa-solid fa-user-tie"></i></span><span class="nm">Sonnet 5.5</span>
+        <button type="button" class="model" data-v="standard" aria-pressed="true">
+          <span class="ic" aria-hidden="true"><i class="fa-solid fa-user-tie"></i></span><span class="nm">Standard</span>
           <span class="tg">Le collègue efficace</span><span class="ds">Bon en tout. Le choix du quotidien.</span>
         </button>
-        <button type="button" class="model" data-v="opus" aria-pressed="false">
-          <span class="ic" aria-hidden="true"><i class="fa-solid fa-flask"></i></span><span class="nm">Opus 5.5</span>
-          <span class="tg">L'expert</span><span class="ds">Le plus fort. Plus lent et plus cher.</span>
+        <button type="button" class="model" data-v="expert" aria-pressed="false">
+          <span class="ic" aria-hidden="true"><i class="fa-solid fa-flask"></i></span><span class="nm">Expert</span>
+          <span class="tg">Le spécialiste</span><span class="ds">Le plus fort. Plus lent et plus cher.</span>
         </button>
       </div>
     </section>
@@ -392,7 +392,7 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
         <div class="ctl-ends" aria-hidden="true"><span>Bas</span><span>Max</span></div>
       </div>
       <p class="small" id="effortTxt"></p>
-      <p class="disabled-note" id="haikuNote" hidden>Haiku n'a pas ce réglage. Il répond toujours vite.</p>
+      <p class="disabled-note" id="fastNote" hidden>Le modèle rapide n'a pas ce réglage. Il répond toujours vite.</p>
     </section>
 
     <section class="card s4">
@@ -453,9 +453,9 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
               <div class="ctl">
                 <span>Modèle</span>
                 <div class="seg" id="misModel" role="group" aria-label="Modèle pour la mission">
-                  <button type="button" data-v="haiku" aria-pressed="false"><i class="fa-solid fa-person-running" aria-hidden="true"></i> Haiku</button>
-                  <button type="button" data-v="sonnet" aria-pressed="true"><i class="fa-solid fa-user-tie" aria-hidden="true"></i> Sonnet</button>
-                  <button type="button" data-v="opus" aria-pressed="false"><i class="fa-solid fa-flask" aria-hidden="true"></i> Opus</button>
+                  <button type="button" data-v="rapide" aria-pressed="false"><i class="fa-solid fa-person-running" aria-hidden="true"></i> Rapide</button>
+                  <button type="button" data-v="standard" aria-pressed="true"><i class="fa-solid fa-user-tie" aria-hidden="true"></i> Standard</button>
+                  <button type="button" data-v="expert" aria-pressed="false"><i class="fa-solid fa-flask" aria-hidden="true"></i> Expert</button>
                 </div>
               </div>
               <div class="ctl">
@@ -489,15 +489,16 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></span><h2>Les 3 modèles en bref</h2></div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>Modèle</th><th>Pour quoi ?</th><th class="num">Mémoire</th><th class="num">Prix API*</th></tr></thead>
+          <thead><tr><th>Modèle</th><th>Pour quoi ?</th><th class="num">Mémoire*</th><th class="num">Prix API*</th></tr></thead>
           <tbody>
-            <tr><td><strong>Haiku 4.5</strong></td><td>Tâches simples, gros volumes</td><td class="num">200 000</td><td class="num">1 $ / 5 $</td></tr>
-            <tr><td><strong>Sonnet 5.5</strong></td><td>Le quotidien : écrire, analyser, coder</td><td class="num">1 million</td><td class="num">2 $ / 10 $</td></tr>
-            <tr><td><strong>Opus 5.5</strong></td><td>Les tâches dures et longues</td><td class="num">1 million</td><td class="num">4 $ / 20 $</td></tr>
+            <tr><td><strong>Rapide</strong></td><td>Tâches simples, gros volumes</td><td class="num">200 000</td><td class="num">1 $ / 5 $</td></tr>
+            <tr><td><strong>Standard</strong></td><td>Le quotidien : écrire, analyser, coder</td><td class="num">1 million</td><td class="num">2 $ / 10 $</td></tr>
+            <tr><td><strong>Expert</strong></td><td>Les tâches dures et longues</td><td class="num">1 million</td><td class="num">4 $ / 20 $</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="small muted">* Prix pour 1 million de tokens : lus / écrits. Tarifs publics de l'API, septembre 2026. Il existe aussi Fable, encore plus puissant (10 $ / 50 $).</p>
+      <p class="small muted">* Exemple avec les 3 modèles de Claude, tarifs publics de l'API de septembre 2026. Prix pour 1 million de tokens : lus / écrits. Il existe aussi des modèles encore plus puissants (10 $ / 50 $).</p>
+      <p class="small muted">Chaque IA donne ses propres noms à ses modèles. Les noms chez Claude et chez ChatGPT : voir le tableau de « La Boîte à Outils de l'IA ».</p>
     </section>
 
     <section class="card s4 retenir">
@@ -529,7 +530,7 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
 
   </div>
   <footer class="foot">
-    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a aria-current="page">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils Claude</a><a href="8-forfait-api.html">8 Forfait ou API</a></nav>
+    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a aria-current="page">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils de l'IA</a><a href="8-forfait-api.html">8 Forfait ou API</a></nav>
     <span>Vitesse, qualité et temps sont des estimations pour comprendre, pas des mesures. Les prix sont les tarifs publics de l'API.</span>
     <div class="modes">
       <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
@@ -778,9 +779,9 @@ function initDefi(items, options) {
 
 
 const MODELS = {
-  haiku:  { name: "Haiku 4.5",  speed: 95, quality: 52, inP: 1, outP: 5,  tps: 160, effort: false },
-  sonnet: { name: "Sonnet 5.5", speed: 72, quality: 76, inP: 2, outP: 10, tps: 90,  effort: true },
-  opus:   { name: "Opus 5.5",   speed: 50, quality: 88, inP: 4, outP: 20, tps: 60,  effort: true },
+  rapide:   { name: "Modèle rapide",   speed: 95, quality: 52, inP: 1, outP: 5,  tps: 160, effort: false },
+  standard: { name: "Modèle standard", speed: 72, quality: 76, inP: 2, outP: 10, tps: 90,  effort: true },
+  expert:   { name: "Modèle expert",   speed: 50, quality: 88, inP: 4, outP: 20, tps: 60,  effort: true },
 };
 const EFFORT = [
   { name: "Bas",       q: -10, think: 0.2, sp: 10,  txt: "L'IA répond presque tout de suite. Elle réfléchit très peu." },
@@ -807,7 +808,7 @@ const ASKS = [
 // Avec une demande floue, l'IA devine : la qualité reste bloquée, quel que soit le modèle.
 const FLOU = 30;
 const INPUT = 2000;
-const st = { model: "sonnet", effort: 1, task: 2, clear: true };
+const st = { model: "standard", effort: 1, task: 2, clear: true };
 
 function evaluate(mk, e, t, clear = true) {
   const m = MODELS[mk], task = TASKS[t];
@@ -854,12 +855,12 @@ function render() {
   const task = TASKS[st.task];
   const slider = $("#effort");
   slider.disabled = !m.effort;
-  $("#haikuNote").hidden = m.effort;
+  $("#fastNote").hidden = m.effort;
   $("#vEffort").textContent = m.effort ? EFFORT[st.effort].name : "–";
   $("#effortTxt").textContent = m.effort ? EFFORT[st.effort].txt : "";
 
-  // Le coût est comparé au réglage le plus cher pour cette tâche (Opus, effort max).
-  const maxPrice = evaluate("opus", 4, st.task).price;
+  // Le coût est comparé au réglage le plus cher pour cette tâche (modèle expert, effort max).
+  const maxPrice = evaluate("expert", 4, st.task).price;
   const costPct = Math.max(3, (r.price / maxPrice) * 100);
   $("#bSpeed").style.width = r.speed + "%";
   $("#bQual").style.width = r.quality + "%";
@@ -898,7 +899,7 @@ render();
 
 // Jeu : mission budget. Une tâche compte « au meilleur prix » si elle est réussie du premier coup, à moins de 1,25 fois le minimum.
 const TASK_LABELS = $$("#segTask button").map((b, k) => `${TASKS[k].ic} ${b.textContent.trim()}`);
-const mis = { k: 0, model: "sonnet", effort: 1, tries: 0, spent: 0, min: 0, good: 0 };
+const mis = { k: 0, model: "standard", effort: 1, tries: 0, spent: 0, min: 0, good: 0 };
 const cfgName = (mk, e) => MODELS[mk].name + (MODELS[mk].effort ? `, effort ${EFFORT[e].name.toLowerCase()}` : "");
 function renderMission() {
   const done = mis.k === TASKS.length;
@@ -914,7 +915,7 @@ function renderMission() {
     $("#misNeed").textContent = "";
     rich($("#misResult"), (mis.good === TASKS.length ? "{trophy} Parfait ! " : "") +
       `Tu as dépensé ${priceTxt(mis.spent)}. Le minimum était ${priceTxt(mis.min)}. ` +
-      "{lightbulb} Le savais-tu ? Pour créer une appli, Opus en effort moyen coûte moins cher que Sonnet en effort max : un modèle plus fort a besoin de moins réfléchir.");
+      "{lightbulb} Le savais-tu ? Pour créer une appli, le modèle expert en effort moyen coûte moins cher que le modèle standard en effort max : un modèle plus fort a besoin de moins réfléchir.");
     if (mis.good === TASKS.length) confetti("{sack-dollar}");
     return;
   }
@@ -958,19 +959,19 @@ renderMission();
 
 // Défi final
 initDefi([
-  { q: "Tu veux corriger les fautes d'un e-mail. Quel modèle ?", a: "haiku",
-    options: [["haiku", "{person-running} Haiku"], ["sonnet", "{user-tie} Sonnet"], ["opus", "{flask} Opus"]],
+  { q: "Tu veux corriger les fautes d'un e-mail. Quel modèle ?", a: "rapide",
+    options: [["rapide", "{person-running} Rapide"], ["standard", "{user-tie} Standard"], ["expert", "{flask} Expert"]],
     why: "Une tâche simple : le stagiaire rapide suffit. Il est rapide et pas cher." },
-  { q: "Ton appli a un bug très difficile à trouver. Que choisis-tu ?", a: "opus",
-    options: [["haiku", "Haiku"], ["sonnet", "Sonnet, effort moyen"], ["opus", "Opus, effort haut"]],
+  { q: "Ton appli a un bug très difficile à trouver. Que choisis-tu ?", a: "expert",
+    options: [["rapide", "Rapide"], ["standard", "Standard, effort moyen"], ["expert", "Expert, effort haut"]],
     why: "Une tâche dure : l'expert, avec du temps pour réfléchir." },
-  { q: "Tu dois résumer 500 avis clients, chaque jour.", a: "haiku",
-    options: [["haiku", "Haiku"], ["opus", "Opus, effort max"]],
-    why: "Une tâche simple, en gros volume : Haiku coûte 4 fois moins cher qu'Opus, et il va plus vite." },
+  { q: "Tu dois résumer 500 avis clients, chaque jour.", a: "rapide",
+    options: [["rapide", "Rapide"], ["expert", "Expert, effort max"]],
+    why: "Une tâche simple, en gros volume : le modèle rapide coûte 4 fois moins cher que l'expert, et il va plus vite." },
   { q: "Monter l'effort, ça veut dire…", a: "think",
     options: [["fast", "L'IA répond plus vite"], ["think", "L'IA réfléchit plus longtemps"], ["model", "On change de modèle"]],
     why: "Plus d'effort = plus de tokens de réflexion. Plus lent et plus cher, mais utile pour les tâches difficiles." },
-  { q: "Opus te répond à côté de ce que tu voulais. Que fais-tu d'abord ?", a: "ask",
+  { q: "Le modèle expert te répond à côté de ce que tu voulais. Que fais-tu d'abord ?", a: "ask",
     options: [["effort", "Je monte l'effort au max"], ["ask", "Je précise ma demande"], ["same", "Je renvoie le même message"]],
     why: "L'IA ne devine pas ce que tu veux. Préciser ta demande est gratuit. Plus d'effort coûte plus cher, et ne l'aide pas à deviner." },
   { q: "Quelle demande donne la meilleure affiche ?", a: "clear",
