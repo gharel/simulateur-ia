@@ -289,17 +289,41 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 td.c, th.c { text-align: center; }
 
 .switches { display: grid; gap: 8px; }
-.winner { display: grid; gap: 6px; }
-.winner .big { font-size: clamp(2.6rem, 6vw, 4rem); }
-.score .fill { background: var(--muted); }
-.score.top .fill { background: var(--accent); }
+.sw .lbl { display: grid; gap: 2px; }
+.sw .lbl small { font-size: .9rem; font-weight: 400; color: var(--muted); }
 
-.cmp th.hl, .cmp td.hl { background: color-mix(in oklab, var(--accent) 14%, transparent); }
-.cmp thead th.hl { color: var(--accent-text); }
-.cmp thead th { font-family: var(--font-display); font-size: 1.15rem; text-transform: none; letter-spacing: 0; color: var(--fg); }
-.cmp thead th:first-child { font-family: var(--font-body); font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
-.cmp tbody th { font-size: .78rem; width: 18%; }
-.cmp td { min-width: 180px; }
+/* Deux colonnes : à gauche on règle, à droite on voit l'effet */
+.lab { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 28px; }
+@media (max-width: 900px) { .lab { grid-template-columns: minmax(0, 1fr); } }
+.lab-col { display: grid; gap: 18px; align-content: start; }
+.lab-part { display: grid; gap: 12px; }
+.lab h3 .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
+.set-wrap { display: grid; gap: 16px; }
+
+/* Le bon prompt : ton message, puis la réponse de Claude */
+.who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.msg-me { justify-self: end; max-width: 88%; display: grid; gap: 4px; background: var(--accent); color: var(--on-accent); border-radius: 18px 18px 4px 18px; padding: 12px 16px; font-weight: 700; }
+.msg-me .who { color: var(--on-accent); }
+.bubble { background: var(--surface-2); border-radius: 18px 18px 18px 4px; padding: 16px; display: grid; gap: 8px; }
+.sent { padding: 6px 10px; border-radius: 8px; font-weight: 700; display: block; }
+.sent.ok { background: color-mix(in oklab, var(--ok) 16%, transparent); }
+.sent.warn { background: color-mix(in oklab, var(--warn) 18%, transparent); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: .9rem; color: var(--muted); }
+.fill.ok { background: var(--ok); } .fill.warn { background: var(--warn); } .fill.bad { background: var(--bad); }
+.out { display: grid; gap: 12px; justify-items: start; }
+.out > .bubble { justify-self: stretch; }
+
+/* Une seule appli : Chat + Cowork = Claude */
+.merge { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; font-weight: 700; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 12px; background: var(--surface-2); }
+.chip.new { background: var(--accent); color: var(--on-accent); font-family: var(--font-display); font-weight: 400; font-size: 1.3rem; }
+.merge .to { display: inline-flex; align-items: center; gap: 12px; }
+.merge .to > .svg-inline--fa { color: var(--accent-text); }
+.note { background: var(--surface-2); border-radius: 18px; padding: 16px 18px; display: grid; gap: 6px; }
+.note strong .svg-inline--fa { color: var(--accent-text); margin-right: 6px; }
+.thread { display: grid; gap: 10px; }
+.lab-col > .pill { justify-self: start; }
+.do { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; font-weight: 700; }
 
 .kitchen { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 @media (max-width: 760px) { .kitchen { grid-template-columns: minmax(0, 1fr); } }
@@ -346,56 +370,90 @@ td.c, th.c { text-align: center; }
         <div class="ctl">
           <span class="eyebrow">Comprendre l'IA · Fiche 7 sur 8</span>
           <h1>La Boîte<br>à Outils Claude</h1>
-          <p class="lead">Chat, Cowork ou Code ? Projet, Skill ou Connecteur ? Trouve le bon outil pour ton besoin.</p>
+          <p class="lead">Écris un bon prompt. Puis donne à Claude les bons outils.</p>
         </div>
         <div class="word-card">
           <span class="eyebrow">En résumé</span>
-          <strong>3 façons</strong>
-          <p>d'utiliser Claude : Chat, Cowork, Code.</p>
-          <strong>3 bonus</strong>
-          <p>pour l'aider : Projet, Skill, Connecteur.</p>
+          <strong>3 morceaux</strong>
+          <p>pour un bon prompt : contexte, action, objectif.</p>
+          <strong>3 outils</strong>
+          <p>pour aider Claude : Projet, Skill, Connecteur.</p>
         </div>
       </div>
     </section>
 
-    <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-compass"></i></span><h2>Quel Claude pour moi ?</h2></div>
-      <p class="muted">Coche ce qui te ressemble.</p>
-      <div class="switches">
-        <label class="sw" for="q1"><span><i class="fa-solid fa-comments" aria-hidden="true"></i> Je veux poser des questions, écrire, réfléchir</span><input type="checkbox" id="q1"></label>
-        <label class="sw" for="q2"><span><i class="fa-solid fa-folder-open" aria-hidden="true"></i> Claude doit ouvrir et ranger des fichiers de mon ordinateur</span><input type="checkbox" id="q2" checked></label>
-        <label class="sw" for="q3"><span><i class="fa-solid fa-person-running" aria-hidden="true"></i> Claude doit faire une longue tâche tout seul</span><input type="checkbox" id="q3" checked></label>
-        <label class="sw" for="q4"><span><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i> Je veux créer ou modifier un logiciel, un site, une appli</span><input type="checkbox" id="q4"></label>
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-pen-to-square"></i></span><h2>Le bon prompt : contexte, action, objectif</h2></div>
+      <p>Un <strong>prompt</strong>, c'est le message que tu écris à l'IA. Ce que tu ne dis pas, Claude le devine. Et il peut se tromper (voir « Le Détecteur de Bobards »).</p>
+      <div id="promptGuess"></div>
+      <div class="lab">
+        <div class="lab-col">
+          <h3>Ajoute les 3 morceaux</h3>
+          <div class="set-wrap" id="ppSet">
+            <div class="switches">
+              <label class="sw" for="ppCtx"><span class="lbl"><span><i class="fa-solid fa-user" aria-hidden="true"></i> Le contexte</span><small>Ta situation : qui tu es, à qui tu écris.</small></span><input type="checkbox" id="ppCtx"></label>
+              <label class="sw" for="ppAct"><span class="lbl"><span><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i> Une action précise</span><small>Un verbe, et ce qu'il faut faire exactement.</small></span><input type="checkbox" id="ppAct"></label>
+              <label class="sw" for="ppObj"><span class="lbl"><span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> L'objectif</span><small>Le but, et le résultat que tu veux.</small></span><input type="checkbox" id="ppObj"></label>
+            </div>
+            <div class="meter">
+              <div class="meter-top"><span>Ce que Claude doit deviner</span><span id="ppVal"></span></div>
+              <div class="track"><div class="fill" id="ppFill"></div></div>
+            </div>
+          </div>
+          <div class="note">
+            <strong><i class="fa-solid fa-lightbulb" aria-hidden="true"></i>En plus</strong>
+            <p>Finis ton prompt par : « Si tu ne sais pas, dis-le. S'il te manque une info, pose-moi des questions. »</p>
+          </div>
+        </div>
+        <div class="lab-col">
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Ton prompt</h3>
+            <div class="msg-me" id="ppPrompt" aria-live="polite"></div>
+          </div>
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-envelope" aria-hidden="true"></i> La réponse de Claude</h3>
+            <div class="out" id="ppOut">
+              <div class="bubble" id="ppAnswer" aria-live="polite"></div>
+              <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Vient de ton prompt</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Deviné par Claude</span></div>
+              <span class="pill" id="ppPill"></span>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
-
-    <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></span><h2>Ma recommandation</h2></div>
-      <div class="winner">
-        <span class="eyebrow">Utilise plutôt</span>
-        <span class="big" id="winName" aria-live="polite">Cowork</span>
-        <p id="winTxt"></p>
-      </div>
-      <div class="meter score" id="scChat"><div class="meter-top"><span><i class="fa-solid fa-comments" aria-hidden="true"></i> Chat</span><span></span></div><div class="track"><div class="fill"></div></div></div>
-      <div class="meter score" id="scCowork"><div class="meter-top"><span><i class="fa-solid fa-handshake" aria-hidden="true"></i> Cowork</span><span></span></div><div class="track"><div class="fill"></div></div></div>
-      <div class="meter score" id="scCode"><div class="meter-top"><span><i class="fa-solid fa-laptop-code" aria-hidden="true"></i> Code</span><span></span></div><div class="track"><div class="fill"></div></div></div>
+      <p class="small muted">Exemple fabriqué pour comprendre. Tu réécris le même contexte à chaque fois ? Range-le dans un Projet (voir plus bas).</p>
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-clipboard-list"></i></span><h2>Chat, Cowork, Code : les différences</h2></div>
-      <div class="tbl-wrap">
-        <table class="cmp" id="cmp">
-          <thead><tr><th></th><th data-col="chat"><i class="fa-solid fa-comments" aria-hidden="true"></i> Chat</th><th data-col="cowork"><i class="fa-solid fa-handshake" aria-hidden="true"></i> Cowork</th><th data-col="code"><i class="fa-solid fa-laptop-code" aria-hidden="true"></i> Code</th></tr></thead>
-          <tbody>
-            <tr><th>C'est quoi ?</th><td data-col="chat">Une conversation. Tu demandes, Claude répond.</td><td data-col="cowork">Claude fait une tâche de bureau à ta place, en plusieurs étapes.</td><td data-col="code">Claude écrit du code, le teste et lance des commandes.</td></tr>
-            <tr><th>Pour qui ?</th><td data-col="chat">Tout le monde.</td><td data-col="cowork">Ceux qui veulent déléguer des tâches.</td><td data-col="code">Les développeurs et les curieux du numérique.</td></tr>
-            <tr><th>Où ?</th><td data-col="chat">Site web, appli mobile, appli ordinateur.</td><td data-col="cowork">Appli Claude sur ordinateur.</td><td data-col="code">Terminal, éditeur de code, appli ordinateur, web.</td></tr>
-            <tr><th>Claude peut toucher</th><td data-col="chat">Ce que tu écris et les fichiers que tu envoies.</td><td data-col="cowork">Un dossier de ton ordinateur que tu choisis.</td><td data-col="code">Les fichiers d'un projet et le terminal.</td></tr>
-            <tr><th>Exemple</th><td data-col="chat">« Aide-moi à écrire un mail à mon propriétaire. »</td><td data-col="cowork">« Range mes factures et fais-en un tableau. »</td><td data-col="code">« Ajoute un bouton de connexion à mon site. »</td></tr>
-          </tbody>
-        </table>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-arrows-to-circle"></i></span><h2>Une seule appli : Claude</h2></div>
+      <div class="lab">
+        <div class="lab-col">
+          <div class="merge">
+            <span class="chip"><i class="fa-solid fa-comments" aria-hidden="true"></i> Chat</span>
+            <span aria-hidden="true">+</span>
+            <span class="chip"><i class="fa-solid fa-handshake" aria-hidden="true"></i> Cowork</span>
+            <span class="to"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i><span class="chip new">Claude</span></span>
+          </div>
+          <p>Avant, il fallait choisir : <strong>Chat</strong> pour parler, <strong>Cowork</strong> pour lui confier une tâche sur tes fichiers. Les deux deviennent une seule appli : <strong>Claude</strong>.</p>
+          <p><strong>Tu n'as plus à choisir.</strong> Tu écris ta demande. Claude voit s'il doit répondre, ou agir en plusieurs étapes.</p>
+          <div class="note">
+            <strong><i class="fa-solid fa-laptop-code" aria-hidden="true"></i>Et Claude Code ?</strong>
+            <p>Il reste à part. C'est l'outil pour créer ou modifier un logiciel, un site, une appli. Il lit le code, le change et le teste.</p>
+          </div>
+        </div>
+        <div class="lab-col">
+          <div class="ctl">
+            <span>Choisis une demande</span>
+            <div class="seg" id="segAsk" role="group" aria-label="Demande">
+              <button type="button" data-v="mail" aria-pressed="true"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Un mail</button>
+              <button type="button" data-v="factures" aria-pressed="false"><i class="fa-solid fa-file-invoice" aria-hidden="true"></i> Des factures</button>
+              <button type="button" data-v="site" aria-pressed="false"><i class="fa-solid fa-laptop-code" aria-hidden="true"></i> Un site</button>
+            </div>
+          </div>
+          <div class="thread" id="askThread" aria-live="polite"></div>
+          <span class="pill" id="askPill"></span>
+        </div>
       </div>
-      <p class="small muted">Dans Cowork et Code, Claude te demande la permission avant les actions importantes.</p>
+      <p class="small muted">Annoncé par Anthropic en septembre 2026. Le changement arrive peu à peu : d'abord pour les abonnements Pro et Max, puis Team et Free. Tes conversations, Projets, Skills et Connecteurs sont gardés.</p>
     </section>
 
     <section class="card s4">
@@ -415,7 +473,7 @@ td.c, th.c { text-align: center; }
           <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></span><span class="state">Désactivé</span></span>
           <span class="nm">Projet</span>
           <span class="meta">= le plan de travail avec tes ingrédients</span>
-          <span>Un espace où tu ranges des documents et des consignes. Claude les garde pour toutes les conversations du projet.</span>
+          <span>Un espace où tu ranges des documents et des consignes, comme ton contexte. Claude les garde pour toutes les conversations du projet.</span>
         </button>
         <button type="button" class="piece" data-k="skill" aria-pressed="false">
           <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-scroll"></i></span><span class="state">Désactivé</span></span>
@@ -445,24 +503,25 @@ td.c, th.c { text-align: center; }
         <table>
           <thead><tr><th>Usage</th><th class="c"><span role="img" aria-label="Mes données"><i class="fa-solid fa-lock"></i></span></th><th class="c"><span role="img" aria-label="Contenu extérieur"><i class="fa-solid fa-inbox"></i></span></th><th class="c"><span role="img" aria-label="Peut agir"><i class="fa-solid fa-bolt"></i></span></th><th>Risque</th></tr></thead>
           <tbody>
-            <tr><td>Chat : tu écris toi-même ton texte</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td><span class="pill ok">Très faible</span></td></tr>
-            <tr><td>Chat : tu colles un e-mail ou un PDF reçu</td><td class="c">–</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill ok">Faible</span></td></tr>
-            <tr><td>Chat avec la recherche web</td><td class="c">–</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill ok">Faible</span></td></tr>
+            <tr><td>Tu écris toi-même ton texte</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td><span class="pill ok">Très faible</span></td></tr>
+            <tr><td>Tu colles un e-mail ou un PDF reçu</td><td class="c">–</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill ok">Faible</span></td></tr>
+            <tr><td>Claude cherche sur le web pour toi</td><td class="c">–</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill ok">Faible</span></td></tr>
             <tr><td>Assistant branché sur ta boîte mail, en lecture seule</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill warn">Moyen</span></td></tr>
             <tr><td>Agent qui lit tes e-mails et répond seul</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td><span class="pill bad">Élevé</span></td></tr>
             <tr><td>Agent qui navigue sur le web avec tes comptes connectés</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td><span class="pill bad">Élevé</span></td></tr>
           </tbody>
         </table>
       </div>
-      <p class="small muted">Un connecteur ou Cowork peut ajouter <span role="img" aria-label="l'accès à tes données"><i class="fa-solid fa-lock"></i></span> et <span role="img" aria-label="le droit d'agir seule"><i class="fa-solid fa-bolt"></i></span>. Plus l'IA a de pouvoir, plus ce qu'elle lit compte.</p>
+      <p class="small muted">Un connecteur, ou Claude qui agit sur tes fichiers, peut ajouter <span role="img" aria-label="l'accès à tes données"><i class="fa-solid fa-lock"></i></span> et <span role="img" aria-label="le droit d'agir seule"><i class="fa-solid fa-bolt"></i></span>.
+        Par défaut, Claude te demande la permission avant d'agir. Un réglage lui permet de continuer sans demander : garde-le pour les tâches sans risque. Plus l'IA a de pouvoir, plus ce qu'elle lit compte.</p>
     </section>
 
     <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
-        <li><span>Chat pour parler. Cowork pour déléguer une tâche sur tes fichiers. Code pour créer des logiciels.</span></li>
-        <li><span>Projet = tes documents et consignes rangés au même endroit.</span></li>
-        <li><span>Skill = une méthode réutilisable. Connecteur = un accès à tes autres outils.</span></li>
+        <li><span>Un bon prompt = le contexte + une action précise + l'objectif.</span></li>
+        <li><span>Une seule appli, Claude : il répond ou il agit, selon ta demande. Claude Code reste à part, pour créer des logiciels.</span></li>
+        <li><span>Projet = ton contexte et tes documents. Skill = ta méthode. Connecteur = un accès à tes autres outils.</span></li>
       </ul>
     </section>
 
@@ -733,33 +792,62 @@ function initDefi(items, options) {
 })();
 
 
-const PRODUCTS = {
-  chat:   { name: "Chat",   txt: "Une simple conversation suffit. Écris ta demande, Claude répond." },
-  cowork: { name: "Cowork", txt: "Claude travaille dans un dossier de ton ordinateur. Il fait la tâche en plusieurs étapes, et tu vérifies le résultat." },
-  code:   { name: "Code",   txt: "Claude lit le code de ton projet, le modifie et le teste. Idéal pour créer un site ou une appli." },
+// Le bon prompt : chaque morceau ajouté remplace une partie que Claude devinait.
+// Pour chaque morceau : ce que tu écris, puis la ligne de la réponse [devinée, venue du prompt].
+const PP = {
+  ctx: { icon: "{user}", say: "Je suis Lucie, la secrétaire d'un club de randonnée. J'écris aux 40 membres.",
+    lines: [["Madame, Monsieur,", "Bonjour à toutes et à tous,"], ["[Votre nom]", "Lucie, secrétaire du club de randonnée"]] },
+  act: { icon: "{hand-pointer}", vague: "Écris un mail.", say: "Écris un mail pour rappeler de payer la cotisation de l'année.",
+    lines: [["Je me permets de vous écrire au sujet de notre projet commun.", "C'est le moment de payer votre cotisation au club pour l'année."]] },
+  obj: { icon: "{bullseye}", say: "Le but : que tout le monde ait payé avant le 30 novembre. Ton amical, 5 lignes au plus.",
+    lines: [["Je reste à votre disposition pour toute question. Bien cordialement,", "Merci de le faire avant le 30 novembre. À très bientôt."]] },
 };
-function renderChooser() {
-  const q = [1, 2, 3, 4].map((i) => $("#q" + i).checked);
-  const sc = { chat: 1, cowork: 0, code: 0 };
-  if (q[0]) sc.chat += 3;
-  if (q[1]) { sc.cowork += 3; sc.code += 1; }
-  if (q[2]) { sc.cowork += 2; sc.code += 2; }
-  if (q[3]) sc.code += 4;
-  const order = ["chat", "cowork", "code"];
-  const win = order.reduce((a, b) => (sc[b] > sc[a] ? b : a));
-  const max = Math.max(...Object.values(sc));
-  $("#winName").textContent = PRODUCTS[win].name;
-  $("#winTxt").textContent = q.some(Boolean) ? PRODUCTS[win].txt : "Rien de coché ? Commence par le Chat, c'est le plus simple.";
-  const el = { chat: "#scChat", cowork: "#scCowork", code: "#scCode" };
-  for (const k of order) {
-    const m = $(el[k]);
-    m.classList.toggle("top", k === win);
-    m.querySelector(".fill").style.width = Math.max(4, (sc[k] / max) * 100) + "%";
-    m.querySelector(".meter-top span:last-child").textContent = k === win ? "le plus adapté" : sc[k] / max >= 0.6 ? "possible" : "moins adapté";
-  }
-  $$("#cmp [data-col]").forEach((c) => c.classList.toggle("hl", c.dataset.col === win));
+const PP_PILL = [
+  ["bad", "{circle-xmark} Un mail passe-partout : à réécrire"],
+  ["warn", "{triangle-exclamation} Claude devine encore : à corriger"],
+  ["warn", "{triangle-exclamation} Presque : il manque un morceau"],
+  ["ok", "{circle-check} Prêt : relis-le avant de l'envoyer"],
+];
+function renderPrompt() {
+  const on = { ctx: $("#ppCtx").checked, act: $("#ppAct").checked, obj: $("#ppObj").checked };
+  const n = Object.values(on).filter(Boolean).length, missing = 3 - n;
+  // Le prompt : le contexte d'abord, puis l'action, puis l'objectif.
+  const said = [on.ctx && PP.ctx.icon + " " + PP.ctx.say, PP.act.icon + " " + (on.act ? PP.act.say : PP.act.vague), on.obj && PP.obj.icon + " " + PP.obj.say].filter(Boolean);
+  $("#ppPrompt").replaceChildren(h("span", "who", "Toi"), ...said.map((s) => h("span", "", s)));
+  // La réponse : salutation, sujet, fin, signature.
+  const line = (k, i) => { const known = on[k]; return h("span", "sent " + (known ? "ok" : "warn"), (known ? "{circle-check} " : "{triangle-exclamation} ") + PP[k].lines[i][known ? 1 : 0]); };
+  $("#ppAnswer").replaceChildren(h("span", "who", "Claude"), line("ctx", 0), line("act", 0), line("obj", 0), line("ctx", 1));
+  $("#ppVal").textContent = missing ? `${missing} morceau${missing > 1 ? "x" : ""} sur 3` : "rien";
+  const fill = $("#ppFill");
+  fill.style.width = Math.max(4, (missing / 3) * 100) + "%";
+  fill.className = "fill " + (missing >= 2 ? "bad" : missing ? "warn" : "ok");
+  const [cls, txt] = PP_PILL[n];
+  $("#ppPill").className = "pill " + cls;
+  rich($("#ppPill"), txt);
 }
-[1, 2, 3, 4].forEach((i) => $("#q" + i).addEventListener("change", renderChooser));
+["#ppCtx", "#ppAct", "#ppObj"].forEach((s) => $(s).addEventListener("change", renderPrompt));
+
+// Une seule appli : Claude voit s'il doit répondre ou agir. Pour un logiciel, c'est Claude Code.
+const ASK = {
+  mail: { q: "Aide-moi à écrire un mail délicat à un client.", pill: ["ok", "{comments} Claude répond"],
+    steps: ["Claude voit qu'une réponse suffit.", "Il te propose un mail, dans la conversation.", "Tu le relis, tu le changes, et tu l'envoies toi-même."] },
+  factures: { q: "Range mes 200 factures dans des dossiers, puis fais-en un tableau.", pill: ["warn", "{folder-open} Claude agit, avec ta permission"],
+    steps: ["Claude voit qu'il doit agir sur tes fichiers.", "Tu choisis le dossier qu'il peut ouvrir. Il trie les factures, puis fait le tableau.", "Avant une action importante, il te demande la permission. À la fin, tu vérifies."] },
+  site: { q: "Ajoute une page de réservation au site de l'agence.", pill: ["", "{laptop-code} Pour ça : Claude Code"],
+    steps: ["Il faut lire et changer le code du site.", "C'est le travail de Claude Code, l'outil à part pour créer des logiciels.", "Claude Code change le site, le teste, et te montre ce qu'il a changé."] },
+};
+function renderAsk(k) {
+  const A = ASK[k], ol = h("ol", "do");
+  ol.append(...A.steps.map((s) => h("li", "", s)));
+  const me = h("div", "msg-me");
+  me.append(h("span", "who", "Toi"), h("span", "", A.q));
+  const bub = h("div", "bubble");
+  bub.append(h("span", "who", "Ce qui se passe"), ol);
+  $("#askThread").replaceChildren(me, bub);
+  $("#askPill").className = "pill " + A.pill[0];
+  rich($("#askPill"), A.pill[1]);
+}
+renderAsk(initSeg($("#segAsk"), renderAsk));
 
 const CAN = {
   projet: "{layer-group} Se souvenir de tes documents et de tes consignes, à chaque conversation du projet.",
@@ -847,17 +935,24 @@ function nextMissionK() {
 $("#kCheck").addEventListener("click", checkMissionK);
 $("#kNext").addEventListener("click", nextMissionK);
 
+// Devine d'abord : avec « Écris un mail. », Claude devine tout le reste.
+guess($("#promptGuess"), {
+  q: "Tu écris seulement : « Écris un mail. » Que fait Claude ?",
+  options: [["ask", "Il te pose des questions"], ["guess", "Il écrit un mail, et devine le reste"], ["no", "Il refuse"]], a: "guess",
+  why: "Le plus souvent, il écrit un mail passe-partout. Il devine à qui tu écris, pourquoi, et sur quel ton. Ajoute les 3 morceaux pour voir la différence.",
+  lock: [$("#ppSet"), $("#ppOut")],
+});
+
 // Défi final
+const PIECES = [["ctx", "{user} Le contexte"], ["act", "{hand-pointer} L'action"], ["obj", "{bullseye} L'objectif"]];
 initDefi([
-  { q: "Tu veux de l'aide pour écrire un e-mail délicat à un client.", a: "chat",
-    options: [["chat", "{comments} Chat"], ["cowork", "{handshake} Cowork"], ["code", "{laptop-code} Code"]],
-    why: "Une conversation suffit : tu demandes, Claude répond." },
-  { q: "Claude doit ranger 200 factures de ton ordinateur dans des dossiers, puis en faire un tableau.", a: "cowork",
-    options: [["chat", "{comments} Chat"], ["cowork", "{handshake} Cowork"], ["code", "{laptop-code} Code"]],
-    why: "Une tâche de bureau en plusieurs étapes, sur tes fichiers : c'est Cowork." },
-  { q: "Tu veux ajouter une page de réservation au site de l'agence.", a: "code",
-    options: [["chat", "{comments} Chat"], ["cowork", "{handshake} Cowork"], ["code", "{laptop-code} Code"]],
-    why: "Créer ou modifier un site, c'est le travail de Code." },
+  { q: "« Je tiens un petit restaurant à Nouméa. » C'est quel morceau du prompt ?", a: "ctx", options: PIECES,
+    why: "C'est ta situation : qui tu es. Claude n'a plus à le deviner." },
+  { q: "« Le but : avoir plus de clients le lundi midi. » C'est quel morceau du prompt ?", a: "obj", options: PIECES,
+    why: "C'est le but : ce que tu veux obtenir." },
+  { q: "Claude doit ranger 200 factures de ton ordinateur, puis en faire un tableau. Tu ouvres…", a: "claude",
+    options: [["claude", "{comments} L'appli Claude"], ["cowork", "{handshake} Une appli Cowork à part"], ["code", "{laptop-code} Claude Code"]],
+    why: "Cowork fait maintenant partie de l'appli Claude. Claude voit qu'il doit agir sur tes fichiers, et te demande la permission." },
   { q: "Tu veux que Claude lise tes e-mails Gmail.", a: "connecteur",
     options: [["projet", "{layer-group} Projet"], ["skill", "{scroll} Skill"], ["connecteur", "{plug} Connecteur"]],
     why: "Il faut un branchement vers Gmail." },
@@ -868,7 +963,7 @@ initDefi([
     options: [["projet", "{layer-group} Projet"], ["skill", "{scroll} Skill"], ["connecteur", "{plug} Connecteur"]],
     why: "Une méthode écrite une fois et réutilisée : c'est une Skill." },
 ]);
-renderChooser();
+renderPrompt();
 renderKitchen();
 renderMissionK();
 </script>
