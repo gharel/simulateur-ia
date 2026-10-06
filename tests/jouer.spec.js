@@ -72,6 +72,25 @@ test("1-tokens.html : le compte est bon se gagne en 3 manches", async ({ page })
   await expect(page.locator("#cbToks .tok")).toHaveCount(7);
 });
 
+test("5-complaisance.html : choisir chaque version neutre donne 4 sur 4", async ({ page }) => {
+  await open(page, "5-complaisance.html");
+  for (let r = 0; r < 4; r++) {
+    // La version neutre est marquée dans les données de la page (NQ).
+    const i = await page.evaluate((k) => NQ[k].o.findIndex(([, ok]) => ok), r);
+    await page.locator("#nqOpts button").nth(i).click();
+    await expect(page.locator("#nqResult")).toContainText("Bien vu");
+    if (r < 3) await page.locator("#nqNext").click();
+  }
+  await expect(page.locator("#nqScore")).toHaveText("4 / 4");
+  await expect(page.locator("#nqResult")).toContainText("4 sur 4");
+  // « Rejouer », puis une mauvaise réponse : la correction montre la version neutre.
+  await page.locator("#nqNext").click();
+  const wrong = await page.evaluate(() => NQ[0].o.findIndex(([, ok]) => !ok));
+  await page.locator("#nqOpts button").nth(wrong).click();
+  await expect(page.locator("#nqResult")).toContainText("La version neutre");
+  await expect(page.locator("#nqScore")).toHaveText("0 / 4");
+});
+
 test("4-hallucinations.html : changer la règle du classement change le gagnant", async ({ page }) => {
   await open(page, "4-hallucinations.html");
   await page.locator("#rankGuess .qbtns button").first().click();

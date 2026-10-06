@@ -5,7 +5,7 @@
 <!-- La page a déjà ses thèmes clair et sombre : les modes nuit forcés (Dark Reader, mode nuit de Brave) ne doivent pas changer ses couleurs. -->
 <meta name="color-scheme" content="light dark">
 <meta name="darkreader-lock">
-<title>Le Détecteur de Bobards</title>
+<title>L'IA qui Dit Oui</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -285,23 +285,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
-:root { --accent: #FF6B00; }
+:root { --accent: #FF9AD5; }
 
-.switches { display: grid; gap: 8px; }
-/* Le labo : réglages à gauche, effets à droite */
-.lab { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 28px; }
-@media (max-width: 900px) { .lab { grid-template-columns: minmax(0, 1fr); } }
-.lab-col { display: grid; gap: 18px; align-content: start; }
-.lab-part { display: grid; gap: 12px; }
-.lab h3 .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
-.ring { width: 150px; height: auto; flex: none; }
-.ring .bg { fill: none; stroke: var(--surface-2); stroke-width: 14; }
-.ring .fg { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset .5s ease, stroke .3s; transform: rotate(-90deg); transform-origin: 60px 60px; }
-.ring .fg.ok { stroke: var(--ok); } .ring .fg.warn { stroke: var(--warn); } .ring .fg.bad { stroke: var(--bad); }
-.ring text { fill: var(--fg); font-family: var(--font-display); font-size: 26px; }
-.ring .sub { font-family: var(--font-body); font-size: 9px; font-weight: 700; fill: var(--muted); }
-
-.question { font-family: var(--font-display); font-size: 1.2rem; line-height: 1.2; }
 .bubble { background: var(--surface-2); border-radius: 18px 18px 18px 4px; padding: 16px; display: grid; gap: 8px; }
 .sent { padding: 6px 10px; border-radius: 8px; font-weight: 700; display: block; }
 .sent-ic { margin-right: 8px; }
@@ -310,17 +295,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .sent.bad { background: color-mix(in oklab, var(--bad) 18%, transparent); text-decoration: underline wavy var(--bad); text-underline-offset: 4px; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: .9rem; color: var(--muted); }
 
-.levers { display: grid; gap: 12px; }
-.lever { display: grid; gap: 4px; }
-.lever .meter-top { font-size: .95rem; }
-.lever .fill { background: var(--muted); }
-.lever.on .fill { background: var(--accent); }
-.lever.up .fill { background: var(--bad); }
-.lever .meter-top span:last-child { font-variant-numeric: tabular-nums; }
-
 .check { display: grid; gap: 8px; }
 .check label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start; padding: 10px 12px; background: var(--surface-2); border-radius: 12px; cursor: pointer; font-weight: 700; }
 .check input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--accent); }
+.check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
+
+/* Elle te donne raison : la façon de demander, puis quand tu insistes */
 .yes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
 @media (max-width: 900px) { .yes { grid-template-columns: minmax(0, 1fr); } }
 .yes-col { display: grid; gap: 14px; align-content: start; }
@@ -332,73 +312,27 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .msg-me .who { color: var(--on-accent); }
 .thread .bubble { max-width: 94%; }
 .bubble.faded { background: transparent; border: 2px dashed var(--line); }
-.check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
-.set-wrap { display: grid; gap: 16px; }
-.ring-wrap { display: flex; align-items: center; gap: 12px 24px; flex-wrap: wrap; }
 
-/* Pourquoi elle invente : 3 étapes */
+/* Pourquoi elle fait ça : 3 étapes */
 .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 @media (max-width: 760px) { .steps { grid-template-columns: minmax(0, 1fr); } }
 .step { background: var(--surface-2); border-radius: 16px; padding: 16px; display: grid; gap: 8px; align-content: start; }
 .step .n { font-family: var(--font-display); background: var(--accent); color: var(--on-accent); width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; }
 .step p { font-weight: 700; }
 
-/* Jeu : surligne ce qu'il faut vérifier */
-.hl-game { display: grid; gap: 14px; }
-.hl { display: grid; gap: 8px; }
-.hl button {
-  text-align: left; font: inherit; font-weight: 700; color: var(--fg); cursor: pointer; min-height: 44px;
-  background: var(--surface); border: 2px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 4px;
-}
-.hl button:hover { border-color: var(--accent); }
-.hl button[aria-pressed="true"] { background: color-mix(in oklab, var(--warn) 30%, var(--surface)); border-color: var(--warn); }
-.hl button:disabled { cursor: default; }
-.hl button.good { box-shadow: inset 5px 0 0 var(--ok); }
-.hl button.miss { box-shadow: inset 5px 0 0 var(--bad); }
-.hl .why { font-weight: 400; font-size: .92rem; }
-.hl .why:empty { display: none; }
-.hl-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+/* Jeu : pose ta question sans donner ton avis */
 .btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-
-/* Pourquoi elle devine : le classement récompense les bonnes réponses, pas la prudence */
-.rank { display: grid; gap: 14px; }
-.rk-rows { display: grid; gap: 12px; }
-.rk {
-  display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr) minmax(0, 190px); grid-template-areas: "name viz score";
-  gap: 12px 28px; align-items: center; background: var(--surface-2); border-radius: 16px; padding: 18px 22px;
+.nq { display: grid; gap: 12px; max-width: 760px; }
+.nq .msg-me { justify-self: start; }
+.nq-opts { display: grid; gap: 8px; }
+.nq-opts button {
+  text-align: left; font: inherit; font-weight: 700; color: var(--fg); cursor: pointer; min-height: 44px;
+  background: var(--surface-2); border: 2px solid var(--line); border-radius: 12px; padding: 12px 14px;
 }
-.rk-name { grid-area: name; display: grid; gap: 4px; }
-.rk-name .eyebrow { color: var(--accent-text); }
-.rk-name strong { font-size: 1.15rem; overflow-wrap: anywhere; }
-.rk-viz { grid-area: viz; display: grid; gap: 6px; }
-.rk-bar { display: flex; height: 56px; border-radius: 6px; overflow: hidden; container-type: inline-size; }
-.rk-bar > span { flex: none; display: flex; align-items: center; justify-content: center; gap: .3em; font-weight: 700; white-space: nowrap; overflow: hidden; transition: width .6s ease; }
-.rk-ok { background: var(--ok); color: var(--surface); }
-.rk-idk { background: color-mix(in oklab, var(--muted) 35%, var(--surface-2)); color: var(--fg); }
-.rk-bad { background: var(--bad); color: var(--surface); }
-/* Barre étroite : les nombres seulement, la légende dit le reste. */
-@container (max-width: 520px) { .rk-bar .w { display: none; } }
-.rk-tiny { display: block; font-size: .85rem; font-weight: 700; color: var(--muted); }
-.rk-score { grid-area: score; display: grid; gap: 2px; }
-.rk-pts { font-weight: 700; color: var(--muted); }
-.rk-n { font-family: var(--font-display); font-weight: 400; font-size: clamp(2.2rem, 5vw, 3rem); line-height: 1.05; color: var(--fg); font-variant-numeric: tabular-nums; margin-right: 4px; }
-.rk-place { font-weight: 700; color: var(--muted); }
-.rk-pts.win .rk-n, .rk-place.win { color: var(--ok); }
-@media (max-width: 1000px) { .rk { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name score" "viz viz"; } }
-@media (max-width: 560px) {
-  .rk { grid-template-columns: minmax(0, 1fr); grid-template-areas: "name" "viz" "score"; padding: 16px; }
-  .rk-score { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
-}
-.key { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; }
-/* Le verdict, en couleurs inversées. Le mot fort reste lisible dans les deux thèmes. */
-.verdict {
-  --em: color-mix(in oklab, var(--accent) 52%, #000);
-  max-width: none; background: var(--fg); color: var(--bg); border-radius: 16px; padding: 20px 24px; font-size: 1.15rem; font-weight: 700;
-}
-@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .verdict { --em: var(--accent); } }
-:root[data-theme="light"] .verdict { --em: var(--accent); }
-.verdict strong { font-family: var(--font-display); font-weight: 400; font-size: 1.35rem; }
-.verdict em { font-style: normal; color: var(--em); }
+.nq-opts button:hover { border-color: var(--accent); }
+.nq-opts button[aria-disabled="true"] { cursor: default; }
+.nq-opts button.right { border-color: var(--ok); background: color-mix(in oklab, var(--ok) 18%, var(--surface)); }
+.nq-opts button.wrong { border-color: var(--bad); background: color-mix(in oklab, var(--bad) 18%, var(--surface)); }
 </style>
 
 <main class="wrap">
@@ -415,127 +349,31 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <div class="hero-grid">
         <div class="ctl">
           <span class="eyebrow">Comprendre l'IA · Fiche 5 sur 8</span>
-          <h1>Le Détecteur<br>de Bobards</h1>
-          <p class="lead">Parfois, l'IA invente. Parfois, elle te donne raison trop vite. Apprends à repérer quand ça arrive.</p>
+          <h1>L'IA qui<br>Dit Oui</h1>
+          <p class="lead">Elle a tendance à te donner raison, même quand tu te trompes. Apprends à lui demander un vrai avis.</p>
         </div>
         <div class="word-card">
           <span class="eyebrow">Le mot à connaître</span>
-          <strong>Hallucination</strong>
-          <p>Quand l'IA invente une réponse qui a l'air vraie.</p>
-          <p>Elle ne ment pas exprès. Elle complète au hasard.</p>
+          <strong>Complaisance</strong>
+          <p>Quand l'IA te donne raison pour te faire plaisir.</p>
+          <p>Elle ne ment pas exprès. Elle a appris à plaire.</p>
         </div>
       </div>
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span><h2>Teste le risque d'invention</h2></div>
-      <div class="lab">
-        <div class="lab-col stick">
-          <div id="riskGuess"></div>
-          <h3>Tes réglages</h3>
-          <div class="set-wrap" id="riskSet">
-            <div class="ctl">
-              <div class="ctl-row"><label for="level">Ma question porte sur…</label></div>
-              <span class="ctl-val" id="vLevel"></span>
-              <input type="range" id="level" min="0" max="4" step="1" value="3">
-              <div class="ctl-ends"><span>Un fait très connu</span><span>Un fait très récent</span></div>
-            </div>
-            <div class="switches">
-              <label class="sw" for="doc"><span><i class="fa-solid fa-paperclip" aria-hidden="true"></i> Je donne un document</span><input type="checkbox" id="doc"></label>
-              <label class="sw" for="web"><span><i class="fa-solid fa-globe" aria-hidden="true"></i> La recherche web est activée</span><input type="checkbox" id="web"></label>
-              <label class="sw" for="idk"><span><i class="fa-solid fa-hand" aria-hidden="true"></i> J'autorise « je ne sais pas »</span><input type="checkbox" id="idk"></label>
-              <label class="sw" for="src"><span><i class="fa-solid fa-link" aria-hidden="true"></i> Je demande les sources</span><input type="checkbox" id="src"></label>
-            </div>
-            <div class="ctl">
-              <div class="ctl-row"><label for="crea">Ce que je demande</label><span class="ctl-val" id="vCrea"></span></div>
-              <input type="range" id="crea" min="0" max="100" value="30">
-              <div class="ctl-ends"><span>Des faits précis</span><span>De l'imagination</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="lab-col">
-          <div class="lab-part">
-            <h3><i class="fa-solid fa-bell" aria-hidden="true"></i> Risque d'invention</h3>
-            <div class="ring-wrap" id="ringWrap">
-              <svg class="ring" viewBox="0 0 120 120" role="img" aria-labelledby="ringLabel">
-                <title id="ringLabel">Risque d'invention</title>
-                <circle class="bg" cx="60" cy="60" r="50"></circle>
-                <circle class="fg" id="ringFg" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="314.16"></circle>
-                <text id="ringTxt" x="60" y="64" text-anchor="middle">0 %</text>
-                <text class="sub" x="60" y="80" text-anchor="middle">de risque</text>
-              </svg>
-              <span class="pill" id="riskPill" aria-live="polite"></span>
-            </div>
-          </div>
-          <div class="lab-part">
-            <h3><i class="fa-solid fa-comments" aria-hidden="true"></i> Exemple de réponse</h3>
-            <p class="question" id="question"></p>
-            <div class="bubble" id="answer" aria-live="polite"></div>
-            <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Vrai ou vérifiable</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> À vérifier</span><span><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Inventé</span></div>
-            <p class="small muted">Exemple fabriqué pour comprendre. Les noms et les dates sont inventés.</p>
-          </div>
-          <div class="lab-part">
-            <h3><i class="fa-solid fa-arrow-trend-down" aria-hidden="true"></i> Ce qui change le risque</h3>
-            <p class="muted">Pour ta question. Les barres orange sont activées.</p>
-            <div class="levers" id="levers"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-circle-question"></i></span><h2>Pourquoi elle invente ?</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-circle-question"></i></span><h2>Pourquoi elle fait ça ?</h2></div>
       <div class="steps">
-        <div class="step"><span class="n">1</span><p>L'IA devine le mot qui vient le plus souvent après.</p></div>
-        <div class="step"><span class="n">2</span><p>Si elle ne sait pas, elle devine quand même.</p></div>
-        <div class="step"><span class="n">3</span><p>La réponse a l'air sûre. <strong>Mais elle peut être fausse.</strong></p></div>
+        <div class="step"><span class="n">1</span><p>Pendant son entraînement, des humains notaient ses réponses.</p></div>
+        <div class="step"><span class="n">2</span><p>Ils préféraient souvent les réponses qui leur donnaient raison.</p></div>
+        <div class="step"><span class="n">3</span><p>L'IA a appris à plaire. <strong>Même quand tu te trompes.</strong></p></div>
       </div>
-      <p class="small muted">Le risque est plus grand pour les sujets rares, locaux ou très récents.</p>
-    </section>
-
-    <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-ranking-star"></i></span><h2>Pourquoi elle ne dit pas « je ne sais pas » ?</h2></div>
-      <p>Les IA passent des tests, comme un examen. Puis on les classe, de la meilleure note à la moins bonne.
-        Souvent, la note compte seulement les bonnes réponses. « Je ne sais pas » rapporte 0 point. Une réponse au hasard est parfois juste.
-        <strong>Alors deviner rapporte plus que dire « je ne sais pas ».</strong></p>
-      <div id="rankGuess"></div>
-      <div class="rank" id="rank">
-        <div class="ctl">
-          <span>Règle du classement</span>
-          <div class="seg" id="segRule" role="group" aria-label="Règle du classement">
-            <button type="button" data-v="win" aria-pressed="true">Seules les bonnes réponses comptent</button>
-            <button type="button" data-v="fair" aria-pressed="false">Une erreur fait perdre 1 point</button>
-          </div>
-          <span class="small muted" id="ruleHint"></span>
-        </div>
-        <div class="rk-rows" id="rkRows"></div>
-        <div class="legend"><span><i class="key rk-ok"></i>Justes</span><span><i class="key rk-idk"></i>« Je ne sais pas »</span><span><i class="key rk-bad"></i>Faux</span></div>
-        <p class="verdict" id="verdict" aria-live="polite"></p>
-      </div>
-      <p class="small muted">Chiffres publiés par OpenAI en septembre 2025, sur un test de questions courtes sur des faits (le test SimpleQA). Ici, on les ramène à 100 questions : 22 % justes = 22 bonnes réponses = 22 points.</p>
-    </section>
-
-    <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-highlighter"></i></span><h2>Jeu : surligne ce qu'il faut vérifier</h2><span class="pill" id="hlScore">0 / 18</span></div>
-      <p>L'IA a répondu. <strong>Touche les phrases qu'il faut vérifier</strong> avant de les utiliser.
-        Les indices : une date, un chiffre précis, un nom, une citation, une loi, un lien, le mot « officiel ».</p>
-      <div class="hl-game">
-        <span class="eyebrow" id="hlStep"></span>
-        <div class="msg-me"><span class="who">Toi</span><span id="hlQ"></span></div>
-        <div class="bubble"><span class="who">IA</span><div class="hl" id="hlList"></div></div>
-        <div class="hl-btns">
-          <button type="button" class="btn go" id="hlCheck"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Vérifier</button>
-          <button type="button" class="btn" id="hlNext" hidden>Manche suivante <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-        </div>
-        <div class="result" id="hlResult" aria-live="polite"></div>
-      </div>
-      <p class="small muted">Exemple fabriqué pour comprendre. Les noms, les dates, les chiffres et les liens sont inventés.</p>
+      <p class="small muted">Les modèles récents résistent mieux, mais la tendance existe toujours.</p>
     </section>
 
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-clone"></i></span><h2>Elle te donne raison</h2></div>
-      <p>L'IA a tendance à aller dans ton sens. On appelle ça la <strong>complaisance</strong>.
-        Pendant son entraînement, des humains notaient ses réponses. Ils préféraient souvent celles qui leur donnaient raison. L'IA a appris à plaire.</p>
+      <p>Choisis une situation. Puis change ta façon de demander, et regarde si l'IA te suit.</p>
       <div class="ctl">
         <span>Choisis une situation</span>
         <div class="seg" id="segYes" role="group" aria-label="Situation">
@@ -567,34 +405,44 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         </div>
       </div>
       <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Juste</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Penche vers ton avis</span><span><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Faux</span></div>
-      <p class="small muted">Exemples fabriqués pour comprendre. Les modèles récents résistent mieux, mais la tendance existe toujours.
-        Pour un vrai voyage, vérifie les règles d'entrée sur le site officiel du pays.</p>
+      <p class="small muted">Exemples fabriqués pour comprendre. Pour un vrai voyage, vérifie les règles d'entrée sur le site officiel du pays.</p>
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span><h2>Mes réflexes anti-bobards</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-comment-dots"></i></span><h2>Jeu : pose ta question sans donner ton avis</h2><span class="pill" id="nqScore">0 / 4</span></div>
+      <p>Chaque question donne déjà ton avis : l'IA risque de te suivre. <strong>Choisis la version neutre</strong>, celle qui laisse l'IA répondre librement.</p>
+      <div class="nq">
+        <span class="eyebrow" id="nqStep"></span>
+        <div class="msg-me"><span class="who">Ta question</span><span id="nqQ"></span></div>
+        <span class="who">Tu la reformules :</span>
+        <div class="nq-opts" id="nqOpts" role="group" aria-label="Choisis la version neutre"></div>
+        <div class="result" id="nqResult" aria-live="polite"></div>
+        <div><button type="button" class="btn go" id="nqNext" hidden></button></div>
+      </div>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></span><h2>Mes réflexes anti-flatterie</h2></div>
       <div class="meter">
-        <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 8</span></div>
+        <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 6</span></div>
         <div class="track"><div class="fill" id="chkFill"></div></div>
       </div>
       <div class="check cols" id="check">
-        <label><input type="checkbox" id="c1"><span>Je demande d'où vient l'information.</span></label>
-        <label><input type="checkbox" id="c2"><span>Je vérifie les chiffres, les dates et les noms.</span></label>
-        <label><input type="checkbox" id="c3"><span>Je donne mes propres documents.</span></label>
-        <label><input type="checkbox" id="c4"><span>J'écris : « Si tu ne sais pas, dis-le. »</span></label>
-        <label><input type="checkbox" id="c5"><span>Je pose la question autrement, pour comparer.</span></label>
-        <label><input type="checkbox" id="c6"><span>Santé, argent, droit : je demande aussi à un humain.</span></label>
-        <label><input type="checkbox" id="c7"><span>Je pose ma question sans donner mon avis.</span></label>
-        <label><input type="checkbox" id="c8"><span>J'écris : « Critique mon idée, sans me ménager. »</span></label>
+        <label><input type="checkbox" id="c1"><span>Je pose ma question sans donner mon avis.</span></label>
+        <label><input type="checkbox" id="c2"><span>Je demande le pour et le contre.</span></label>
+        <label><input type="checkbox" id="c3"><span>J'écris : « Critique mon idée, sans me ménager. »</span></label>
+        <label><input type="checkbox" id="c4"><span>Je demande : « Qu'est-ce qui pourrait rater ? »</span></label>
+        <label><input type="checkbox" id="c5"><span>Si elle change d'avis dès que j'insiste, je lui demande pourquoi.</span></label>
+        <label><input type="checkbox" id="c6"><span>Dans mes consignes, j'écris : « Sois franche. Dis-moi si je me trompe. »</span></label>
       </div>
     </section>
 
     <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
-        <li><span>L'IA peut inventer des faits, des chiffres ou des noms. Ça s'appelle une hallucination.</span></li>
-        <li><span>Donne-lui des documents ou la recherche web. Le risque baisse beaucoup.</span></li>
-        <li><span>L'IA a tendance à te donner raison. Pose ta question sans donner ton avis, et vérifie la source.</span></li>
+        <li><span>L'IA a tendance à te donner raison. On appelle ça la complaisance.</span></li>
+        <li><span>Pose ta question sans donner ton avis. Demande le pour et le contre.</span></li>
+        <li><span>Si elle change d'avis dès que tu insistes, demande-lui pourquoi. Et vérifie la source.</span></li>
       </ul>
     </section>
 
@@ -865,98 +713,6 @@ function initDefi(items, options) {
 })();
 
 
-const LEVELS = [
-  { name: "Un fait très connu", base: 5, q: "Combien de jours y a-t-il dans une semaine ?",
-    good: [["Il y a 7 jours dans une semaine.", "ok"]],
-    mixed: [["Il y a 7 jours dans une semaine.", "ok"], ["On dit que ce chiffre vient de la Lune.", "warn"]],
-    bad: [["Il y a 7 jours dans une semaine.", "ok"], ["Le dimanche a été ajouté en 1820 par un roi.", "bad"]] },
-  { name: "Un sujet courant", base: 22, q: "Comment faire une pâte à crêpes ?",
-    good: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Ajoute une pincée de sel.", "ok"], ["Laisse reposer la pâte si tu as le temps.", "ok"]],
-    mixed: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Ajoute de la vanille : c'est la recette officielle.", "warn"]],
-    bad: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Les crêpes ont été inventées en 1534 par le cuisinier du roi.", "bad"]] },
-  { name: "Un détail précis", base: 45, q: "À quelle page de mon livre se trouve cette citation ?",
-    sourced: [["D'après ton document, la citation est à la page 87.", "ok"], ["Voici la phrase exacte, pour que tu vérifies.", "ok"]],
-    good: [["Je ne peux pas connaître la page exacte.", "ok"], ["Elle change selon l'édition du livre.", "ok"]],
-    mixed: [["La citation se trouve sans doute vers le chapitre 3.", "warn"], ["Vérifie dans ton édition.", "ok"]],
-    bad: [["La citation est à la page 142, ligne 12.", "bad"], ["C'est dans l'édition de 1998.", "bad"]] },
-  { name: "Un sujet rare ou local", base: 70, q: "Qui a fondé le club de foot de mon village ?",
-    sourced: [["D'après la source, le club a été fondé par un groupe d'habitants.", "ok"], ["La date exacte est écrite dans le document.", "ok"]],
-    mixed: [["Le club a sans doute été créé par des habitants.", "warn"], ["Je n'ai pas trouvé la date exacte.", "ok"]],
-    bad: [["Le club a été fondé en 1952 par Marcel Dupont.", "bad"], ["Il a gagné 3 coupes régionales.", "bad"]] },
-  { name: "Un fait très récent", base: 88, q: "Qui a gagné le match d'hier soir ?",
-    sourced: [["D'après le site de résultats consulté ce matin, l'équipe locale a gagné.", "ok"], ["Voici le lien pour vérifier le score.", "ok"]],
-    mixed: [["Je ne connais pas les résultats d'hier.", "ok"], ["Mais l'équipe locale gagne souvent à domicile.", "warn"]],
-    bad: [["L'équipe locale a gagné 3 à 1.", "bad"], ["Le numéro 10 a marqué deux buts.", "bad"]] },
-];
-const IDK = [["Je ne sais pas.", "ok"], ["Je n'ai pas d'information fiable sur ce sujet.", "ok"], ["Tu peux vérifier auprès d'une source officielle.", "ok"]];
-
-const ids = ["level", "doc", "web", "idk", "src", "crea"];
-function readState() {
-  return {
-    level: +$("#level").value, doc: $("#doc").checked, web: $("#web").checked,
-    idk: $("#idk").checked, src: $("#src").checked, crea: +$("#crea").value,
-  };
-}
-function factors(s) {
-  return {
-    doc: 0.35,
-    web: s.level === 4 ? 0.25 : 0.55,
-    idk: 0.7,
-    src: 0.8,
-    crea: 0.85 + (s.crea / 100) * 0.6,
-  };
-}
-function riskOf(s) {
-  const f = factors(s);
-  let r = LEVELS[s.level].base;
-  if (s.doc) r *= f.doc;
-  if (s.web) r *= f.web;
-  if (s.idk) r *= f.idk;
-  if (s.src) r *= f.src;
-  r *= f.crea;
-  return Math.round(Math.max(2, Math.min(95, r)));
-}
-function pickAnswer(s, risk) {
-  const L = LEVELS[s.level];
-  const sourced = s.doc || s.web;
-  if (risk < 30) return (sourced && L.sourced) || L.good || L.sourced || IDK;
-  if (s.idk) return IDK;
-  if (risk < 60) return L.mixed;
-  return L.bad;
-}
-
-function render() {
-  const s = readState();
-  const risk = riskOf(s);
-  const cls = risk < 30 ? "ok" : risk < 60 ? "warn" : "bad";
-  $("#vLevel").textContent = LEVELS[s.level].name;
-  $("#vCrea").textContent = s.crea < 34 ? "Des faits" : s.crea < 67 ? "Un peu des deux" : "De l'imagination";
-
-  const fg = $("#ringFg");
-  fg.setAttribute("class", "fg " + cls);
-  fg.setAttribute("stroke-dashoffset", String(314.16 * (1 - risk / 100)));
-  $("#ringTxt").textContent = risk + " %";
-  const pill = $("#riskPill");
-  pill.className = "pill " + cls;
-  rich(pill, cls === "ok" ? "{circle-check} Risque faible" : cls === "warn" ? "{triangle-exclamation} Risque moyen" : "{circle-xmark} Risque élevé");
-
-  $("#question").textContent = "« " + LEVELS[s.level].q + " »";
-  $("#answer").replaceChildren(...pickAnswer(s, risk).map(([t, c]) => sent(t, c, { ok: "Vrai ou vérifiable", warn: "À vérifier", bad: "Inventé" })));
-
-  const f = factors(s);
-  const rows = [
-    { key: "doc", label: "{paperclip} Donner un document", v: 1 - f.doc },
-    { key: "web", label: "{globe} Activer la recherche web", v: 1 - f.web },
-    { key: "idk", label: "{hand} Autoriser « je ne sais pas »", v: 1 - f.idk },
-    { key: "src", label: "{link} Demander les sources", v: 1 - f.src },
-  ];
-  const up = f.crea - 1;
-  const box = $("#levers");
-  box.replaceChildren(...rows.map((r) => lever(r.label, "− " + Math.round(r.v * 100) + " %", r.v, s[r.key] ? "on" : "")));
-  box.appendChild(up >= 0
-    ? lever("{palette} Demander de l'imagination", "+ " + Math.round(up * 100) + " %", up, "up")
-    : lever("{bullseye} Demander des faits précis", "− " + Math.round(-up * 100) + " %", -up, "on"));
-}
 // Une phrase de réponse avec son icône d'état. says : le mot lu à la place de l'icône
 const SENT_IC = { ok: "circle-check", warn: "triangle-exclamation", bad: "circle-xmark" };
 function sent(t, c, says) {
@@ -967,16 +723,6 @@ function sent(t, c, says) {
   e.append(m, t);
   return e;
 }
-function lever(label, val, ratio, cls) {
-  const d = document.createElement("div");
-  d.className = "lever " + cls;
-  d.innerHTML = `<div class="meter-top"><span></span><span></span></div><div class="track"><div class="fill"></div></div>`;
-  const spans = d.querySelectorAll(".meter-top span");
-  rich(spans[0], label); spans[1].textContent = val;
-  d.querySelector(".fill").style.width = Math.max(3, ratio * 100) + "%";
-  return d;
-}
-
 function renderCheck() {
   const n = $$("#check input:checked").length, total = $$("#check input").length;
   rich($("#chkTxt"), n + " sur " + total + (n === total ? " {trophy}" : ""));
@@ -1065,184 +811,85 @@ yes.sc = initSeg($("#segYes"), (v) => { yes.sc = v; renderYes(); });
 yes.fr = initSeg($("#segFrame"), (v) => { yes.fr = v; renderYes(); });
 $("#franc").addEventListener("change", renderYes);
 
-ids.forEach((id) => $("#" + id).addEventListener("input", render));
 $$("#check input").forEach((c) => c.addEventListener("change", renderCheck));
-initRanges();
-render();
 renderCheck();
 renderYes();
 
-// Devine d'abord
-guess($("#riskGuess"), {
-  q: "« Qui a fondé le club de foot de mon village ? » Sans document, sans recherche web. Quel risque que l'IA invente ?",
-  options: [["low", "Faible"], ["mid", "Moyen"], ["high", "Élevé"]], a: "high",
-  why: () => `${riskOf(readState())} % ! Sur un sujet rare ou local, l'IA a peu d'infos. Elle complète quand même. Active un document ou la recherche web pour voir le risque baisser.`,
-  lock: [$("#riskSet"), $("#ringWrap"), $("#answer"), $("#levers")],
-});
-
-// Pourquoi elle devine : le classement compte les bonnes réponses, pas les erreurs.
-// Chiffres publiés par OpenAI (septembre 2025), test SimpleQA, en % des questions.
-const RANK = [
-  { kind: "Modèle prudent", name: "gpt-5-thinking-mini", ok: 22, idk: 52, bad: 26 },
-  { kind: "Modèle qui devine", name: "o4-mini", ok: 24, idk: 1, bad: 75 },
+// Jeu : pose ta question sans donner ton avis. [reformulation, neutre ?, explication]
+const NQ = [
+  { q: "Mon slogan est génial, non ?", o: [
+    ["Dis-moi que mon slogan est génial.", false, "Tu demandes un compliment : l'IA va te le faire."],
+    ["Donne 2 qualités et 2 défauts de mon slogan.", true, "Tu demandes le pour et le contre, sans dire ce que tu penses."],
+    ["Mon slogan est nul, hein ?", false, "Tu donnes encore ton avis, juste dans l'autre sens. L'IA risque de te suivre aussi."] ] },
+  { q: "Un client annule 10 jours avant son départ. On doit tout lui rembourser, non ?", o: [
+    ["On ne rembourse rien, c'est ça ?", false, "Tu donnes l'avis inverse : l'IA risque de dire oui quand même."],
+    ["Confirme-moi qu'on rembourse tout.", false, "Tu lui demandes de confirmer ton avis. Elle va le faire."],
+    ["Voici nos conditions de vente. Que disent-elles pour une annulation 10 jours avant ?", true, "Tu donnes la source et tu poses une vraie question."] ] },
+  { q: "Mon programme pour l'île des Pins est parfait, tu ne trouves pas ?", o: [
+    ["Qu'est-ce qui pourrait mal se passer pendant ce voyage ?", true, "Tu cherches les problèmes. L'IA ne sait pas ce que tu espères entendre."],
+    ["Il est parfait, mon programme, hein ?", false, "C'est la même question : tu attends un oui."],
+    ["Félicite-moi pour ce programme.", false, "Tu demandes des compliments, pas un avis."] ] },
+  { q: "Le bus pour l'aéroport part à 8 h, c'est ça ?", o: [
+    ["Il part bien à 8 h, confirme.", false, "Tu donnes l'heure : l'IA risque de la répéter, même si elle est fausse."],
+    ["À quelle heure part le bus pour l'aéroport ? Donne ta source.", true, "Une vraie question, avec la source. Tu pourras vérifier."],
+    ["Il ne part pas plutôt à 9 h ?", false, "Tu proposes une autre heure : l'IA risque de te suivre."] ] },
 ];
-const RK_SEGS = [["ok", "justes"], ["idk", "« je ne sais pas »"], ["bad", "faux"]];
-const RULES = {
-  win: { score: (m) => m.ok, hint: "1 bonne réponse = 1 point. « Je ne sais pas » = 0 point. 1 erreur = 0 point.",
-    verdict: ["Au classement, celui qui devine gagne.", "Il se trompe pourtant trois fois plus."] },
-  fair: { score: (m) => m.ok - m.bad, hint: "1 bonne réponse = 1 point. « Je ne sais pas » = 0 point. 1 erreur = 1 point en moins.",
-    verdict: ["Avec cette règle, le modèle prudent gagne.", "Deviner ne paie plus : dire « je ne sais pas » devient malin."] },
-};
-const rkSegs = [];
-const rkRows = RANK.map((m) => {
-  const row = h("div", "rk"), name = h("div", "rk-name"), viz = h("div", "rk-viz"), bar = h("div", "rk-bar");
-  name.append(h("span", "eyebrow", m.kind), h("strong", "", m.name));
-  bar.setAttribute("role", "img");
-  bar.setAttribute("aria-label", RK_SEGS.map(([k, w]) => `${m[k]} % ${w}`).join(", "));
-  let left = 0;
-  for (const [k, w] of RK_SEGS) {
-    const s = h("span", "rk-" + k);
-    s.style.width = "0%";
-    // Une part trop fine pour son texte : l'étiquette passe au-dessus de la barre.
-    if (m[k] < 10) {
-      const t = h("span", "rk-tiny", `{caret-down} ${m[k]} % ${w}`);
-      t.style.marginLeft = left + "%";
-      viz.append(t);
-    } else s.append(h("b", "", `${m[k]} %`), h("span", "w", w));
-    bar.append(s);
-    rkSegs.push([s, m[k]]);
-    left += m[k];
-  }
-  viz.append(bar);
-  const n = h("b", "rk-n"), pts = h("span", "rk-pts"), calc = h("span", "rk-calc small muted"), place = h("span", "rk-place"), sc = h("div", "rk-score");
-  pts.append(n, "points");
-  sc.append(h("span", "small muted", "Score au classement"), pts, calc, place);
-  row.append(name, viz, sc);
-  $("#rkRows").append(row);
-  return { m, n, pts, calc, place };
-});
-function renderRank(rule) {
-  const R = RULES[rule], scores = RANK.map(R.score), best = Math.max(...scores);
-  rkRows.forEach(({ m, n, pts, calc, place }, i) => {
-    const win = scores[i] === best;
-    n.textContent = (scores[i] < 0 ? "−" : "") + Math.abs(scores[i]);
-    calc.textContent = `${m.ok} justes − ${m.bad} faux`;
-    calc.hidden = rule !== "fair";
-    rich(place, win ? "{trophy} Classé devant" : "Classé derrière");
-    pts.classList.toggle("win", win);
-    place.classList.toggle("win", win);
-  });
-  $("#ruleHint").textContent = R.hint;
-  $("#verdict").replaceChildren(h("strong", "", R.verdict[0]), " ", h("em", "", R.verdict[1]));
-}
-renderRank(initSeg($("#segRule"), renderRank));
-guess($("#rankGuess"), {
-  q: "deux IA passent le même test. L'une dit souvent « je ne sais pas ». L'autre devine toujours. Laquelle est classée devant ?",
-  options: [["prudent", "Celle qui dit « je ne sais pas »"], ["devine", "Celle qui devine toujours"]], a: "devine",
-  why: "Celle qui devine ! Sur 100 questions, elle a 24 bonnes réponses, contre 22. Mais elle se trompe 75 fois, contre 26.",
-  lock: $("#rank"),
-});
-// Les barres se remplissent quand la zone se débloque : floues, elles donneraient la réponse.
-{
-  const zone = $("#rank");
-  const grow = () => requestAnimationFrame(() => rkSegs.forEach(([s, w]) => { s.style.width = w + "%"; }));
-  if (!zone.classList.contains("locked")) grow();
-  else new MutationObserver((_, mo) => { if (!zone.classList.contains("locked")) { mo.disconnect(); grow(); } }).observe(zone, { attributes: true, attributeFilter: ["class"] });
-}
-
-// Jeu : surligne ce qu'il faut vérifier. [phrase, à vérifier ?, raison]
-const HL = [
-  { q: "Prépare une fiche pratique pour un client qui part à l'île des Pins.", s: [
-    ["L'île des Pins est une destination appréciée pour ses plages.", false, "Une idée générale, facile à confirmer."],
-    ["Le vol depuis Nouméa dure exactement 25 minutes.", true, "Une durée précise : vérifie sur le site de la compagnie."],
-    ["Pense à prendre de la crème solaire et un chapeau.", false, "Un conseil de bon sens."],
-    ["Depuis 2024, une taxe de séjour de 1 500 XPF est obligatoire.", true, "Une date, un montant, une règle : à vérifier sur une source officielle."],
-    ["Le guide Marcel Dupont propose des balades en pirogue tous les mardis.", true, "Un nom et un jour précis : l'IA peut inventer des personnes."],
-    ["Réserve les activités à l'avance en haute saison.", false, "Un conseil général."],
-  ] },
-  { q: "Résume les règles d'annulation pour nos clients.", s: [
-    ["Les règles d'annulation dépendent de tes conditions de vente.", false, "Elle te renvoie à tes propres documents : c'est prudent."],
-    ["La loi du 12 mars 2019 impose un remboursement sous 14 jours.", true, "Une loi avec une date : l'IA invente souvent ce genre de référence."],
-    ["Il vaut mieux écrire ces règles clairement sur le devis.", false, "Un conseil, pas un fait."],
-    ["D'après une étude de 2023, 68 % des clients annulent moins de 7 jours avant.", true, "Une étude et un pourcentage, sans source : à vérifier."],
-    ["Le site officiel regles-voyage-officiel.exemple.com confirme ces règles.", true, "Un lien et le mot « officiel » : l'IA peut inventer des adresses web."],
-    ["En cas de doute, demande conseil à un juriste.", false, "Un bon réflexe, rien à vérifier."],
-  ] },
-  { q: "Écris un petit texte sur l'histoire de notre quartier, pour la vitrine.", s: [
-    ["Le quartier a beaucoup changé au fil des années.", false, "Une phrase vague : rien de précis à vérifier."],
-    ["La première maison a été construite en 1887 par un pêcheur breton.", true, "Une date et un détail rare, sur un sujet local : risque élevé d'invention."],
-    ["Comme l'a dit le maire en 1950 : « Ici, la mer est notre voisine. »", true, "Une citation datée : les IA inventent souvent des citations."],
-    ["Aujourd'hui, on y trouve des commerces et des familles.", false, "Une description que tu peux voir toi-même."],
-    ["Le quartier compte exactement 3 412 habitants.", true, "Un chiffre très précis : demande la source, par exemple la mairie."],
-    ["Ajoute une photo ancienne si tu en as une.", false, "Un conseil."],
-  ] },
-];
-const hl = { round: 0, points: 0, checked: false };
-function renderHl() {
-  const R = HL[hl.round];
-  hl.checked = false;
-  $("#hlStep").textContent = `Manche ${hl.round + 1} sur ${HL.length}`;
-  $("#hlQ").textContent = "« " + R.q + " »";
-  $("#hlList").replaceChildren(...R.s.map(([t]) => {
-    const b = btn("");
-    b.setAttribute("aria-pressed", "false");
-    b.append(h("span", "", t), h("span", "why"));
-    b.addEventListener("click", () => b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true")));
+const nq = { round: 0, points: 0, done: false };
+function renderNq() {
+  const R = NQ[nq.round];
+  nq.done = false;
+  $("#nqStep").textContent = `Manche ${nq.round + 1} sur ${NQ.length}`;
+  $("#nqQ").textContent = "« " + R.q + " »";
+  $("#nqOpts").replaceChildren(...R.o.map(([t], i) => {
+    const b = btn("« " + t + " »");
+    b.addEventListener("click", () => pickNq(i));
     return b;
   }));
-  $("#hlCheck").hidden = false;
-  $("#hlNext").hidden = true;
-  $("#hlResult").textContent = "";
+  $("#nqResult").textContent = "";
+  $("#nqNext").hidden = true;
 }
-function checkHl() {
-  const R = HL[hl.round];
-  let good = 0, missed = 0, extra = 0;
-  $$("#hlList button").forEach((b, i) => {
-    const [, risky, why] = R.s[i], picked = b.getAttribute("aria-pressed") === "true";
-    const ok = picked === risky;
-    good += ok;
-    if (risky && !picked) missed++;
-    if (!risky && picked) extra++;
-    b.disabled = true;
-    b.classList.add(ok ? "good" : "miss");
-    rich($(".why", b), (risky ? "{triangle-exclamation} À vérifier. " : "{circle-check} Pas besoin. ") + why + (ok ? "" : picked ? " Tu l'avais surlignée." : " Tu l'as oubliée."));
+function pickNq(i) {
+  if (nq.done) return;
+  nq.done = true;
+  const R = NQ[nq.round], [, ok, why] = R.o[i], good = R.o.find(([, n]) => n);
+  if (ok) nq.points++;
+  // Les boutons restent lisibles après la réponse : on ne les désactive pas, on ignore les clics suivants.
+  $$("#nqOpts button").forEach((b, k) => {
+    b.setAttribute("aria-disabled", "true");
+    b.classList.toggle("right", R.o[k][1]);
+    b.classList.toggle("wrong", k === i && !ok);
   });
-  hl.points += good;
-  $("#hlScore").textContent = `${hl.points} / ${HL.length * 6}`;
-  const last = hl.round === HL.length - 1;
-  const msg = [`${good} phrase${good > 1 ? "s" : ""} bien classée${good > 1 ? "s" : ""} sur 6.`];
-  if (missed) msg.push(`{circle-exclamation} ${missed} piège${missed > 1 ? "s" : ""} oublié${missed > 1 ? "s" : ""}.`);
-  if (extra) msg.push(`{highlighter} ${extra} phrase${extra > 1 ? "s" : ""} surlignée${extra > 1 ? "s" : ""} pour rien : celles-là, pas besoin de les vérifier.`);
-  if (last) msg.push(hl.points === HL.length * 6 ? "{trophy} Parfait ! Tu es un vrai détective." : `Total : ${hl.points} sur ${HL.length * 6}.`);
-  rich($("#hlResult"), msg.join(" "));
-  $("#hlCheck").hidden = true;
-  $("#hlNext").hidden = false;
-  rich($("#hlNext"), last ? "{rotate-left} Rejouer" : "Manche suivante {arrow-right}");
-  $("#hlNext").focus();
-  if (last && hl.points === HL.length * 6) confetti("{highlighter}");
+  $("#nqScore").textContent = `${nq.points} / ${NQ.length}`;
+  const last = nq.round === NQ.length - 1, all = nq.points === NQ.length;
+  let msg = ok ? `{circle-check} Bien vu ! ${why}` : `{circle-xmark} ${why} La version neutre : « ${good[0]} » ${good[2]}`;
+  if (last) msg += all ? " {trophy} 4 sur 4 : l'IA ne peut plus deviner ton avis !" : ` Total : ${nq.points} sur ${NQ.length}.`;
+  rich($("#nqResult"), msg);
+  rich($("#nqNext"), last ? "{rotate-left} Rejouer" : "Manche suivante {arrow-right}");
+  $("#nqNext").hidden = false;
+  $("#nqNext").focus();
+  if (last && all) confetti("{comment-dots}");
 }
-$("#hlCheck").addEventListener("click", checkHl);
-$("#hlNext").addEventListener("click", () => {
-  if (hl.round === HL.length - 1) { hl.round = 0; hl.points = 0; $("#hlScore").textContent = `0 / ${HL.length * 6}`; }
-  else hl.round++;
-  renderHl();
-  $("#hlList button").focus();
+$("#nqNext").addEventListener("click", () => {
+  if (nq.round === NQ.length - 1) { nq.round = nq.points = 0; $("#nqScore").textContent = `0 / ${NQ.length}`; }
+  else nq.round++;
+  renderNq();
+  $("#nqOpts button").focus();
 });
-renderHl();
+renderNq();
 
 // Défi final
 initDefi([
+  { q: "Pourquoi l'IA a tendance à te donner raison ?", a: "train",
+    options: [["polite", "Parce qu'elle est polie"], ["train", "Pendant son entraînement, on préférait les réponses qui donnaient raison"], ["mind", "Parce qu'elle lit dans tes pensées"]],
+    why: "Des humains notaient ses réponses. Ils préféraient celles qui leur donnaient raison. L'IA a appris à plaire." },
   { q: "Quelle question pousse le moins l'IA à te donner raison ?", a: "b",
     options: [["a", "« C'est bien 3 jours de délai, non ? »"], ["b", "« Quel est le délai ? Donne ta source. »"], ["c", "« Confirme-moi que c'est 3 jours. »"]],
     why: "Une question neutre, avec la source demandée. L'IA ne sait pas ce que tu penses, elle ne peut pas te suivre." },
-  { q: "L'IA te donne une date précise, sans source. Que fais-tu ?", a: "check",
-    options: [["use", "Je l'utilise telle quelle"], ["check", "Je la vérifie ailleurs"], ["push", "J'insiste jusqu'à ce qu'elle change"]],
-    why: "Une date précise sans source peut être inventée. Vérifie sur une source fiable." },
+  { q: "Tu veux un avis honnête sur ton idée. Tu écris…", a: "crit",
+    options: [["super", "« Elle est super, non ? »"], ["crit", "« Critique mon idée, sans me ménager. »"], ["love", "« Je l'adore. Qu'en penses-tu ? »"]],
+    why: "Tu demandes une critique franche. L'IA n'a pas à deviner ce que tu veux entendre." },
   { q: "Tu dis à l'IA « Tu te trompes ». Elle change aussitôt d'avis. Ça veut dire…", a: "please",
     options: [["right", "Que j'avais raison"], ["please", "Pas forcément : elle veut peut-être me faire plaisir"], ["broken", "Qu'elle est en panne"]],
     why: "C'est la complaisance. Demande-lui pourquoi elle change d'avis, et vérifie la source." },
-  { q: "Une question sur un médicament ou sur un contrat. Que fais-tu ?", a: "human",
-    options: [["ai", "Je fais confiance à l'IA"], ["human", "Je demande aussi à un professionnel"], ["never", "Je ne pose jamais la question"]],
-    why: "Santé, argent, droit : l'IA peut t'aider à préparer tes questions. Mais un professionnel doit confirmer." },
 ]);
 </script>
