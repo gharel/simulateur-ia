@@ -330,6 +330,11 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
 .log li.ok { box-shadow: inset 4px 0 0 var(--ok); }
 .log li.warn { box-shadow: inset 4px 0 0 var(--warn); }
 .log li.bad { box-shadow: inset 4px 0 0 var(--bad); }
+
+/* Ta demande : floue ou précise */
+.ask { display: grid; grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); gap: 16px; align-items: center; }
+@media (max-width: 640px) { .ask { grid-template-columns: minmax(0, 1fr); } }
+.prompt { display: grid; gap: 4px; max-width: none; background: var(--surface-2); border-radius: 16px 16px 16px 4px; padding: 14px 16px; font-weight: 700; }
 </style>
 
 <main class="wrap">
@@ -347,7 +352,7 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
         <div class="ctl">
           <span class="eyebrow">Comprendre l'IA · Fiche 3 sur 8</span>
           <h1>Le Bon<br>Cerveau</h1>
-          <p class="lead">Une petite tâche n'a pas besoin d'un expert. Choisis le bon modèle et le bon effort.</p>
+          <p class="lead">Une petite tâche n'a pas besoin d'un expert. Choisis le bon modèle et le bon effort. Et dis clairement ce que tu veux.</p>
         </div>
         <div class="word-card">
           <span class="eyebrow">Les mots à connaître</span>
@@ -355,6 +360,8 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
           <p>Le « cerveau » de l'IA. Il y en a des petits et des grands.</p>
           <strong>Effort</strong>
           <p>Le temps que l'IA prend pour réfléchir avant de répondre.</p>
+          <strong>Prompt</strong>
+          <p>Ta demande : le message que tu écris à l'IA.</p>
         </div>
       </div>
     </section>
@@ -397,6 +404,18 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
         <button type="button" data-v="3" aria-pressed="false"><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i> Créer une appli</button>
         <button type="button" data-v="4" aria-pressed="false"><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i> Problème très difficile</button>
       </div>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-4"></i></span><h2>Écris ta demande</h2></div>
+      <div class="ask">
+        <div class="seg" id="segAsk" role="group" aria-label="Ta demande">
+          <button type="button" data-v="0" aria-pressed="false"><i class="fa-solid fa-cloud" aria-hidden="true"></i> Floue</button>
+          <button type="button" data-v="1" aria-pressed="true"><i class="fa-solid fa-bullseye" aria-hidden="true"></i> Précise</button>
+        </div>
+        <p class="prompt" id="askTxt" aria-live="polite"></p>
+      </div>
+      <p class="small muted">Une demande précise dit ce que tu veux, pour qui et sous quelle forme. Elle donne aussi les informations utiles.</p>
     </section>
 
     <section class="card s3">
@@ -487,6 +506,7 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
         <li><span>Gros modèle = plus intelligent, mais plus lent et plus cher.</span></li>
         <li><span>Plus d'effort = l'IA réfléchit plus longtemps. Utile pour les tâches difficiles.</span></li>
         <li><span>Pour une tâche simple, un petit modèle avec peu d'effort suffit.</span></li>
+        <li><span>Bonne réponse = bon modèle + bonne demande. Il faut les deux : le meilleur modèle ne devine pas ce que tu veux.</span></li>
       </ul>
     </section>
 
@@ -776,13 +796,23 @@ const TASKS = [
   { name: "créer une appli",             ic: "{mobile-screen}", need: 84, out: 20000, think: 15000 },
   { name: "résoudre un problème difficile", ic: "{puzzle-piece}", need: 92, out: 4000, think: 30000 },
 ];
+// Pour chaque tâche : la demande floue, puis la demande précise.
+const ASKS = [
+  ["Améliore mon texte.", "Corrige seulement les fautes d'orthographe. Ne change pas mes phrases."],
+  ["Résume.", "Résume cet e-mail en 3 points. Dis-moi ce que je dois faire, et pour quand."],
+  ["Fais un rapport.", "Écris un rapport d'une page sur les ventes de mars, pour mon chef. En 3 parties : les chiffres, les problèmes, les idées."],
+  ["Fais-moi une appli.", "Crée une appli de liste de courses, pour téléphone. Je coche ce que j'ai acheté. Les produits sont rangés par rayon."],
+  ["Ça ne marche pas. Aide-moi.", "Mon calcul donne un résultat faux. Voici le calcul, le résultat attendu et ce que j'ai déjà essayé. Trouve l'erreur, étape par étape."],
+];
+// Avec une demande floue, l'IA devine : la qualité reste bloquée, quel que soit le modèle.
+const FLOU = 30;
 const INPUT = 2000;
-const st = { model: "sonnet", effort: 1, task: 2 };
+const st = { model: "sonnet", effort: 1, task: 2, clear: true };
 
-function evaluate(mk, e, t) {
+function evaluate(mk, e, t, clear = true) {
   const m = MODELS[mk], task = TASKS[t];
   const lvl = m.effort ? EFFORT[e] : { q: 0, think: 0, sp: 0 };
-  const quality = Math.min(99, m.quality + lvl.q);
+  const quality = Math.min(clear ? 99 : FLOU, m.quality + lvl.q);
   const thinkTok = Math.round(task.think * lvl.think);
   const outTok = task.out + thinkTok;
   const secs = outTok / m.tps + 1;
@@ -800,7 +830,8 @@ function priceTxt(p) {
   if (p < 0.1) return fmt(p, 3) + " $";
   return fmt(p, 2) + " $";
 }
-function verdictOf(r, need) {
+function verdictOf(r, need, clear) {
+  if (!clear) return { cls: "bad", lab: "{triangle-exclamation} Demande floue", txt: "L'IA doit deviner ce que tu veux. Même le plus gros modèle se trompe." };
   if (r.quality < need) return { cls: "bad", lab: "{triangle-exclamation} Pas assez fort", txt: "Le résultat risque d'être moyen. Prends un modèle plus fort ou monte l'effort." };
   if (r.quality - need > 22) return { cls: "warn", lab: "{money-bill-wave} Trop puissant", txt: "Ça marche, mais tu attends et tu paies pour rien. Un plus petit modèle suffit." };
   return { cls: "ok", lab: "{circle-check} Bon choix", txt: "Ce réglage est adapté à la tâche." };
@@ -819,7 +850,7 @@ function best(t) {
 
 function render() {
   const m = MODELS[st.model];
-  const r = evaluate(st.model, st.effort, st.task);
+  const r = evaluate(st.model, st.effort, st.task, st.clear);
   const task = TASKS[st.task];
   const slider = $("#effort");
   slider.disabled = !m.effort;
@@ -839,15 +870,19 @@ function render() {
   $("#sTime").textContent = timeTxt(r.secs);
   $("#sThink").textContent = fmt(r.thinkTok);
   $("#sPrice").textContent = priceTxt(r.price);
+  $("#askTxt").replaceChildren(h("span", "eyebrow", "Tu écris à l'IA"), h("span", "", `« ${ASKS[st.task][+st.clear]} »`));
 
-  const v = verdictOf(r, task.need);
+  const v = verdictOf(r, task.need, st.clear);
   const pill = $("#verdict");
   pill.className = "pill " + v.cls;
   rich(pill, v.lab);
   $("#verdictTxt").textContent = v.txt;
   const b = best(st.task);
-  $("#reco").innerHTML = b
-    ? `Le moins cher qui réussit à <b>${task.name}</b> : <b>${MODELS[b.mk].name}</b>${MODELS[b.mk].effort ? `, effort <b>${EFFORT[b.e].name}</b>` : ""} (${priceTxt(b.r.price)}).`
+  const cfg = b && `<b>${MODELS[b.mk].name}</b>${MODELS[b.mk].effort ? `, effort <b>${EFFORT[b.e].name}</b>` : ""}`;
+  $("#reco").innerHTML = !st.clear
+    ? `Précise ta demande : c'est gratuit. Ensuite, ${cfg} suffit.`
+    : b
+    ? `Le moins cher qui réussit à <b>${task.name}</b> : ${cfg} (${priceTxt(b.r.price)}).`
     : "Aucun réglage ne suffit. Découpe la tâche en petits morceaux.";
 }
 
@@ -857,6 +892,7 @@ $$("#models .model").forEach((btn) => btn.addEventListener("click", () => {
 }));
 $("#effort").addEventListener("input", (e) => { st.effort = +e.target.value; render(); });
 st.task = +initSeg($("#segTask"), (v) => { st.task = +v; render(); });
+st.clear = initSeg($("#segAsk"), (v) => { st.clear = v === "1"; render(); }) === "1";
 initRanges();
 render();
 
@@ -934,5 +970,11 @@ initDefi([
   { q: "Monter l'effort, ça veut dire…", a: "think",
     options: [["fast", "L'IA répond plus vite"], ["think", "L'IA réfléchit plus longtemps"], ["model", "On change de modèle"]],
     why: "Plus d'effort = plus de tokens de réflexion. Plus lent et plus cher, mais utile pour les tâches difficiles." },
+  { q: "Opus te répond à côté de ce que tu voulais. Que fais-tu d'abord ?", a: "ask",
+    options: [["effort", "Je monte l'effort au max"], ["ask", "Je précise ma demande"], ["same", "Je renvoie le même message"]],
+    why: "L'IA ne devine pas ce que tu veux. Préciser ta demande est gratuit. Plus d'effort coûte plus cher, et ne l'aide pas à deviner." },
+  { q: "Quelle demande donne la meilleure affiche ?", a: "clear",
+    options: [["vague", "« Fais une belle affiche, vite ! »"], ["clear", "« Une affiche A4 pour la fête du quartier, samedi à 14 h. Couleurs gaies. »"]],
+    why: "Elle dit ce que tu veux, pour quoi et sous quelle forme. L'IA n'a plus à deviner." },
 ]);
 </script>

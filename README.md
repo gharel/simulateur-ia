@@ -6,7 +6,7 @@
 
 1. **Le Sac à Tokens** : les tokens, et comment l'IA découpe le texte
 2. **La Mémoire qui Déborde** : la conversation relue à chaque message, la fenêtre de contexte et la compression
-3. **Le Bon Cerveau** : choisir le modèle et l'effort
+3. **Le Bon Cerveau** : choisir le modèle et l'effort, et écrire une demande précise (bonne réponse = bon modèle + bonne demande)
 
 **Partie 2 · Repérer les pièges**
 
