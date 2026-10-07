@@ -55,7 +55,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; }
-.bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+/* L'espace entre les cartes grandit avec l'écran : 20 px sur téléphone, 40 px sur ordinateur. */
+.bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(20px, 3.2vw, 40px); }
 /* --gap : l'espace entre les blocs d'une carte. Les règles « Ce qui va ensemble » s'en servent. */
 .card {
   --gap: 24px;
@@ -64,12 +65,12 @@ body {
 }
 .s2 { grid-column: span 2; } .s3 { grid-column: span 3; } .s4 { grid-column: span 4; }
 @media (max-width: 900px) {
-  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .s1, .s3, .s4 { grid-column: span 2; }
   .s2 { grid-column: span 1; }
 }
 @media (max-width: 640px) {
-  .bento { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .bento { grid-template-columns: minmax(0, 1fr); }
   .s1, .s2, .s3, .s4 { grid-column: span 1; }
   .card { --gap: 20px; padding: 24px 20px; }
 }
@@ -196,7 +197,7 @@ th, td { text-align: left; padding: 14px 12px; border-bottom: 1px solid var(--li
 th { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
-.foot { margin-top: 48px; display: grid; gap: 16px; color: var(--muted); font-size: .9rem; line-height: 1.55; }
+.foot { margin-top: clamp(48px, 5vw, 64px); display: grid; gap: 16px; color: var(--muted); font-size: .9rem; line-height: 1.55; }
 .foot strong { color: var(--fg); }
 
 @media (prefers-reduced-motion: reduce) {
@@ -222,7 +223,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 }
 
 /* Skazy Formation : logo en haut, mention en bas (même bloc dans chaque fiche) */
-.brand { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.brand { margin-bottom: clamp(24px, 3.2vw, 40px); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .brand a { display: inline-flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; color: var(--fg); text-decoration: none; border-radius: 10px; }
 .brand-logo { display: block; width: 109px; height: 36px; flex: none; }
 .brand-url { font-size: .85rem; font-weight: 700; color: var(--muted); padding-left: 14px; border-left: 2px solid var(--line); }
@@ -236,6 +237,9 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 @media (max-width: 480px) { .brand-url { display: none; } }
 .modes { display: flex; flex-wrap: wrap; gap: 8px; }
 .modes-help { display: grid; gap: 8px; max-width: 80ch; }
+
+/* Une icône et son mot, sur la même ligne (voir glue() dans le script) */
+.nobr { white-space: nowrap; }
 
 /* Icônes Font Awesome : couleur des icônes d'état */
 .fa-circle-check { color: var(--ok); }
@@ -809,6 +813,42 @@ function initDefi(items, options) {
   $("#defiReset").hidden = true;
   paintBadge();
 }
+
+// Coupures de ligne. Une espace insécable garde ? ! : ; » % $ € = · / avec ce qui précède, « avec ce qui suit,
+// et un nombre avec les mots qui l'entourent (« la fiche 1 », « 3 étoiles »). Un mot à trait d'union (e-mail, dis-moi) ne se coupe plus en deux,
+// sauf une adresse ou un nom avec des chiffres (gpt-5-thinking-mini), qui restent tels quels.
+// Le texte ajouté ensuite par la page passe aussi par là.
+function tidy(s) {
+  return s.replace(/ +(?=[?!:;»%$€=·/])/g, "\u00A0").replace(/« +/g, "«\u00A0")
+    .replace(/(\d) +(?=[\p{L}\d$€%])/gu, "$1\u00A0").replace(/(\p{L}) +(?=\d)/gu, "$1\u00A0").replace(/([−+]) +(?=\d)/g, "$1\u00A0")
+    .replace(/[^\s@/]*\p{L}-\p{L}[^\s@/]*/gu, (w) => (/\.\p{L}|\d/u.test(w) ? w : w.replace(/(\p{L})-(?=\p{L})/gu, "$1-\u2060")));
+}
+// Chrome coupe toujours la ligne juste après une icône, même devant une espace insécable. Pour qu'une icône reste
+// avec le mot qui la suit (« {icône} Bravo »), ou avec le mot d'avant quand elle finit le texte (« Suivant {icône} »),
+// on les range ensemble dans un <span class="nobr">. Pas dans un flex : l'icône y est déjà à côté du texte.
+const isIcon = (e) => e?.nodeType === 1 && /(^|\s)(fa-|svg-inline--fa)/.test(e.getAttribute("class"));
+const near = (n, dir) => { let s = n[dir]; while (s?.nodeType === 8) s = s[dir]; return s; };
+function glue(node) {
+  const p = node.parentNode, before = near(node, "previousSibling"), after = near(node, "nextSibling"), rest = after && near(after, "nextSibling");
+  const iconBefore = isIcon(before), iconAfter = isIcon(after) && (!rest || (rest.nodeType === 3 && !rest.data.trim()));
+  if (!(iconBefore || iconAfter) || p?.nodeType !== 1 || p.classList.contains("nobr") || /flex|grid/.test(getComputedStyle(p).display)) return;
+  const wrap = (at, ...kids) => { const s = document.createElement("span"); s.className = "nobr"; at.before(s); s.append(...kids); };
+  const first = iconBefore && node.data.match(/^\s*\S+/)?.[0];
+  if (first) { node.data = node.data.slice(first.length); wrap(before, before, first); }
+  const last = iconAfter && node.data.match(/\S+\s*$/)?.[0];
+  if (last) { node.data = node.data.slice(0, -last.length); wrap(after, last, after); }
+}
+function tidyText(node) {
+  if (/^(SCRIPT|STYLE|TEXTAREA)$/.test(node.nodeName) || /^(SCRIPT|STYLE|TEXTAREA)$/.test(node.parentNode?.nodeName)) return;
+  if (node.nodeType === 1) return [...node.childNodes].forEach(tidyText);
+  if (node.nodeType !== 3) return;
+  const t = tidy(node.data);
+  if (t !== node.data) node.data = t;
+  glue(node);
+}
+tidyText(document.body);
+new MutationObserver((ms) => ms.forEach((m) => (m.type === "characterData" ? tidyText(m.target) : m.addedNodes.forEach(tidyText))))
+  .observe(document.body, { childList: true, characterData: true, subtree: true });
 
 // Boutons des modes, en bas de page. Atelier : texte plus gros, réponses révélées par l'animateur.
 // Démonstration : rien n'est flou. Le choix suit d'une fiche à l'autre.

@@ -6,7 +6,7 @@
 
 1. **Le Sac à Tokens** : les tokens, et comment l'IA découpe le texte
 2. **La Mémoire qui Déborde** : la conversation relue à chaque message, la fenêtre de contexte et la compression
-3. **Le Bon Cerveau** : choisir le modèle et l'effort, et écrire une demande précise (bonne réponse = bon modèle + bonne demande)
+3. **Le Bon Cerveau** : choisir le modèle et l'effort, et écrire une demande précise (bonne réponse = bon modèle + bonne demande), et les noms des modèles chez Claude et ChatGPT
 
 **Partie 2 · Repérer les pièges**
 
@@ -17,7 +17,7 @@
 **Partie 3 · Agir avec l'IA**
 
 7. **La Boîte à Outils de l'IA** : le bon prompt (contexte, action précise, objectif), répondre ou agir (l'exemple de Claude, qui réunit Chat et Cowork), l'agent de code, Projets, Skills, Connecteurs, les risques de chaque outil, et les noms de ces outils chez Claude et ChatGPT
-8. **Forfait ou Compteur ?** : abonnement ou paiement à l'usage
+8. **Forfait ou Compteur ?** : abonnement ou paiement à l'usage, et les noms des forfaits chez Claude et ChatGPT
 
 ## Jouer
 
@@ -88,7 +88,7 @@ npx playwright install chromium
 npm test
 ```
 
-Les tests Playwright ouvrent chaque page sur bureau et sur téléphone. Ils vérifient les icônes, la marque Skazy Formation, la mise en page, les zones floutées, le contraste de chaque texte (thèmes clair et sombre) et les jeux.
+Les tests Playwright ouvrent chaque page sur bureau et sur téléphone. Ils vérifient les icônes, la marque Skazy Formation, la mise en page, les coupures de ligne (pas de ponctuation seule en début de ligne, pas de mot coupé), les zones floutées, le contraste de chaque texte (thèmes clair et sombre) et les jeux.
 
 Les pages ont leur propre thème sombre. Elles demandent aux modes nuit forcés (mode nuit de Brave, extension Dark Reader) de ne pas changer leurs couleurs, avec `<meta name="darkreader-lock">`.
 

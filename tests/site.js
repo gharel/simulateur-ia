@@ -2,6 +2,7 @@
 const fs = require("fs");
 const path = require("path");
 const { pathToFileURL } = require("url");
+const { lineBreakIssues } = require("./coupures");
 
 const ROOT = path.resolve(__dirname, "..");
 const FICHES = ["1-tokens.html", "2-memoire.html", "3-modele-effort.html", "4-hallucinations.html", "5-complaisance.html", "6-message-piege.html", "7-boite-outils.html", "8-forfait-api.html"];
@@ -30,16 +31,18 @@ async function open(page, f, query = "") {
 // Si ça bloque ici : Font Awesome n'a pas pu se charger (pas de connexion ?).
 const iconsReady = (page) => page.waitForFunction(() => !document.querySelector("i[class*='fa-']"), null, { timeout: 15_000 });
 
-// Ce qui ne doit jamais s'afficher : un jeton {icône} brut, un emoji, une icône inconnue.
+// Ce qui ne doit jamais s'afficher : un jeton {icône} brut, un emoji, une icône inconnue,
+// une mauvaise coupure de ligne (ponctuation seule en début de ligne, mot coupé… voir coupures.js).
 async function displayProblems(page) {
   const text = await page.locator("body").innerText();
   return {
     jetons: text.match(/\{[a-z0-9-]+\}/g) || [],
     emoji: text.match(new RegExp(PICTO.source, "gu")) || [],
     iconesInconnues: await page.locator("svg.svg-inline--fa .missing").count(),
+    coupures: await page.evaluate(lineBreakIssues),
   };
 }
-const NO_PROBLEM = { jetons: [], emoji: [], iconesInconnues: 0 };
+const NO_PROBLEM = { jetons: [], emoji: [], iconesInconnues: 0, coupures: [] };
 
 // Joue avec toute la page : répond aux « Devine d'abord », allume la lampe, clique partout, bouge les curseurs.
 // Pas les boutons des modes (ils rechargent la page) ni l'impression.
