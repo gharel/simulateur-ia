@@ -302,6 +302,35 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
+/* Animations : elles montrent ce qui change (même bloc dans chaque fiche). Elles déplacent (transform) sans jamais cacher un texte.
+   Si le système demande moins d'animations, la règle prefers-reduced-motion plus haut les arrête toutes. */
+@keyframes pop { 40% { transform: scale(1.06); } }
+@keyframes bump { 40% { transform: scale(1.18); } }
+@keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+@keyframes rise { from { transform: translateY(var(--rise, 18px)); } }
+@keyframes grow { from { transform: scale(0); } 70% { transform: scale(1.25); } }
+@keyframes glow { from { box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 55%, transparent); } }
+@keyframes win { from { transform: scale(.4) rotate(-40deg); } 65% { transform: scale(1.2) rotate(-4deg); } }
+.hero .hero-grid > * { animation: rise .6s cubic-bezier(.2, .8, .2, 1) backwards; }
+.hero .hero-grid > :last-child { animation-delay: .12s; }
+.qbtns button.right { animation: pop .4s ease; }
+.qbtns button.wrong { animation: shake .4s ease; }
+.unlocking { animation: glow 1.2s ease-out; }
+.badge.won { animation: win .7s cubic-bezier(.3, 1.3, .5, 1); }
+.stars .svg-inline--fa { animation: grow .45s ease backwards; }
+.stars .svg-inline--fa:nth-child(2) { animation-delay: .12s; }
+.stars .svg-inline--fa:nth-child(3) { animation-delay: .24s; }
+.bump { animation: bump .4s ease; }
+/* Une carte monte un peu en arrivant à l'écran. Des étapes arrivent l'une après l'autre : une cause, puis sa conséquence. */
+@supports (animation-timeline: view()) {
+  .bento > .card:not(.hero) { animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+  .steps > * { --rise: 36px; animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% cover 30%; }
+  .steps > :nth-child(2) { animation-range: entry 10% cover 35%; }
+  .steps > :nth-child(3) { animation-range: entry 20% cover 40%; }
+  .steps > :nth-child(4) { animation-range: entry 30% cover 45%; }
+  .steps > :nth-child(5) { animation-range: entry 40% cover 50%; }
+}
+
 :root { --accent: #FF2E93; }
 
 .models { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
@@ -355,6 +384,13 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
 .ask { display: grid; grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); gap: 20px 28px; align-items: center; }
 @media (max-width: 640px) { .ask { grid-template-columns: minmax(0, 1fr); } }
 .prompt { display: grid; gap: 6px; max-width: none; background: var(--surface-2); border-radius: 16px 16px 16px 4px; padding: 16px 20px; font-weight: 700; line-height: 1.5; }
+
+/* Le résultat arrive à la vitesse du modèle : plus l'IA réfléchit, plus les jauges mettent du temps à se remplir. */
+.results .fill { transition-duration: var(--think, .45s); }
+.think { display: none; }
+.think.on { display: inline-flex; }
+@keyframes think { to { transform: scale(1.25); } }
+.think.on .svg-inline--fa { animation: think .5s ease-in-out infinite alternate; }
 </style>
 
 <main class="wrap">
@@ -439,7 +475,7 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
     </section>
 
     <section class="card s3">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-chart-column"></i></span><h2>Le résultat</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-chart-column"></i></span><h2>Le résultat</h2><span class="pill think" id="thinkPill" aria-hidden="true"><i class="fa-solid fa-brain"></i> L'IA réfléchit…</span></div>
       <div class="results">
         <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-bolt" aria-hidden="true"></i> Vitesse</span><span id="tSpeed"></span></div><div class="track"><div class="fill" id="bSpeed"></div></div></div>
         <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> Qualité</span><span id="tQual"></span></div><div class="track"><div class="fill" id="bQual"></div></div></div>
@@ -749,6 +785,31 @@ function confetti(ic) {
   setTimeout(() => box.remove(), 3200);
 }
 
+// Animations (même bloc dans chaque fiche). Si le système demande moins d'animations, tout s'affiche tout de suite.
+const STILL = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Relance une animation liée à une classe. replay(pastille) : un score qui vient de changer grossit un instant.
+function replay(el, cls = "bump") { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+// Un nombre qui va jusqu'à sa nouvelle valeur : on voit qu'il change, et dans quel sens.
+function countTo(el, to, show = (v) => fmt(Math.round(v))) {
+  const from = el.countAt ?? to;
+  cancelAnimationFrame(el.countRaf);
+  if (from === to || STILL()) { el.countAt = to; el.textContent = show(to); return; }
+  const t0 = performance.now();
+  const tick = (t) => {
+    const k = Math.min(1, (t - t0) / 500);
+    el.countAt = k < 1 ? from + (to - from) * (1 - (1 - k) ** 3) : to;
+    el.textContent = show(el.countAt);
+    if (k < 1) el.countRaf = requestAnimationFrame(tick);
+  };
+  el.countRaf = requestAnimationFrame(tick);
+}
+// Lance fn une seule fois, quand l'élément arrive à l'écran.
+function onSeen(el, fn) {
+  if (!("IntersectionObserver" in window)) return fn();
+  const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); fn(); } }, { threshold: 0.3 });
+  io.observe(el);
+}
+
 // Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.
 function initDefi(items, options) {
   const [ic, name] = BADGES[FICHE];
@@ -773,6 +834,7 @@ function initDefi(items, options) {
     $("#defiReset").hidden = false;
     const good = [...firsts.values()].filter(Boolean).length;
     $("#defiScore").textContent = `${good} / ${total}`;
+    replay($("#defiScore"));
     if (firsts.size < total) return;
     const stars = good === total ? 3 : good === total - 1 ? 2 : 1;
     record = Math.max(record, stars);
@@ -937,6 +999,14 @@ function render() {
   // Le coût est comparé au réglage le plus cher pour cette tâche (modèle expert, effort max).
   const maxPrice = evaluate("expert", 4, st.task).price;
   const costPct = Math.max(3, (r.price / maxPrice) * 100);
+  // Le temps de réponse règle la vitesse des jauges. Pendant ce temps, « L'IA réfléchit… » s'affiche.
+  const think = Math.min(2, 0.25 + Math.log10(Math.max(1, r.secs)) * 0.55);
+  $(".results").style.setProperty("--think", think.toFixed(2) + "s");
+  if (!STILL()) {
+    $("#thinkPill").classList.add("on");
+    clearTimeout(render.think);
+    render.think = setTimeout(() => $("#thinkPill").classList.remove("on"), think * 1000);
+  }
   $("#bSpeed").style.width = r.speed + "%";
   $("#bQual").style.width = r.quality + "%";
   $("#bCost").style.width = costPct + "%";
@@ -944,7 +1014,7 @@ function render() {
   $("#tQual").textContent = r.quality + " / 100 · il faut " + task.need;
   $("#tCost").textContent = costPct < 15 ? "petit" : costPct < 45 ? "moyen" : "élevé";
   $("#sTime").textContent = timeTxt(r.secs);
-  $("#sThink").textContent = fmt(r.thinkTok);
+  countTo($("#sThink"), r.thinkTok);
   $("#sPrice").textContent = priceTxt(r.price);
   $("#askTxt").replaceChildren(h("span", "eyebrow", "Tu écris à l'IA"), h("span", "", `« ${ASKS[st.task][+st.clear]} »`));
 
@@ -1010,7 +1080,7 @@ function launchMission() {
     mis.tries++;
   } else {
     const top = ratio <= 1.25;
-    if (top && !mis.tries) mis.good++;
+    if (top && !mis.tries) { mis.good++; replay($("#misScore")); }
     li = h("li", top ? "ok" : "warn", head + (top
       ? (mis.tries ? "{circle-check} réussi, au bon prix cette fois." : "{bullseye} réussi au meilleur prix !")
       : `{circle-check} réussi, mais ${fmt(ratio, ratio < 10 ? 1 : 0)} fois plus cher que nécessaire. Le moins cher : ${cfgName(b.mk, b.e)} (${priceTxt(b.r.price)}).`));

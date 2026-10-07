@@ -14,6 +14,17 @@ for (const f of PAGES) {
   }
 }
 
+// Si le système demande moins d'animations, rien ne bouge : ni animation CSS, ni transition, ni animation lancée en JS.
+for (const f of PAGES) {
+  test(`${f} : aucune animation quand le système le demande`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await open(page, f);
+    await playEverything(page, 1);
+    const running = await page.evaluate(() => document.getAnimations().map((a) => a.animationName || a.transitionProperty || "JS"));
+    expect(running).toEqual([]);
+  });
+}
+
 for (const f of FICHES) {
   test(`${f} : finir le défi donne le badge`, async ({ page }) => {
     await open(page, f);

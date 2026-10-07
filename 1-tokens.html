@@ -302,6 +302,35 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
+/* Animations : elles montrent ce qui change (même bloc dans chaque fiche). Elles déplacent (transform) sans jamais cacher un texte.
+   Si le système demande moins d'animations, la règle prefers-reduced-motion plus haut les arrête toutes. */
+@keyframes pop { 40% { transform: scale(1.06); } }
+@keyframes bump { 40% { transform: scale(1.18); } }
+@keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+@keyframes rise { from { transform: translateY(var(--rise, 18px)); } }
+@keyframes grow { from { transform: scale(0); } 70% { transform: scale(1.25); } }
+@keyframes glow { from { box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 55%, transparent); } }
+@keyframes win { from { transform: scale(.4) rotate(-40deg); } 65% { transform: scale(1.2) rotate(-4deg); } }
+.hero .hero-grid > * { animation: rise .6s cubic-bezier(.2, .8, .2, 1) backwards; }
+.hero .hero-grid > :last-child { animation-delay: .12s; }
+.qbtns button.right { animation: pop .4s ease; }
+.qbtns button.wrong { animation: shake .4s ease; }
+.unlocking { animation: glow 1.2s ease-out; }
+.badge.won { animation: win .7s cubic-bezier(.3, 1.3, .5, 1); }
+.stars .svg-inline--fa { animation: grow .45s ease backwards; }
+.stars .svg-inline--fa:nth-child(2) { animation-delay: .12s; }
+.stars .svg-inline--fa:nth-child(3) { animation-delay: .24s; }
+.bump { animation: bump .4s ease; }
+/* Une carte monte un peu en arrivant à l'écran. Des étapes arrivent l'une après l'autre : une cause, puis sa conséquence. */
+@supports (animation-timeline: view()) {
+  .bento > .card:not(.hero) { animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+  .steps > * { --rise: 36px; animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% cover 30%; }
+  .steps > :nth-child(2) { animation-range: entry 10% cover 35%; }
+  .steps > :nth-child(3) { animation-range: entry 20% cover 40%; }
+  .steps > :nth-child(4) { animation-range: entry 30% cover 45%; }
+  .steps > :nth-child(5) { animation-range: entry 40% cover 50%; }
+}
+
 :root { --accent: #C6FF00; }
 
 .tokens { display: flex; flex-wrap: wrap; gap: 6px; min-height: 48px; align-content: flex-start; }
@@ -324,6 +353,10 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .cb-game { display: grid; gap: 20px; max-width: 760px; }
 .cb-goal { display: grid; gap: 4px; padding: 16px 20px 16px 24px; border-radius: 14px; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
 .cb-goal strong { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; line-height: 1.2; }
+
+/* Les nouveaux tokens tombent un par un dans la zone : on voit le texte se découper en morceaux. */
+@keyframes drop { from { transform: translateY(-16px) scale(.5); } }
+.tok.new { animation: drop .4s cubic-bezier(.3, 1.4, .6, 1) backwards; animation-delay: var(--d, 0ms); }
 </style>
 
 <main class="wrap">
@@ -620,6 +653,31 @@ function confetti(ic) {
   setTimeout(() => box.remove(), 3200);
 }
 
+// Animations (même bloc dans chaque fiche). Si le système demande moins d'animations, tout s'affiche tout de suite.
+const STILL = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Relance une animation liée à une classe. replay(pastille) : un score qui vient de changer grossit un instant.
+function replay(el, cls = "bump") { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+// Un nombre qui va jusqu'à sa nouvelle valeur : on voit qu'il change, et dans quel sens.
+function countTo(el, to, show = (v) => fmt(Math.round(v))) {
+  const from = el.countAt ?? to;
+  cancelAnimationFrame(el.countRaf);
+  if (from === to || STILL()) { el.countAt = to; el.textContent = show(to); return; }
+  const t0 = performance.now();
+  const tick = (t) => {
+    const k = Math.min(1, (t - t0) / 500);
+    el.countAt = k < 1 ? from + (to - from) * (1 - (1 - k) ** 3) : to;
+    el.textContent = show(el.countAt);
+    if (k < 1) el.countRaf = requestAnimationFrame(tick);
+  };
+  el.countRaf = requestAnimationFrame(tick);
+}
+// Lance fn une seule fois, quand l'élément arrive à l'écran.
+function onSeen(el, fn) {
+  if (!("IntersectionObserver" in window)) return fn();
+  const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); fn(); } }, { threshold: 0.3 });
+  io.observe(el);
+}
+
 // Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.
 function initDefi(items, options) {
   const [ic, name] = BADGES[FICHE];
@@ -644,6 +702,7 @@ function initDefi(items, options) {
     $("#defiReset").hidden = false;
     const good = [...firsts.values()].filter(Boolean).length;
     $("#defiScore").textContent = `${good} / ${total}`;
+    replay($("#defiScore"));
     if (firsts.size < total) return;
     const stars = good === total ? 3 : good === total - 1 ? 2 : 1;
     record = Math.max(record, stars);
@@ -745,14 +804,26 @@ function tokenize(text) {
   return out;
 }
 
-const tokChips = (toks) => toks.map((s) => { const e = document.createElement("span"); e.className = "tok"; e.textContent = s; return e; });
+// Les tokens à partir de « from » sont nouveaux : ils tombent l'un après l'autre, tous les « ms » millisecondes.
+const tokChips = (toks, from = 0, ms = 25) => toks.map((s, i) => {
+  const e = document.createElement("span");
+  e.className = "tok";
+  e.textContent = s;
+  if (i >= from) { e.classList.add("new"); e.style.setProperty("--d", Math.min(i - from, 40) * ms + "ms"); }
+  return e;
+});
+let shownToks = [];
 const txt = $("#txt");
 function renderText() {
   const t = txt.value;
   const toks = tokenize(t);
   const words = (t.match(/[\p{L}\p{N}][\p{L}\p{M}\p{N}'’-]*/gu) || []).length;
-  const box = $("#toks");
-  box.replaceChildren(...tokChips(toks.slice(0, 400)));
+  const box = $("#toks"), shown = toks.slice(0, 400);
+  // Seuls les tokens qui changent tombent : le début de la phrase ne bouge pas.
+  let same = 0;
+  while (same < shown.length && shown[same] === shownToks[same]) same++;
+  box.replaceChildren(...tokChips(shown, same));
+  shownToks = shown;
   $("#sWords").textContent = fmt(words);
   $("#sToks").textContent = fmt(toks.length);
   $("#sChars").textContent = fmt([...t].length);
@@ -795,6 +866,7 @@ function cbRound() {
 function cbEnd(ok) {
   if (ok) cb.won++;
   $("#cbScore").textContent = `${cb.won} / ${CB.length}`;
+  if (ok) replay($("#cbScore"));
   $("#cbTxt").readOnly = true;
   $("#cbCheck").hidden = $("#cbSkip").hidden = true;
   const last = cb.round === CB.length - 1;
@@ -809,7 +881,7 @@ $("#cbCheck").addEventListener("click", () => {
   const [goal] = CB[cb.round], toks = tokenize($("#cbTxt").value.trim());
   if (!toks.length) { rich($("#cbResult"), "{pen} Écris d'abord ta phrase."); return; }
   cb.tries++;
-  $("#cbToks").replaceChildren(...tokChips(toks));
+  $("#cbToks").replaceChildren(...tokChips(toks, 0, 70));
   const d = toks.length - goal;
   if (d) {
     rich($("#cbResult"), `{circle-xmark} ${toks.length} tokens : ${d < 0 ? `il en manque ${-d}` : `${d} de trop`}. Regarde le découpage, change un mot, puis vérifie encore.`);

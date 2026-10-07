@@ -79,6 +79,11 @@ Chaque page charge la version SVG + JS depuis cdnjs (`solid.min.js` et `fontawes
 - Dans le JS : écrire `{coins}` dans le texte, puis l'afficher avec `rich(el, texte)` ou `h(tag, classe, texte)`. Exemple : `rich(el, "{circle-check} Bravo !")`. Pour un attribut (`aria-label`…), `plain(texte)` retire les icônes.
 - Une fois l'icône affichée, le `<i>` devient un `<svg class="svg-inline--fa fa-coins">` : en CSS, cibler `.fa-coins` ou `.svg-inline--fa`, pas `.fa-solid`.
 
+### Animations
+
+Les animations montrent ce qui change : les tokens tombent un par un, le classement s'inverse, la courbe se dessine, le point fait le tour de la boucle de l'agent, le permis reçoit son tampon. Elles déplacent les éléments sans jamais cacher un texte.
+Si le système demande moins d'animations (réglage « Réduire les animations »), tout s'affiche tout de suite, sans mouvement.
+
 ### Zones floutées
 
 « Devine d'abord » floute la suite tant qu'on n'a pas répondu. Chaque zone floutée affiche « Réponds d'abord à la question ».

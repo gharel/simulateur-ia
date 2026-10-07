@@ -302,6 +302,35 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
+/* Animations : elles montrent ce qui change (même bloc dans chaque fiche). Elles déplacent (transform) sans jamais cacher un texte.
+   Si le système demande moins d'animations, la règle prefers-reduced-motion plus haut les arrête toutes. */
+@keyframes pop { 40% { transform: scale(1.06); } }
+@keyframes bump { 40% { transform: scale(1.18); } }
+@keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+@keyframes rise { from { transform: translateY(var(--rise, 18px)); } }
+@keyframes grow { from { transform: scale(0); } 70% { transform: scale(1.25); } }
+@keyframes glow { from { box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 55%, transparent); } }
+@keyframes win { from { transform: scale(.4) rotate(-40deg); } 65% { transform: scale(1.2) rotate(-4deg); } }
+.hero .hero-grid > * { animation: rise .6s cubic-bezier(.2, .8, .2, 1) backwards; }
+.hero .hero-grid > :last-child { animation-delay: .12s; }
+.qbtns button.right { animation: pop .4s ease; }
+.qbtns button.wrong { animation: shake .4s ease; }
+.unlocking { animation: glow 1.2s ease-out; }
+.badge.won { animation: win .7s cubic-bezier(.3, 1.3, .5, 1); }
+.stars .svg-inline--fa { animation: grow .45s ease backwards; }
+.stars .svg-inline--fa:nth-child(2) { animation-delay: .12s; }
+.stars .svg-inline--fa:nth-child(3) { animation-delay: .24s; }
+.bump { animation: bump .4s ease; }
+/* Une carte monte un peu en arrivant à l'écran. Des étapes arrivent l'une après l'autre : une cause, puis sa conséquence. */
+@supports (animation-timeline: view()) {
+  .bento > .card:not(.hero) { animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+  .steps > * { --rise: 36px; animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% cover 30%; }
+  .steps > :nth-child(2) { animation-range: entry 10% cover 35%; }
+  .steps > :nth-child(3) { animation-range: entry 20% cover 40%; }
+  .steps > :nth-child(4) { animation-range: entry 30% cover 45%; }
+  .steps > :nth-child(5) { animation-range: entry 40% cover 50%; }
+}
+
 :root { --accent: #FF6B00; }
 
 .switches { display: grid; gap: 10px; }
@@ -410,6 +439,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-theme="light"] .verdict { --em: var(--accent); }
 .verdict strong { font-family: var(--font-display); font-weight: 400; font-size: 1.35rem; }
 .verdict em { font-style: normal; color: var(--em); }
+
+/* La cloche sonne quand le risque devient élevé. Au classement, le premier passe en haut. */
+@keyframes ring { 10%, 30%, 50% { transform: rotate(16deg); } 20%, 40% { transform: rotate(-16deg); } 60% { transform: none; } }
+.alarm .fa-bell { animation: ring 1s ease; transform-origin: 50% 10%; }
+.rk-n { display: inline-block; }
+.rk { position: relative; }
 </style>
 
 <main class="wrap">
@@ -468,7 +503,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         </div>
         <div class="lab-col">
           <div class="lab-part">
-            <h3><i class="fa-solid fa-bell" aria-hidden="true"></i> Risque d'invention</h3>
+            <h3 id="riskTitle"><i class="fa-solid fa-bell" aria-hidden="true"></i> Risque d'invention</h3>
             <div class="ring-wrap" id="ringWrap">
               <svg class="ring" viewBox="0 0 120 120" role="img" aria-labelledby="ringLabel">
                 <title id="ringLabel">Risque d'invention</title>
@@ -766,6 +801,31 @@ function confetti(ic) {
   setTimeout(() => box.remove(), 3200);
 }
 
+// Animations (même bloc dans chaque fiche). Si le système demande moins d'animations, tout s'affiche tout de suite.
+const STILL = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Relance une animation liée à une classe. replay(pastille) : un score qui vient de changer grossit un instant.
+function replay(el, cls = "bump") { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+// Un nombre qui va jusqu'à sa nouvelle valeur : on voit qu'il change, et dans quel sens.
+function countTo(el, to, show = (v) => fmt(Math.round(v))) {
+  const from = el.countAt ?? to;
+  cancelAnimationFrame(el.countRaf);
+  if (from === to || STILL()) { el.countAt = to; el.textContent = show(to); return; }
+  const t0 = performance.now();
+  const tick = (t) => {
+    const k = Math.min(1, (t - t0) / 500);
+    el.countAt = k < 1 ? from + (to - from) * (1 - (1 - k) ** 3) : to;
+    el.textContent = show(el.countAt);
+    if (k < 1) el.countRaf = requestAnimationFrame(tick);
+  };
+  el.countRaf = requestAnimationFrame(tick);
+}
+// Lance fn une seule fois, quand l'élément arrive à l'écran.
+function onSeen(el, fn) {
+  if (!("IntersectionObserver" in window)) return fn();
+  const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); fn(); } }, { threshold: 0.3 });
+  io.observe(el);
+}
+
 // Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.
 function initDefi(items, options) {
   const [ic, name] = BADGES[FICHE];
@@ -790,6 +850,7 @@ function initDefi(items, options) {
     $("#defiReset").hidden = false;
     const good = [...firsts.values()].filter(Boolean).length;
     $("#defiScore").textContent = `${good} / ${total}`;
+    replay($("#defiScore"));
     if (firsts.size < total) return;
     const stars = good === total ? 3 : good === total - 1 ? 2 : 1;
     record = Math.max(record, stars);
@@ -934,6 +995,8 @@ function render() {
   const s = readState();
   const risk = riskOf(s);
   const cls = risk < 30 ? "ok" : risk < 60 ? "warn" : "bad";
+  if (cls === "bad" && render.cls !== "bad") replay($("#riskTitle"), "alarm");
+  render.cls = cls;
   $("#vLevel").textContent = LEVELS[s.level].name;
   $("#vCrea").textContent = s.crea < 34 ? "Des faits" : s.crea < 67 ? "Un peu des deux" : "De l'imagination";
 
@@ -1041,18 +1104,28 @@ const rkRows = RANK.map((m) => {
   sc.append(h("span", "small muted", "Score au classement"), pts, calc, place);
   row.append(name, viz, sc);
   $("#rkRows").append(row);
-  return { m, n, pts, calc, place };
+  return { m, n, pts, calc, place, row };
 });
 function renderRank(rule) {
   const R = RULES[rule], scores = RANK.map(R.score), best = Math.max(...scores);
-  rkRows.forEach(({ m, n, pts, calc, place }, i) => {
+  // Le mieux classé passe en haut : les lignes glissent jusqu'à leur nouvelle place.
+  const before = rkRows.map(({ row }) => row.getBoundingClientRect().top);
+  const order = RANK.map((_, i) => i).sort((a, b) => scores[b] - scores[a]);
+  rkRows.forEach(({ m, n, pts, calc, place, row }, i) => {
     const win = scores[i] === best;
+    row.style.order = order.indexOf(i);
     n.textContent = (scores[i] < 0 ? "−" : "") + Math.abs(scores[i]);
     calc.textContent = `${m.ok} justes − ${m.bad} faux`;
     calc.hidden = rule !== "fair";
     rich(place, win ? "{trophy} Classé devant" : "Classé derrière");
     pts.classList.toggle("win", win);
     place.classList.toggle("win", win);
+  });
+  if (!STILL()) rkRows.forEach(({ row, n }, i) => {
+    const dy = before[i] - row.getBoundingClientRect().top;
+    row.style.zIndex = dy > 0 ? 1 : "";
+    if (dy) row.animate([{ transform: `translateY(${dy}px)` }, { transform: "none" }], { duration: 650, easing: "cubic-bezier(.3, 1.2, .5, 1)" });
+    replay(n);
   });
   $("#ruleHint").textContent = R.hint;
   $("#verdict").replaceChildren(h("strong", "", R.verdict[0]), " ", h("em", "", R.verdict[1]));

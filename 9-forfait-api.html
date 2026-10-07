@@ -302,6 +302,35 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
+/* Animations : elles montrent ce qui change (même bloc dans chaque fiche). Elles déplacent (transform) sans jamais cacher un texte.
+   Si le système demande moins d'animations, la règle prefers-reduced-motion plus haut les arrête toutes. */
+@keyframes pop { 40% { transform: scale(1.06); } }
+@keyframes bump { 40% { transform: scale(1.18); } }
+@keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+@keyframes rise { from { transform: translateY(var(--rise, 18px)); } }
+@keyframes grow { from { transform: scale(0); } 70% { transform: scale(1.25); } }
+@keyframes glow { from { box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 55%, transparent); } }
+@keyframes win { from { transform: scale(.4) rotate(-40deg); } 65% { transform: scale(1.2) rotate(-4deg); } }
+.hero .hero-grid > * { animation: rise .6s cubic-bezier(.2, .8, .2, 1) backwards; }
+.hero .hero-grid > :last-child { animation-delay: .12s; }
+.qbtns button.right { animation: pop .4s ease; }
+.qbtns button.wrong { animation: shake .4s ease; }
+.unlocking { animation: glow 1.2s ease-out; }
+.badge.won { animation: win .7s cubic-bezier(.3, 1.3, .5, 1); }
+.stars .svg-inline--fa { animation: grow .45s ease backwards; }
+.stars .svg-inline--fa:nth-child(2) { animation-delay: .12s; }
+.stars .svg-inline--fa:nth-child(3) { animation-delay: .24s; }
+.bump { animation: bump .4s ease; }
+/* Une carte monte un peu en arrivant à l'écran. Des étapes arrivent l'une après l'autre : une cause, puis sa conséquence. */
+@supports (animation-timeline: view()) {
+  .bento > .card:not(.hero) { animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+  .steps > * { --rise: 36px; animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% cover 30%; }
+  .steps > :nth-child(2) { animation-range: entry 10% cover 35%; }
+  .steps > :nth-child(3) { animation-range: entry 20% cover 40%; }
+  .steps > :nth-child(4) { animation-range: entry 30% cover 45%; }
+  .steps > :nth-child(5) { animation-range: entry 40% cover 50%; }
+}
+
 :root { --accent: #B14EFF; --accent-text: #C47BFF; --plan: #F3F3F8; }
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --plan: #12121A; } }
 :root[data-theme="light"] { --plan: #12121A; }
@@ -345,6 +374,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .noms thead th { width: 36%; }
 .noms thead th:first-child { width: 28%; }
 @media (max-width: 900px) { .bets { grid-template-columns: minmax(0, 1fr); } }
+
+/* La droite de l'API se dessine, puis la ligne de bascule pousse et le point d'usage bat : on voit où les deux prix se croisent. */
+@keyframes draw { from { stroke-dashoffset: 1; } }
+@keyframes grow-line { from { transform: scaleY(0); } }
+@keyframes beat { 40% { transform: scale(1.7); } }
+.chart-box.draw .l-api { stroke-dasharray: 1; animation: draw 1.1s ease-in-out backwards; }
+.chart-box.draw .l-even { transform-box: fill-box; transform-origin: bottom; animation: grow-line .5s ease 1s backwards; }
+.chart-box.draw .t-even { animation: rise .4s ease 1.2s backwards; }
+.chart-box.draw .dot-now { transform-box: fill-box; transform-origin: center; animation: beat .6s ease 1.1s; }
 </style>
 
 <main class="wrap">
@@ -709,6 +747,31 @@ function confetti(ic) {
   setTimeout(() => box.remove(), 3200);
 }
 
+// Animations (même bloc dans chaque fiche). Si le système demande moins d'animations, tout s'affiche tout de suite.
+const STILL = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Relance une animation liée à une classe. replay(pastille) : un score qui vient de changer grossit un instant.
+function replay(el, cls = "bump") { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+// Un nombre qui va jusqu'à sa nouvelle valeur : on voit qu'il change, et dans quel sens.
+function countTo(el, to, show = (v) => fmt(Math.round(v))) {
+  const from = el.countAt ?? to;
+  cancelAnimationFrame(el.countRaf);
+  if (from === to || STILL()) { el.countAt = to; el.textContent = show(to); return; }
+  const t0 = performance.now();
+  const tick = (t) => {
+    const k = Math.min(1, (t - t0) / 500);
+    el.countAt = k < 1 ? from + (to - from) * (1 - (1 - k) ** 3) : to;
+    el.textContent = show(el.countAt);
+    if (k < 1) el.countRaf = requestAnimationFrame(tick);
+  };
+  el.countRaf = requestAnimationFrame(tick);
+}
+// Lance fn une seule fois, quand l'élément arrive à l'écran.
+function onSeen(el, fn) {
+  if (!("IntersectionObserver" in window)) return fn();
+  const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); fn(); } }, { threshold: 0.3 });
+  io.observe(el);
+}
+
 // Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.
 function initDefi(items, options) {
   const [ic, name] = BADGES[FICHE];
@@ -733,6 +796,7 @@ function initDefi(items, options) {
     $("#defiReset").hidden = false;
     const good = [...firsts.values()].filter(Boolean).length;
     $("#defiScore").textContent = `${good} / ${total}`;
+    replay($("#defiScore"));
     if (firsts.size < total) return;
     const stars = good === total ? 3 : good === total - 1 ? 2 : 1;
     record = Math.max(record, stars);
@@ -841,8 +905,8 @@ function render() {
   $("#vPerDay").textContent = fmt(perDay);
   $("#vDays").textContent = fmt(days);
   $("#sizeHint").textContent = s.hint;
-  $("#apiCost").textContent = money(api);
-  $("#planCost").textContent = money(plan);
+  countTo($("#apiCost"), api, money);
+  countTo($("#planCost"), plan, money);
   // Les 2 barres : la plus chère fait toute la largeur
   const top = Math.max(api, plan) || 1, apiLow = api < plan * 0.9, planLow = api > plan * 1.1;
   $("#cmpApi").style.width = (api / top) * 100 + "%";
@@ -903,7 +967,7 @@ function drawChart({ perDay, days, plan, cpm, even }) {
   const dEnd = Math.min(xMax, cpm > 0 ? yMax / (cpm * days) : xMax);
   el("path", { class: "a-api", d: `M${x(0)},${y(0)} L${x(dEnd)},${y(cpm * days * dEnd)} L${x(dEnd)},${y(0)} Z` });
   el("line", { class: "l-plan", x1: x(0), x2: x(xMax), y1: y(plan), y2: y(plan) });
-  el("path", { class: "l-api", d: `M${x(0)},${y(0)} L${x(dEnd)},${y(cpm * days * dEnd)}` });
+  el("path", { class: "l-api", pathLength: 1, d: `M${x(0)},${y(0)} L${x(dEnd)},${y(cpm * days * dEnd)}` });
 
   const tp = el("text", { class: "t-lab t-plan", x: W - m.r, y: y(plan) - 8, "text-anchor": "end" });
   tp.textContent = "Forfait " + money(plan);
@@ -921,6 +985,16 @@ function drawChart({ perDay, days, plan, cpm, even }) {
 }
 
 ["perDay", "days", "plan", "inP", "outP", "cache"].forEach((id) => $("#" + id).addEventListener("input", render));
+// La courbe se dessine quand elle arrive à l'écran, puis après chaque pari.
+let drawEnd;
+function drawIntro() {
+  if (STILL()) return;
+  $("#chart").classList.add("draw");
+  render();
+  clearTimeout(drawEnd);
+  drawEnd = setTimeout(() => $("#chart").classList.remove("draw"), 2000);
+}
+onSeen($("#chart"), drawIntro);
 st.size = initSeg($("#segSize"), (v) => { st.size = v; render(); });
 initSeg($("#segModel"), (v) => { $("#inP").value = PRICES[v][0]; $("#outP").value = PRICES[v][1]; render(); });
 initRanges();
@@ -959,10 +1033,12 @@ function applyProfile(P) {
       why: () => P.why(P.perDay * P.days * cpmOf(P.size, P.model)),
       onShow(ok, first) {
         applyProfile(P);
+        drawIntro();
         if (!first) return;
         firsts.set(i, ok);
         const good = [...firsts.values()].filter(Boolean).length;
         $("#betScore").textContent = `${good} / ${PROFILES.length}`;
+        if (ok) replay($("#betScore"));
         if (firsts.size < PROFILES.length) return;
         rich($("#betResult"), (good === PROFILES.length ? "{trophy} 4 sur 4 ! " : `${good} sur 4. `) +
           "La règle : petit usage ou outil automatique, l'API. Gros usage dans l'appli de l'IA, le forfait.");

@@ -176,7 +176,17 @@ p { margin: 0; max-width: 60ch; }
 
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+/* Animations : les cartes arrivent l'une après l'autre, la barre de progression se remplit,
+   les badges du permis sautent, le permis reçoit son tampon. Seulement à l'ouverture de la page. */
+@keyframes rise { from { transform: translateY(18px); } }
+@keyframes fill-in { from { transform: scaleX(0); } }
+@keyframes bump { 40% { transform: scale(1.12); } }
+@keyframes stamp { from { transform: scale(2.6) rotate(-25deg); } 70% { transform: scale(.9) rotate(4deg); } }
+.bento > .card { animation: rise .6s cubic-bezier(.2, .8, .2, 1) backwards; animation-delay: calc(var(--i, 0) * 60ms); }
+.track span.on { transform-origin: left; animation: fill-in .5s ease backwards; animation-delay: calc(.3s + var(--i, 0) * 90ms); }
+.lic-badges .won { animation: bump .45s ease backwards; animation-delay: calc(.4s + var(--i, 0) * 80ms); }
+.license.stamp .lic-photo { animation: stamp .7s cubic-bezier(.3, 1.3, .5, 1) 1.1s backwards; }
 /* À l'impression : seulement le permis */
 @media print {
   @page { margin: 12mm; }
@@ -384,14 +394,18 @@ const starIcons = (n) => [1, 2, 3].map((k) => icon("star", k > n ? "star-off" : 
 const MODE_QUERY = [ATELIER && "atelier=1", DEMO && "demo=1"].filter(Boolean).join("&");
 const link = (f) => f + (MODE_QUERY ? "?" + MODE_QUERY : "");
 
+// Les animations de l'accueil ne se jouent qu'au premier affichage : pas à chaque lettre du prénom.
+let intro = true;
+$$(".bento > .card").forEach((c, i) => c.style.setProperty("--i", i));
 function render() {
   const p = loadProgress();
   const won = IDS.filter((id) => p[id] > 0);
   const total = IDS.reduce((s, id) => s + (p[id] || 0), 0);
 
-  $("#track").replaceChildren(...IDS.map((id) => {
+  $("#track").replaceChildren(...IDS.map((id, i) => {
     const s = document.createElement("span");
     s.style.background = p[id] ? COLORS[id] : "";
+    if (intro && p[id]) { s.className = "on"; s.style.setProperty("--i", i); }
     return s;
   }));
   $("#progTxt").textContent = `${won.length} badge${won.length > 1 ? "s" : ""} sur ${COUNT}` + (won.length ? ` · ${total} étoile${total > 1 ? "s" : ""} sur ${MAX_STARS}` : "");
@@ -427,9 +441,10 @@ function render() {
   $("#licWho").textContent = (done && $("#licName").value.trim()) || "…";
   $("#licDate").textContent = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
   rich($("#licLevel"), total >= MAX_STARS ? `{star} Expert : ${MAX_STARS} étoiles sur ${MAX_STARS}` : `${total} étoile${total > 1 ? "s" : ""} sur ${MAX_STARS}`);
-  $("#licBadges").replaceChildren(...Object.entries(BADGES).map(([n, [ic, name]]) => {
+  $("#licBadges").replaceChildren(...Object.entries(BADGES).map(([n, [ic, name]], i) => {
     const d = document.createElement("div");
     if (!p[n]) d.className = "off";
+    else if (intro) { d.className = "won"; d.style.setProperty("--i", i); }
     d.innerHTML = `<b aria-hidden="true"></b><span></span><span class="st"></span>`;
     rich(d.children[0], ic);
     d.children[1].textContent = name;
@@ -438,6 +453,8 @@ function render() {
     d.children[2].setAttribute("aria-label", `${p[n] || 0} étoile${p[n] > 1 ? "s" : ""} sur 3`);
     return d;
   }));
+  if (intro && done) $("#license").classList.add("stamp");
+  intro = false;
 }
 
 $("#licName").value = store.get("ia6:name") || "";
