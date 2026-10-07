@@ -302,7 +302,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
-/* Animations : elles montrent ce qui change (même bloc dans chaque fiche). Elles déplacent (transform) sans jamais cacher un texte.
+/* Animations : elles montrent ce qui change quand tu agis : une réponse, un score, une étape d'un schéma (même bloc dans chaque fiche).
+   Elles déplacent (transform) sans jamais cacher un texte. Les cartes, elles, ne bougent pas.
    Si le système demande moins d'animations, la règle prefers-reduced-motion plus haut les arrête toutes. */
 @keyframes pop { 40% { transform: scale(1.06); } }
 @keyframes bump { 40% { transform: scale(1.18); } }
@@ -311,8 +312,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 @keyframes grow { from { transform: scale(0); } 70% { transform: scale(1.25); } }
 @keyframes glow { from { box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 55%, transparent); } }
 @keyframes win { from { transform: scale(.4) rotate(-40deg); } 65% { transform: scale(1.2) rotate(-4deg); } }
-.hero .hero-grid > * { animation: rise .6s cubic-bezier(.2, .8, .2, 1) backwards; }
-.hero .hero-grid > :last-child { animation-delay: .12s; }
 .qbtns button.right { animation: pop .4s ease; }
 .qbtns button.wrong { animation: shake .4s ease; }
 .unlocking { animation: glow 1.2s ease-out; }
@@ -321,15 +320,36 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .stars .svg-inline--fa:nth-child(2) { animation-delay: .12s; }
 .stars .svg-inline--fa:nth-child(3) { animation-delay: .24s; }
 .bump { animation: bump .4s ease; }
-/* Une carte monte un peu en arrivant à l'écran. Des étapes arrivent l'une après l'autre : une cause, puis sa conséquence. */
-@supports (animation-timeline: view()) {
-  .bento > .card:not(.hero) { animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% entry 70%; }
-  .steps > * { --rise: 36px; animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% cover 30%; }
-  .steps > :nth-child(2) { animation-range: entry 10% cover 35%; }
-  .steps > :nth-child(3) { animation-range: entry 20% cover 40%; }
-  .steps > :nth-child(4) { animation-range: entry 30% cover 45%; }
-  .steps > :nth-child(5) { animation-range: entry 40% cover 50%; }
+
+/* Pas à pas : un schéma ou une procédure, étape par étape (même bloc dans chaque fiche). Voir procedure() dans le script.
+   Le rail se remplit jusqu'à l'étape vue. Le schéma de la fiche suit l'étape : .proc[data-at="0"], "1"… */
+.proc { display: grid; gap: 20px; }
+.proc-rail { --k: 0; position: relative; display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; }
+.proc-rail::before, .proc-rail::after {
+  content: ""; position: absolute; top: 20px; left: calc(50% / var(--n, 3)); right: calc(50% / var(--n, 3));
+  height: 4px; border-radius: 99px; background: var(--line);
 }
+.proc-rail::after { background: var(--accent); transform-origin: left center; transform: scaleX(var(--k)); transition: transform .5s cubic-bezier(.5, 0, .3, 1); }
+.proc-rail li { display: grid; }
+.proc-rail button {
+  position: relative; z-index: 1; display: grid; justify-items: center; align-content: start; gap: 8px; padding: 0 6px; min-height: 44px;
+  border: 0; background: none; color: var(--muted); font: inherit; font-weight: 700; font-size: .9rem; line-height: 1.3; text-align: center; cursor: pointer;
+}
+.proc-rail b {
+  width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 400; font-size: 1.05rem; background: var(--surface-2); color: var(--fg); border: 3px solid var(--line);
+}
+.proc-rail button:hover b { border-color: var(--accent); }
+.proc-rail .done b { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.proc-rail [aria-current] { color: var(--fg); }
+.proc-rail [aria-current] b { box-shadow: 0 0 0 5px color-mix(in oklab, var(--accent) 35%, transparent); animation: pop .4s ease; }
+/* Sur téléphone, le rail garde les numéros : le titre de l'étape est juste en dessous. */
+@media (max-width: 640px) { .proc-rail button > span { display: none; } }
+.proc-txt { display: grid; gap: 4px; align-content: start; padding: 16px 20px 16px 24px; border-radius: 14px; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); line-height: 1.5; }
+.proc-txt strong { font-size: 1.1rem; }
+.proc-nav { display: flex; flex-wrap: wrap; gap: 10px; }
+.proc-nav .btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.proc-nav .btn:disabled { cursor: default; color: var(--muted); border-style: dashed; }
 
 :root { --accent: #FF2E93; }
 
@@ -808,6 +828,55 @@ function onSeen(el, fn) {
   if (!("IntersectionObserver" in window)) return fn();
   const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); fn(); } }, { threshold: 0.3 });
   io.observe(el);
+}
+
+// Pas à pas : un schéma ou une procédure, étape par étape (même bloc dans chaque fiche).
+// steps : [{ label, title, text }]. title et text peuvent être des fonctions, quand l'étape dépend d'un réglage de la page.
+// Le rail se place au début de el, puis le texte de l'étape, puis le schéma, et les boutons à la fin.
+// Si la page a déjà sa place pour le texte et les boutons (.proc-txt et .proc-nav), ils vont là.
+// show(i, from) dessine l'étape i. from : l'étape d'avant, ou null au premier affichage et après redraw() (un réglage a changé).
+function procedure(el, steps, show) {
+  const n = steps.length, val = (v) => (typeof v === "function" ? v() : v);
+  let at = 0;
+  const rail = h("ol", "proc-rail");
+  rail.style.setProperty("--n", n);
+  rail.setAttribute("aria-label", "Les étapes");
+  const nodes = steps.map((s, i) => {
+    const b = btn("");
+    b.append(h("b", "", String(i + 1)), h("span", "", s.label));
+    b.setAttribute("aria-label", `Étape ${i + 1} : ${plain(s.label)}`);
+    b.addEventListener("click", () => go(i));
+    const li = document.createElement("li");
+    li.append(b);
+    rail.append(li);
+    return b;
+  });
+  const txt = $(".proc-txt", el) || h("div", "proc-txt");
+  const nav = $(".proc-nav", el) || el.appendChild(h("div", "proc-nav"));
+  const prev = btn("{arrow-left} Étape d'avant", "btn"), next = btn("", "btn go");
+  txt.setAttribute("aria-live", "polite");
+  prev.addEventListener("click", () => go(at - 1));
+  next.addEventListener("click", () => go(at < n - 1 ? at + 1 : 0));
+  nav.append(prev, next);
+  el.prepend(rail);
+  if (!txt.isConnected) rail.after(txt);
+  function go(i, redraw) {
+    const from = redraw ? null : at;
+    at = Math.max(0, Math.min(n - 1, i));
+    el.dataset.at = at;
+    rail.style.setProperty("--k", at / Math.max(1, n - 1));
+    nodes.forEach((b, k) => {
+      b.parentNode.classList.toggle("done", k <= at);
+      if (k === at) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+    });
+    const s = steps[at];
+    txt.replaceChildren(h("span", "eyebrow", `Étape ${at + 1} sur ${n}`), h("strong", "", val(s.title || s.label)), h("span", "", val(s.text)));
+    prev.disabled = at === 0;
+    rich(next, at < n - 1 ? "Étape suivante {arrow-right}" : "{rotate-left} Revoir depuis le début");
+    show(at, from);
+  }
+  go(0, true);
+  return { go, redraw: () => go(at, true), get at() { return at; } };
 }
 
 // Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.

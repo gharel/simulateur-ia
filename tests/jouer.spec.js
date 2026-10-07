@@ -138,12 +138,12 @@ test.describe("8-agent.html : l'agent sur mesure", () => {
     const read = () => page.locator("#tree li.read").evaluateAll((ls) => ls.map((l) => l.dataset.f));
     expect(await read()).toEqual(["agents", "skill", "tarifs"]);
     await page.locator('#segReader button[data-v="marque"]').click();
-    expect(await read()).toEqual(["agents", "claude", "skill", "tarifs"]);
+    expect(await read()).toEqual(["agents", "marque", "skill", "tarifs"]);
     await page.locator("#impSw").click();
-    expect(await read()).toEqual(["claude", "skill"]);
+    expect(await read()).toEqual(["marque", "skill"]);
     await expect(page.locator("#readStatus")).toHaveClass(/bad/);
     await page.locator('#segTask button[data-v="question"]').click();
-    expect(await read()).toEqual(["claude"]);
+    expect(await read()).toEqual(["marque"]);
   });
 
   test("le banc d'essai : les bonnes consignes passent les 4 tests", async ({ page }) => {
@@ -161,6 +161,112 @@ test.describe("8-agent.html : l'agent sur mesure", () => {
     await expect(page.locator("#benchScore")).toHaveText("3 / 4");
     await expect(page.locator("#benchLog li").nth(2)).toHaveClass(/bad/);
     await expect(page.locator("#bench .row").nth(2)).toHaveClass(/fail/);
+  });
+
+  test("créer ton agent : les bons choix passent les 3 tests, et un test raté renvoie vers l'étape à corriger", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await open(page, "8-agent.html");
+    const proc = page.locator("#buildProc"), next = proc.locator(".proc-nav .go"), step = (i) => page.locator("#bdForm .bd-step").nth(i);
+    await step(0).locator("button", { hasText: "devis" }).click();
+    await next.click();
+    for (const sw of await step(1).locator("input").all()) await sw.check();
+    await next.click();
+    // Les 3 outils utiles, sans le compte bancaire ni tous les dossiers.
+    for (const i of [0, 1, 2]) await step(2).locator("input").nth(i).check();
+    await next.click();
+    for (const seg of await step(3).locator(".seg").all()) await seg.locator('button[data-v="ask"]').click();
+    await next.click();
+    await step(4).locator(".bd-tests .btn.go").click();
+    await expect(step(4).locator(".log li.ok")).toHaveCount(3);
+    await expect(page.locator("#plSlots .pl-slot.set")).toHaveCount(5);
+    await expect(page.locator("#bdPlan")).toHaveClass(/ready/);
+    // Il a le droit d'envoyer seul : le test de l'e-mail piégé rate, et son bouton ramène à l'étape 4.
+    await proc.locator(".proc-rail button").nth(3).click();
+    await step(3).locator(".seg").first().locator('button[data-v="self"]').click();
+    await expect(page.locator("#plSlots .pl-slot").nth(3)).toHaveClass(/warn/);
+    await proc.locator(".proc-rail button").nth(4).click();
+    await step(4).locator(".bd-tests .btn.go").click();
+    await expect(step(4).locator(".log li").nth(2)).toHaveClass(/bad/);
+    await step(4).locator(".log li").nth(2).locator(".btn").click();
+    await expect(proc).toHaveAttribute("data-at", "3");
+    await expect(page.locator("#bdPlan")).not.toHaveClass(/ready/);
+  });
+});
+
+// Les schémas pas à pas : un rail d'étapes, le texte de l'étape, et le schéma qui suit.
+test.describe("schémas pas à pas", () => {
+  test("6-message-piege.html : l'ordre caché va du pirate à l'IA, puis revient au pirate", async ({ page }) => {
+    await open(page, "6-message-piege.html");
+    const proc = page.locator("#trapProc"), next = proc.locator(".proc-nav .go");
+    await expect(proc.locator(".proc-rail [aria-current]")).toContainText("1");
+    await expect(proc.locator(".proc-nav button").first()).toBeDisabled();
+    await next.click();
+    await expect(page.locator("#aiNd")).toContainText("Résume mes nouveaux");
+    await next.click();
+    await expect(proc.locator(".proc-rail li.done")).toHaveCount(3);
+    await expect(page.locator('#chain .node[data-k="end"]')).toHaveClass(/bad/);
+    // La dernière étape ramène au début. Un clic sur le rail ouvre une étape.
+    await expect(next).toContainText("Revoir depuis le début");
+    await next.click();
+    await expect(proc).toHaveAttribute("data-at", "0");
+    await proc.locator(".proc-rail button").nth(1).click();
+    await expect(proc.locator(".proc-txt")).toContainText("Tu donnes un travail à l'IA");
+    // Avec les yeux de l'IA, les morceaux du fil se ressemblent : plus de légende.
+    await page.locator('#segFlow button[data-v="ai"]').click();
+    await expect(page.locator("#flow")).toHaveClass(/ai/);
+    await expect(page.locator("#flowLegend")).toBeHidden();
+    await expect(page.locator("#flowNote")).toBeVisible();
+  });
+
+  test("4-hallucinations.html : sur une question rare, l'IA choisit quand même un mot", async ({ page }) => {
+    await open(page, "4-hallucinations.html");
+    const next = page.locator("#whyProc .proc-nav .go");
+    await page.locator('#segNext button[data-v="rare"]').click();
+    await expect(page.locator("#gmSlot")).toHaveText("…");
+    await next.click();
+    await expect(page.locator("#gmSlot")).toHaveText("1998.");
+    await expect(page.locator(".gm-row.pick")).toContainText("9 %");
+    await next.click();
+    await expect(page.locator("#gmCmp")).toBeVisible();
+    await expect(page.locator("#gmPill")).toContainText("être faux");
+    // La question connue, à la même étape : le mot choisi a 92 chances sur 100.
+    await page.locator('#segNext button[data-v="known"]').click();
+    await expect(page.locator("#gmSlot")).toHaveText("Nouméa.");
+    await expect(page.locator("#gmPill")).toContainText("Juste");
+  });
+
+  test("5-complaisance.html : ton vote compte, et la réponse qui fait plaisir gagne", async ({ page }) => {
+    await open(page, "5-complaisance.html");
+    const next = page.locator("#trainProc .proc-nav .go");
+    await page.locator('#trAns [data-v="frank"]').click();
+    await next.click();
+    await expect(page.locator('#trAns [data-v="yes"] .tr-votes .v')).toHaveCount(7);
+    await expect(page.locator('#trAns [data-v="frank"] .tr-votes .v.me')).toHaveCount(1);
+    await expect(page.locator("#trainProc .proc-txt")).toContainText("tu as choisi B");
+    await next.click();
+    await expect(page.locator("#trLater .sent.bad")).toHaveCount(1);
+  });
+
+  test("1-tokens.html : un roman tient dans le sac, tout le code d'une appli le fait déborder", async ({ page }) => {
+    await open(page, "1-tokens.html");
+    const add = (t) => page.locator("#sacAdd button", { hasText: t }).click();
+    await add("roman");
+    await expect(page.locator("#sacSt")).toHaveClass(/ok/);
+    await add("code");
+    await expect(page.locator("#sacSt")).toHaveClass(/bad/);
+    await expect(page.locator("#sacSt")).toContainText("Ça déborde");
+    await page.locator("#sacEmpty").click();
+    await expect(page.locator("#sacBar .sac-part")).toHaveCount(0);
+  });
+
+  test("9-forfait-api.html : le forfait se bloque, l'API s'arrête seulement au plafond", async ({ page }) => {
+    await open(page, "9-forfait-api.html");
+    await page.locator("#burst").fill("80");
+    await expect(page.locator("#qSt")).toHaveClass(/bad/);
+    await expect(page.locator("#qSt")).toContainText("Pause au message 41");
+    await expect(page.locator("#bSt")).toHaveClass(/ok/);
+    await page.locator("#cap").check();
+    await expect(page.locator("#bSt")).toContainText("Plafond atteint");
   });
 });
 

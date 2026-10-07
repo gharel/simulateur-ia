@@ -17,7 +17,7 @@
 **Partie 3 · Agir avec l'IA**
 
 7. **La Boîte à Outils de l'IA** : le bon prompt (contexte, action précise, objectif), répondre ou agir (l'exemple de Claude, qui réunit Chat et Cowork), l'agent de code, Projets, Skills, Connecteurs, les risques de chaque outil, et les noms de ces outils chez Claude et ChatGPT
-8. **L'Agent sur Mesure** : ce qu'est un agent (la boucle regarde, décide, agit, vérifie), créer le sien en 5 étapes, le fichier de consignes (AGENTS.md, CLAUDE.md avec `@AGENTS.md`, SKILL.md), et où ranger ses consignes chez Claude et ChatGPT
+8. **L'Agent sur Mesure** : ce qu'est un agent (la boucle regarde, décide, agit, vérifie), créer le sien en 5 étapes, le fichier de consignes (AGENTS.md, le fichier d'une marque avec `@AGENTS.md`, SKILL.md), et où ranger ses consignes chez Claude et ChatGPT
 9. **Forfait ou Compteur ?** : abonnement ou paiement à l'usage, et les noms des forfaits chez Claude et ChatGPT
 
 ## Jouer
@@ -81,7 +81,16 @@ Chaque page charge la version SVG + JS depuis cdnjs (`solid.min.js` et `fontawes
 
 ### Animations
 
-Les animations montrent ce qui change : les tokens tombent un par un, le classement s'inverse, la courbe se dessine, le point fait le tour de la boucle de l'agent, le permis reçoit son tampon. Elles déplacent les éléments sans jamais cacher un texte.
+Les animations montrent ce qui change quand tu agis : les tokens tombent un par un, le classement s'inverse, la courbe se dessine, le point fait le tour de la boucle de l'agent, le permis reçoit son tampon. Elles déplacent les éléments sans jamais cacher un texte. Les cartes, elles, ne bougent pas.
+
+Les explications en étapes sont des **schémas pas à pas** : un rail d'étapes, le texte de l'étape, et un schéma qui change à chaque clic.
+
+- fiche 1 : remplis le sac de 200 000 tokens, jusqu'à ce qu'il déborde ;
+- fiche 4 : la machine à deviner le mot suivant, sur une question connue ou rare ;
+- fiche 5 : tu notes 2 réponses avec 9 autres personnes, et l'IA apprend que le oui plaît ;
+- fiche 6 : l'ordre caché va du pirate à l'e-mail, puis à l'IA, puis revient au pirate. Le fil de texte se voit avec tes yeux, ou avec ceux de l'IA ;
+- fiche 8 : un formulaire en 5 étapes (tâche, consignes, outils, limites, test) remplit le plan de ton agent. Les tests disent quelle étape corriger ;
+- fiche 9 : une grosse journée de messages vide le quota du forfait, et fait monter la facture de l'API jusqu'au plafond.
 Si le système demande moins d'animations (réglage « Réduire les animations »), tout s'affiche tout de suite, sans mouvement.
 
 ### Zones floutées

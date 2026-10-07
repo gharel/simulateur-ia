@@ -302,7 +302,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
-/* Animations : elles montrent ce qui change (même bloc dans chaque fiche). Elles déplacent (transform) sans jamais cacher un texte.
+/* Animations : elles montrent ce qui change quand tu agis : une réponse, un score, une étape d'un schéma (même bloc dans chaque fiche).
+   Elles déplacent (transform) sans jamais cacher un texte. Les cartes, elles, ne bougent pas.
    Si le système demande moins d'animations, la règle prefers-reduced-motion plus haut les arrête toutes. */
 @keyframes pop { 40% { transform: scale(1.06); } }
 @keyframes bump { 40% { transform: scale(1.18); } }
@@ -311,8 +312,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 @keyframes grow { from { transform: scale(0); } 70% { transform: scale(1.25); } }
 @keyframes glow { from { box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 55%, transparent); } }
 @keyframes win { from { transform: scale(.4) rotate(-40deg); } 65% { transform: scale(1.2) rotate(-4deg); } }
-.hero .hero-grid > * { animation: rise .6s cubic-bezier(.2, .8, .2, 1) backwards; }
-.hero .hero-grid > :last-child { animation-delay: .12s; }
 .qbtns button.right { animation: pop .4s ease; }
 .qbtns button.wrong { animation: shake .4s ease; }
 .unlocking { animation: glow 1.2s ease-out; }
@@ -321,15 +320,36 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .stars .svg-inline--fa:nth-child(2) { animation-delay: .12s; }
 .stars .svg-inline--fa:nth-child(3) { animation-delay: .24s; }
 .bump { animation: bump .4s ease; }
-/* Une carte monte un peu en arrivant à l'écran. Des étapes arrivent l'une après l'autre : une cause, puis sa conséquence. */
-@supports (animation-timeline: view()) {
-  .bento > .card:not(.hero) { animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% entry 70%; }
-  .steps > * { --rise: 36px; animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% cover 30%; }
-  .steps > :nth-child(2) { animation-range: entry 10% cover 35%; }
-  .steps > :nth-child(3) { animation-range: entry 20% cover 40%; }
-  .steps > :nth-child(4) { animation-range: entry 30% cover 45%; }
-  .steps > :nth-child(5) { animation-range: entry 40% cover 50%; }
+
+/* Pas à pas : un schéma ou une procédure, étape par étape (même bloc dans chaque fiche). Voir procedure() dans le script.
+   Le rail se remplit jusqu'à l'étape vue. Le schéma de la fiche suit l'étape : .proc[data-at="0"], "1"… */
+.proc { display: grid; gap: 20px; }
+.proc-rail { --k: 0; position: relative; display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; }
+.proc-rail::before, .proc-rail::after {
+  content: ""; position: absolute; top: 20px; left: calc(50% / var(--n, 3)); right: calc(50% / var(--n, 3));
+  height: 4px; border-radius: 99px; background: var(--line);
 }
+.proc-rail::after { background: var(--accent); transform-origin: left center; transform: scaleX(var(--k)); transition: transform .5s cubic-bezier(.5, 0, .3, 1); }
+.proc-rail li { display: grid; }
+.proc-rail button {
+  position: relative; z-index: 1; display: grid; justify-items: center; align-content: start; gap: 8px; padding: 0 6px; min-height: 44px;
+  border: 0; background: none; color: var(--muted); font: inherit; font-weight: 700; font-size: .9rem; line-height: 1.3; text-align: center; cursor: pointer;
+}
+.proc-rail b {
+  width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 400; font-size: 1.05rem; background: var(--surface-2); color: var(--fg); border: 3px solid var(--line);
+}
+.proc-rail button:hover b { border-color: var(--accent); }
+.proc-rail .done b { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.proc-rail [aria-current] { color: var(--fg); }
+.proc-rail [aria-current] b { box-shadow: 0 0 0 5px color-mix(in oklab, var(--accent) 35%, transparent); animation: pop .4s ease; }
+/* Sur téléphone, le rail garde les numéros : le titre de l'étape est juste en dessous. */
+@media (max-width: 640px) { .proc-rail button > span { display: none; } }
+.proc-txt { display: grid; gap: 4px; align-content: start; padding: 16px 20px 16px 24px; border-radius: 14px; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); line-height: 1.5; }
+.proc-txt strong { font-size: 1.1rem; }
+.proc-nav { display: flex; flex-wrap: wrap; gap: 10px; }
+.proc-nav .btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.proc-nav .btn:disabled { cursor: default; color: var(--muted); border-style: dashed; }
 
 :root { --accent: #B14EFF; --accent-text: #C47BFF; --plan: #F3F3F8; }
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --plan: #12121A; } }
@@ -367,9 +387,21 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
 .versus { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 @media (max-width: 640px) { .versus { grid-template-columns: minmax(0, 1fr); } }
-.versus > div { background: var(--surface-2); border-radius: 16px; padding: 20px 22px 22px; display: grid; gap: 10px; align-content: start; }
-.versus h3 { color: var(--accent-text); margin-bottom: 2px; }
-.versus p { font-weight: 700; line-height: 1.5; }
+.versus > div { background: var(--surface-2); border-radius: 16px; padding: 20px 22px 22px; display: grid; gap: 16px; align-content: start; }
+.versus h3 { color: var(--accent-text); }
+/* Bloqué ou pas : les messages partent. Le quota du forfait se vide, la facture de l'API monte jusqu'au plafond, si tu en mets un. */
+.day { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px 32px; align-items: end; }
+@media (max-width: 760px) { .day { grid-template-columns: minmax(0, 1fr); } }
+.status { padding: 14px 18px 14px 22px; border-radius: 12px; background: var(--surface); font-weight: 700; line-height: 1.5; box-shadow: inset 4px 0 0 var(--line); }
+.status.ok { box-shadow: inset 4px 0 0 var(--ok); }
+.status.warn { box-shadow: inset 4px 0 0 var(--warn); }
+.status.bad { box-shadow: inset 4px 0 0 var(--bad); }
+.versus .track { background: var(--surface); }
+.fill.ok { background: var(--ok); } .fill.warn { background: var(--warn); } .fill.bad { background: var(--bad); }
+.track.bill { position: relative; overflow: visible; }
+.cap { position: absolute; top: -6px; bottom: -6px; width: 4px; margin-left: -2px; border-radius: 2px; background: var(--fg); }
+/* Le forfait se bloque, ou l'API touche son plafond : le message tremble. */
+.status.hit { animation: shake .4s ease; }
 .bets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .noms thead th { width: 36%; }
 .noms thead th:first-child { width: 28%; }
@@ -480,7 +512,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       </div>
     </section>
 
-    <section class="card s2">
+    <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-pen-nib"></i></span><h2>Les prix (modifiables)</h2></div>
       <p class="muted">Les prix changent souvent. Tu peux les corriger ici.</p>
       <div class="fields">
@@ -491,20 +523,30 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <p class="small muted">Exemple avec les prix API publics de Claude, septembre 2026 : modèle rapide = 1 $ / 5 $, standard = 2 $ / 10 $, expert = 4 $ / 20 $. Choisir un modèle remplit ces cases. Le prix du forfait est un exemple : vérifie le tarif actuel.</p>
     </section>
 
-    <section class="card s2">
+    <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-ban"></i></span><h2>Bloqué ou pas ?</h2></div>
+      <p>Une grosse journée de travail. Envoie des messages, l'un après l'autre. Avec le forfait, le quota se vide. Avec l'API, la facture monte.</p>
+      <div class="day">
+        <div class="ctl">
+          <div class="ctl-row"><label for="burst">Messages envoyés d'affilée</label><span class="ctl-val" id="vBurst"></span></div>
+          <input type="range" id="burst" min="0" max="120" step="5" value="20">
+          <div class="ctl-ends" aria-hidden="true"><span>0</span><span>120 messages</span></div>
+        </div>
+        <label class="sw" for="cap"><span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> API : je fixe un plafond de 2 $ par jour</span><input type="checkbox" id="cap"></label>
+      </div>
       <div class="versus">
         <div>
           <h3><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Forfait</h3>
-          <p>Le prix ne bouge pas.</p>
-          <p>Si tu utilises beaucoup, tu dois faire une pause. La limite revient après quelques heures.</p>
+          <div class="meter"><div class="meter-top"><span>Ton quota des 5 heures</span><span id="qTxt"></span></div><div class="track"><div class="fill" id="qFill"></div></div></div>
+          <div class="status" id="qSt" aria-live="polite"></div>
         </div>
         <div>
           <h3><i class="fa-solid fa-receipt" aria-hidden="true"></i> API</h3>
-          <p>Pas de pause obligatoire.</p>
-          <p>Mais la facture monte avec l'usage. On peut fixer un plafond de dépense.</p>
+          <div class="meter"><div class="meter-top"><span>La facture du jour</span><span id="bTxt"></span></div><div class="track bill"><div class="fill" id="bFill"></div><span class="cap" id="capMark" hidden></span></div></div>
+          <div class="status" id="bSt" aria-live="polite"></div>
         </div>
       </div>
+      <p class="small muted">Exemple : un forfait avec environ 40 messages moyens par période de 5 heures. Un gros message use plus de quota. Le vrai quota change selon l'IA et le modèle. Le prix d'un message API vient de tes réglages, plus haut.</p>
     </section>
 
     <section class="card s4">
@@ -772,6 +814,55 @@ function onSeen(el, fn) {
   io.observe(el);
 }
 
+// Pas à pas : un schéma ou une procédure, étape par étape (même bloc dans chaque fiche).
+// steps : [{ label, title, text }]. title et text peuvent être des fonctions, quand l'étape dépend d'un réglage de la page.
+// Le rail se place au début de el, puis le texte de l'étape, puis le schéma, et les boutons à la fin.
+// Si la page a déjà sa place pour le texte et les boutons (.proc-txt et .proc-nav), ils vont là.
+// show(i, from) dessine l'étape i. from : l'étape d'avant, ou null au premier affichage et après redraw() (un réglage a changé).
+function procedure(el, steps, show) {
+  const n = steps.length, val = (v) => (typeof v === "function" ? v() : v);
+  let at = 0;
+  const rail = h("ol", "proc-rail");
+  rail.style.setProperty("--n", n);
+  rail.setAttribute("aria-label", "Les étapes");
+  const nodes = steps.map((s, i) => {
+    const b = btn("");
+    b.append(h("b", "", String(i + 1)), h("span", "", s.label));
+    b.setAttribute("aria-label", `Étape ${i + 1} : ${plain(s.label)}`);
+    b.addEventListener("click", () => go(i));
+    const li = document.createElement("li");
+    li.append(b);
+    rail.append(li);
+    return b;
+  });
+  const txt = $(".proc-txt", el) || h("div", "proc-txt");
+  const nav = $(".proc-nav", el) || el.appendChild(h("div", "proc-nav"));
+  const prev = btn("{arrow-left} Étape d'avant", "btn"), next = btn("", "btn go");
+  txt.setAttribute("aria-live", "polite");
+  prev.addEventListener("click", () => go(at - 1));
+  next.addEventListener("click", () => go(at < n - 1 ? at + 1 : 0));
+  nav.append(prev, next);
+  el.prepend(rail);
+  if (!txt.isConnected) rail.after(txt);
+  function go(i, redraw) {
+    const from = redraw ? null : at;
+    at = Math.max(0, Math.min(n - 1, i));
+    el.dataset.at = at;
+    rail.style.setProperty("--k", at / Math.max(1, n - 1));
+    nodes.forEach((b, k) => {
+      b.parentNode.classList.toggle("done", k <= at);
+      if (k === at) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+    });
+    const s = steps[at];
+    txt.replaceChildren(h("span", "eyebrow", `Étape ${at + 1} sur ${n}`), h("strong", "", val(s.title || s.label)), h("span", "", val(s.text)));
+    prev.disabled = at === 0;
+    rich(next, at < n - 1 ? "Étape suivante {arrow-right}" : "{rotate-left} Revoir depuis le début");
+    show(at, from);
+  }
+  go(0, true);
+  return { go, redraw: () => go(at, true), get at() { return at; } };
+}
+
 // Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.
 function initDefi(items, options) {
   const [ic, name] = BADGES[FICHE];
@@ -924,6 +1015,44 @@ function render() {
   else rich(v, "{handshake} Les deux coûtent à peu près pareil. Le forfait évite les surprises, l'API évite les pauses.");
 
   drawChart({ perDay, days, plan, cpm, even });
+  renderDay(cpm, plan);
+}
+
+// Bloqué ou pas : des messages d'affilée. Le forfait a un quota pour 5 heures (en messages moyens : un gros message en use plus).
+// L'API ne s'arrête pas, sauf au plafond que tu fixes. Exemple : 40 messages moyens, plafond de 2 $.
+const QUOTA = 40, QUOTA_USE = { short: 0.3, mid: 1, long: 5 }, CAP = 2;
+const dayWas = { blocked: false, capped: false };
+function renderDay(cpm, plan) {
+  const n = +$("#burst").value, use = QUOTA_USE[st.size], cap = $("#cap").checked;
+  $("#vBurst").textContent = fmt(n);
+  // Forfait : le quota se vide, message après message.
+  const fit = Math.floor(QUOTA / use), left = Math.max(0, fit - n), blocked = n > fit;
+  const q = $("#qFill");
+  q.style.width = (left / fit) * 100 + "%";
+  q.className = "fill " + (blocked ? "bad" : left < fit / 4 ? "warn" : "ok");
+  $("#qTxt").textContent = blocked ? "Vide" : `${fmt(left)} message${left > 1 ? "s" : ""} restant${left > 1 ? "s" : ""}`;
+  const qs = $("#qSt");
+  qs.className = "status " + (blocked ? "bad" : "ok");
+  rich(qs, blocked ? `{hourglass-half} Pause au message ${fmt(fit + 1)}. Tu attends quelques heures que la limite revienne. Le prix ne bouge pas : ${money(plan)} par mois.`
+    : `{circle-check} Ça marche. Le prix ne bouge pas : ${money(plan)} par mois.`);
+  // API : la facture monte. Avec un plafond, elle s'arrête au plafond, et l'API aussi.
+  const stopAt = cpm > 0 ? Math.floor(CAP / cpm) : Infinity, capped = cap && n > stopAt;
+  const bill = (capped ? stopAt : n) * cpm, top = Math.max(120 * cpm, CAP * 1.25);
+  const b = $("#bFill");
+  b.style.width = Math.min(100, (bill / top) * 100) + "%";
+  b.className = "fill " + (capped ? "warn" : "");
+  $("#bTxt").textContent = money(bill);
+  $("#capMark").hidden = !cap;
+  $("#capMark").style.left = (CAP / top) * 100 + "%";
+  const bs = $("#bSt");
+  bs.className = "status " + (capped ? "warn" : "ok");
+  rich(bs, capped ? `{ban} Plafond atteint au message ${fmt(stopAt + 1)} : l'API s'arrête jusqu'à demain. C'est toi qui l'as choisi.`
+    : !n ? "{circle-check} Pas encore de message, pas de facture."
+    : `{circle-check} Pas de pause. Mais la facture monte : ${money(bill)} aujourd'hui.` + (cap ? "" : " Sans plafond, rien ne l'arrête."));
+  // Le message qui annonce un blocage tremble, au moment où il arrive.
+  if (blocked && !dayWas.blocked) replay(qs, "hit");
+  if (capped && !dayWas.capped) replay(bs, "hit");
+  Object.assign(dayWas, { blocked, capped });
 }
 
 function niceMax(v) {
@@ -984,7 +1113,7 @@ function drawChart({ perDay, days, plan, cpm, even }) {
   box.replaceChildren(svg);
 }
 
-["perDay", "days", "plan", "inP", "outP", "cache"].forEach((id) => $("#" + id).addEventListener("input", render));
+["perDay", "days", "plan", "inP", "outP", "cache", "burst", "cap"].forEach((id) => $("#" + id).addEventListener("input", render));
 // La courbe se dessine quand elle arrive à l'écran, puis après chaque pari.
 let drawEnd;
 function drawIntro() {

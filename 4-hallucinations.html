@@ -302,7 +302,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
-/* Animations : elles montrent ce qui change (même bloc dans chaque fiche). Elles déplacent (transform) sans jamais cacher un texte.
+/* Animations : elles montrent ce qui change quand tu agis : une réponse, un score, une étape d'un schéma (même bloc dans chaque fiche).
+   Elles déplacent (transform) sans jamais cacher un texte. Les cartes, elles, ne bougent pas.
    Si le système demande moins d'animations, la règle prefers-reduced-motion plus haut les arrête toutes. */
 @keyframes pop { 40% { transform: scale(1.06); } }
 @keyframes bump { 40% { transform: scale(1.18); } }
@@ -311,8 +312,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 @keyframes grow { from { transform: scale(0); } 70% { transform: scale(1.25); } }
 @keyframes glow { from { box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 55%, transparent); } }
 @keyframes win { from { transform: scale(.4) rotate(-40deg); } 65% { transform: scale(1.2) rotate(-4deg); } }
-.hero .hero-grid > * { animation: rise .6s cubic-bezier(.2, .8, .2, 1) backwards; }
-.hero .hero-grid > :last-child { animation-delay: .12s; }
 .qbtns button.right { animation: pop .4s ease; }
 .qbtns button.wrong { animation: shake .4s ease; }
 .unlocking { animation: glow 1.2s ease-out; }
@@ -321,15 +320,36 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .stars .svg-inline--fa:nth-child(2) { animation-delay: .12s; }
 .stars .svg-inline--fa:nth-child(3) { animation-delay: .24s; }
 .bump { animation: bump .4s ease; }
-/* Une carte monte un peu en arrivant à l'écran. Des étapes arrivent l'une après l'autre : une cause, puis sa conséquence. */
-@supports (animation-timeline: view()) {
-  .bento > .card:not(.hero) { animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% entry 70%; }
-  .steps > * { --rise: 36px; animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% cover 30%; }
-  .steps > :nth-child(2) { animation-range: entry 10% cover 35%; }
-  .steps > :nth-child(3) { animation-range: entry 20% cover 40%; }
-  .steps > :nth-child(4) { animation-range: entry 30% cover 45%; }
-  .steps > :nth-child(5) { animation-range: entry 40% cover 50%; }
+
+/* Pas à pas : un schéma ou une procédure, étape par étape (même bloc dans chaque fiche). Voir procedure() dans le script.
+   Le rail se remplit jusqu'à l'étape vue. Le schéma de la fiche suit l'étape : .proc[data-at="0"], "1"… */
+.proc { display: grid; gap: 20px; }
+.proc-rail { --k: 0; position: relative; display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; }
+.proc-rail::before, .proc-rail::after {
+  content: ""; position: absolute; top: 20px; left: calc(50% / var(--n, 3)); right: calc(50% / var(--n, 3));
+  height: 4px; border-radius: 99px; background: var(--line);
 }
+.proc-rail::after { background: var(--accent); transform-origin: left center; transform: scaleX(var(--k)); transition: transform .5s cubic-bezier(.5, 0, .3, 1); }
+.proc-rail li { display: grid; }
+.proc-rail button {
+  position: relative; z-index: 1; display: grid; justify-items: center; align-content: start; gap: 8px; padding: 0 6px; min-height: 44px;
+  border: 0; background: none; color: var(--muted); font: inherit; font-weight: 700; font-size: .9rem; line-height: 1.3; text-align: center; cursor: pointer;
+}
+.proc-rail b {
+  width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 400; font-size: 1.05rem; background: var(--surface-2); color: var(--fg); border: 3px solid var(--line);
+}
+.proc-rail button:hover b { border-color: var(--accent); }
+.proc-rail .done b { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.proc-rail [aria-current] { color: var(--fg); }
+.proc-rail [aria-current] b { box-shadow: 0 0 0 5px color-mix(in oklab, var(--accent) 35%, transparent); animation: pop .4s ease; }
+/* Sur téléphone, le rail garde les numéros : le titre de l'étape est juste en dessous. */
+@media (max-width: 640px) { .proc-rail button > span { display: none; } }
+.proc-txt { display: grid; gap: 4px; align-content: start; padding: 16px 20px 16px 24px; border-radius: 14px; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); line-height: 1.5; }
+.proc-txt strong { font-size: 1.1rem; }
+.proc-nav { display: flex; flex-wrap: wrap; gap: 10px; }
+.proc-nav .btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.proc-nav .btn:disabled { cursor: default; color: var(--muted); border-style: dashed; }
 
 :root { --accent: #FF6B00; }
 
@@ -374,12 +394,41 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .set-wrap { display: grid; gap: 22px; }
 .ring-wrap { display: flex; align-items: center; gap: 12px 24px; flex-wrap: wrap; }
 
-/* Pourquoi elle invente : 3 étapes */
-.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-@media (max-width: 760px) { .steps { grid-template-columns: minmax(0, 1fr); } }
-.step { background: var(--surface-2); border-radius: 16px; padding: 20px 22px 22px; display: grid; gap: 12px; align-content: start; }
-.step .n { font-family: var(--font-display); background: var(--accent); color: var(--on-accent); width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; }
-.step p { font-weight: 700; line-height: 1.5; }
+/* Pourquoi elle invente : la machine à deviner le mot suivant. À gauche la conversation, à droite les mots possibles. */
+.gm { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px 48px; align-items: start; }
+.gm-chat, .gm-viz, .gm-cmp { display: grid; gap: 16px; align-content: start; }
+/* Sur téléphone : la question, les mots possibles, puis la réponse. Le mot choisi arrive juste au-dessus des boutons. */
+@media (max-width: 900px) {
+  .gm { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .gm-chat { display: contents; }
+  .gm-viz { order: 1; }
+  .gm-ans { order: 2; }
+  .gm-cmp { order: 3; }
+  .gm-row { padding: 4px 10px; }
+}
+.gm-viz { gap: 14px; }
+.gm-viz h3 .svg-inline--fa, .gm-cmp .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
+.gm-ans { justify-self: start; max-width: 94%; }
+.gm-sent { font-weight: 700; line-height: 1.6; }
+.gm-slot { display: inline-block; min-width: 4em; padding: 0 8px; border-radius: 8px; border: 2px dashed var(--line); text-align: center; }
+.gm-slot.filled { border: 2px solid var(--accent); background: color-mix(in oklab, var(--accent) 16%, var(--surface-2)); }
+.gm-cmp[hidden] { display: none; }
+.gm-cmp > .pill { justify-self: start; }
+.gm-cmp .fill.ok { background: var(--ok); }
+.gm-cmp .fill.bad { background: var(--bad); }
+.gm-rows { display: grid; gap: 8px; }
+.gm-row {
+  display: grid; grid-template-columns: minmax(0, 6.5em) minmax(0, 1fr) 4.2em; gap: 12px; align-items: center;
+  padding: 8px 12px; border-radius: 12px; border: 2px solid transparent; font-weight: 700;
+}
+.gm-row.pick { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, var(--surface)); }
+.gm-track { height: 14px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.gm-row.pick .gm-track { background: var(--surface); }
+.gm-fill { display: block; height: 100%; border-radius: 99px; background: var(--accent); transform-origin: left center; transform: scaleX(var(--v, 0)); transition: transform .5s ease; }
+.gm-p { text-align: right; font-variant-numeric: tabular-nums; }
+/* Le mot choisi tombe dans la réponse. */
+@keyframes drop { from { transform: translateY(-16px) scale(.6); } }
+.gm-slot.drop { animation: drop .45s cubic-bezier(.3, 1.4, .6, 1); }
 
 /* Jeu : surligne ce qu'il faut vérifier */
 .hl-game { display: grid; gap: 20px; }
@@ -533,12 +582,33 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-circle-question"></i></span><h2>Pourquoi elle invente ?</h2></div>
-      <div class="steps">
-        <div class="step"><span class="n">1</span><p>L'IA devine le mot qui vient le plus souvent après.</p></div>
-        <div class="step"><span class="n">2</span><p>Si elle ne sait pas, elle devine quand même.</p></div>
-        <div class="step"><span class="n">3</span><p>La réponse a l'air sûre. <strong>Mais elle peut être fausse.</strong></p></div>
+      <p>L'IA écrit sa réponse mot après mot. À chaque mot, elle devine celui qui a le plus de chances de venir après. Choisis une question, puis suis l'IA, étape par étape.</p>
+      <div class="ctl">
+        <span>Choisis une question</span>
+        <div class="seg" id="segNext" role="group" aria-label="Choisis une question">
+          <button type="button" data-v="known" aria-pressed="true"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Une question connue</button>
+          <button type="button" data-v="rare" aria-pressed="false"><i class="fa-solid fa-store" aria-hidden="true"></i> Une question rare</button>
+        </div>
       </div>
-      <p class="small muted">Le risque est plus grand pour les sujets rares, locaux ou très récents.</p>
+      <div class="proc" id="whyProc">
+        <div class="gm">
+          <div class="gm-chat">
+            <div class="msg-me"><span class="who">Toi</span><span id="gmQ"></span></div>
+            <div class="bubble gm-ans"><span class="who">IA</span><span class="gm-sent"><span id="gmStart"></span> <span class="gm-slot" id="gmSlot"></span></span></div>
+            <div class="gm-cmp" id="gmCmp">
+              <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Le ton de la réponse</span><span>Sûr</span></div><div class="track"><div class="fill" style="width: 100%"></div></div></div>
+              <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> Ses chances d'avoir juste</span><span id="gmOdds"></span></div><div class="track"><div class="fill" id="gmOddsFill"></div></div></div>
+              <span class="pill" id="gmPill"></span>
+            </div>
+          </div>
+          <div class="gm-viz">
+            <h3><i class="fa-solid fa-dice" aria-hidden="true"></i> Les mots possibles, et leurs chances</h3>
+            <div class="gm-rows" id="gmRows"></div>
+            <p class="small muted">Chances sur 100. Les autres mots en ont encore moins.</p>
+          </div>
+        </div>
+      </div>
+      <p class="small muted">Chances inventées pour comprendre. Le risque est plus grand pour les sujets rares, locaux ou très récents.</p>
       <h3>Et pourquoi elle ne dit pas « je ne sais pas » ?</h3>
       <p>Les IA passent des tests, comme un examen. Puis on les classe, de la meilleure note à la moins bonne.
         Souvent, la note compte seulement les bonnes réponses. « Je ne sais pas » rapporte 0 point. Une réponse au hasard est parfois juste.
@@ -826,6 +896,55 @@ function onSeen(el, fn) {
   io.observe(el);
 }
 
+// Pas à pas : un schéma ou une procédure, étape par étape (même bloc dans chaque fiche).
+// steps : [{ label, title, text }]. title et text peuvent être des fonctions, quand l'étape dépend d'un réglage de la page.
+// Le rail se place au début de el, puis le texte de l'étape, puis le schéma, et les boutons à la fin.
+// Si la page a déjà sa place pour le texte et les boutons (.proc-txt et .proc-nav), ils vont là.
+// show(i, from) dessine l'étape i. from : l'étape d'avant, ou null au premier affichage et après redraw() (un réglage a changé).
+function procedure(el, steps, show) {
+  const n = steps.length, val = (v) => (typeof v === "function" ? v() : v);
+  let at = 0;
+  const rail = h("ol", "proc-rail");
+  rail.style.setProperty("--n", n);
+  rail.setAttribute("aria-label", "Les étapes");
+  const nodes = steps.map((s, i) => {
+    const b = btn("");
+    b.append(h("b", "", String(i + 1)), h("span", "", s.label));
+    b.setAttribute("aria-label", `Étape ${i + 1} : ${plain(s.label)}`);
+    b.addEventListener("click", () => go(i));
+    const li = document.createElement("li");
+    li.append(b);
+    rail.append(li);
+    return b;
+  });
+  const txt = $(".proc-txt", el) || h("div", "proc-txt");
+  const nav = $(".proc-nav", el) || el.appendChild(h("div", "proc-nav"));
+  const prev = btn("{arrow-left} Étape d'avant", "btn"), next = btn("", "btn go");
+  txt.setAttribute("aria-live", "polite");
+  prev.addEventListener("click", () => go(at - 1));
+  next.addEventListener("click", () => go(at < n - 1 ? at + 1 : 0));
+  nav.append(prev, next);
+  el.prepend(rail);
+  if (!txt.isConnected) rail.after(txt);
+  function go(i, redraw) {
+    const from = redraw ? null : at;
+    at = Math.max(0, Math.min(n - 1, i));
+    el.dataset.at = at;
+    rail.style.setProperty("--k", at / Math.max(1, n - 1));
+    nodes.forEach((b, k) => {
+      b.parentNode.classList.toggle("done", k <= at);
+      if (k === at) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+    });
+    const s = steps[at];
+    txt.replaceChildren(h("span", "eyebrow", `Étape ${at + 1} sur ${n}`), h("strong", "", val(s.title || s.label)), h("span", "", val(s.text)));
+    prev.disabled = at === 0;
+    rich(next, at < n - 1 ? "Étape suivante {arrow-right}" : "{rotate-left} Revoir depuis le début");
+    show(at, from);
+  }
+  go(0, true);
+  return { go, redraw: () => go(at, true), get at() { return at; } };
+}
+
 // Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.
 function initDefi(items, options) {
   const [ic, name] = BADGES[FICHE];
@@ -1064,6 +1183,62 @@ guess($("#riskGuess"), {
   why: () => `${riskOf(readState())} % ! Sur un sujet rare ou local, l'IA a peu d'infos. Elle complète quand même. Active un document ou la recherche web pour voir le risque baisser.`,
   lock: [$("#riskSet"), $("#ringWrap"), $("#answer"), $("#levers")],
 });
+
+// Pourquoi elle invente : l'IA écrit le mot qui a le plus de chances de venir après. Même quand aucun mot n'a beaucoup de chances.
+// [mot, chances sur 100]. Chiffres inventés pour comprendre.
+const NEXT = {
+  known: { q: "Quelle est la plus grande ville de Nouvelle-Calédonie ?", start: "La plus grande ville de Nouvelle-Calédonie est",
+    words: [["Nouméa", 92], ["Dumbéa", 4], ["Païta", 2], ["Koné", 1]] },
+  rare: { q: "En quelle année a ouvert la boulangerie de ma rue, à Nouméa ?", start: "La boulangerie de ta rue a ouvert en",
+    words: [["1998", 9], ["2005", 8], ["1987", 7], ["2012", 6]] },
+};
+let nextQ = "known";
+const isKnown = () => nextQ === "known";
+const gmRows = NEXT.known.words.map(() => {
+  const r = h("div", "gm-row"), w = h("span", "gm-w"), track = h("span", "gm-track"), fill = h("span", "gm-fill"), p = h("span", "gm-p");
+  track.append(fill);
+  r.append(w, track, p);
+  $("#gmRows").append(r);
+  return { r, w, fill, p };
+});
+const WHY_STEPS = [
+  { label: "Elle devine", title: "L'IA devine le mot qui vient le plus souvent après",
+    text: () => (isKnown() ? "Elle a lu beaucoup de textes sur Nouméa. Après « la plus grande ville de Nouvelle-Calédonie est », un mot revient presque toujours."
+      : "Sur ta boulangerie, elle n'a presque rien lu. Plusieurs années sont possibles, et aucune ne revient souvent.") },
+  { label: "Elle choisit", title: () => (isKnown() ? "Elle choisit le mot le plus probable" : "Si elle ne sait pas, elle devine quand même"),
+    text: () => (isKnown() ? "Nouméa a 92 chances sur 100. Elle l'écrit. Ici, elle sait."
+      : "1998 n'a que 9 chances sur 100. Elle l'écrit quand même : c'est le premier de la liste.") },
+  { label: "Ça a l'air sûr", title: "La réponse a l'air sûre",
+    text: () => (isKnown() ? "La réponse est juste. Elle a l'air sûre, et elle l'est."
+      : "La réponse a l'air aussi sûre que l'autre. Mais elle peut être fausse : 1998 n'avait que 9 chances sur 100.") },
+];
+const whyProc = procedure($("#whyProc"), WHY_STEPS, (i, from) => {
+  const N = NEXT[nextQ], [top, odds] = N.words[0];
+  $("#gmQ").textContent = "« " + N.q + " »";
+  $("#gmStart").textContent = N.start;
+  const slot = $("#gmSlot");
+  slot.textContent = i ? top + "." : "…";
+  slot.classList.toggle("filled", i > 0);
+  // Le mot choisi tombe dans la réponse quand on arrive à l'étape 2, ou quand la question change.
+  if (i === 1 || (i && from === null)) replay(slot, "drop");
+  // Les barres poussent quand la question change, et quand on revient à la 1re étape.
+  const grow = from === null || (i === 0 && from !== 0);
+  gmRows.forEach(({ r, w, fill, p }, k) => {
+    const [word, v] = N.words[k];
+    w.textContent = word;
+    p.textContent = v + " %";
+    r.classList.toggle("pick", i > 0 && k === 0);
+    if (grow && !STILL()) { fill.style.transition = "none"; fill.style.setProperty("--v", 0); void fill.offsetWidth; fill.style.transition = ""; }
+    fill.style.setProperty("--v", v / 100);
+  });
+  $("#gmCmp").hidden = i < 2;
+  $("#gmOdds").textContent = odds + " %";
+  $("#gmOddsFill").className = "fill " + (isKnown() ? "ok" : "bad");
+  $("#gmOddsFill").style.width = odds + "%";
+  $("#gmPill").className = "pill " + (isKnown() ? "ok" : "bad");
+  rich($("#gmPill"), isKnown() ? "{circle-check} Juste" : "{triangle-exclamation} Peut-être faux : à vérifier");
+});
+initSeg($("#segNext"), (v) => { nextQ = v; whyProc.redraw(); });
 
 // Pourquoi elle devine : le classement compte les bonnes réponses, pas les erreurs.
 // Chiffres publiés par OpenAI (septembre 2025), test SimpleQA, en % des questions.

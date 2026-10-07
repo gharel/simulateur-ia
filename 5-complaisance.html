@@ -302,7 +302,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
-/* Animations : elles montrent ce qui change (même bloc dans chaque fiche). Elles déplacent (transform) sans jamais cacher un texte.
+/* Animations : elles montrent ce qui change quand tu agis : une réponse, un score, une étape d'un schéma (même bloc dans chaque fiche).
+   Elles déplacent (transform) sans jamais cacher un texte. Les cartes, elles, ne bougent pas.
    Si le système demande moins d'animations, la règle prefers-reduced-motion plus haut les arrête toutes. */
 @keyframes pop { 40% { transform: scale(1.06); } }
 @keyframes bump { 40% { transform: scale(1.18); } }
@@ -311,8 +312,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 @keyframes grow { from { transform: scale(0); } 70% { transform: scale(1.25); } }
 @keyframes glow { from { box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 55%, transparent); } }
 @keyframes win { from { transform: scale(.4) rotate(-40deg); } 65% { transform: scale(1.2) rotate(-4deg); } }
-.hero .hero-grid > * { animation: rise .6s cubic-bezier(.2, .8, .2, 1) backwards; }
-.hero .hero-grid > :last-child { animation-delay: .12s; }
 .qbtns button.right { animation: pop .4s ease; }
 .qbtns button.wrong { animation: shake .4s ease; }
 .unlocking { animation: glow 1.2s ease-out; }
@@ -321,15 +320,36 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .stars .svg-inline--fa:nth-child(2) { animation-delay: .12s; }
 .stars .svg-inline--fa:nth-child(3) { animation-delay: .24s; }
 .bump { animation: bump .4s ease; }
-/* Une carte monte un peu en arrivant à l'écran. Des étapes arrivent l'une après l'autre : une cause, puis sa conséquence. */
-@supports (animation-timeline: view()) {
-  .bento > .card:not(.hero) { animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% entry 70%; }
-  .steps > * { --rise: 36px; animation: rise linear backwards; animation-timeline: view(); animation-range: entry 0% cover 30%; }
-  .steps > :nth-child(2) { animation-range: entry 10% cover 35%; }
-  .steps > :nth-child(3) { animation-range: entry 20% cover 40%; }
-  .steps > :nth-child(4) { animation-range: entry 30% cover 45%; }
-  .steps > :nth-child(5) { animation-range: entry 40% cover 50%; }
+
+/* Pas à pas : un schéma ou une procédure, étape par étape (même bloc dans chaque fiche). Voir procedure() dans le script.
+   Le rail se remplit jusqu'à l'étape vue. Le schéma de la fiche suit l'étape : .proc[data-at="0"], "1"… */
+.proc { display: grid; gap: 20px; }
+.proc-rail { --k: 0; position: relative; display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; }
+.proc-rail::before, .proc-rail::after {
+  content: ""; position: absolute; top: 20px; left: calc(50% / var(--n, 3)); right: calc(50% / var(--n, 3));
+  height: 4px; border-radius: 99px; background: var(--line);
 }
+.proc-rail::after { background: var(--accent); transform-origin: left center; transform: scaleX(var(--k)); transition: transform .5s cubic-bezier(.5, 0, .3, 1); }
+.proc-rail li { display: grid; }
+.proc-rail button {
+  position: relative; z-index: 1; display: grid; justify-items: center; align-content: start; gap: 8px; padding: 0 6px; min-height: 44px;
+  border: 0; background: none; color: var(--muted); font: inherit; font-weight: 700; font-size: .9rem; line-height: 1.3; text-align: center; cursor: pointer;
+}
+.proc-rail b {
+  width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 400; font-size: 1.05rem; background: var(--surface-2); color: var(--fg); border: 3px solid var(--line);
+}
+.proc-rail button:hover b { border-color: var(--accent); }
+.proc-rail .done b { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.proc-rail [aria-current] { color: var(--fg); }
+.proc-rail [aria-current] b { box-shadow: 0 0 0 5px color-mix(in oklab, var(--accent) 35%, transparent); animation: pop .4s ease; }
+/* Sur téléphone, le rail garde les numéros : le titre de l'étape est juste en dessous. */
+@media (max-width: 640px) { .proc-rail button > span { display: none; } }
+.proc-txt { display: grid; gap: 4px; align-content: start; padding: 16px 20px 16px 24px; border-radius: 14px; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); line-height: 1.5; }
+.proc-txt strong { font-size: 1.1rem; }
+.proc-nav { display: flex; flex-wrap: wrap; gap: 10px; }
+.proc-nav .btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.proc-nav .btn:disabled { cursor: default; color: var(--muted); border-style: dashed; }
 
 :root { --accent: #FF9AD5; }
 
@@ -359,12 +379,34 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .thread .bubble { max-width: 94%; }
 .bubble.faded { background: transparent; border: 2px dashed var(--line); }
 
-/* Pourquoi elle fait ça : 3 étapes */
-.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-@media (max-width: 760px) { .steps { grid-template-columns: minmax(0, 1fr); } }
-.step { background: var(--surface-2); border-radius: 16px; padding: 20px 22px 22px; display: grid; gap: 12px; align-content: start; }
-.step .n { font-family: var(--font-display); background: var(--accent); color: var(--on-accent); width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; }
-.step p { font-weight: 700; line-height: 1.5; }
+/* Pourquoi elle fait ça : l'entraînement. 2 réponses, 10 personnes votent, l'IA retient ce qui plaît. */
+.tr { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px 48px; align-items: start; }
+@media (max-width: 900px) { .tr { grid-template-columns: minmax(0, 1fr); } }
+.tr-col { display: grid; gap: 16px; align-content: start; }
+.tr-col h3 .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
+.tr-col > .msg-me { justify-self: start; }
+.tr-ans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .tr-ans { grid-template-columns: minmax(0, 1fr); } }
+.tr-a {
+  display: grid; gap: 8px; align-content: start; text-align: left; font: inherit; color: var(--fg); cursor: pointer; min-height: 48px;
+  padding: 14px 16px; border-radius: 16px; background: var(--surface-2); border: 2px solid var(--line); line-height: 1.45;
+}
+.tr-a:hover { border-color: var(--accent); }
+.tr-a[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 45%, transparent); }
+.tr-a.win { border-color: var(--accent); }
+.tr-t { font-weight: 700; }
+.tr-votes { display: flex; flex-wrap: wrap; gap: 4px; }
+.tr-votes:empty { display: none; }
+/* Chaque vote arrive l'un après l'autre. Ton vote est en couleur. */
+.tr-votes .v {
+  display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-size: .8rem;
+  background: var(--surface); color: var(--muted); animation: grow .35s ease backwards; animation-delay: calc(var(--i, 0) * 60ms);
+}
+.tr-votes .v.me { background: var(--accent); color: var(--on-accent); }
+.tr-n { font-weight: 700; }
+.tr-n:empty { display: none; }
+.tr-later { display: grid; gap: 12px; }
+.tr-later .bubble { animation: lean .6s cubic-bezier(.3, 1.4, .5, 1) backwards; --lean: 1; transform: translateX(5%); }
 
 /* Jeu : pose ta question sans donner ton avis. L'étape colle à la question, « Tu la reformules » colle aux choix. */
 .btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
@@ -414,12 +456,27 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-circle-question"></i></span><h2>Pourquoi elle fait ça ?</h2></div>
-      <div class="steps">
-        <div class="step"><span class="n">1</span><p>Pendant son entraînement, des humains notaient ses réponses.</p></div>
-        <div class="step"><span class="n">2</span><p>Ils préféraient souvent les réponses qui leur donnaient raison.</p></div>
-        <div class="step"><span class="n">3</span><p>L'IA a appris à plaire. <strong>Même quand tu te trompes.</strong></p></div>
+      <p>Pendant son entraînement, l'IA apprend avec nos notes. Mets-toi à la place des humains qui notent, puis regarde ce que l'IA retient.</p>
+      <div class="proc" id="trainProc">
+        <div class="tr">
+          <div class="tr-col">
+            <div class="msg-me"><span class="who">La question</span>« J'ai écrit ce mail à un client fâché. Il est parfait, non ? »</div>
+            <div class="tr-ans" id="trAns" role="group" aria-label="Quelle réponse préfères-tu ?">
+              <button type="button" class="tr-a" data-v="yes" aria-pressed="false"><span class="who">Réponse A</span><span class="tr-t">« Oui, il est parfait ! Tu peux l'envoyer. »</span><span class="tr-votes" aria-hidden="true"></span><span class="tr-n"></span></button>
+              <button type="button" class="tr-a" data-v="frank" aria-pressed="false"><span class="who">Réponse B</span><span class="tr-t">« Il est clair. Mais il ne s'excuse pas : ajoute une phrase pour ça. »</span><span class="tr-votes" aria-hidden="true"></span><span class="tr-n"></span></button>
+            </div>
+          </div>
+          <div class="tr-col">
+            <h3><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Ce que l'IA retient</h3>
+            <div class="meter">
+              <div class="meter-top"><span>Elle penche vers : te donner raison</span><span id="trVal"></span></div>
+              <div class="track"><div class="fill" id="trFill"></div></div>
+            </div>
+            <div class="tr-later" id="trLater" data-empty="Va jusqu'à l'étape 3 pour voir ce qu'elle fait plus tard."></div>
+          </div>
+        </div>
       </div>
-      <p class="small muted">Les modèles récents résistent mieux, mais la tendance existe toujours.</p>
+      <p class="small muted">Exemple fabriqué pour comprendre. Les modèles récents résistent mieux, mais la tendance existe toujours.</p>
     </section>
 
     <section class="card s4">
@@ -721,6 +778,55 @@ function onSeen(el, fn) {
   io.observe(el);
 }
 
+// Pas à pas : un schéma ou une procédure, étape par étape (même bloc dans chaque fiche).
+// steps : [{ label, title, text }]. title et text peuvent être des fonctions, quand l'étape dépend d'un réglage de la page.
+// Le rail se place au début de el, puis le texte de l'étape, puis le schéma, et les boutons à la fin.
+// Si la page a déjà sa place pour le texte et les boutons (.proc-txt et .proc-nav), ils vont là.
+// show(i, from) dessine l'étape i. from : l'étape d'avant, ou null au premier affichage et après redraw() (un réglage a changé).
+function procedure(el, steps, show) {
+  const n = steps.length, val = (v) => (typeof v === "function" ? v() : v);
+  let at = 0;
+  const rail = h("ol", "proc-rail");
+  rail.style.setProperty("--n", n);
+  rail.setAttribute("aria-label", "Les étapes");
+  const nodes = steps.map((s, i) => {
+    const b = btn("");
+    b.append(h("b", "", String(i + 1)), h("span", "", s.label));
+    b.setAttribute("aria-label", `Étape ${i + 1} : ${plain(s.label)}`);
+    b.addEventListener("click", () => go(i));
+    const li = document.createElement("li");
+    li.append(b);
+    rail.append(li);
+    return b;
+  });
+  const txt = $(".proc-txt", el) || h("div", "proc-txt");
+  const nav = $(".proc-nav", el) || el.appendChild(h("div", "proc-nav"));
+  const prev = btn("{arrow-left} Étape d'avant", "btn"), next = btn("", "btn go");
+  txt.setAttribute("aria-live", "polite");
+  prev.addEventListener("click", () => go(at - 1));
+  next.addEventListener("click", () => go(at < n - 1 ? at + 1 : 0));
+  nav.append(prev, next);
+  el.prepend(rail);
+  if (!txt.isConnected) rail.after(txt);
+  function go(i, redraw) {
+    const from = redraw ? null : at;
+    at = Math.max(0, Math.min(n - 1, i));
+    el.dataset.at = at;
+    rail.style.setProperty("--k", at / Math.max(1, n - 1));
+    nodes.forEach((b, k) => {
+      b.parentNode.classList.toggle("done", k <= at);
+      if (k === at) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+    });
+    const s = steps[at];
+    txt.replaceChildren(h("span", "eyebrow", `Étape ${at + 1} sur ${n}`), h("strong", "", val(s.title || s.label)), h("span", "", val(s.text)));
+    prev.disabled = at === 0;
+    rich(next, at < n - 1 ? "Étape suivante {arrow-right}" : "{rotate-left} Revoir depuis le début");
+    show(at, from);
+  }
+  go(0, true);
+  return { go, redraw: () => go(at, true), get at() { return at; } };
+}
+
 // Défi final : seule la 1re réponse compte pour les étoiles. Tout juste = 3, une erreur = 2, sinon 1.
 function initDefi(items, options) {
   const [ic, name] = BADGES[FICHE];
@@ -841,6 +947,46 @@ function renderCheck() {
   rich($("#chkTxt"), n + " sur " + total + (n === total ? " {trophy}" : ""));
   $("#chkFill").style.width = (n / total) * 100 + "%";
 }
+
+// Pourquoi elle fait ça : pendant l'entraînement, des humains choisissent la meilleure de 2 réponses. L'IA retient ce qui plaît.
+// Sur 10 personnes, 7 préfèrent la réponse qui leur donne raison. Ton vote compte dans les 10. Chiffres inventés pour comprendre.
+const TRAIN = { yes: 7, frank: 3 };
+let trPick = null;
+const TRAIN_STEPS = [
+  { label: "Des humains notent", title: "Pendant son entraînement, des humains notaient ses réponses",
+    text: "L'IA écrit 2 réponses. Une personne choisit la meilleure. Et toi, laquelle préfères-tu ? Touche une réponse." },
+  { label: "Le oui gagne", title: "Ils préféraient souvent les réponses qui leur donnaient raison",
+    text: () => (trPick === "yes" ? "Toi aussi, tu as choisi A. Sur 10 personnes, 7 préfèrent la réponse qui fait plaisir."
+      : trPick === "frank" ? "Toi, tu as choisi B, la réponse franche. Bien vu ! Mais sur 10 personnes, 7 préfèrent A, la réponse qui fait plaisir."
+      : "Sur 10 personnes, 7 préfèrent A : la réponse qui fait plaisir. Touche une réponse pour voter aussi.") },
+  { label: "Elle apprend à plaire", title: "L'IA a appris à plaire",
+    text: "Elle retient : « Donner raison, ça plaît. » Plus tard, elle le refait. Même quand tu te trompes." },
+];
+const trainProc = procedure($("#trainProc"), TRAIN_STEPS, (i, from) => {
+  for (const b of $$("#trAns .tr-a")) {
+    const k = b.dataset.v, box = $(".tr-votes", b), me = trPick === k;
+    b.setAttribute("aria-pressed", String(me));
+    b.classList.toggle("win", i > 0 && k === "yes");
+    if (!i) { box.replaceChildren(); $(".tr-n", b).textContent = ""; continue; }
+    // Les votes arrivent quand on passe à l'étape 2, ou quand tu votes.
+    if (from === null || from === 0 || !box.childElementCount) {
+      box.replaceChildren(...Array.from({ length: TRAIN[k] }, (_, j) => {
+        const v = h("span", "v" + (me && !j ? " me" : ""), me && !j ? "{user-check}" : "{user}");
+        v.style.setProperty("--i", j);
+        return v;
+      }));
+    }
+    $(".tr-n", b).textContent = `${TRAIN[k]} votes sur 10` + (me ? ", avec le tien" : "");
+  }
+  $("#trFill").style.width = i === 2 ? "70%" : "0%";
+  $("#trVal").textContent = i === 2 ? "7 fois sur 10" : "Pas encore";
+  $("#trLater").replaceChildren(...(i === 2 ? [
+    msg("Plus tard, une personne écrit", "« Pas besoin d'autorisation pour 10 jours en Australie, non ? »", "msg-me"),
+    msg("IA", [["Tu as raison, un passeport valide suffit.", "bad"]], "bubble"),
+    h("p", "small muted", "C'est faux : il faut une autorisation. Elle a suivi l'avis de la personne (voir juste en dessous)."),
+  ] : []));
+});
+$$("#trAns .tr-a").forEach((b) => b.addEventListener("click", () => { trPick = b.dataset.v; trainProc.redraw(); }));
 
 // Complaisance : la réponse suit l'avis glissé dans la question
 const YES = {
