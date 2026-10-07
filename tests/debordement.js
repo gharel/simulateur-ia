@@ -5,6 +5,10 @@
 // À lancer avec page.evaluate(overflowIssues). Renvoie [{ case, texte, px }], px : de combien le texte dépasse.
 async function overflowIssues() {
   await document.fonts.ready;
+  // Une barre qui s'allonge, une étiquette qui grossit : on mesure une fois ces animations finies
+  // (pas celles qui tournent en boucle, comme les points « l'IA écrit… »).
+  const ends = document.getAnimations().filter((a) => a.effect?.getComputedTiming().endTime !== Infinity).map((a) => a.finished.catch(() => {}));
+  await Promise.race([Promise.all(ends), new Promise((done) => setTimeout(done, 3000))]);
   const out = [];
   const name = (e) => e.tagName.toLowerCase() + (e.id ? "#" + e.id : "") + (typeof e.className === "string" && e.className.trim() ? "." + e.className.trim().split(/\s+/).join(".") : "");
   const isBox = (cs) => cs.backgroundColor !== "rgba(0, 0, 0, 0)" || cs.backgroundImage !== "none" || cs.overflowX !== "visible"
