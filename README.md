@@ -17,7 +17,7 @@
 **Partie 3 · Agir avec l'IA**
 
 7. **La Boîte à Outils de l'IA** : le bon prompt (contexte, action précise, objectif), répondre ou agir (l'exemple de Claude, qui réunit Chat et Cowork), l'agent de code, Projets, Skills, Connecteurs, les risques de chaque outil, et les noms de ces outils chez Claude et ChatGPT
-8. **L'Agent sur Mesure** : ce qu'est un agent (la boucle regarde, décide, agit, vérifie), créer le sien en 5 étapes, le fichier de consignes (AGENTS.md, le fichier d'une marque avec `@AGENTS.md`, SKILL.md), et où ranger ses consignes chez Claude et ChatGPT
+8. **L'Agent sur Mesure** : ce qu'est un agent (la boucle regarde, décide, agit, vérifie), créer le sien en 5 étapes, ses fichiers (AGENTS.md pour les consignes, SKILL.md pour une méthode, et où ranger la méthode pour qu'elle ne prenne pas de place à chaque tâche), et où ranger ses consignes chez Claude et ChatGPT
 9. **Forfait ou Compteur ?** : abonnement ou paiement à l'usage, et les noms des forfaits chez Claude et ChatGPT
 
 ## Jouer

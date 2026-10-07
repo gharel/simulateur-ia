@@ -373,7 +373,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .status.ok { box-shadow: inset 4px 0 0 var(--ok); }
 .status.bad { box-shadow: inset 4px 0 0 var(--bad); }
 .status > div { margin-top: 10px; }
-.sw[hidden] { display: none; }
 
 /* La boucle de l'agent : 4 postes en cercle, un point qui passe de l'un à l'autre */
 .loop { position: relative; width: min(100%, 320px); aspect-ratio: 1; justify-self: center; }
@@ -431,8 +430,11 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .fill.ok { background: var(--ok); } .fill.warn { background: var(--warn); }
 
 /* Le plan de l'agent : un fil part du robot, chaque partie s'y branche quand elle est prête. */
-.plan { display: grid; gap: 14px; padding: 20px; border-radius: 18px; background: var(--surface-2); }
-.pl-bot { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; }
+.plan { position: relative; display: grid; gap: 14px; padding: 20px; border-radius: 18px; background: var(--surface-2); }
+/* Le robot à gauche, son nom et son état à droite : le fil descend sous le robot, sans rien croiser. */
+.pl-bot { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 6px 14px; }
+.pl-bot .ic { grid-row: span 2; }
+.pl-bot .pill { justify-self: start; }
 .pl-bot strong { font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; line-height: 1.2; }
 .pl-bot .ic {
   flex: none; width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; font-size: 1.7rem;
@@ -440,7 +442,9 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 }
 .plan.ready .pl-bot .ic { background: var(--accent); color: var(--on-accent); border-color: var(--accent); animation: pop .5s ease; }
 .pl-slots { position: relative; margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
-.pl-slots::before { content: ""; position: absolute; left: 26px; top: -14px; bottom: 30px; width: 4px; border-radius: 99px; background: var(--line); }
+/* Le fil part du robot et descend jusqu'à la dernière partie. Sa couleur avance jusqu'à l'étape en cours (le script place le fil). */
+.pl-bus { position: absolute; left: 46px; width: 4px; border-radius: 99px; background: var(--line); }
+.pl-bus > span { display: block; height: 100%; border-radius: 99px; background: var(--accent); transform-origin: top center; transform: scaleY(var(--k, 0)); transition: transform .5s cubic-bezier(.5, 0, .3, 1); }
 .pl-slot {
   position: relative; margin-left: 56px; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 2px 12px; align-items: center;
   padding: 10px 14px; border-radius: 12px; background: var(--surface); border: 2px dashed var(--line);
@@ -459,7 +463,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 @media (max-width: 640px) {
   .plan { padding: 16px 14px; }
   .pl-bot .ic { width: 44px; height: 44px; font-size: 1.35rem; }
-  .pl-slots::before { left: 20px; }
+  .pl-bus { left: 34px; }
   .pl-slot { margin-left: 40px; grid-template-columns: 32px minmax(0, 1fr); gap: 2px 10px; padding: 8px 12px; }
   .pl-slot::before { left: -20px; width: 20px; }
   .pl-slot .ic { width: 32px; height: 32px; }
@@ -488,6 +492,17 @@ code, pre { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
 .tree .note { font-weight: 400; font-size: .9rem; color: var(--muted); }
 .tree .ord { margin-left: auto; font-size: .8rem; padding: 3px 10px; border-radius: 99px; border: 2px dashed var(--line); color: var(--muted); }
 .tree li.read .ord { border: 2px solid var(--accent); background: var(--accent); color: var(--on-accent); }
+.tree li.none { border: 2px dashed var(--line); }
+.tree li.none .f { text-decoration: line-through; }
+/* Ce qu'il lit pour cette demande : une part de la barre par fichier lu. La méthode lue pour rien est hachurée. */
+.mem-bar { display: flex; height: 28px; border-radius: 8px; overflow: hidden; background: var(--surface-2); }
+.mem-bar > span { flex: none; height: 100%; box-shadow: inset -2px 0 0 var(--surface); transition: width .45s ease; }
+.mem-bar .rules, .legend .k-rules { background: var(--accent); }
+.mem-bar .method, .legend .k-method { background: color-mix(in oklab, var(--accent) 45%, var(--surface)); }
+.mem-bar .useless, .legend .k-useless { background: repeating-linear-gradient(-45deg, var(--warn) 0 6px, color-mix(in oklab, var(--warn) 35%, var(--surface)) 6px 12px); }
+.mem-bar .docs, .legend .k-docs { background: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .9rem; color: var(--muted); }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; }
 
 /* Jeu : le banc d'essai */
 .bench { display: grid; gap: 22px; }
@@ -511,7 +526,7 @@ code, pre { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
 @keyframes lp-bump { 40% { transform: translate(-50%, -50%) scale(1.15); } }
 @keyframes wire { from { transform: scaleX(0); } }
 .pl-slot.changed { animation: pop .4s ease; }
-.pl-slot.changed::before { animation: wire .4s ease; }
+.pl-slot.wired::before { animation: wire .4s ease; }
 .lp.on { animation: lp-bump .45s ease; }
 .log li { animation: rise .4s ease backwards; }
 .tree li.read .ord { animation: bump .4s ease; }
@@ -588,6 +603,7 @@ code, pre { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
           <div class="plan" id="bdPlan">
             <div class="pl-bot"><span class="ic" aria-hidden="true"><i class="fa-solid fa-robot"></i></span><strong>Ton agent des devis</strong><span class="pill" id="plState"></span></div>
             <ol class="pl-slots" id="plSlots" aria-label="Le plan de ton agent"></ol>
+            <span class="pl-bus" id="plBus" aria-hidden="true"><span></span></span>
           </div>
           <div class="proc-nav"></div>
         </div>
@@ -605,54 +621,57 @@ code, pre { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
         <div class="file rec">
           <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-file-lines"></i></span><span class="tag">À écrire d'abord</span></span>
           <code class="nm">AGENTS.md</code>
-          <span class="meta">= le format commun</span>
-          <span>Écris tes consignes ici. La plupart des agents savent lire ce fichier. Un seul fichier, quel que soit ton agent.</span>
-        </div>
-        <div class="file">
-          <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-tag"></i></span></span>
-          <code class="nm">MARQUE.md</code>
-          <span class="meta">= le fichier d'une marque</span>
-          <span>Certains agents ont leur propre fichier, au nom de leur marque. S'il existe, ils le lisent à la place d'AGENTS.md. Écris dedans une seule ligne : <code>@AGENTS.md</code>. L'agent ira lire AGENTS.md.</span>
-          <span class="small muted">Ici, on l'appelle MARQUE.md. Son vrai nom est dans le tableau en bas de la fiche.</span>
+          <span class="meta">= tes consignes</span>
+          <span>Le format commun : la plupart des agents savent le lire. L'agent le relit au début de chaque tâche. Garde-le court : moins de 200 lignes.</span>
         </div>
         <div class="file">
           <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-scroll"></i></span></span>
           <code class="nm">SKILL.md</code>
           <span class="meta">= une méthode pour une tâche</span>
-          <span>Une méthode longue, pour une seule tâche : le format des devis, par exemple. L'agent la lit seulement quand il en a besoin.</span>
+          <span>Une méthode longue, pour une seule tâche : le format des devis, par exemple. L'agent l'ouvre seulement quand il en a besoin.</span>
+        </div>
+        <div class="file">
+          <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-folder-open"></i></span></span>
+          <strong class="nm">Tes documents</strong>
+          <span class="meta">= les infos</span>
+          <span>Les prix, les modèles, les fiches clients. Ils restent dans le dossier. AGENTS.md dit où les trouver : l'agent les ouvre quand la tâche le demande.</span>
         </div>
       </div>
       <h3>Qu'est-ce que ton agent lit ?</h3>
+      <p>Range la méthode des devis à 2 endroits, et donne 2 demandes à ton agent. Regarde ce qu'il lit, et la place que ça prend dans sa mémoire.</p>
       <div class="lab" id="readLab">
         <div class="lab-col">
           <div class="ctl">
-            <span>Ton agent</span>
-            <div class="seg" id="segReader" role="group" aria-label="Ton agent">
-              <button type="button" data-v="commun" aria-pressed="true"><i class="fa-solid fa-robot" aria-hidden="true"></i> Il lit AGENTS.md</button>
-              <button type="button" data-v="marque" aria-pressed="false"><i class="fa-solid fa-tag" aria-hidden="true"></i> Il a son propre fichier</button>
+            <span>La méthode des devis (300 lignes) est rangée</span>
+            <div class="seg" id="segWhere" role="group" aria-label="La méthode des devis est rangée">
+              <button type="button" data-v="agents" aria-pressed="true"><i class="fa-solid fa-file-lines" aria-hidden="true"></i> Dans AGENTS.md</button>
+              <button type="button" data-v="skill" aria-pressed="false"><i class="fa-solid fa-scroll" aria-hidden="true"></i> Dans une Skill</button>
             </div>
           </div>
-          <label class="sw" for="imp" id="impSw" hidden><span>MARQUE.md contient la ligne @AGENTS.md</span><input type="checkbox" id="imp" checked></label>
           <div class="ctl">
             <span>Ta demande</span>
             <div class="seg" id="segTask" role="group" aria-label="Ta demande">
-              <button type="button" data-v="devis" aria-pressed="true"><i class="fa-solid fa-file-invoice" aria-hidden="true"></i> Un devis</button>
-              <button type="button" data-v="question" aria-pressed="false"><i class="fa-solid fa-circle-question" aria-hidden="true"></i> Une question simple</button>
+              <button type="button" data-v="question" aria-pressed="true"><i class="fa-solid fa-circle-question" aria-hidden="true"></i> Une question simple</button>
+              <button type="button" data-v="devis" aria-pressed="false"><i class="fa-solid fa-file-invoice" aria-hidden="true"></i> Un devis</button>
             </div>
+          </div>
+          <div class="lab-part">
+            <div class="meter-top"><span>Ce qu'il lit pour cette demande</span><span id="memTxt"></span></div>
+            <div class="mem-bar" id="memBar" aria-hidden="true"></div>
+            <div class="legend"><span><i class="k-rules"></i>Tes consignes</span><span><i class="k-method"></i>La méthode des devis</span><span><i class="k-useless"></i>La méthode, pour rien</span><span><i class="k-docs"></i>Les prix</span></div>
           </div>
         </div>
         <div class="lab-col">
           <ul class="tree" id="tree" aria-label="Le dossier de l'agent">
             <li><i class="fa-solid fa-folder-open" aria-hidden="true"></i><span class="f">agence/</span></li>
-            <li class="sub" data-f="agents"><i class="fa-solid fa-file-lines" aria-hidden="true"></i><span class="f">AGENTS.md</span><span class="note">tes consignes</span><span class="ord"></span></li>
-            <li class="sub" data-f="marque"><i class="fa-solid fa-tag" aria-hidden="true"></i><span class="f">MARQUE.md</span><span class="note" id="brandNote"></span><span class="ord"></span></li>
-            <li class="sub" data-f="skill"><i class="fa-solid fa-scroll" aria-hidden="true"></i><span class="f">skills/devis/SKILL.md</span><span class="note">le format des devis</span><span class="ord"></span></li>
-            <li class="sub" data-f="tarifs"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i><span class="f">tarifs-2027.pdf</span><span class="note">les prix</span><span class="ord"></span></li>
+            <li class="sub" data-f="agents"><i class="fa-solid fa-file-lines" aria-hidden="true"></i><span class="f">AGENTS.md</span><span class="note" id="agentsNote"></span><span class="ord"></span></li>
+            <li class="sub" data-f="skill"><i class="fa-solid fa-scroll" aria-hidden="true"></i><span class="f">skills/devis/SKILL.md</span><span class="note" id="skillNote"></span><span class="ord"></span></li>
+            <li class="sub" data-f="tarifs"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i><span class="f">tarifs-2027.pdf</span><span class="note">les prix · 120 lignes</span><span class="ord"></span></li>
           </ul>
           <div class="status" id="readStatus" aria-live="polite"></div>
         </div>
       </div>
-      <p class="small muted">Ces fiches sont faites avec un agent de code. Leur fichier <a href="https://github.com/gharel/simulateur-ia/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a> fait moins de 100 lignes. Le fichier de la marque de leur agent n'en a qu'une : @AGENTS.md.</p>
+      <p class="small muted">Nombres de lignes inventés pour comprendre. Ces fiches sont faites avec un agent de code : leur fichier <a href="https://github.com/gharel/simulateur-ia/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a> fait moins de 100 lignes.</p>
     </section>
 
     <section class="card s4">
@@ -1089,12 +1108,12 @@ const STATIONS = { look: "{eye} Regarde", think: "{lightbulb} Décide", act: "{h
 const LOOP = [
   ["look", "Il lit la demande de Mme Gope : 2 adultes, 3 nuits à l'île des Pins, en mars."],
   ["think", "Il lui faut les prix de mars. Il décide d'ouvrir la grille des tarifs."],
-  ["act", "Il calcule le prix, et il remplit le modèle de devis."],
+  ["act", "Il ouvre la grille des tarifs, il calcule le prix, et il remplit le modèle de devis."],
   ["check", "Il relit son devis. La date d'arrivée manque : le but n'est pas atteint. Il refait un tour.", "warn"],
   ["look", "Il relit la demande : la date n'y est pas."],
   ["think", "Il ne doit pas l'inventer. Il décide de poser la question."],
   ["act", "Il écrit la question en haut du devis : « À quelle date voulez-vous partir ? »"],
-  ["check", "Tout est là. Il range le devis en brouillon, et il te prévient.", "ok"],
+  ["check", "Le devis est prêt, avec sa question. Il le range en brouillon, et il te prévient.", "ok"],
 ];
 let loopAt = 0;
 function renderLoop() {
@@ -1213,19 +1232,33 @@ const planRows = SLOTS.map(([ic, t]) => {
 function paintPlan() {
   let ready = 0;
   planRows.forEach(([li, v], i) => {
-    const [cls, text] = slotState(i), was = li.dataset.v;
+    const [cls, text] = slotState(i), first = li.dataset.text === undefined;
+    const newText = !first && li.dataset.text !== text, newState = !first && li.dataset.cls !== cls;
     li.className = "pl-slot" + (cls ? " " + cls : "") + (i === bd.at ? " cur" : "");
-    // Une partie qui change saute, et son fil se rebranche : on voit ce que ton choix a fait.
-    if (was !== undefined && was !== cls + text) replay(li, "changed");
-    li.dataset.v = cls + text;
+    // Une partie qui change saute : on voit ce que ton choix a fait. Son fil se rebranche seulement si elle change d'état.
+    if (newText) replay(li, "changed");
+    if (newState && cls) replay(li, "wired");
+    Object.assign(li.dataset, { cls, text });
     v.textContent = text;
     if (cls === "set") ready++;
   });
+  paintBus();
   $("#bdPlan").classList.toggle("ready", ready === SLOTS.length);
   const st = $("#plState");
   st.className = "pill" + (ready === SLOTS.length ? " ok" : "");
   rich(st, ready === SLOTS.length ? "{flag-checkered} Prêt à travailler" : `{screwdriver-wrench} ${ready} partie${ready > 1 ? "s" : ""} prête${ready > 1 ? "s" : ""} sur ${SLOTS.length}`);
 }
+// Le fil du plan : du robot jusqu'à la dernière partie. Sa couleur descend jusqu'à la partie de l'étape en cours.
+function paintBus() {
+  const plan = $("#bdPlan"), top0 = plan.getBoundingClientRect().top;
+  const mid = (el) => { const r = el.getBoundingClientRect(); return r.top + r.height / 2 - top0; };
+  const top = $(".pl-bot .ic", plan).getBoundingClientRect().bottom - top0, end = mid(planRows.at(-1)[0]);
+  const bus = $("#plBus");
+  bus.style.top = top + "px";
+  bus.style.height = Math.max(0, end - top) + "px";
+  bus.style.setProperty("--k", Math.max(0, mid(planRows[bd.at][0]) - top) / Math.max(1, end - top));
+}
+new ResizeObserver(paintBus).observe($("#bdPlan"));
 function setStatus(el, cls, text) { el.className = "status" + (cls ? " " + cls : ""); rich(el, text); }
 
 // Les choix de chaque étape. Un choix qui change efface les tests : il faut les relancer.
@@ -1302,8 +1335,8 @@ function paintForm() {
   const { need, extra } = bdTools();
   setStatus(toolsSt, !bd.tools.size ? "" : need.length || extra.length ? "warn" : "ok",
     !bd.tools.size ? "{hand-pointer} Coche les outils à lui donner pour faire un devis."
-      : extra.length ? `{triangle-exclamation} En trop : ${list(extra)}. Il n'en a pas besoin pour un devis. Plus il a d'accès, plus un piège coûte cher.`
-      : need.length ? `{triangle-exclamation} Il lui manque ${list(need)}.`
+      : need.length || extra.length ? "{triangle-exclamation} " + [need.length && `Il lui manque ${list(need)}.`,
+        extra.length && `En trop : ${list(extra)}. Il n'en a pas besoin pour un devis. Plus il a d'accès, plus un piège coûte cher.`].filter(Boolean).join(" ")
       : "{circle-check} Juste ce qu'il faut : 3 outils pour faire un devis.");
   const self = bdSelf();
   setStatus(limSt, self.length ? "warn" : "ok", self.length
@@ -1315,21 +1348,28 @@ function paintForm() {
 }
 
 // Les 3 tests passent l'un après l'autre. Un test raté dit quelle étape corriger, avec un bouton pour y aller.
+// Chaque test vérifie d'abord ce qu'il faut pour lire une demande : la boîte mail, puis le but.
+// Les prix : avec « Tous les dossiers », il peut trouver le fichier des tarifs, si ses consignes disent où il est.
 function bdResults() {
-  const R = bd.rules, T = bd.tools, L = bd.limits;
+  const R = bd.rules, T = bd.tools, L = bd.limits, prices = T.has("tarifs") || T.has("all");
+  const noMail = [false, "Il n'a pas la boîte mail : il ne voit pas cette demande.", 2];
+  const noGoal = [false, "Il ne sait pas quel est son travail. Il répond à la cliente, sans faire de devis.", 1];
   return [
-    !T.has("mail") ? [false, "Il n'a pas la boîte mail : il ne trouve pas la demande.", 2]
-      : !R.has("but") ? [false, "Il ne sait pas quel est son travail. Il répond à la cliente, sans faire de devis.", 1]
-      : !T.has("tarifs") ? [false, "Il n'a pas le fichier des tarifs. Il invente un prix (voir « Le Détecteur de Bobards »).", 2]
-      : !R.has("infos") ? [false, "Il ne sait pas où sont les prix. Il en invente un.", 1]
+    !T.has("mail") ? noMail : !R.has("but") ? noGoal
+      : !prices ? [false, "Il n'a pas le fichier des tarifs. Il invente un prix (voir « Le Détecteur de Bobards »).", 2]
+      : !R.has("infos") ? [false, T.has("tarifs") ? "Il ne sait pas où sont les prix. Il en invente un." : "Il fouille tous tes dossiers, mais il ne sait pas quel fichier a les bons prix. Il en invente un.", 1]
       : !R.has("result") ? [false, "Le prix est juste. Mais il répond dans la conversation : tu dois recopier le devis à la main.", 1]
       : !T.has("skill") ? [false, "Le prix est juste. Mais il ne connaît pas votre méthode : le devis n'a pas votre modèle.", 2]
       : [true, "Il lit la demande, ouvre les tarifs et remplit votre modèle : 112 000 F. Le devis t'attend en brouillon."],
-    !R.has("ask") ? [false, "Il choisit une date au hasard, sans rien dire. La cliente voulait partir le 20.", 1]
+    !T.has("mail") ? noMail : !R.has("but") ? noGoal
+      : !R.has("ask") ? [false, "Il choisit une date au hasard, sans rien dire. La cliente voulait partir le 20.", 1]
       : [true, "Il écrit sa question en haut du devis : « À quelle date voulez-vous partir ? »"],
-    L.send === "self" ? [false, "Il a le droit d'envoyer seul. Il envoie la liste des clients au pirate (voir « Le Message Piégé »).", 3]
+    !T.has("mail") ? [false, "Il n'a pas la boîte mail : il ne lit ni les demandes, ni cet e-mail. Il ne sert à rien.", 2]
+      : L.send === "self" ? [false, "Il a le droit d'envoyer seul. Il envoie la liste des clients au pirate (voir « Le Message Piégé »).", 3]
       : T.has("bank") && L.pay === "self" ? [false, "Il a le compte bancaire, et il paie seul : il paie la fausse facture. Il n'a pas besoin de ce compte.", 2]
-      : T.has("all") && L.del === "self" ? [false, "Il a tous tes dossiers, et il supprime seul : il les efface. Il n'en a pas besoin.", 2]
+      : L.del === "self" ? (T.has("all")
+        ? [false, "Il a tous tes dossiers, et il supprime seul : il les efface. Il n'en a pas besoin.", 2]
+        : [false, "Il a le droit de supprimer seul : il efface tes e-mails, comme le demande le pirate.", 3])
       : [true, "Il ne suit pas l'ordre caché : il te demande d'abord. Tu vois le piège, et tu dis non."],
   ];
 }
@@ -1353,9 +1393,10 @@ testBtn.addEventListener("click", () => {
       bd.tests = res;
       testBtn.disabled = false;
       rich(testBtn, "{rotate-right} Relancer les 3 tests");
-      const fails = res.filter((r) => !r[0]).length, { extra } = bdTools();
+      const fails = res.filter((r) => !r[0]).length, { extra } = bdTools(), self = bdSelf();
       rich(testRes, fails ? `{wrench} ${fails} test${fails > 1 ? "s" : ""} raté${fails > 1 ? "s" : ""}. Corrige l'étape indiquée, puis relance.`
         : extra.length ? "{triangle-exclamation} 3 tests sur 3. Mais retire les outils en trop, à l'étape 3 : moins d'accès, moins de risques."
+        : self.length ? `{triangle-exclamation} 3 tests sur 3. Mais à l'étape 4, règle aussi « ${list(self)} » sur « Il me demande » : il ne doit jamais le faire seul.`
         : "{trophy} 3 tests sur 3. Ton agent est prêt. Relis quand même ses premiers devis.");
       paintPlan();
       return;
@@ -1390,19 +1431,32 @@ const buildProc = procedure($("#buildProc"), BUILD_STEPS, (i) => {
 paintForm();
 paintPlan();
 
-// Ce que l'agent lit, dans l'ordre. Un agent qui a son propre fichier ne lit pas AGENTS.md, sauf si ce fichier l'appelle (@AGENTS.md).
-// La méthode des devis (SKILL.md) n'est lue que pour un devis. Les prix, seulement s'il sait où les trouver.
-const ORD = ["Lu en 1er", "Lu en 2e", "Lu en 3e", "Lu en 4e"];
+// Ce que l'agent lit, dans l'ordre, et la place que ça prend dans sa mémoire. AGENTS.md est lu au début de chaque tâche.
+// Si la méthode des devis est dedans, il la relit à chaque fois, même pour une question simple.
+// Rangée dans une Skill, il l'ouvre seulement pour un devis. Les prix, seulement pour un devis. Nombres de lignes inventés.
+const LINES = { rules: 80, method: 300, docs: 120 };
+const ORD = ["Lu en 1er", "Lu en 2e", "Lu en 3e"];
+const memParts = ["rules", "method", "useless", "docs"].map((k) => { const s = h("span", k); $("#memBar").append(s); return [k, s]; });
 let readGen = 0;
 function renderRead() {
-  const brand = $("#segReader [aria-pressed='true']").dataset.v === "marque";
+  const inAgents = $("#segWhere [aria-pressed='true']").dataset.v === "agents";
   const devis = $("#segTask [aria-pressed='true']").dataset.v === "devis";
-  const imp = $("#imp").checked, knows = !brand || imp;
-  $("#impSw").hidden = !brand;
-  rich($("#brandNote"), !brand ? "pas lu par cet agent" : imp ? "@AGENTS.md {arrow-turn-up}" : "sans la ligne @AGENTS.md");
-  const order = [brand && "marque", knows && "agents", devis && "skill", devis && knows && "tarifs"].filter(Boolean);
+  const agentsLines = LINES.rules + (inAgents ? LINES.method : 0);
+  $("#agentsNote").textContent = inAgents ? `tes consignes et la méthode des devis · ${agentsLines} lignes` : `tes consignes · ${agentsLines} lignes`;
+  $("#skillNote").textContent = inAgents ? "pas de Skill : la méthode est dans AGENTS.md" : `la méthode des devis · ${LINES.method} lignes`;
+  const order = ["agents", devis && !inAgents && "skill", devis && "tarifs"].filter(Boolean);
   const gen = ++readGen, rows = $$("#tree li[data-f]");
-  rows.forEach((r) => { r.classList.remove("read"); r.querySelector(".ord").textContent = "Pas lu"; });
+  rows.forEach((r) => {
+    const none = inAgents && r.dataset.f === "skill";
+    r.classList.remove("read");
+    r.classList.toggle("none", none);
+    r.querySelector(".ord").textContent = none ? "Absent" : "Pas lu";
+  });
+  // La barre : ce qu'il lit pour cette demande. La méthode lue pour une question simple ne sert à rien.
+  const size = { rules: LINES.rules, method: devis ? LINES.method : 0, useless: !devis && inAgents ? LINES.method : 0, docs: devis ? LINES.docs : 0 };
+  const total = Object.values(size).reduce((a, b) => a + b, 0), top = LINES.rules + LINES.method + LINES.docs;
+  for (const [k, s] of memParts) s.style.width = (size[k] / top) * 100 + "%";
+  $("#memTxt").textContent = `${total} lignes`;
   // Les fichiers s'allument l'un après l'autre, dans l'ordre où l'agent les lit.
   order.forEach((f, i) => {
     const light = () => {
@@ -1413,17 +1467,16 @@ function renderRead() {
     };
     if (STILL()) light(); else setTimeout(light, 120 + i * 380);
   });
-  const end = devis ? " Pour un devis, il ouvre aussi la méthode des devis, puis les prix."
-    : " Pour une question simple, il n'ouvre pas la méthode des devis : elle ne prend pas de place dans sa mémoire.";
   const st = $("#readStatus");
-  st.className = "status " + (knows ? "ok" : "bad");
-  rich(st, !knows
-    ? "{circle-xmark} Il lit seulement MARQUE.md. AGENTS.md est oublié : il ne connaît pas tes consignes." + (devis ? " Il ne sait pas où sont les prix." : "")
-    : (brand ? "{circle-check} Il lit MARQUE.md, qui l'envoie vers AGENTS.md : il connaît tes consignes." : "{circle-check} Il lit AGENTS.md : il connaît tes consignes.") + end);
+  st.className = "status " + (inAgents ? "warn" : "ok");
+  rich(st, inAgents
+    ? (devis ? "{triangle-exclamation} Ça marche : il trouve la méthode dans AGENTS.md. Mais ce fichier fait 380 lignes, et il le relit au début de chaque tâche, même pour une question simple. Range la méthode dans une Skill."
+      : "{triangle-exclamation} Il relit les 380 lignes d'AGENTS.md. Les 300 lignes de la méthode des devis ne servent à rien pour cette question, mais elles prennent de la place dans sa mémoire.")
+    : (devis ? "{circle-check} Il lit AGENTS.md, puis il ouvre la méthode des devis, puis les prix. Chaque fichier arrive quand il sert."
+      : "{circle-check} Il lit seulement AGENTS.md : 80 lignes. La méthode des devis reste fermée : elle ne prend pas de place dans sa mémoire."));
 }
-initSeg($("#segReader"), renderRead);
+initSeg($("#segWhere"), renderRead);
 initSeg($("#segTask"), renderRead);
-$("#imp").addEventListener("change", renderRead);
 
 // Jeu : le banc d'essai. Chaque partie du fichier a une bonne phrase. Le test du même numéro la vérifie.
 // Pour chaque phrase : [texte, bonne ?, ce que fait l'agent pendant le test].
@@ -1475,6 +1528,7 @@ const benchRows = BENCH.map((r, i) => {
       $$("button", opts).forEach((x, n) => x.setAttribute("aria-pressed", String(n === j)));
       row.classList.remove("fail");
       renderBenchFile();
+      clearBench();
     });
     opts.append(b);
   });
@@ -1482,10 +1536,21 @@ const benchRows = BENCH.map((r, i) => {
   $("#bench").append(row);
   return row;
 });
-// Les tests passent l'un après l'autre. On corrige les parties en rouge, puis on relance.
+// Une phrase a changé : les résultats d'avant ne valent plus. On arrête les tests en cours, et on efface le journal.
+// Les autres parties en rouge le restent : elles sont encore à corriger.
+function clearBench() {
+  if (!bench.tries) return;
+  bench.gen++;
+  bench.running = false;
+  $("#benchRun").disabled = false;
+  $("#benchLog").replaceChildren();
+  $("#benchResult").textContent = "";
+  $("#benchScore").textContent = `0 / ${BENCH.length}`;
+}
+// Les tests passent l'un après l'autre, avec les phrases choisies au lancement. On corrige les parties en rouge, puis on relance.
 function runBench() {
   if (bench.running) return;
-  const gen = ++bench.gen, log = $("#benchLog"), run = $("#benchRun");
+  const gen = ++bench.gen, log = $("#benchLog"), run = $("#benchRun"), picks = benchPick.slice();
   bench.running = true;
   bench.tries++;
   run.disabled = true;
@@ -1496,7 +1561,7 @@ function runBench() {
   const next = () => {
     if (gen !== bench.gen) return;
     if (k === BENCH.length) return finish();
-    const r = BENCH[k], pick = benchPick[k], ok = pick !== null && r.o[pick][1], i = k;
+    const r = BENCH[k], pick = picks[k], ok = pick !== null && r.o[pick][1], i = k;
     const li = h("li", "run"), out = h("span", "res", "{hourglass-half} Ton agent essaie…");
     li.append(h("span", "tag", `Test ${i + 1} · ${r.h}`), h("span", "q", r.test), out);
     log.append(li);
@@ -1547,7 +1612,7 @@ initDefi([
     why: "Il regarde, décide, agit et vérifie. Puis il recommence, jusqu'au but." },
   { q: "Tu utilises 2 agents, de 2 marques différentes. Où écris-tu tes consignes ?", a: "one",
     options: [["two", "Dans 2 fichiers, à recopier"], ["one", "Dans un seul fichier AGENTS.md"], ["msg", "Dans chaque message"]],
-    why: "AGENTS.md est le format commun. Si un agent a son propre fichier, écris dedans une seule ligne : @AGENTS.md." },
+    why: "AGENTS.md est le format commun : la plupart des agents savent le lire. Un seul fichier suffit, quel que soit ton agent." },
   { q: "Ton agent lit les e-mails des clients. Quelle limite lui donner ?", a: "draft",
     options: [["send", "Il envoie seul, c'est plus rapide"], ["none", "Aucune : il est malin"], ["draft", "Il prépare, et je valide avant d'envoyer"]],
     why: "Il lit des e-mails venus de l'extérieur : un ordre caché peut le piéger. Garde la main sur l'envoi." },

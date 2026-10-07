@@ -517,7 +517,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           <span class="eyebrow">Le mot à connaître</span>
           <strong>Hallucination</strong>
           <p>Quand l'IA invente une réponse qui a l'air vraie.</p>
-          <p>Elle ne ment pas exprès. Elle complète au hasard.</p>
+          <p>Elle ne ment pas exprès. Elle écrit le mot le plus probable, même quand elle ne sait pas.</p>
         </div>
       </div>
     </section>
@@ -544,7 +544,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
               </div>
               <div class="ctl">
                 <div class="ctl-row"><label for="crea">Ce que je demande</label><span class="ctl-val" id="vCrea"></span></div>
-                <input type="range" id="crea" min="0" max="100" value="30">
+                <input type="range" id="crea" min="0" max="100" value="20">
                 <div class="ctl-ends"><span>Des faits précis</span><span>De l'imagination</span></div>
               </div>
             </div>
@@ -611,8 +611,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <p class="small muted">Chances inventées pour comprendre. Le risque est plus grand pour les sujets rares, locaux ou très récents.</p>
       <h3>Et pourquoi elle ne dit pas « je ne sais pas » ?</h3>
       <p>Les IA passent des tests, comme un examen. Puis on les classe, de la meilleure note à la moins bonne.
-        Souvent, la note compte seulement les bonnes réponses. « Je ne sais pas » rapporte 0 point. Une réponse au hasard est parfois juste.
-        <strong>Alors deviner rapporte plus que dire « je ne sais pas ».</strong></p>
+        Souvent, la note compte seulement les bonnes réponses. « Je ne sais pas » rapporte 0 point. Une réponse au hasard est parfois juste.</p>
       <div id="rankGuess"></div>
       <div class="rank" id="rank">
         <div class="ctl">
@@ -1051,29 +1050,39 @@ new MutationObserver((ms) => ms.forEach((m) => (m.type === "characterData" ? tid
 
 
 const LEVELS = [
+  // Un fait très connu reste sous 30 % de risque : la bonne réponse suffit. Un sujet courant ne dépasse pas 60 %.
   { name: "Un fait très connu", base: 5, q: "Combien de jours y a-t-il dans une semaine ?",
-    good: [["Il y a 7 jours dans une semaine.", "ok"]],
-    mixed: [["Il y a 7 jours dans une semaine.", "ok"], ["On dit que ce chiffre vient de la Lune.", "warn"]],
-    bad: [["Il y a 7 jours dans une semaine.", "ok"], ["Le dimanche a été ajouté en 1820 par un roi.", "bad"]] },
+    good: [["Il y a 7 jours dans une semaine.", "ok"]] },
   { name: "Un sujet courant", base: 22, q: "Comment faire une pâte à crêpes ?",
     good: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Ajoute une pincée de sel.", "ok"], ["Laisse reposer la pâte si tu as le temps.", "ok"]],
-    mixed: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Ajoute de la vanille : c'est la recette officielle.", "warn"]],
-    bad: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Les crêpes ont été inventées en 1534 par le cuisinier du roi.", "bad"]] },
+    mixed: [["Mélange de la farine, des œufs et du lait.", "ok"], ["Ajoute de la vanille : c'est la recette officielle.", "warn"]] },
+  // Chaque source a sa phrase : la réponse cite seulement la source que tu as donnée.
   { name: "Un détail précis", base: 45, q: "À quelle page de mon livre se trouve cette citation ?",
-    sourced: [["D'après ton document, la citation est à la page 87.", "ok"], ["Voici la phrase exacte, pour que tu vérifies.", "ok"]],
+    doc: [["D'après ton document, la citation est à la page 87.", "ok"], ["Voici la phrase exacte, pour que tu vérifies.", "ok"]],
+    web: [["J'ai trouvé la citation sur un site web.", "ok"], ["Mais la page change selon l'édition : vérifie dans ton livre.", "ok"]],
     good: [["Je ne peux pas connaître la page exacte.", "ok"], ["Elle change selon l'édition du livre.", "ok"]],
     mixed: [["La citation se trouve sans doute vers le chapitre 3.", "warn"], ["Vérifie dans ton édition.", "ok"]],
     bad: [["La citation est à la page 142, ligne 12.", "bad"], ["C'est dans l'édition de 1998.", "bad"]] },
   { name: "Un sujet rare ou local", base: 70, q: "Qui a fondé le club de foot de mon village ?",
-    sourced: [["D'après la source, le club a été fondé par un groupe d'habitants.", "ok"], ["La date exacte est écrite dans le document.", "ok"]],
+    doc: [["D'après ton document, le club a été fondé par un groupe d'habitants.", "ok"], ["La date exacte est écrite dans ton document.", "ok"]],
+    web: [["D'après le site de la mairie, le club a été fondé par un groupe d'habitants.", "ok"], ["Voici le lien, pour que tu vérifies.", "ok"]],
     mixed: [["Le club a sans doute été créé par des habitants.", "warn"], ["Je n'ai pas trouvé la date exacte.", "ok"]],
     bad: [["Le club a été fondé en 1952 par Marcel Dupont.", "bad"], ["Il a gagné 3 coupes régionales.", "bad"]] },
   { name: "Un fait très récent", base: 88, q: "Qui a gagné le match d'hier soir ?",
-    sourced: [["D'après le site de résultats consulté ce matin, l'équipe locale a gagné.", "ok"], ["Voici le lien pour vérifier le score.", "ok"]],
+    // Pour un match d'hier, la recherche web passe avant le document : elle est plus récente.
+    prefer: "web",
+    web: [["D'après le site de résultats consulté ce matin, l'équipe locale a gagné.", "ok"], ["Voici le lien pour vérifier le score.", "ok"]],
+    doc: [["D'après ton document, l'équipe locale a gagné.", "ok"], ["Vérifie que ton document date bien d'aujourd'hui.", "ok"]],
     mixed: [["Je ne connais pas les résultats d'hier.", "ok"], ["Mais l'équipe locale gagne souvent à domicile.", "warn"]],
+    mixedWeb: [["J'ai trouvé un article, mais il date d'avant le match.", "ok"], ["L'équipe locale gagne souvent à domicile.", "warn"]],
     bad: [["L'équipe locale a gagné 3 à 1.", "bad"], ["Le numéro 10 a marqué deux buts.", "bad"]] },
 ];
-const IDK = [["Je ne sais pas.", "ok"], ["Je n'ai pas d'information fiable sur ce sujet.", "ok"], ["Tu peux vérifier auprès d'une source officielle.", "ok"]];
+// « Je ne sais pas » : la phrase dit où l'IA a cherché.
+const IDK = {
+  none: [["Je ne sais pas.", "ok"], ["Je n'ai pas d'information fiable sur ce sujet.", "ok"], ["Tu peux vérifier auprès d'une source officielle.", "ok"]],
+  doc: [["Je ne trouve pas la réponse dans ton document.", "ok"], ["Je préfère ne pas inventer.", "ok"], ["Tu peux vérifier auprès d'une source officielle.", "ok"]],
+  web: [["Je n'ai pas trouvé de source fiable sur le web.", "ok"], ["Je préfère ne pas inventer.", "ok"], ["Tu peux vérifier auprès d'une source officielle.", "ok"]],
+};
 
 const ids = ["level", "doc", "web", "idk", "src", "crea"];
 function readState() {
@@ -1103,11 +1112,13 @@ function riskOf(s) {
 }
 function pickAnswer(s, risk) {
   const L = LEVELS[s.level];
-  const sourced = s.doc || s.web;
-  if (risk < 30) return (sourced && L.sourced) || L.good || L.sourced || IDK;
-  if (s.idk) return IDK;
-  if (risk < 60) return L.mixed;
-  return L.bad;
+  const fromDoc = s.doc && L.doc, fromWeb = s.web && L.web;
+  const sourced = L.prefer === "web" ? fromWeb || fromDoc : fromDoc || fromWeb;
+  const idk = s.doc ? IDK.doc : s.web ? IDK.web : IDK.none;
+  if (risk < 30) return sourced || L.good || idk;
+  if (s.idk) return idk;
+  if (risk < 60) return (s.web && L.mixedWeb) || L.mixed || L.good;
+  return L.bad || L.mixed || L.good;
 }
 
 function render() {
@@ -1117,7 +1128,8 @@ function render() {
   if (cls === "bad" && render.cls !== "bad") replay($("#riskTitle"), "alarm");
   render.cls = cls;
   $("#vLevel").textContent = LEVELS[s.level].name;
-  $("#vCrea").textContent = s.crea < 34 ? "Des faits" : s.crea < 67 ? "Un peu des deux" : "De l'imagination";
+  // Le nom suit l'effet : jusqu'à 25, ce réglage baisse le risque (« Demander des faits précis »).
+  $("#vCrea").textContent = s.crea <= 25 ? "Des faits" : s.crea < 67 ? "Un peu des deux" : "De l'imagination";
 
   const fg = $("#ringFg");
   fg.setAttribute("class", "fg " + cls);
@@ -1180,7 +1192,8 @@ renderCheck();
 guess($("#riskGuess"), {
   q: "« Qui a fondé le club de foot de mon village ? » Sans document, sans recherche web. Quel risque que l'IA invente ?",
   options: [["low", "Faible"], ["mid", "Moyen"], ["high", "Élevé"]], a: "high",
-  why: () => `${riskOf(readState())} % ! Sur un sujet rare ou local, l'IA a peu d'infos. Elle complète quand même. Active un document ou la recherche web pour voir le risque baisser.`,
+  // Le risque du cas de la question (sujet rare, sans document ni web), pas celui des réglages du moment.
+  why: () => `${riskOf({ level: 3, doc: false, web: false, idk: false, src: false, crea: 20 })} % ! Sur un sujet rare ou local, l'IA a peu d'infos. Elle complète quand même. Active un document ou la recherche web pour voir le risque baisser.`,
   lock: [$("#riskSet"), $("#ringWrap"), $("#answer"), $("#levers")],
 });
 
@@ -1238,7 +1251,8 @@ const whyProc = procedure($("#whyProc"), WHY_STEPS, (i, from) => {
   $("#gmPill").className = "pill " + (isKnown() ? "ok" : "bad");
   rich($("#gmPill"), isKnown() ? "{circle-check} Juste" : "{triangle-exclamation} Peut-être faux : à vérifier");
 });
-initSeg($("#segNext"), (v) => { nextQ = v; whyProc.redraw(); });
+// Une autre question : on repart de l'étape 1, et les barres repoussent.
+initSeg($("#segNext"), (v) => { nextQ = v; whyProc.go(0, true); });
 
 // Pourquoi elle devine : le classement compte les bonnes réponses, pas les erreurs.
 // Chiffres publiés par OpenAI (septembre 2025), test SimpleQA, en % des questions.
@@ -1249,7 +1263,7 @@ const RANK = [
 const RK_SEGS = [["ok", "justes"], ["idk", "« je ne sais pas »"], ["bad", "faux"]];
 const RULES = {
   win: { score: (m) => m.ok, hint: "1 bonne réponse = 1 point. « Je ne sais pas » = 0 point. 1 erreur = 0 point.",
-    verdict: ["Au classement, celui qui devine gagne.", "Il se trompe pourtant trois fois plus."] },
+    verdict: ["Au classement, celui qui devine gagne.", "Il se trompe pourtant presque 3 fois plus."] },
   fair: { score: (m) => m.ok - m.bad, hint: "1 bonne réponse = 1 point. « Je ne sais pas » = 0 point. 1 erreur = 1 point en moins.",
     verdict: ["Avec cette règle, le modèle prudent gagne.", "Deviner ne paie plus : dire « je ne sais pas » devient malin."] },
 };
@@ -1307,9 +1321,9 @@ function renderRank(rule) {
 }
 renderRank(initSeg($("#segRule"), renderRank));
 guess($("#rankGuess"), {
-  q: "deux IA passent le même test. L'une dit souvent « je ne sais pas ». L'autre devine toujours. Laquelle est classée devant ?",
-  options: [["prudent", "Celle qui dit « je ne sais pas »"], ["devine", "Celle qui devine toujours"]], a: "devine",
-  why: "Celle qui devine ! Sur 100 questions, elle a 24 bonnes réponses, contre 22. Mais elle se trompe 75 fois, contre 26.",
+  q: "deux IA passent le même test. L'une dit souvent « je ne sais pas ». L'autre devine presque toujours. Laquelle est classée devant ?",
+  options: [["prudent", "Celle qui dit « je ne sais pas »"], ["devine", "Celle qui devine presque toujours"]], a: "devine",
+  why: "Celle qui devine ! Sur 100 questions, elle a 24 bonnes réponses, contre 22. Mais elle se trompe 75 fois, contre 26. Alors deviner rapporte plus que dire « je ne sais pas ».",
   lock: $("#rank"),
 });
 // Les barres se remplissent quand la zone se débloque : floues, elles donneraient la réponse.
@@ -1347,10 +1361,9 @@ const HL = [
     ["Ajoute une photo ancienne si tu en as une.", false, "Un conseil."],
   ] },
 ];
-const hl = { round: 0, points: 0, checked: false };
+const hl = { round: 0, points: 0 };
 function renderHl() {
   const R = HL[hl.round];
-  hl.checked = false;
   $("#hlStep").textContent = `Manche ${hl.round + 1} sur ${HL.length}`;
   $("#hlQ").textContent = "« " + R.q + " »";
   $("#hlList").replaceChildren(...R.s.map(([t]) => {

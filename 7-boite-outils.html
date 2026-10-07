@@ -1016,9 +1016,10 @@ const PP = {
   ctx: { icon: "{user}", say: "Je suis Lucie, la secrétaire d'un club de randonnée. J'écris aux 40 membres.",
     lines: [["Madame, Monsieur,", "Bonjour à toutes et à tous,"], ["[Votre nom]", "Lucie, secrétaire du club de randonnée"]] },
   act: { icon: "{hand-pointer}", vague: "Écris un mail.", say: "Écris un mail pour rappeler de payer la cotisation de l'année.",
-    lines: [["Je me permets de vous écrire au sujet de notre projet commun.", "C'est le moment de payer votre cotisation au club pour l'année."]] },
+    // [devinée, venue du prompt, devinée quand l'objectif parle déjà de payer]
+    lines: [["Je me permets de vous écrire au sujet de notre projet commun.", "C'est le moment de payer votre cotisation au club pour l'année.", "Je vous écris au sujet d'un paiement."]] },
   obj: { icon: "{bullseye}", say: "Le but : que tout le monde ait payé avant le 30 novembre. Ton amical, 5 lignes au plus.",
-    lines: [["Je reste à votre disposition pour toute question. Bien cordialement,", "Merci de le faire avant le 30 novembre. À très bientôt."]] },
+    lines: [["Je reste à votre disposition pour toute question. Bien cordialement,", "Merci de payer avant le 30 novembre. À très bientôt."]] },
 };
 const PP_PILL = [
   ["bad", "{circle-xmark} Un mail passe-partout : à réécrire"],
@@ -1036,7 +1037,10 @@ function renderPrompt() {
   // Une ligne qui vient d'un morceau qu'on vient d'ajouter (ou d'enlever) saute : on voit ce que ce morceau change.
   const was = renderPrompt.on || on;
   renderPrompt.on = on;
-  const line = (k, i) => { const known = on[k]; return h("span", "sent " + (known ? "ok" : "warn") + (known !== was[k] ? " flip" : ""), (known ? "{circle-check} " : "{triangle-exclamation} ") + PP[k].lines[i][known ? 1 : 0]); };
+  const line = (k, i) => {
+    const known = on[k], L = PP[k].lines[i];
+    return h("span", "sent " + (known ? "ok" : "warn") + (known !== was[k] ? " flip" : ""), (known ? "{circle-check} " : "{triangle-exclamation} ") + (known ? L[1] : (on.obj && L[2]) || L[0]));
+  };
   $("#ppAnswer").replaceChildren(h("span", "who", "L'IA"), line("ctx", 0), line("act", 0), line("obj", 0), line("ctx", 1));
   $("#ppVal").textContent = missing ? `${missing} morceau${missing > 1 ? "x" : ""} sur 3` : "rien";
   const fill = $("#ppFill");
@@ -1098,7 +1102,7 @@ const PIECE_NAMES = { projet: "Projet", skill: "Skill", connecteur: "Connecteur"
 const MISSIONS = [
   { q: "Chaque lundi, fais le planning de l'équipe à partir de mon agenda, toujours au même format.", need: ["skill", "connecteur"],
     why: "Le Connecteur ouvre l'agenda. La Skill garde le même format chaque semaine." },
-  { q: "Écris nos devis avec nos tarifs 2027 et nos conditions de vente, à chaque conversation.", need: ["projet"],
+  { q: "Réponds aux questions des clients avec nos tarifs 2027 et nos conditions de vente, à chaque conversation.", need: ["projet"],
     why: "Les tarifs et les conditions sont des documents à garder sous la main : c'est un Projet." },
   { q: "Trouve dans ma boîte Gmail l'e-mail de Claire, et résume-le.", need: ["connecteur"],
     why: "Il faut un branchement vers Gmail : c'est un Connecteur." },

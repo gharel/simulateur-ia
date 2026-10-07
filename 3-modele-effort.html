@@ -363,7 +363,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .model[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 .model .nm { font-family: var(--font-display); font-size: 1.35rem; line-height: 1.1; }
 .model .tg { font-weight: 700; line-height: 1.35; }
-.model .ds { font-size: .92rem; line-height: 1.45; opacity: .85; }
+.model .ds { font-size: .92rem; line-height: 1.45; }
 .model .ic { font-size: 1.5rem; line-height: 1; color: var(--accent-text); margin-bottom: 4px; }
 .model[aria-pressed="true"] .ic { color: inherit; }
 
@@ -393,7 +393,9 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
 .mis-play[hidden] { display: none; }
 .mis-card .btn { justify-self: start; }
 .btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-.seg.off { opacity: .45; pointer-events: none; }
+/* Réglage sans effet (le modèle rapide n'a pas d'effort) : en pointillés, le texte en gris. Le script le rend inerte. */
+.seg.off { pointer-events: none; background: transparent; box-shadow: inset 0 0 0 2px var(--line); }
+.seg.off button, .seg.off button[aria-pressed="true"] { background: transparent; color: var(--muted); }
 .log { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
 .log li { padding: 12px 16px 12px 20px; border-radius: 10px; background: var(--surface-2); font-weight: 700; font-size: .95rem; line-height: 1.5; }
 .log li.ok { box-shadow: inset 4px 0 0 var(--ok); }
@@ -518,7 +520,7 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-sack-dollar"></i></span><h2>Jeu : mission budget</h2><span class="pill" id="misScore">0 / 5</span></div>
       <p>5 tâches arrivent l'une après l'autre. Pour chacune, choisis un modèle et un effort, puis lance.
-        <strong>Réussis chaque tâche en dépensant le moins possible.</strong> Si c'est raté, tu paies quand même, et tu recommences.</p>
+        <strong>Réussis chaque tâche du premier coup, en dépensant le moins possible.</strong> Si c'est raté, tu paies quand même, et tu recommences.</p>
       <div class="mis">
         <div class="mis-col stick">
           <div class="mis-card" id="misCard" tabindex="-1">
@@ -985,16 +987,16 @@ new MutationObserver((ms) => ms.forEach((m) => (m.type === "characterData" ? tid
 
 
 const MODELS = {
-  rapide:   { name: "Modèle rapide",   speed: 95, quality: 52, inP: 1, outP: 5,  tps: 160, effort: false },
-  standard: { name: "Modèle standard", speed: 72, quality: 76, inP: 2, outP: 10, tps: 90,  effort: true },
-  expert:   { name: "Modèle expert",   speed: 50, quality: 88, inP: 4, outP: 20, tps: 60,  effort: true },
+  rapide:   { name: "Modèle rapide",   quality: 52, inP: 1, outP: 5,  tps: 160, effort: false },
+  standard: { name: "Modèle standard", quality: 76, inP: 2, outP: 10, tps: 90,  effort: true },
+  expert:   { name: "Modèle expert",   quality: 88, inP: 4, outP: 20, tps: 60,  effort: true },
 };
 const EFFORT = [
-  { name: "Bas",       q: -10, think: 0.2, sp: 10,  txt: "L'IA répond presque tout de suite. Elle réfléchit très peu." },
-  { name: "Moyen",     q: 0,   think: 1,   sp: 0,   txt: "L'IA réfléchit un peu avant de répondre. Bon équilibre." },
-  { name: "Haut",      q: 5,   think: 2,   sp: -12, txt: "L'IA prend son temps. Elle vérifie son travail." },
-  { name: "Très haut", q: 8,   think: 3.5, sp: -22, txt: "L'IA réfléchit longtemps. Utile pour coder ou les longues tâches." },
-  { name: "Max",       q: 10,  think: 6,   sp: -32, txt: "L'IA réfléchit au maximum. Pour les problèmes très difficiles." },
+  { name: "Bas",       q: -10, think: 0.2, txt: "L'IA répond presque tout de suite. Elle réfléchit très peu." },
+  { name: "Moyen",     q: 0,   think: 1,   txt: "L'IA réfléchit un peu avant de répondre. Bon équilibre." },
+  { name: "Haut",      q: 5,   think: 2,   txt: "L'IA prend son temps. Elle vérifie son travail." },
+  { name: "Très haut", q: 8,   think: 3.5, txt: "L'IA réfléchit longtemps. Utile pour coder ou les longues tâches." },
+  { name: "Max",       q: 10,  think: 6,   txt: "L'IA réfléchit au maximum. Pour les problèmes très difficiles." },
 ];
 const TASKS = [
   { name: "corriger une faute",          ic: "{pen}",           need: 35, out: 100,   think: 200 },
@@ -1018,14 +1020,20 @@ const st = { model: "standard", effort: 1, task: 2, clear: true };
 
 function evaluate(mk, e, t, clear = true) {
   const m = MODELS[mk], task = TASKS[t];
-  const lvl = m.effort ? EFFORT[e] : { q: 0, think: 0, sp: 0 };
+  const lvl = m.effort ? EFFORT[e] : { q: 0, think: 0 };
   const quality = Math.min(clear ? 99 : FLOU, m.quality + lvl.q);
   const thinkTok = Math.round(task.think * lvl.think);
   const outTok = task.out + thinkTok;
   const secs = outTok / m.tps + 1;
   const price = (INPUT * m.inP + outTok * m.outP) / 1e6;
-  const speed = Math.max(5, Math.min(100, m.speed + lvl.sp));
-  return { quality, thinkTok, secs, price, speed };
+  return { quality, thinkTok, secs, price };
+}
+// Tous les réglages possibles : chaque modèle, avec chaque effort qu'il a.
+const CONFIGS = Object.keys(MODELS).flatMap((mk) => (MODELS[mk].effort ? [0, 1, 2, 3, 4] : [0]).map((e) => [mk, e]));
+// La vitesse vient du temps de réponse, pour cette tâche : 100 = le réglage le plus rapide, 5 = le plus lent.
+function speedOf(r, t) {
+  const all = CONFIGS.map(([mk, e]) => Math.log(evaluate(mk, e, t).secs)), lo = Math.min(...all), hi = Math.max(...all);
+  return Math.round(100 - ((Math.log(r.secs) - lo) / (hi - lo || 1)) * 95);
 }
 function timeTxt(s) {
   if (s < 60) return "≈ " + Math.max(1, Math.round(s)) + " s";
@@ -1037,20 +1045,24 @@ function priceTxt(p) {
   if (p < 0.1) return fmt(p, 3) + " $";
   return fmt(p, 2) + " $";
 }
-function verdictOf(r, need, clear) {
+// Même règle que le jeu « Mission budget » : au-delà de 1,25 fois le prix du réglage le moins cher qui réussit, c'est trop.
+function verdictOf(r, t, clear) {
+  const need = TASKS[t].need;
   if (!clear) return { cls: "bad", lab: "{triangle-exclamation} Demande floue", txt: "L'IA doit deviner ce que tu veux. Même le plus gros modèle se trompe." };
-  if (r.quality < need) return { cls: "bad", lab: "{triangle-exclamation} Pas assez fort", txt: "Le résultat risque d'être moyen. Prends un modèle plus fort ou monte l'effort." };
-  if (r.quality - need > 22) return { cls: "warn", lab: "{money-bill-wave} Trop puissant", txt: "Ça marche, mais tu attends et tu paies pour rien. Un plus petit modèle suffit." };
+  if (r.quality < need) {
+    const m = MODELS[st.model], more = m.effort && st.effort < 4;
+    return { cls: "bad", lab: "{triangle-exclamation} Pas assez fort", txt: "Le résultat risque d'être moyen. " +
+      (!m.effort ? "Prends un modèle plus fort." : more ? "Monte l'effort, ou prends un modèle plus fort." : "Prends un modèle plus fort.") };
+  }
+  if (r.price > 1.25 * best(t).r.price) return { cls: "warn", lab: "{money-bill-wave} Trop puissant", txt: "Ça marche, mais tu attends et tu paies pour rien. Un réglage moins cher suffit." };
   return { cls: "ok", lab: "{circle-check} Bon choix", txt: "Ce réglage est adapté à la tâche." };
 }
+// Le réglage le moins cher qui réussit la tâche. Il y en a toujours un : le modèle expert en effort max a 98.
 function best(t) {
   let pick = null;
-  for (const mk of Object.keys(MODELS)) {
-    const levels = MODELS[mk].effort ? [0, 1, 2, 3, 4] : [0];
-    for (const e of levels) {
-      const r = evaluate(mk, e, t);
-      if (r.quality >= TASKS[t].need && (!pick || r.price < pick.r.price)) pick = { mk, e, r };
-    }
+  for (const [mk, e] of CONFIGS) {
+    const r = evaluate(mk, e, t);
+    if (r.quality >= TASKS[t].need && (!pick || r.price < pick.r.price)) pick = { mk, e, r };
   }
   return pick;
 }
@@ -1076,10 +1088,11 @@ function render() {
     clearTimeout(render.think);
     render.think = setTimeout(() => $("#thinkPill").classList.remove("on"), think * 1000);
   }
-  $("#bSpeed").style.width = r.speed + "%";
+  const speed = speedOf(r, st.task);
+  $("#bSpeed").style.width = speed + "%";
   $("#bQual").style.width = r.quality + "%";
   $("#bCost").style.width = costPct + "%";
-  $("#tSpeed").textContent = r.speed >= 80 ? "très rapide" : r.speed >= 55 ? "rapide" : r.speed >= 35 ? "lent" : "très lent";
+  $("#tSpeed").textContent = speed >= 80 ? "très rapide" : speed >= 55 ? "rapide" : speed >= 35 ? "lent" : "très lent";
   $("#tQual").textContent = r.quality + " / 100 · il faut " + task.need;
   $("#tCost").textContent = costPct < 15 ? "petit" : costPct < 45 ? "moyen" : "élevé";
   $("#sTime").textContent = timeTxt(r.secs);
@@ -1087,7 +1100,7 @@ function render() {
   $("#sPrice").textContent = priceTxt(r.price);
   $("#askTxt").replaceChildren(h("span", "eyebrow", "Tu écris à l'IA"), h("span", "", `« ${ASKS[st.task][+st.clear]} »`));
 
-  const v = verdictOf(r, task.need, st.clear);
+  const v = verdictOf(r, st.task, st.clear);
   const pill = $("#verdict");
   pill.className = "pill " + v.cls;
   rich(pill, v.lab);
@@ -1096,9 +1109,7 @@ function render() {
   const cfg = b && `<b>${MODELS[b.mk].name}</b>${MODELS[b.mk].effort ? `, effort <b>${EFFORT[b.e].name}</b>` : ""}`;
   $("#reco").innerHTML = !st.clear
     ? `Précise ta demande : c'est gratuit. Ensuite, ${cfg} suffit.`
-    : b
-    ? `Le moins cher qui réussit à <b>${task.name}</b> : ${cfg} (${priceTxt(b.r.price)}).`
-    : "Aucun réglage ne suffit. Découpe la tâche en petits morceaux.";
+    : `Le moins cher qui réussit à <b>${task.name}</b> : ${cfg} (${priceTxt(b.r.price)}).`;
 }
 
 $$("#models .model").forEach((btn) => btn.addEventListener("click", () => {
@@ -1123,9 +1134,10 @@ function renderMission() {
   $("#misPlay").hidden = done;
   $("#misAgain").hidden = !done;
   $("#misEffort").classList.toggle("off", !MODELS[mis.model].effort);
+  $("#misEffort").inert = !MODELS[mis.model].effort;
   if (done) {
     $("#misStep").textContent = "Mission terminée";
-    rich($("#misTask"), `{flag-checkered} ${mis.good} tâche${mis.good > 1 ? "s" : ""} sur ${TASKS.length} au meilleur prix`);
+    rich($("#misTask"), `{flag-checkered} ${mis.good} tâche${mis.good > 1 ? "s" : ""} sur ${TASKS.length} au meilleur prix, du premier coup`);
     $("#misNeed").textContent = "";
     rich($("#misResult"), (mis.good === TASKS.length ? "{trophy} Parfait ! " : "") +
       `Tu as dépensé ${priceTxt(mis.spent)}. Le minimum était ${priceTxt(mis.min)}. ` +
@@ -1181,7 +1193,7 @@ initDefi([
     why: "Une tâche dure : l'expert, avec du temps pour réfléchir." },
   { q: "Tu dois résumer 500 avis clients, chaque jour.", a: "rapide",
     options: [["rapide", "Rapide"], ["expert", "Expert, effort max"]],
-    why: "Une tâche simple, en gros volume : le modèle rapide coûte 4 fois moins cher que l'expert, et il va plus vite." },
+    why: "Une tâche simple, en gros volume : le modèle rapide coûte plus de 20 fois moins cher que l'expert en effort max, et il va bien plus vite." },
   { q: "Monter l'effort, ça veut dire…", a: "think",
     options: [["fast", "L'IA répond plus vite"], ["think", "L'IA réfléchit plus longtemps"], ["model", "On change de modèle"]],
     why: "Plus d'effort = plus de tokens de réflexion. Plus lent et plus cher, mais utile pour les tâches difficiles." },

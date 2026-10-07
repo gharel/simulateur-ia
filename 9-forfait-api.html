@@ -992,6 +992,9 @@ function render() {
   const msgs = perDay * days;
   const api = cpm * msgs;
   const s = SIZES[st.size];
+  // Le bouton d'un modèle reste allumé seulement si les prix sont les siens : on peut les changer à la main, plus bas.
+  const inP = +$("#inP").value, outP = +$("#outP").value;
+  $$("#segModel button").forEach((b) => b.setAttribute("aria-pressed", String(PRICES[b.dataset.v][0] === inP && PRICES[b.dataset.v][1] === outP)));
 
   $("#vPerDay").textContent = fmt(perDay);
   $("#vDays").textContent = fmt(days);
@@ -1010,7 +1013,8 @@ function render() {
 
   const even = cpm > 0 ? plan / (days * cpm) : Infinity;
   const v = $("#verdict");
-  if (api < plan * 0.9) rich(v, `{receipt} L'API coûte moins cher pour toi. Le forfait devient rentable à partir de ${fmt(Math.ceil(even))} messages par jour.`);
+  if (api < plan * 0.9) rich(v, even === Infinity ? "{receipt} Avec ces prix, l'API ne coûte rien."
+    : `{receipt} L'API coûte moins cher pour toi. Le forfait devient rentable à partir de ${fmt(Math.ceil(even))} messages par jour.`);
   else if (api > plan * 1.1) rich(v, `{credit-card} Le forfait est moins cher pour toi. Tu économises environ ${money(api - plan)} par mois. Attention : le forfait a une limite d'usage.`);
   else rich(v, "{handshake} Les deux coûtent à peu près pareil. Le forfait évite les surprises, l'API évite les pauses.");
 
@@ -1057,7 +1061,8 @@ function renderDay(cpm, plan) {
 
 function niceMax(v) {
   const p = Math.pow(10, Math.floor(Math.log10(v)));
-  for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p;
+  // Un maximum qui se coupe bien en 4 : les graduations tombent sur des nombres ronds.
+  for (const m of [1, 2, 4, 6, 8, 10]) if (m * p >= v) return m * p;
   return 10 * p;
 }
 function drawChart({ perDay, days, plan, cpm, even }) {
@@ -1066,7 +1071,8 @@ function drawChart({ perDay, days, plan, cpm, even }) {
   const H = W < 560 ? 260 : 320;
   const m = { l: 58, r: 16, t: 26, b: 40 };
   const xMax = 200;
-  const yMax = niceMax(Math.max(cpm * days * xMax, plan * 1.4, 1));
+  // L'échelle montre le forfait et ton usage. Au-delà, la droite de l'API sort par le haut.
+  const yMax = niceMax(Math.max(plan * 2.5, cpm * days * perDay * 1.25, 1));
   const x = (d) => m.l + (d / xMax) * (W - m.l - m.r);
   const y = (c) => H - m.b - (Math.min(c, yMax) / yMax) * (H - m.t - m.b);
   const ns = "http://www.w3.org/2000/svg";
@@ -1083,7 +1089,7 @@ function drawChart({ perDay, days, plan, cpm, even }) {
     const c = (yMax / 4) * i;
     el("line", { x1: m.l, x2: W - m.r, y1: y(c), y2: y(c) }, grid);
     const t = el("text", { x: m.l - 8, y: y(c) + 4, "text-anchor": "end" }, axis);
-    t.textContent = fmt(c) + " $";
+    t.textContent = fmt(c, c % 1 ? 1 : 0) + " $";
   }
   for (const d of [0, 50, 100, 150, 200]) {
     const t = el("text", { x: x(d), y: H - m.b + 22, "text-anchor": d === 0 ? "start" : d === 200 ? "end" : "middle" }, axis);
@@ -1094,7 +1100,7 @@ function drawChart({ perDay, days, plan, cpm, even }) {
 
   // La droite de l'API est coupée en haut du graphique si elle dépasse.
   const dEnd = Math.min(xMax, cpm > 0 ? yMax / (cpm * days) : xMax);
-  el("path", { class: "a-api", d: `M${x(0)},${y(0)} L${x(dEnd)},${y(cpm * days * dEnd)} L${x(dEnd)},${y(0)} Z` });
+  el("path", { class: "a-api", d: `M${x(0)},${y(0)} L${x(dEnd)},${y(cpm * days * dEnd)} L${x(xMax)},${y(cpm * days * xMax)} L${x(xMax)},${y(0)} Z` });
   el("line", { class: "l-plan", x1: x(0), x2: x(xMax), y1: y(plan), y2: y(plan) });
   el("path", { class: "l-api", pathLength: 1, d: `M${x(0)},${y(0)} L${x(dEnd)},${y(cpm * days * dEnd)}` });
 
@@ -1138,12 +1144,12 @@ const PROFILES = [
   { who: "{user-tie} Sophie, responsable d'agence. 40 messages moyens par jour dans l'appli de l'IA (modèle standard), 22 jours par mois.",
     perDay: 40, days: 22, size: "mid", model: "standard", a: "plan",
     why: (api) => `Avec l'API, ce serait ${money(api)} par mois. Le forfait coûte moins cher, et la facture ne bouge pas.` },
-  { who: "{flask} Marc, développeur. 80 gros travaux par jour avec le modèle expert, 22 jours par mois.",
-    perDay: 80, days: 22, size: "long", model: "expert", a: "plan",
-    why: (api) => `Avec l'API : ${money(api)} par mois ! Le forfait coûte bien moins cher. Mais avec autant de gros travaux, Marc atteindra la limite et devra faire des pauses.` },
+  { who: "{flask} Marc, développeur. 15 gros travaux par jour avec le modèle expert, 22 jours par mois.",
+    perDay: 15, days: 22, size: "long", model: "expert", a: "plan",
+    why: (api) => `Avec l'API : ${money(api)} par mois ! Le forfait coûte bien moins cher. Mais avec ses gros travaux, Marc touchera parfois la limite : il devra faire des pauses.` },
   { who: "{robot} Le robot de l'agence. Un outil qui trie 200 e-mails par jour, tout seul, avec le modèle rapide, 31 jours par mois.",
     perDay: 200, days: 31, size: "short", model: "rapide", a: "api",
-    why: (api) => `Piège ! Le forfait ne marche que dans l'appli de l'IA, avec un humain. Un robot passe par l'API : environ ${money(api)} par mois. On peut fixer un plafond de dépense.` },
+    why: (api) => `Piège ! Le forfait ne marche que dans l'appli de l'IA, avec un humain. Un robot passe par l'API : environ ${money(api)} par mois. On peut fixer un plafond de dépense. Le calculateur dit que le forfait coûte moins cher, mais un robot ne peut pas s'en servir.` },
 ];
 function applyProfile(P) {
   $(`#segModel button[data-v="${P.model}"]`).click();
@@ -1178,7 +1184,7 @@ function applyProfile(P) {
 
 // Défi final
 initDefi([
-  { q: "Tu as atteint la limite de ton forfait. Que se passe-t-il ?", a: "wait",
+  { q: "Tu as atteint la limite de ton forfait, sans option payante. Que se passe-t-il ?", a: "wait",
     options: [["pay", "Je paie un supplément"], ["wait", "Je fais une pause"], ["stop", "Mon compte est fermé"]],
     why: "Le prix ne bouge pas. Mais il faut attendre : la limite revient après quelques heures." },
   { q: "Tu veux une facture qui ne change jamais.", a: "plan",

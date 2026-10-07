@@ -132,18 +132,22 @@ test.describe("8-agent.html : l'agent sur mesure", () => {
     await expect(next).toBeVisible();
   });
 
-  test("ce que l'agent lit : sans @AGENTS.md, ses consignes sont oubliées", async ({ page }) => {
+  test("ce que l'agent lit : rangée dans une Skill, la méthode des devis n'est lue que pour un devis", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await open(page, "8-agent.html", "?demo=1");
     const read = () => page.locator("#tree li.read").evaluateAll((ls) => ls.map((l) => l.dataset.f));
+    // Au départ : la méthode est dans AGENTS.md, et la demande est une question simple. Il relit 380 lignes, dont 300 pour rien.
+    expect(await read()).toEqual(["agents"]);
+    await expect(page.locator("#memTxt")).toHaveText("380 lignes");
+    await expect(page.locator("#readStatus")).toHaveClass(/warn/);
+    await expect(page.locator('#tree [data-f="skill"]')).toHaveClass(/none/);
+    await page.locator('#segWhere button[data-v="skill"]').click();
+    expect(await read()).toEqual(["agents"]);
+    await expect(page.locator("#memTxt")).toHaveText("80 lignes");
+    await expect(page.locator("#readStatus")).toHaveClass(/ok/);
+    await page.locator('#segTask button[data-v="devis"]').click();
     expect(await read()).toEqual(["agents", "skill", "tarifs"]);
-    await page.locator('#segReader button[data-v="marque"]').click();
-    expect(await read()).toEqual(["agents", "marque", "skill", "tarifs"]);
-    await page.locator("#impSw").click();
-    expect(await read()).toEqual(["marque", "skill"]);
-    await expect(page.locator("#readStatus")).toHaveClass(/bad/);
-    await page.locator('#segTask button[data-v="question"]').click();
-    expect(await read()).toEqual(["marque"]);
+    await expect(page.locator("#memTxt")).toHaveText("500 lignes");
   });
 
   test("le banc d'essai : les bonnes consignes passent les 4 tests", async ({ page }) => {
@@ -191,6 +195,52 @@ test.describe("8-agent.html : l'agent sur mesure", () => {
     await expect(proc).toHaveAttribute("data-at", "3");
     await expect(page.locator("#bdPlan")).not.toHaveClass(/ready/);
   });
+
+  test("créer ton agent : sans la boîte mail, aucun test ne passe, et une limite oubliée est signalée", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await open(page, "8-agent.html");
+    const proc = page.locator("#buildProc"), step = (i) => page.locator("#bdForm .bd-step").nth(i), run = () => step(4).locator(".bd-tests .btn.go").click();
+    await step(0).locator("button", { hasText: "devis" }).click();
+    await proc.locator(".proc-rail button").nth(4).click();
+    await run();
+    await expect(step(4).locator(".log li.bad")).toHaveCount(3);
+    await expect(step(4).locator(".log li").nth(2)).toContainText("boîte mail");
+    // Tout est bon, sauf « Payer » : les 3 tests passent, mais le résultat dit de régler la limite.
+    await proc.locator(".proc-rail button").nth(1).click();
+    for (const sw of await step(1).locator("input").all()) await sw.check();
+    await proc.locator(".proc-rail button").nth(2).click();
+    for (const i of [0, 1, 2]) await step(2).locator("input").nth(i).check();
+    await proc.locator(".proc-rail button").nth(3).click();
+    for (const k of [0, 2]) await step(3).locator(".seg").nth(k).locator('button[data-v="ask"]').click();
+    await proc.locator(".proc-rail button").nth(4).click();
+    await run();
+    await expect(step(4).locator(".log li.ok")).toHaveCount(3);
+    await expect(step(4).locator(".result")).toContainText("règle aussi");
+    await expect(page.locator("#bdPlan")).not.toHaveClass(/ready/);
+  });
+
+  test("le banc d'essai : changer une phrase efface les résultats d'avant", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await open(page, "8-agent.html");
+    await page.locator("#benchRun").click();
+    await expect(page.locator("#benchLog li")).toHaveCount(4);
+    await page.locator("#bench .row").first().locator("button").first().click();
+    await expect(page.locator("#benchLog li")).toHaveCount(0);
+    await expect(page.locator("#benchResult")).toBeEmpty();
+    await expect(page.locator("#benchScore")).toHaveText("0 / 4");
+  });
+});
+
+test("2-memoire.html : le graphique montre le total lu, et ×N part de 1", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await open(page, "2-memoire.html", "?demo=1");
+  await page.locator("#nSend").fill("15");
+  // 15 envois moyens : 117 600 tokens lus en tout. La dernière barre, c'est ce total.
+  await expect(page.locator("#bars > span")).toHaveCount(15);
+  await expect(page.locator("#lBars")).toHaveText(/117\s600/);
+  await expect(page.locator("#sCum")).toHaveText(/117\s600/);
+  await page.locator("#btnReset").click();
+  await expect(page.locator("#sMult")).toHaveText("×1,0");
 });
 
 // Les schémas pas à pas : un rail d'étapes, le texte de l'étape, et le schéma qui suit.
@@ -229,9 +279,14 @@ test.describe("schémas pas à pas", () => {
     await next.click();
     await expect(page.locator("#gmCmp")).toBeVisible();
     await expect(page.locator("#gmPill")).toContainText("être faux");
-    // La question connue, à la même étape : le mot choisi a 92 chances sur 100.
+    // Une autre question repart de l'étape 1. Le mot choisi a alors 92 chances sur 100.
     await page.locator('#segNext button[data-v="known"]').click();
+    await expect(page.locator("#whyProc")).toHaveAttribute("data-at", "0");
+    await expect(page.locator("#gmSlot")).toHaveText("…");
+    await expect(page.locator("#gmCmp")).toBeHidden();
+    await next.click();
     await expect(page.locator("#gmSlot")).toHaveText("Nouméa.");
+    await next.click();
     await expect(page.locator("#gmPill")).toContainText("Juste");
   });
 

@@ -517,7 +517,8 @@ new MutationObserver((ms) => ms.forEach((m) => (m.type === "characterData" ? tid
   if (MODE_QUERY) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?" + MODE_QUERY + "$1"); });
 })();
 // Revenir sur l'accueil (bouton « précédent ») doit montrer les badges gagnés entre-temps.
-addEventListener("pageshow", render);
+// Seulement au retour : au premier affichage, render() vient de jouer les animations d'arrivée.
+addEventListener("pageshow", (e) => { if (e.persisted) render(); });
 addEventListener("storage", render);
 render();
 </script>

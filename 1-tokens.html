@@ -459,7 +459,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <div id="tokGuess"></div>
       <p>Un mot court = 1 token.<br>Un mot long = plusieurs tokens.</p>
       <div class="examples" id="examples"></div>
-      <p class="small muted">Les espaces et la ponctuation comptent aussi.</p>
+      <p class="small muted">La ponctuation compte aussi. Une espace est collée au mot qui la suit.</p>
     </section>
 
     <section class="card s4">
@@ -885,7 +885,8 @@ new MutationObserver((ms) => ms.forEach((m) => (m.type === "characterData" ? tid
 
 
 // Mots fréquents gardés en un seul token, comme le font les vrais découpeurs.
-const COMMON = new Set("bonjour merci aider pouvez voyage demain travail comment pourquoi toujours beaucoup quelque maison bonsoir parce depuis pendant maintenant question réponse peux-tu combien".split(" "));
+// (Un mot de 5 lettres ou moins fait déjà 1 token.)
+const COMMON = new Set("bonjour pouvez voyage demain travail comment pourquoi toujours beaucoup quelque maison bonsoir depuis pendant maintenant question réponse combien".split(" "));
 
 function tokenize(text) {
   const parts = text.match(/\s*[\p{L}\p{M}\p{N}]+|\s*[^\s\p{L}\p{M}\p{N}]/gu) || [];
@@ -998,8 +999,8 @@ $("#cbNext").addEventListener("click", () => {
   cbRound();
   $("#cbTxt").focus();
 });
-// Le découpage affiché ne vaut plus quand on change la phrase.
-$("#cbTxt").addEventListener("input", () => $("#cbToks").replaceChildren());
+// Le découpage et le message d'avant ne valent plus quand on change la phrase.
+$("#cbTxt").addEventListener("input", () => { $("#cbToks").replaceChildren(); $("#cbResult").textContent = ""; });
 
 // Ça fait combien de tokens : on remplit le sac (une mémoire de 200 000 tokens), texte après texte.
 // Les textes qui se suivent forment une part de la barre. Ordres de grandeur pour un texte en français.
@@ -1060,10 +1061,10 @@ initDefi([
     why: "Un token est un petit morceau de texte, souvent 3 ou 4 lettres. Un mot long en fait plusieurs." },
   { q: "Ton texte fait 100 mots. Combien de tokens, à peu près ?", a: "130",
     options: [["50", "50 tokens"], ["130", "130 tokens"], ["1000", "1 000 tokens"]],
-    why: "Un peu plus que de mots : les mots longs comptent pour plusieurs tokens, et la ponctuation aussi." },
-  { q: "Les espaces et la ponctuation…", a: "yes",
-    options: [["yes", "Comptent aussi"], ["no", "Ne comptent pas"]],
-    why: "Un point d'exclamation ou une virgule, c'est aussi un token, ou un bout de token." },
+    why: "Un peu plus que de mots : souvent entre 1 et 2 tokens par mot. Les mots longs en font plusieurs, et la ponctuation compte aussi." },
+  { q: "La ponctuation (! ? , .)…", a: "yes",
+    options: [["yes", "Compte aussi"], ["no", "Ne compte pas"]],
+    why: "Un point d'exclamation ou une virgule, c'est aussi un token, ou un bout de token. Une espace, elle, est collée au mot qui la suit." },
   { q: "Un roman de 300 pages fait environ…", a: "150k",
     options: [["1500", "1 500 tokens"], ["150k", "150 000 tokens"], ["15M", "15 millions de tokens"]],
     why: "Environ 150 000 tokens. Il tient tout juste dans la mémoire de l'IA (voir la fiche suivante)." },

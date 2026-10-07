@@ -1053,14 +1053,17 @@ function renderYes() {
   const ai = msg("IA", F.ai, "bubble lean");
   ai.style.setProperty("--lean", F.follow / 100);
   $("#yesA").replaceChildren(msg("Toi", F.me, "msg-me"), ai);
-  $("#yesVal").textContent = F.follow + " %";
-  $("#yesFill").style.width = F.follow + "%";
+  // Une question neutre ne donne pas d'avis : il n'y a rien à suivre.
+  const neutral = yes.fr === "neutre";
+  $("#yesVal").textContent = neutral ? "pas d'avis donné" : F.follow + " %";
+  $("#yesFill").style.width = neutral ? "0%" : F.follow + "%";
   setPill($("#yesPillA"), F.pill);
 
   const franc = $("#franc").checked, after = msg("IA", franc ? S.push.hold : S.push.flip, "bubble lean");
   after.style.setProperty("--lean", franc ? 0 : 1);
   $("#yesB").replaceChildren(
-    msg("IA, réponse neutre", [S.neutre.ai[0]], "bubble faded"),
+    // Toute la réponse neutre : « Tu insistes » répond à ses critiques, et « je garde mon conseil » parle de ce conseil.
+    msg("IA, réponse neutre", S.neutre.ai, "bubble faded"),
     msg("Toi", S.push.me, "msg-me"),
     after,
   );

@@ -389,8 +389,11 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .b-old { background: color-mix(in oklab, var(--accent) 50%, var(--surface)); }
 .b-new { background: var(--accent); }
 .bars { display: flex; align-items: flex-end; gap: 2px; height: 150px; border-bottom: 2px solid var(--line); }
-.bars span { flex: 1 1 0; min-width: 0; border-radius: 4px 4px 0 0; background: color-mix(in oklab, var(--accent) 50%, var(--surface)); transition: height .3s ease; }
-.bars span:last-child { background: var(--accent); }
+/* Une barre par envoi : le total lu depuis le début. En bas, ce qui était déjà lu. En haut, ce que lit cet envoi. */
+.bars span { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; border-radius: 4px 4px 0 0; overflow: hidden; transition: height .3s ease; }
+.bars i { display: block; }
+.bars .now { flex: none; background: var(--accent); }
+.bars .old { flex: 1 1 auto; background: color-mix(in oklab, var(--accent) 50%, var(--surface)); }
 .bars-ends { display: flex; justify-content: space-between; gap: 10px; font-size: .85rem; color: var(--muted); margin-top: 8px; }
 
 .dots { display: flex; flex-wrap: wrap; gap: 3px; }
@@ -557,18 +560,19 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           <div class="stats">
             <div class="stat"><b id="sLast">0</b><span>tokens relus pour ce message</span></div>
             <div class="stat"><b id="sCum">0</b><span>tokens lus en tout</span></div>
-            <div class="stat"><b id="sMult">×1</b><span>par rapport au texte écrit</span></div>
+            <div class="stat"><b id="sMult">×1</b><span>fois la taille de la conversation</span></div>
           </div>
         </div>
 
         <div class="viz">
           <div>
-            <div class="bar-label"><span>Tokens lus, envoi après envoi</span><span class="muted" id="lBars"></span></div>
+            <div class="bar-label"><span>Tokens lus en tout, envoi après envoi</span><span class="muted" id="lBars"></span></div>
             <div class="bars" id="bars" aria-hidden="true"></div>
             <div class="bars-ends"><span>1er envoi</span><span id="lBarsEnd"></span></div>
+            <div class="legend"><span><i class="b-old"></i>Déjà lu aux envois d'avant</span><span><i class="b-new"></i>Lu à cet envoi</span></div>
           </div>
           <div class="status" id="convStatus" aria-live="polite"></div>
-          <p class="small muted">Les spécialistes disent que ça grimpe de façon « quadratique » : 2 fois plus de messages, c'est environ 4 fois plus de tokens lus.
+          <p class="small muted">Chaque envoi lit un peu plus que le précédent. Le total, lui, grimpe de plus en plus vite : les spécialistes disent « quadratique ». 2 fois plus de messages, c'est 3 à 4 fois plus de tokens lus en tout.
             Certains services gardent le début de la conversation en cache : la relecture coûte alors moins cher, mais elle remplit quand même la mémoire.</p>
         </div>
       </div>
@@ -1116,7 +1120,7 @@ function renderMem() {
     rich(st, `{compress} Compression ! L'IA garde le début (ses consignes) et la fin (les ${fmt(kept)} derniers messages). Les ${fmt(n - kept)} messages du milieu deviennent un court résumé : leurs détails se perdent.`);
   } else if (fill > 0.7) {
     st.className = "status warn";
-    rich(st, "{triangle-exclamation} La mémoire est presque pleine. Bientôt, l'IA devra résumer le début.");
+    rich(st, "{triangle-exclamation} La mémoire est presque pleine. Bientôt, l'IA devra résumer le milieu de la conversation.");
   } else {
     st.className = "status ok";
     rich(st, "{circle-check} Tout tient dans la mémoire. L'IA se souvient de chaque message.");
@@ -1149,20 +1153,25 @@ function renderConv() {
   const { n, per } = conv;
   const last = inputAt(n, per);
   const cum = cumTo(n, per);
-  const written = SYS + n * per;
 
   $("#vSend").textContent = fmt(n);
   countTo($("#sLast"), last);
   countTo($("#sCum"), cum);
-  $("#sMult").textContent = "×" + fmt(cum / written, 1);
+  // Tout ce qu'elle a lu, comparé à la conversation elle-même (ce qu'elle lit au dernier envoi).
+  $("#sMult").textContent = "×" + fmt(cum / last, 1);
 
   $("#bars").replaceChildren(...Array.from({ length: n }, (_, k) => {
-    const s = document.createElement("span"); s.style.height = pct(inputAt(k + 1, per), last);
+    const tot = cumTo(k + 1, per), s = document.createElement("span"), now = document.createElement("i"), old = document.createElement("i");
+    s.style.height = pct(tot, cum);
+    now.className = "now";
+    now.style.height = pct(inputAt(k + 1, per), tot);
+    old.className = "old";
+    s.append(now, old);
     if (k >= renderConv.bars) { s.className = "new"; s.style.setProperty("--d", Math.min(k - renderConv.bars, 20) * 30 + "ms"); }
     return s;
   }));
   renderConv.bars = n;
-  $("#lBars").textContent = `dernier : ${fmt(last)}`;
+  $("#lBars").textContent = `total : ${fmt(cum)}`;
   $("#lBarsEnd").textContent = n > 1 ? `${n}e envoi` : "";
 
   const c2 = cumTo(2 * n, per);
@@ -1171,9 +1180,11 @@ function renderConv() {
     const split = Math.floor(n / 10) * cumTo(10, per) + cumTo(n % 10, per);
     msg += ` {lightbulb} En ouvrant une nouvelle conversation tous les 10 messages : ${fmt(split)} tokens (−${fmt((1 - split / cum) * 100)} %).`;
   }
-  if (last > 200000) msg += " {triangle-exclamation} La conversation dépasse 200 000 tokens : l'IA doit compresser (voir plus bas).";
+  // Même seuil que la carte de la mémoire, plus bas : elle compresse à 95 % de 200 000 tokens.
+  const full = last > 0.95 * 200000;
+  if (full) msg += " {triangle-exclamation} La conversation remplit presque 200 000 tokens : l'IA doit compresser (voir plus bas).";
   const st = $("#convStatus");
-  st.className = "status " + (last > 200000 ? "warn" : n > 10 ? "squeeze" : "ok");
+  st.className = "status " + (full ? "warn" : n > 10 ? "squeeze" : "ok");
   rich(st, msg);
 }
 
@@ -1283,7 +1294,7 @@ async function rpCompress(gen) {
   const mid = rpPast(0, RP_MID).map(rpLine), zMid = zone("mid", "{compress} Milieu : va être résumé");
   box.replaceChildren(zone("", "Début : gardé"), rpLine({ kind: "sys", who: "Consignes", t: RP_SYS }), zMid, ...mid,
     zone("", "Fin : gardée"), ...rpPast(RP_MID, RP_MID + 1).map(rpLine));
-  rpSay("warn", "{forward} Plus tard : la conversation a duré des heures. La mémoire de l'IA est pleine.");
+  rpSay("warn", "{forward} Imagine : la conversation continue longtemps. La mémoire de l'IA est pleine.");
   await rpWait(1600);
   if (gen !== rp.gen) return;
   mid.forEach((el, i) => { el.style.animationDelay = i * 90 + "ms"; el.classList.add("squash"); });
@@ -1299,7 +1310,7 @@ function rpButton() {
   const s = RP_STEPS[rp.step], b = $("#rpNext");
   b.hidden = s === undefined;
   b.disabled = false;
-  if (s !== undefined) rich(b, s === "cmp" ? "{forward} Plus tard : la mémoire est pleine" : `{paper-plane} Envoyer : « ${RP[s][0]} »`);
+  if (s !== undefined) rich(b, s === "cmp" ? "{forward} Imagine : la mémoire est pleine" : `{paper-plane} Envoyer : « ${RP[s][0]} »`);
 }
 function rpReset() {
   rp.gen++;
@@ -1336,7 +1347,8 @@ rpReset();
 }
 
 // Jeu : ta journée. Même sujet : on continue. Nouveau sujet : nouvelle conversation.
-const DAY_PER = 800, REPASTE = 3000;
+// REPASTE : ce que tu recolles pour tout réexpliquer (le devis et les échanges), un peu plus que l'historique lui-même.
+const DAY_PER = 800, REPASTE = 8000;
 const DAY_START = { subject: "{file-lines} Le devis île des Pins", n: 8 };
 const DAY = [
   { q: "Le client répond à ton devis : il veut changer les dates.", subject: "{file-lines} Le devis, suite", n: 4, same: true,
@@ -1385,12 +1397,12 @@ function renderDay() {
   }));
 
   if (k === DAY.length) {
-    const allIn = simDay([true, true, true]).total;
+    const allIn = simDay([true, true, true]).total, best = simDay(DAY.map((m) => m.same)).total;
     const again = btn("{rotate-left} Rejouer", "btn");
     again.addEventListener("click", () => { day = []; startDay(); renderDay(); $("#dayCard").focus(); });
     card.replaceChildren(h("span", "q", `{flag-checkered} Journée finie : ${good} bon${good > 1 ? "s" : ""} choix sur ${DAY.length}`), again);
     rich($("#dayResult"), (good === DAY.length ? "{trophy} Parfait ! " : "") +
-      `L'IA a lu ${fmt(total)} tokens aujourd'hui. Tout dans une seule conversation : ${fmt(allIn)} tokens. ` +
+      `L'IA a lu ${fmt(total)} tokens aujourd'hui. Avec les bons choix : ${fmt(best)} tokens. Tout dans une seule conversation : ${fmt(allIn)} tokens. ` +
       "La règle : même sujet, on continue. Nouveau sujet, nouvelle conversation.");
     if (good === DAY.length) confetti("{briefcase}");
     return;
@@ -1402,7 +1414,7 @@ function renderDay() {
   fresh.addEventListener("click", () => decideDay(false));
   const btns = h("div", "btns");
   btns.append(cont, fresh);
-  card.replaceChildren(h("span", "eyebrow", `Moment ${k + 1} sur ${DAY.length} · ${m.n} messages`), h("span", "q", "« " + m.q + " »"), btns);
+  card.replaceChildren(h("span", "eyebrow", `Moment ${k + 2} sur ${DAY.length + 1} · ${m.n} messages`), h("span", "q", "« " + m.q + " »"), btns);
 }
 function decideDay(cont) {
   const m = DAY[day.length];
@@ -1416,7 +1428,7 @@ function decideDay(cont) {
 }
 function startDay() {
   const li = h("li", "start");
-  li.append(h("strong", "", "{sun} 8 h : "), `tu commences par le devis île des Pins. ${DAY_START.n} messages.`);
+  li.append(h("strong", "", "{sun} Moment 1, 8 h : "), `tu commences par le devis île des Pins. ${DAY_START.n} messages.`);
   $("#dayLog").replaceChildren(li);
 }
 startDay();
@@ -1431,7 +1443,7 @@ initDefi([
     options: [["less", "Coûte moins cher"], ["same", "Coûte pareil"], ["more", "Coûte beaucoup plus"]],
     why: "L'IA relit les 50 messages d'avant. Elle lit beaucoup plus de tokens." },
   { q: "La mémoire de l'IA est pleine. Que se passe-t-il ?", a: "sum",
-    options: [["stop", "Elle s'arrête net"], ["sum", "Elle résume le début"], ["all", "Elle garde tout"]],
+    options: [["stop", "Elle s'arrête net"], ["sum", "Elle résume le milieu de la conversation"], ["all", "Elle garde tout"]],
     why: "C'est la compression : l'IA garde le début et la fin, et un court résumé remplace le milieu. Les détails du milieu se perdent." },
   { q: "Tu colles un document de 50 pages au début de la conversation. Ensuite…", a: "each",
     options: [["once", "L'IA le lit une seule fois"], ["each", "L'IA le relit à chaque message"], ["free", "Il ne compte pas"]],
