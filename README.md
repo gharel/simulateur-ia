@@ -1,6 +1,6 @@
-# Comprendre l'IA en 8 fiches
+# Comprendre l'IA en 9 fiches
 
-8 fiches interactives, écrites en FALC (Facile À Lire et à Comprendre), pour expliquer l'IA à un public non technique. Elles vont de « je comprends » à « je choisis mon outil et mon budget ».
+9 fiches interactives, écrites en FALC (Facile À Lire et à Comprendre), pour expliquer l'IA à un public non technique. Elles vont de « je comprends » à « je crée mon agent et je choisis mon budget ».
 
 **Partie 1 · Comprendre comment elle marche**
 
@@ -17,7 +17,8 @@
 **Partie 3 · Agir avec l'IA**
 
 7. **La Boîte à Outils de l'IA** : le bon prompt (contexte, action précise, objectif), répondre ou agir (l'exemple de Claude, qui réunit Chat et Cowork), l'agent de code, Projets, Skills, Connecteurs, les risques de chaque outil, et les noms de ces outils chez Claude et ChatGPT
-8. **Forfait ou Compteur ?** : abonnement ou paiement à l'usage, et les noms des forfaits chez Claude et ChatGPT
+8. **L'Agent sur Mesure** : ce qu'est un agent (la boucle regarde, décide, agit, vérifie), créer le sien en 5 étapes, le fichier de consignes (AGENTS.md, CLAUDE.md avec `@AGENTS.md`, SKILL.md), et où ranger ses consignes chez Claude et ChatGPT
+9. **Forfait ou Compteur ?** : abonnement ou paiement à l'usage, et les noms des forfaits chez Claude et ChatGPT
 
 ## Jouer
 
@@ -31,15 +32,18 @@ Chaque fiche contient :
   - fiche 5 : Pose ta question sans donner ton avis ;
   - fiche 6 : Le gardien des permissions ;
   - fiche 7 : Les missions de la cuisine ;
-  - fiche 8 : Fais ton pari.
+  - fiche 8 : Le banc d'essai ;
+  - fiche 9 : Fais ton pari.
 - **des questions « Devine d'abord »** : on répond avant de voir le résultat.
 - **un défi final** : seule la 1re réponse compte. Il donne un badge et de 1 à 3 étoiles.
 
-Avec les 8 badges, l'accueil délivre un **permis de conduire l'IA** à imprimer.
+Avec les 9 badges, l'accueil délivre un **permis de conduire l'IA** à imprimer.
 
 La progression reste dans le navigateur (`localStorage`), rangée par nom de fiche (`tokens`, `memoire`…). Le bouton « Effacer ma progression » de l'accueil la remet à zéro.
 
 Le parcours avait d'abord 6 fiches. Une progression de cette époque est convertie toute seule : une fiche coupée en deux donne ses deux badges. Les anciennes adresses (`2-modele-effort.html`, `3-hallucinations.html`, `4-boite-outils.html`, `5-forfait-api.html`) renvoient vers la nouvelle fiche.
+
+Le parcours a eu ensuite 8 fiches. La fiche « L'Agent sur Mesure » est arrivée en 8e position : « Forfait ou Compteur ? » est passée de `8-forfait-api.html` à `9-forfait-api.html`, et l'ancienne adresse renvoie vers la nouvelle. Les badges déjà gagnés sont gardés, mais le permis demande aussi le badge de la nouvelle fiche.
 
 ## Mode atelier et mode démonstration
 
@@ -48,7 +52,7 @@ Les deux boutons sont en bas de chaque page, avec une courte explication. Le mod
 - **Mode atelier**, pour animer un groupe : le bouton « Mode atelier », ou l'adresse `index.html?atelier=1`.
   Le texte est plus gros. Dans les quiz, un clic choisit la réponse du groupe, puis « Révéler » affiche la correction.
 - **Mode démonstration**, pour présenter : le bouton « Mode démonstration », ou l'adresse `index.html?demo=1`.
-  Rien n'est flou : tout se voit sans répondre aux questions « Devine d'abord ». Sur l'accueil, le permis se voit aussi, mais on ne l'imprime qu'avec les 8 badges.
+  Rien n'est flou : tout se voit sans répondre aux questions « Devine d'abord ». Sur l'accueil, le permis se voit aussi, mais on ne l'imprime qu'avec les 9 badges.
 
 Pour enlever un mode : le même bouton, ou l'adresse avec `=0` (par exemple `?demo=0`).
 
@@ -64,7 +68,7 @@ Le logo est un SVG intégré dans la page : le mot « skazy » prend la couleur 
 
 Pages HTML statiques, sans étape de build. Ouvrir `index.html`.
 
-Chaque fiche est autonome : CSS et JS sont dans le fichier. Le bloc « Parcours » (défi, badges, mode atelier) est le même dans les 8 fiches. Si tu le modifies, modifie-le partout. Le bandeau Skazy Formation aussi.
+Chaque fiche est autonome : CSS et JS sont dans le fichier. Le bloc « Parcours » (défi, badges, mode atelier) est le même dans les 9 fiches. Si tu le modifies, modifie-le partout. Le bandeau Skazy Formation aussi.
 
 ### Icônes
 

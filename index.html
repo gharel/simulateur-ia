@@ -5,11 +5,11 @@
 <!-- La page a déjà ses thèmes clair et sombre : les modes nuit forcés (Dark Reader, mode nuit de Brave) ne doivent pas changer ses couleurs. -->
 <meta name="color-scheme" content="light dark">
 <meta name="darkreader-lock">
-<title>Comprendre l'IA en 8 fiches</title>
+<title>Comprendre l'IA en 9 fiches</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="description" content="8 fiches interactives et faciles à lire pour comprendre l'IA : tokens, mémoire, modèles, hallucinations, complaisance, sécurité, outils et prix.">
+<meta name="description" content="9 fiches interactives et faciles à lire pour comprendre l'IA : tokens, mémoire, modèles, hallucinations, complaisance, sécurité, outils, agents et prix.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
@@ -57,18 +57,17 @@ body {
 .fiche:hover { transform: translateY(-4px); }
 .fiche:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
 .wide { grid-column: span 6; background: var(--surface); border: 1px solid var(--line); padding: 32px; gap: 20px; }
-.fiche.half { grid-column: span 3; }
 /* Le titre d'une partie colle à ses fiches, loin de la partie d'avant. */
 .part { grid-column: 1 / -1; display: grid; gap: 4px; margin-top: 24px; margin-bottom: calc(16px - var(--bento-gap)); }
 .part h2 { font-size: 1.35rem; }
 @media (max-width: 900px) {
   .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero, .wide { grid-column: span 2; }
-  .fiche, .fiche.half { grid-column: span 1; }
+  .fiche { grid-column: span 1; }
 }
 @media (max-width: 640px) {
   .bento { grid-template-columns: minmax(0, 1fr); }
-  .hero, .fiche, .fiche.half, .wide { grid-column: span 1; }
+  .hero, .fiche, .wide { grid-column: span 1; }
   .card, .hero, .wide { padding: 24px 20px; }
   .part { margin-top: 16px; }
 }
@@ -147,7 +146,7 @@ p { margin: 0; max-width: 60ch; }
 }
 .license::before {
   content: ""; position: absolute; inset: 0 0 auto 0; height: 10px;
-  background: linear-gradient(90deg, #C6FF00 0 12.5%, #4DA3FF 0 25%, #FF2E93 0 37.5%, #FF6B00 0 50%, #FF9AD5 0 62.5%, #FFE600 0 75%, #00E5FF 0 87.5%, #B14EFF 0);
+  background: linear-gradient(90deg, #C6FF00 0 11.11%, #4DA3FF 0 22.22%, #FF2E93 0 33.33%, #FF6B00 0 44.44%, #FF9AD5 0 55.56%, #FFE600 0 66.67%, #00E5FF 0 77.78%, #3CF0B4 0 88.89%, #B14EFF 0);
 }
 .license.locked .lic-body { filter: blur(3px); opacity: .55; }
 .lic-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; flex-wrap: wrap; }
@@ -159,7 +158,7 @@ p { margin: 0; max-width: 60ch; }
 .lic-fields dt { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #55556B; padding-top: 4px; }
 .lic-fields dd { margin: 0; font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; }
 .lic-fields dd.name { font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; line-height: 1.1; }
-.lic-badges { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.lic-badges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 @media (max-width: 640px) { .lic-badges { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .lic-badges div { border: 1.5px solid #D9D9E5; border-radius: 12px; padding: 8px 10px; display: grid; gap: 2px; font-size: .82rem; font-weight: 700; line-height: 1.25; }
 .lic-badges b { font-size: 1.4rem; }
@@ -200,13 +199,13 @@ p { margin: 0; max-width: 60ch; }
   </header>
   <div class="bento">
     <section class="card hero">
-      <span class="eyebrow">Fiches interactives · Facile à lire · Environ 1 h 30 en tout</span>
-      <h1>Comprendre l'IA<br>en 8 fiches</h1>
+      <span class="eyebrow">Fiches interactives · Facile à lire · Environ 1 h 40 en tout</span>
+      <h1>Comprendre l'IA<br>en 9 fiches</h1>
       <p class="lead">Des fiches courtes à manipuler. Bouge les curseurs, joue aux mini-jeux, réussis le défi final de chaque fiche.</p>
-      <p>Chaque défi réussi te donne un badge. Avec les 8 badges, tu gagnes ton <strong>permis de conduire l'IA</strong>.</p>
+      <p>Chaque défi réussi te donne un badge. Avec les 9 badges, tu gagnes ton <strong>permis de conduire l'IA</strong>.</p>
       <div class="progress">
         <div class="track" id="track" aria-hidden="true"></div>
-        <strong id="progTxt" aria-live="polite">0 badge sur 8</strong>
+        <strong id="progTxt" aria-live="polite">0 badge sur 9</strong>
       </div>
       <div><a class="btn main" id="goOn" href="1-tokens.html"><i class="fa-solid fa-play" aria-hidden="true"></i> Commencer par la fiche 1</a></div>
     </section>
@@ -252,14 +251,20 @@ p { margin: 0; max-width: 60ch; }
     </a>
 
     <div class="part"><span class="eyebrow">Partie 3</span><h2>Agir avec l'IA</h2></div>
-    <a class="card fiche half" href="7-boite-outils.html" style="--accent:#00E5FF" data-id="outils">
+    <a class="card fiche" href="7-boite-outils.html" style="--accent:#00E5FF" data-id="outils">
       <span class="eyebrow">Fiche 7</span>
       <h2>La Boîte à Outils de l'IA</h2>
       <p>Écris un bon prompt : contexte, action, objectif. Puis donne à l'IA les bons outils.</p>
       <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="10"></span></span>
     </a>
-    <a class="card fiche half" href="8-forfait-api.html" style="--accent:#B14EFF" data-id="forfait">
+    <a class="card fiche" href="8-agent.html" style="--accent:#3CF0B4" data-id="agent">
       <span class="eyebrow">Fiche 8</span>
+      <h2>L'Agent sur Mesure</h2>
+      <p>Un agent, c'est une IA qui agit pour toi, étape par étape. Écris ses consignes dans un fichier, puis teste-le.</p>
+      <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="15"></span></span>
+    </a>
+    <a class="card fiche" href="9-forfait-api.html" style="--accent:#B14EFF" data-id="forfait">
+      <span class="eyebrow">Fiche 9</span>
       <h2>Forfait ou Compteur ?</h2>
       <p>Payer un prix fixe chaque mois, ou payer à chaque token ? Fais le calcul.</p>
       <span class="go"><span>Ouvrir la fiche <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><span class="fmeta" data-min="10"></span></span>
@@ -281,7 +286,7 @@ p { margin: 0; max-width: 60ch; }
           <div class="lic-body">
             <div class="lic-top">
               <div>
-                <div class="lic-kicker">Comprendre l'IA en 8 fiches</div>
+                <div class="lic-kicker">Comprendre l'IA en 9 fiches</div>
                 <div class="lic-title">Permis de conduire l'IA</div>
               </div>
               <span class="lic-photo" aria-hidden="true"><i class="fa-solid fa-graduation-cap"></i></span>
@@ -311,7 +316,7 @@ p { margin: 0; max-width: 60ch; }
     </div>
     <div class="modes-help">
       <span><strong>Mode atelier</strong> : pour animer un groupe. Le texte est plus gros. Dans les quiz, un clic choisit la réponse du groupe, puis « Révéler » montre la correction.</span>
-      <span><strong>Mode démonstration</strong> : pour présenter. Rien n'est flou, tout se voit sans répondre aux questions « Devine d'abord ». Le permis se voit aussi, sans les 8 badges.</span>
+      <span><strong>Mode démonstration</strong> : pour présenter. Rien n'est flou, tout se voit sans répondre aux questions « Devine d'abord ». Le permis se voit aussi, sans les 9 badges.</span>
       <span>Les deux modes restent actifs d'une fiche à l'autre. Adresses directes : <code>index.html?atelier=1</code> et <code>index.html?demo=1</code></span>
     </div>
     <span class="brand-foot">Une ressource Skazy Formation : <a href="https://formation.skazy.nc/" target="_blank" rel="noopener">formation.skazy.nc</a></span>
@@ -326,15 +331,15 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const BADGES = {
   tokens: ["{coins}", "Maître des tokens"], memoire: ["{memory}", "As de la mémoire"], cerveau: ["{brain}", "Bon Cerveau"],
   bobards: ["{user-secret}", "Détective anti-bobards"], complaisance: ["{scale-balanced}", "Esprit critique"], piege: ["{shield-halved}", "Gardien anti-piège"],
-  outils: ["{toolbox}", "As de la boîte à outils"], forfait: ["{calculator}", "Pro du budget"],
+  outils: ["{toolbox}", "As de la boîte à outils"], agent: ["{robot}", "Créateur d'agent"], forfait: ["{calculator}", "Pro du budget"],
 };
 const FILES = {
   tokens: "1-tokens.html", memoire: "2-memoire.html", cerveau: "3-modele-effort.html", bobards: "4-hallucinations.html",
-  complaisance: "5-complaisance.html", piege: "6-message-piege.html", outils: "7-boite-outils.html", forfait: "8-forfait-api.html",
+  complaisance: "5-complaisance.html", piege: "6-message-piege.html", outils: "7-boite-outils.html", agent: "8-agent.html", forfait: "9-forfait-api.html",
 };
 const COLORS = {
   tokens: "#C6FF00", memoire: "#4DA3FF", cerveau: "#FF2E93", bobards: "#FF6B00",
-  complaisance: "#FF9AD5", piege: "#FFE600", outils: "#00E5FF", forfait: "#B14EFF",
+  complaisance: "#FF9AD5", piege: "#FFE600", outils: "#00E5FF", agent: "#3CF0B4", forfait: "#B14EFF",
 };
 const IDS = Object.keys(BADGES), COUNT = IDS.length, MAX_STARS = COUNT * 3;
 const store = {

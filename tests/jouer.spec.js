@@ -101,6 +101,58 @@ test("4-hallucinations.html : changer la règle du classement change le gagnant"
   await expect(page.locator(".rk-n")).toHaveText(["−4", "−51"]);
 });
 
+test.describe("8-agent.html : l'agent sur mesure", () => {
+  test("la boucle fait 2 tours, puis le but est atteint", async ({ page }) => {
+    await open(page, "8-agent.html", "?demo=1");
+    const next = page.locator("#loopNext");
+    for (let step = 1; step <= 8; step++) {
+      await next.click();
+      await expect(page.locator("#loopLog li")).toHaveCount(step);
+      // Au 5e pas, l'agent refait un tour : « Regarde » se rallume.
+      if (step === 5) {
+        await expect(page.locator('.lp[data-k="look"]')).toHaveClass(/on/);
+        await expect(page.locator("#loopMid")).toHaveText("Tour 2");
+      }
+    }
+    await expect(next).toBeHidden();
+    await expect(page.locator("#loopPill")).toContainText("But atteint");
+    await page.locator("#loopReset").click();
+    await expect(page.locator("#loopLog li")).toHaveCount(0);
+    await expect(next).toBeVisible();
+  });
+
+  test("ce que l'agent lit : sans @AGENTS.md, ses consignes sont oubliées", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await open(page, "8-agent.html", "?demo=1");
+    const read = () => page.locator("#tree li.read").evaluateAll((ls) => ls.map((l) => l.dataset.f));
+    expect(await read()).toEqual(["agents", "skill", "tarifs"]);
+    await page.locator('#segReader button[data-v="marque"]').click();
+    expect(await read()).toEqual(["agents", "claude", "skill", "tarifs"]);
+    await page.locator("#impSw").click();
+    expect(await read()).toEqual(["claude", "skill"]);
+    await expect(page.locator("#readStatus")).toHaveClass(/bad/);
+    await page.locator('#segTask button[data-v="question"]').click();
+    expect(await read()).toEqual(["claude"]);
+  });
+
+  test("le banc d'essai : les bonnes consignes passent les 4 tests", async ({ page }) => {
+    await open(page, "8-agent.html");
+    // La bonne phrase de chaque partie est marquée dans les données de la page (BENCH).
+    const good = await page.evaluate(() => BENCH.map((r) => r.o.findIndex(([, ok]) => ok)));
+    for (const [i, j] of good.entries()) await page.locator("#bench .row").nth(i).locator("button").nth(j).click();
+    await page.locator("#benchRun").click();
+    await expect(page.locator("#benchScore")).toHaveText("4 / 4");
+    await expect(page.locator("#benchResult")).toContainText("Il est prêt");
+    // Avec « Envoie chaque devis dès qu'il est prêt », le test de l'e-mail piégé rate.
+    const risky = await page.evaluate(() => BENCH[2].o.findIndex(([t]) => t.startsWith("Envoie")));
+    await page.locator("#bench .row").nth(2).locator("button").nth(risky).click();
+    await page.locator("#benchRun").click();
+    await expect(page.locator("#benchScore")).toHaveText("3 / 4");
+    await expect(page.locator("#benchLog li").nth(2)).toHaveClass(/bad/);
+    await expect(page.locator("#bench .row").nth(2)).toHaveClass(/fail/);
+  });
+});
+
 test.describe("mode démonstration", () => {
   for (const f of FICHES) {
     test(`${f} : rien n'est flou`, async ({ page }) => {
@@ -135,22 +187,23 @@ test("index.html : le permis se débloque avec tous les badges", async ({ page }
   await open(page, "index.html");
   await expect(page.locator("#licLock")).toBeVisible();
   await page.evaluate(() => localStorage.setItem("ia6:progress", JSON.stringify(
-    { tokens: 3, memoire: 2, cerveau: 3, bobards: 2, complaisance: 3, piege: 3, outils: 1, forfait: 3 })));
+    { tokens: 3, memoire: 2, cerveau: 3, bobards: 2, complaisance: 3, piege: 3, outils: 1, agent: 2, forfait: 3 })));
   await page.reload({ waitUntil: "networkidle" });
   await iconsReady(page);
   await expect(page.locator("#licLock")).toBeHidden();
   await expect(page.locator("#licPrint")).toBeEnabled();
   await expect(page.locator("#license .brand-logo")).toBeVisible();
   await expect(page.locator("#licBadges .st svg")).toHaveCount(FICHES.length * 3);
-  await expect(page.locator("#progTxt")).toHaveText(`${FICHES.length} badges sur ${FICHES.length} · 20 étoiles sur ${FICHES.length * 3}`);
+  await expect(page.locator("#progTxt")).toHaveText(`${FICHES.length} badges sur ${FICHES.length} · 22 étoiles sur ${FICHES.length * 3}`);
 });
 
-test("une progression du parcours en 6 fiches est convertie : on garde ses badges et son permis", async ({ page }) => {
+test("une progression du parcours en 6 fiches est convertie : on garde ses badges", async ({ page }) => {
   await open(page, "index.html");
   await page.evaluate(() => localStorage.setItem("ia6:progress", JSON.stringify({ 1: 3, 2: 3, 3: 2, 4: 3, 5: 1, 6: 3 })));
   await page.reload({ waitUntil: "networkidle" });
   await iconsReady(page);
-  await expect(page.locator("#licLock")).toBeHidden();
+  // La fiche « L'Agent sur Mesure » est arrivée après : son badge manque encore pour le permis.
+  await expect(page.locator("#licLock")).toContainText("Encore 1 badge");
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("ia6:progress")));
   // Une fiche coupée en deux donne ses deux badges.
   expect(saved).toEqual({ tokens: 3, memoire: 3, cerveau: 3, bobards: 2, complaisance: 2, outils: 3, forfait: 1, piege: 3 });

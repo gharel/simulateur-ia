@@ -4,15 +4,15 @@ Consignes pour les agents (Claude Code, Codex…) qui travaillent sur ce dépôt
 
 ## Le projet
 
-- « Comprendre l'IA en 8 fiches » : 8 fiches interactives en 3 parties, et une page d'accueil, écrites en FALC. C'est une ressource [Skazy Formation](https://formation.skazy.nc/).
+- « Comprendre l'IA en 9 fiches » : 9 fiches interactives en 3 parties, et une page d'accueil, écrites en FALC. C'est une ressource [Skazy Formation](https://formation.skazy.nc/).
 - Pages HTML statiques, sans étape de build. Chaque page est autonome : son CSS et son JS sont dans le fichier.
 - En ligne avec GitHub Pages, depuis la branche `gh-pages` : https://gharel.github.io/simulateur-ia/
 
 ## Fichiers
 
 - `index.html` : l'accueil, la progression, le permis à imprimer.
-- `1-tokens.html` à `8-forfait-api.html` : les fiches, dans l'ordre du parcours.
-- `2-modele-effort.html`, `3-hallucinations.html`, `4-boite-outils.html`, `5-forfait-api.html` : les adresses du parcours en 6 fiches. Ce sont de petites pages qui renvoient vers la nouvelle fiche, en gardant `?atelier=1` et `?demo=1`. Ne les supprime pas : des liens circulent.
+- `1-tokens.html` à `9-forfait-api.html` : les fiches, dans l'ordre du parcours.
+- `2-modele-effort.html`, `3-hallucinations.html`, `4-boite-outils.html`, `5-forfait-api.html` : les adresses du parcours en 6 fiches. `8-forfait-api.html` : celle du parcours en 8 fiches. Ce sont de petites pages qui renvoient vers la nouvelle fiche, en gardant `?atelier=1` et `?demo=1`. Ne les supprime pas : des liens circulent.
 - `favicon.svg` : l'icône de l'onglet, « IA » en blanc avec une barre au vert Skazy. `favicon-32.png` et `apple-touch-icon.png` (180 px) en sont des copies, pour Safari et l'écran d'accueil des téléphones. Les liens sont relatifs, pour marcher sous `/simulateur-ia/` sur GitHub Pages.
 - `tests/` : les tests Playwright. `playwright.config.js` les lance sur bureau (1280 px) et sur téléphone (Pixel 7).
 - `README.md` : le contenu des fiches et le mode d'emploi des icônes.
@@ -32,12 +32,12 @@ npm test
 
 ## Règles
 
-- **Blocs communs.** Le CSS de base, le bloc CSS « Skazy Formation, icônes, Parcours » et le JS « Parcours » sont identiques dans les 8 fiches. Modifie-les partout en même temps. Le bandeau Skazy Formation est identique sur les 9 pages. Un test le vérifie.
+- **Blocs communs.** Le CSS de base, le bloc CSS « Skazy Formation, icônes, Parcours » et le JS « Parcours » sont identiques dans les 9 fiches. Modifie-les partout en même temps. Le bandeau Skazy Formation est identique sur les 10 pages. Un test le vérifie.
 - **Progression.** Elle se range par nom de fiche (`const FICHE = "tokens"`…), jamais par numéro : on peut réordonner sans perdre les badges. Une progression du parcours en 6 fiches (clés 1 à 6) est convertie par `loadProgress()`, dans les fiches et dans l'accueil.
 - **Ajouter ou déplacer une fiche.** À mettre à jour :
   - `BADGES` et `CONFETTI_COLORS` (bloc commun) ;
   - `index.html` : la carte, `BADGES`, `FILES`, `COLORS`, la bande de couleurs du permis ;
-  - dans chaque fiche : « Fiche N sur 8 », le menu du bas, la carte « Fiche suivante » ;
+  - dans chaque fiche : « Fiche N sur 9 », le menu du bas, la carte « Fiche suivante » ;
   - `FICHES` dans `tests/site.js`.
 
   Si une adresse change, laisse une page de redirection et ajoute-la à `MOVED` dans `tests/site.js`. Pour renvoyer vers une autre fiche, écris son nom (« voir « Le Sac à Tokens » »), pas son numéro.

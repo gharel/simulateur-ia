@@ -5,10 +5,13 @@ const { pathToFileURL } = require("url");
 const { lineBreakIssues } = require("./coupures");
 
 const ROOT = path.resolve(__dirname, "..");
-const FICHES = ["1-tokens.html", "2-memoire.html", "3-modele-effort.html", "4-hallucinations.html", "5-complaisance.html", "6-message-piege.html", "7-boite-outils.html", "8-forfait-api.html"];
+const FICHES = ["1-tokens.html", "2-memoire.html", "3-modele-effort.html", "4-hallucinations.html", "5-complaisance.html", "6-message-piege.html", "7-boite-outils.html", "8-agent.html", "9-forfait-api.html"];
 const PAGES = ["index.html", ...FICHES];
-// Adresses du parcours en 6 fiches : de petites pages renvoient vers la nouvelle adresse.
-const MOVED = { "2-modele-effort.html": "3-modele-effort.html", "3-hallucinations.html": "4-hallucinations.html", "4-boite-outils.html": "7-boite-outils.html", "5-forfait-api.html": "8-forfait-api.html" };
+// Adresses des parcours en 6 et en 8 fiches : de petites pages renvoient vers la nouvelle adresse.
+const MOVED = {
+  "2-modele-effort.html": "3-modele-effort.html", "3-hallucinations.html": "4-hallucinations.html", "4-boite-outils.html": "7-boite-outils.html",
+  "5-forfait-api.html": "9-forfait-api.html", "8-forfait-api.html": "9-forfait-api.html",
+};
 const SKAZY = "https://formation.skazy.nc/";
 
 // Emoji et pictogrammes Unicode interdits : les icônes passent par Font Awesome.

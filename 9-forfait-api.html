@@ -5,7 +5,7 @@
 <!-- La page a déjà ses thèmes clair et sombre : les modes nuit forcés (Dark Reader, mode nuit de Brave) ne doivent pas changer ses couleurs. -->
 <meta name="color-scheme" content="light dark">
 <meta name="darkreader-lock">
-<title>Le Sac à Tokens</title>
+<title>Forfait ou Compteur ?</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -302,28 +302,49 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 :root[data-mode="atelier"] body { font-size: 21px; }
 :root[data-mode="atelier"] .wrap { max-width: 1440px; }
 
-:root { --accent: #C6FF00; }
+:root { --accent: #B14EFF; --accent-text: #C47BFF; --plan: #F3F3F8; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --plan: #12121A; } }
+:root[data-theme="light"] { --plan: #12121A; }
 
-.tokens { display: flex; flex-wrap: wrap; gap: 6px; min-height: 48px; align-content: flex-start; }
-.tokens:empty { min-height: 0; }
-.tok {
-  white-space: pre; padding: 4px 8px; border-radius: 8px; font-weight: 700; font-size: 1.05rem;
-  background: var(--accent); color: var(--on-accent);
-}
-.tok:nth-child(3n+2) { background: color-mix(in oklab, var(--accent) 45%, var(--surface)); color: var(--fg); }
-.tok:nth-child(3n) { background: transparent; color: var(--accent-text); box-shadow: inset 0 0 0 2px var(--accent); }
-.examples { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); }
-/* Un mot trop long pour la case passe au-dessus de son nombre de tokens. */
-.ex { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 12px; padding: 12px 16px; background: var(--surface-2); border-radius: 12px; line-height: 1.35; }
-.ex code { font-family: var(--font-body); font-weight: 700; overflow-wrap: break-word; }
-.ex .n { margin-left: auto; font-family: var(--font-display); color: var(--accent-text); white-space: nowrap; }
-.btns { display: flex; flex-wrap: wrap; gap: 10px; }
-.btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 640px) { .duo { grid-template-columns: minmax(0, 1fr); } }
+.duo .stat b { font-size: clamp(1.9rem, 4vw, 2.6rem); }
+.duo .stat.plan b { color: var(--fg); }
+.cmp { display: grid; gap: 16px; }
+.cmp .fill.plan { background: var(--plan); }
+.verdict { padding: 16px 20px 16px 24px; border-radius: 14px; background: var(--surface-2); font-weight: 700; line-height: 1.5; box-shadow: inset 4px 0 0 var(--accent); }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+.fields label { display: grid; gap: 8px; font-weight: 700; font-size: .95rem; line-height: 1.4; align-content: space-between; }
+.unit { position: relative; }
+.unit input { padding-right: 34px; }
+.unit::after { content: "$"; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-weight: 700; }
 
-/* Jeu : le compte est bon */
-.cb-game { display: grid; gap: 20px; max-width: 760px; }
-.cb-goal { display: grid; gap: 4px; padding: 16px 20px 16px 24px; border-radius: 14px; background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
-.cb-goal strong { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; line-height: 1.2; }
+.chart-box { width: 100%; }
+.chart-box svg { display: block; width: 100%; height: auto; overflow: visible; }
+.grid line { stroke: var(--line); stroke-width: 1; }
+.axis text { fill: var(--muted); font-family: var(--font-body); font-size: 13px; }
+.l-api { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; }
+.a-api { fill: var(--accent); opacity: .12; }
+.l-plan { fill: none; stroke: var(--plan); stroke-width: 3; stroke-dasharray: 8 6; }
+.l-even { stroke: var(--warn); stroke-width: 2; stroke-dasharray: 4 4; }
+.t-even { fill: var(--warn); font-family: var(--font-body); font-size: 13px; font-weight: 700; }
+.t-lab { font-family: var(--font-body); font-size: 13px; font-weight: 700; }
+.t-api { fill: var(--accent-text); } .t-plan { fill: var(--plan); }
+.dot-now { fill: var(--accent); stroke: var(--bg); stroke-width: 3; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: .9rem; color: var(--muted); }
+.legend i { display: inline-block; width: 22px; height: 0; vertical-align: middle; margin-right: 6px; border-top: 4px solid var(--accent); }
+.legend i.p { border-top: 3px dashed var(--plan); }
+.legend i.e { border-top: 2px dashed var(--warn); }
+
+.versus { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 640px) { .versus { grid-template-columns: minmax(0, 1fr); } }
+.versus > div { background: var(--surface-2); border-radius: 16px; padding: 20px 22px 22px; display: grid; gap: 10px; align-content: start; }
+.versus h3 { color: var(--accent-text); margin-bottom: 2px; }
+.versus p { font-weight: 700; line-height: 1.5; }
+.bets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.noms thead th { width: 36%; }
+.noms thead th:first-child { width: 28%; }
+@media (max-width: 900px) { .bets { grid-template-columns: minmax(0, 1fr); } }
 </style>
 
 <main class="wrap">
@@ -339,85 +360,153 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     <section class="card hero s4">
       <div class="hero-grid">
         <div class="ctl">
-          <span class="eyebrow">Comprendre l'IA · Fiche 1 sur 9</span>
-          <h1>Le Sac<br>à Tokens</h1>
-          <p class="lead">L'IA ne lit pas des mots. Elle lit des petits morceaux de texte : les tokens.</p>
+          <span class="eyebrow">Comprendre l'IA · Fiche 9 sur 9</span>
+          <h1>Forfait<br>ou Compteur ?</h1>
+          <p class="lead">Payer un prix fixe chaque mois, ou payer à chaque token ? Fais le calcul avec ton usage.</p>
         </div>
         <div class="word-card">
-          <span class="eyebrow">Le mot à connaître</span>
-          <strong>Token</strong>
-          <p>Un petit morceau de mot. Souvent 3 ou 4 lettres.</p>
-          <p>L'IA compte tout en tokens : ce qu'elle lit, ce qu'elle écrit, ce que ça coûte.</p>
+          <span class="eyebrow">Les mots à connaître</span>
+          <strong>Forfait</strong>
+          <p>Un abonnement. Prix fixe, mais avec une limite d'usage.</p>
+          <strong>API</strong>
+          <p>Un compteur. Tu paies ce que tu utilises, au token près.</p>
         </div>
       </div>
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-pen"></i></span><h2>Écris une phrase</h2></div>
-      <p class="muted">Regarde comment l'IA la découpe en morceaux.</p>
-      <label class="ctl" for="txt">Ton texte
-        <textarea id="txt" rows="3">Bonjour ! Peux-tu m'aider à préparer mon voyage à Nouméa en décembre ?</textarea>
-      </label>
-      <div class="tokens" id="toks" aria-live="polite"></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span><h2>Mon usage</h2></div>
+      <div class="ctl">
+        <div class="ctl-row"><label for="perDay">Messages par jour</label><span class="ctl-val" id="vPerDay"></span></div>
+        <input type="range" id="perDay" min="1" max="200" value="40">
+      </div>
+      <div class="ctl">
+        <div class="ctl-row"><label for="days">Jours d'utilisation par mois</label><span class="ctl-val" id="vDays"></span></div>
+        <input type="range" id="days" min="1" max="31" value="22">
+      </div>
+      <div class="ctl">
+        <span>Type de message</span>
+        <div class="seg" id="segSize" role="group" aria-label="Type de message">
+          <button type="button" data-v="short" aria-pressed="false">Court</button>
+          <button type="button" data-v="mid" aria-pressed="true">Moyen</button>
+          <button type="button" data-v="long" aria-pressed="false">Gros travail</button>
+        </div>
+        <span class="small muted" id="sizeHint"></span>
+      </div>
+      <div class="ctl">
+        <span>Modèle</span>
+        <div class="seg" id="segModel" role="group" aria-label="Modèle">
+          <button type="button" data-v="rapide" aria-pressed="false">Rapide</button>
+          <button type="button" data-v="standard" aria-pressed="true">Standard</button>
+          <button type="button" data-v="expert" aria-pressed="false">Expert</button>
+        </div>
+      </div>
+      <label class="sw" for="cache"><span><i class="fa-solid fa-recycle" aria-hidden="true"></i> Mémoire cache (relire coûte moins cher)</span><input type="checkbox" id="cache"></label>
+    </section>
+
+    <section class="card s2">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-calculator"></i></span><h2>Le résultat par mois</h2></div>
+      <div class="duo">
+        <div class="stat"><b id="apiCost">–</b><span>avec l'API (compteur)</span></div>
+        <div class="stat plan"><b id="planCost">–</b><span>avec le forfait</span></div>
+      </div>
+      <div class="cmp" aria-hidden="true">
+        <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-receipt"></i> API</span><span id="cmpApiTxt"></span></div><div class="track"><div class="fill" id="cmpApi"></div></div></div>
+        <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-credit-card"></i> Forfait</span><span id="cmpPlanTxt"></span></div><div class="track"><div class="fill plan" id="cmpPlan"></div></div></div>
+      </div>
+      <div class="verdict" id="verdict" aria-live="polite"></div>
       <div class="stats">
-        <div class="stat"><b id="sWords">0</b><span>mots</span></div>
-        <div class="stat"><b id="sToks">0</b><span>tokens</span></div>
-        <div class="stat"><b id="sChars">0</b><span>caractères</span></div>
-        <div class="stat"><b id="sRatio">0</b><span>tokens par mot</span></div>
+        <div class="stat"><b id="sMsgs">–</b><span>messages par mois</span></div>
+        <div class="stat"><b id="sToks">–</b><span>tokens par mois</span></div>
+        <div class="stat"><b id="sPerMsg">–</b><span>prix d'un message (API)</span></div>
       </div>
-      <p class="small muted">Découpage simplifié pour l'exemple. Le vrai découpage change un peu selon le modèle.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-dice"></i></span><h2>Jeu : fais ton pari</h2><span class="pill" id="betScore">0 / 4</span></div>
+      <p>Voici 4 profils. Pour chacun, parie : <strong>forfait à 20 $ par mois, ou API au compteur ?</strong>
+        Après ta réponse, le calculateur se règle sur le profil. Regarde la courbe juste en dessous.</p>
+      <div class="quiz bets" id="bets"></div>
+      <div class="result" id="betResult" aria-live="polite"></div>
+      <p class="small muted">Profils inventés pour comprendre. Calcul avec un forfait à 20 $ et les prix API de septembre 2026.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></span><h2>Où est le point de bascule ?</h2></div>
+      <p class="muted">Le coût par mois selon le nombre de messages par jour.</p>
+      <div class="chart-box" id="chart" role="img" aria-label="Courbe du coût de l'API comparé au prix du forfait"></div>
+      <div class="legend">
+        <span><i></i>API : le prix monte avec l'usage</span>
+        <span><i class="p"></i>Forfait : le prix reste le même</span>
+        <span><i class="e"></i>Point de bascule</span>
+      </div>
     </section>
 
     <section class="card s2">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-ruler"></i></span><h2>Court ou long ?</h2></div>
-      <div id="tokGuess"></div>
-      <p>Un mot court = 1 token.<br>Un mot long = plusieurs tokens.</p>
-      <div class="examples" id="examples"></div>
-      <p class="small muted">Les espaces et la ponctuation comptent aussi.</p>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-pen-nib"></i></span><h2>Les prix (modifiables)</h2></div>
+      <p class="muted">Les prix changent souvent. Tu peux les corriger ici.</p>
+      <div class="fields">
+        <label for="plan">Forfait par mois<span class="unit"><input type="number" id="plan" min="0" step="1" value="20"></span></label>
+        <label for="inP">API : lire 1 million de tokens<span class="unit"><input type="number" id="inP" min="0" step="0.1" value="2"></span></label>
+        <label for="outP">API : écrire 1 million de tokens<span class="unit"><input type="number" id="outP" min="0" step="0.1" value="10"></span></label>
+      </div>
+      <p class="small muted">Exemple avec les prix API publics de Claude, septembre 2026 : modèle rapide = 1 $ / 5 $, standard = 2 $ / 10 $, expert = 4 $ / 20 $. Choisir un modèle remplit ces cases. Le prix du forfait est un exemple : vérifie le tarif actuel.</p>
     </section>
 
-    <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></span><h2>Jeu : le compte est bon</h2><span class="pill" id="cbScore">0 / 3</span></div>
-      <p>Écris une phrase qui fait <strong>exactement</strong> le bon nombre de tokens. Puis vérifie.</p>
-      <p class="small muted">Astuce : un mot court fait 1 token. Un mot long en fait plusieurs. La ponctuation compte aussi.</p>
-      <div class="cb-game">
-        <div class="cb-goal"><span class="eyebrow" id="cbStep"></span><strong id="cbWhat"></strong></div>
-        <label class="ctl" for="cbTxt">Ta phrase
-          <textarea id="cbTxt" rows="2"></textarea>
-        </label>
-        <div class="btns">
-          <button type="button" class="btn go" id="cbCheck"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Vérifier</button>
-          <button type="button" class="btn" id="cbSkip"><i class="fa-solid fa-forward" aria-hidden="true"></i> Je passe</button>
-          <button type="button" class="btn go" id="cbNext" hidden></button>
+    <section class="card s2">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-ban"></i></span><h2>Bloqué ou pas ?</h2></div>
+      <div class="versus">
+        <div>
+          <h3><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Forfait</h3>
+          <p>Le prix ne bouge pas.</p>
+          <p>Si tu utilises beaucoup, tu dois faire une pause. La limite revient après quelques heures.</p>
         </div>
-        <div class="tokens" id="cbToks" aria-hidden="true"></div>
-        <div class="result" id="cbResult" aria-live="polite"></div>
+        <div>
+          <h3><i class="fa-solid fa-receipt" aria-hidden="true"></i> API</h3>
+          <p>Pas de pause obligatoire.</p>
+          <p>Mais la facture monte avec l'usage. On peut fixer un plafond de dépense.</p>
+        </div>
       </div>
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-book"></i></span><h2>Ça fait combien de tokens ?</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-clipboard-list"></i></span><h2>Récap</h2></div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>Texte</th><th class="num">Tokens</th><th class="num">Tient dans 200 000 ?</th></tr></thead>
+          <thead><tr><th></th><th><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Forfait</th><th><i class="fa-solid fa-receipt" aria-hidden="true"></i> API</th></tr></thead>
           <tbody>
-            <tr><td>1 SMS</td><td class="num">≈ 30</td><td class="num"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Oui</td></tr>
-            <tr><td>1 e-mail</td><td class="num">≈ 300</td><td class="num"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Oui</td></tr>
-            <tr><td>1 page de livre</td><td class="num">≈ 500</td><td class="num"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Oui</td></tr>
-            <tr><td>1 roman de 300 pages</td><td class="num">≈ 150 000</td><td class="num"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Tout juste</td></tr>
-            <tr><td>Tout le code d'une grosse appli</td><td class="num">1 million et +</td><td class="num"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Non</td></tr>
+            <tr><th>Prix</th><td>Fixe chaque mois</td><td>Selon les tokens utilisés</td></tr>
+            <tr><th>Limite</th><td>Un quota d'usage par période</td><td>Pas de pause, mais un budget</td></tr>
+            <tr><th>Facture</th><td>Toujours la même</td><td>Change chaque mois</td></tr>
+            <tr><th>Comment ?</th><td>Dans l'appli de l'IA (Claude, ChatGPT…)</td><td>Dans tes propres outils ou applis</td></tr>
+            <tr><th>Pour qui ?</th><td>Particuliers, équipes</td><td>Développeurs, automatisations</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="small muted">Ordres de grandeur pour un texte en français. 200 000 tokens, c'est la taille de la mémoire de beaucoup d'IA (voir la fiche suivante).</p>
+    </section>
+
+    <section class="card s4" id="noms">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-right-left"></i></span><h2>Claude ou ChatGPT : les mêmes forfaits, d'autres noms</h2></div>
+      <p>Chaque IA donne ses propres noms à ses forfaits. Dans les fiches, on utilise des mots qui marchent pour toutes les IA. Voici comment Claude et ChatGPT les appellent.</p>
+      <div class="tbl-wrap">
+        <table class="noms">
+          <thead><tr><th>Dans les fiches</th><th>Chez Claude</th><th>Chez ChatGPT</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Forfait standard</strong></td><td>Pro</td><td>Plus</td></tr>
+            <tr><td><strong>Gros forfait</strong></td><td>Max</td><td>Pro</td></tr>
+            <tr><td><strong>Forfait d'équipe</strong></td><td>Team, Enterprise</td><td>Business, Enterprise</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">Attention au mot « Pro ». Chez Claude, c'est le forfait standard. Chez ChatGPT, c'est le gros forfait. Anthropic fabrique Claude, OpenAI fabrique ChatGPT. Noms vérifiés en octobre 2026 : ils changent souvent.</p>
     </section>
 
     <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
-        <li><span>L'IA lit et écrit en tokens. Un token = un petit bout de mot, souvent 3 ou 4 lettres.</span></li>
-        <li><span>Un mot court = 1 token. Un mot long ou rare = plusieurs tokens. La ponctuation compte aussi.</span></li>
-        <li><span>Tout se compte en tokens : ce que l'IA lit, ce qu'elle écrit, et ce que ça coûte.</span></li>
+        <li><span>Forfait = prix fixe, mais une limite. Quand elle est atteinte, il faut attendre.</span></li>
+        <li><span>API = jamais de pause obligatoire, mais tu paies chaque token.</span></li>
+        <li><span>À chaque message, l'IA relit la conversation. Une longue conversation coûte donc plus cher.</span></li>
       </ul>
     </section>
 
@@ -433,15 +522,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <button type="button" class="btn reveal" id="defiReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Rejouer le défi</button>
     </section>
 
-    <a class="card s4 next" href="2-memoire.html">
-      <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>2 · La Mémoire qui Déborde</strong></span>
+    <a class="card s4 next" href="index.html#permis">
+      <span class="ctl"><span class="eyebrow">C'était la dernière fiche</span><strong><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Voir mon permis IA</strong></span>
       <span class="emo" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
     </a>
 
   </div>
   <footer class="foot">
-    <nav class="series" aria-label="Les 9 fiches"><strong>Comprendre l’IA en 9 fiches :</strong><a href="index.html">Accueil</a><a aria-current="page">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils de l'IA</a><a href="8-agent.html">8 Créer son agent</a><a href="9-forfait-api.html">9 Forfait ou API</a></nav>
-    <span>Chiffres arrondis, pour comprendre. Ce ne sont pas des mesures exactes.</span>
+    <nav class="series" aria-label="Les 9 fiches"><strong>Comprendre l’IA en 9 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils de l'IA</a><a href="8-agent.html">8 Créer son agent</a><a aria-current="page">9 Forfait ou API</a></nav>
+    <span>Calcul simplifié pour comprendre. La cache est comptée ici à 10 % du prix de lecture pour 80 % du texte relu.</span>
     <div class="modes">
       <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
       <button type="button" class="btn" id="demoBtn" aria-pressed="false"><i class="fa-solid fa-lock-open" aria-hidden="true"></i> Mode démonstration : non</button>
@@ -476,7 +565,7 @@ function initSeg(el, onChange) {
   return cur.dataset.v;
 }
 
-const FICHE = "tokens";
+const FICHE = "forfait";
 // Parcours : progression gardée dans ce navigateur, mode atelier, devine d'abord, défi final (même bloc dans chaque fiche)
 const BADGES = {
   tokens: ["{coins}", "Maître des tokens"], memoire: ["{memory}", "As de la mémoire"], cerveau: ["{brain}", "Bon Cerveau"],
@@ -724,126 +813,181 @@ new MutationObserver((ms) => ms.forEach((m) => (m.type === "characterData" ? tid
 })();
 
 
-// Mots fréquents gardés en un seul token, comme le font les vrais découpeurs.
-const COMMON = new Set("bonjour merci aider pouvez voyage demain travail comment pourquoi toujours beaucoup quelque maison bonsoir parce depuis pendant maintenant question réponse peux-tu combien".split(" "));
+const SIZES = {
+  short: { inTok: 2000,  outTok: 400,  hint: "≈ 2 000 tokens lus et 400 écrits. Une petite question." },
+  mid:   { inTok: 10000, outTok: 1000, hint: "≈ 10 000 tokens lus et 1 000 écrits. Avec un document ou une longue conversation." },
+  long:  { inTok: 60000, outTok: 4000, hint: "≈ 60 000 tokens lus et 4 000 écrits. Du code ou de gros documents." },
+};
+const PRICES = { rapide: [1, 5], standard: [2, 10], expert: [4, 20] };
+const st = { size: "mid" };
 
-function tokenize(text) {
-  const parts = text.match(/\s*[\p{L}\p{M}\p{N}]+|\s*[^\s\p{L}\p{M}\p{N}]/gu) || [];
-  const out = [];
-  for (const p of parts) {
-    const lead = p.match(/^\s*/)[0].replace(/\s+/g, " ");
-    const core = p.trimStart();
-    if (core.length <= 5 || !/\p{L}/u.test(core) || COMMON.has(core.toLowerCase())) { out.push(lead + core); continue; }
-    let i = 0, k = 0;
-    while (i < core.length) {
-      const rest = core.length - i;
-      const len = rest <= 5 ? rest : (k === 0 ? 4 : 3 + (k % 2));
-      out.push((k === 0 ? lead : "") + core.slice(i, i + len));
-      i += len; k++;
-    }
+function costPerMsg() {
+  const s = SIZES[st.size];
+  const inP = Math.max(0, +$("#inP").value || 0), outP = Math.max(0, +$("#outP").value || 0);
+  const inFactor = $("#cache").checked ? 0.2 + 0.8 * 0.1 : 1;
+  return (s.inTok * inP * inFactor + s.outTok * outP) / 1e6;
+}
+const money = (v) => (v < 10 ? fmt(v, 2) : fmt(v)) + " $";
+const compact = (n) => n >= 1e9 ? fmt(n / 1e9, 1) + " Md" : n >= 1e6 ? fmt(n / 1e6, 1) + " M" : n >= 1e3 ? fmt(n / 1e3) + " k" : fmt(n);
+
+function render() {
+  const perDay = +$("#perDay").value, days = +$("#days").value;
+  const plan = Math.max(0, +$("#plan").value || 0);
+  const cpm = costPerMsg();
+  const msgs = perDay * days;
+  const api = cpm * msgs;
+  const s = SIZES[st.size];
+
+  $("#vPerDay").textContent = fmt(perDay);
+  $("#vDays").textContent = fmt(days);
+  $("#sizeHint").textContent = s.hint;
+  $("#apiCost").textContent = money(api);
+  $("#planCost").textContent = money(plan);
+  // Les 2 barres : la plus chère fait toute la largeur
+  const top = Math.max(api, plan) || 1, apiLow = api < plan * 0.9, planLow = api > plan * 1.1;
+  $("#cmpApi").style.width = (api / top) * 100 + "%";
+  $("#cmpPlan").style.width = (plan / top) * 100 + "%";
+  rich($("#cmpApiTxt"), apiLow ? "{circle-check} moins cher" : planLow ? "" : "à peu près pareil");
+  rich($("#cmpPlanTxt"), planLow ? "{circle-check} moins cher" : apiLow ? "" : "à peu près pareil");
+  $("#sMsgs").textContent = fmt(msgs);
+  $("#sToks").textContent = compact(msgs * (s.inTok + s.outTok));
+  $("#sPerMsg").textContent = cpm < 0.01 ? fmt(cpm, 4) + " $" : fmt(cpm, 3) + " $";
+
+  const even = cpm > 0 ? plan / (days * cpm) : Infinity;
+  const v = $("#verdict");
+  if (api < plan * 0.9) rich(v, `{receipt} L'API coûte moins cher pour toi. Le forfait devient rentable à partir de ${fmt(Math.ceil(even))} messages par jour.`);
+  else if (api > plan * 1.1) rich(v, `{credit-card} Le forfait est moins cher pour toi. Tu économises environ ${money(api - plan)} par mois. Attention : le forfait a une limite d'usage.`);
+  else rich(v, "{handshake} Les deux coûtent à peu près pareil. Le forfait évite les surprises, l'API évite les pauses.");
+
+  drawChart({ perDay, days, plan, cpm, even });
+}
+
+function niceMax(v) {
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p;
+  return 10 * p;
+}
+function drawChart({ perDay, days, plan, cpm, even }) {
+  const box = $("#chart");
+  const W = Math.max(300, box.clientWidth || 700);
+  const H = W < 560 ? 260 : 320;
+  const m = { l: 58, r: 16, t: 26, b: 40 };
+  const xMax = 200;
+  const yMax = niceMax(Math.max(cpm * days * xMax, plan * 1.4, 1));
+  const x = (d) => m.l + (d / xMax) * (W - m.l - m.r);
+  const y = (c) => H - m.b - (Math.min(c, yMax) / yMax) * (H - m.t - m.b);
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const el = (tag, attrs, parent = svg) => {
+    const e = document.createElementNS(ns, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    parent.appendChild(e); return e;
+  };
+  const grid = el("g", { class: "grid" });
+  const axis = el("g", { class: "axis" });
+  for (let i = 0; i <= 4; i++) {
+    const c = (yMax / 4) * i;
+    el("line", { x1: m.l, x2: W - m.r, y1: y(c), y2: y(c) }, grid);
+    const t = el("text", { x: m.l - 8, y: y(c) + 4, "text-anchor": "end" }, axis);
+    t.textContent = fmt(c) + " $";
   }
-  return out;
-}
-
-const tokChips = (toks) => toks.map((s) => { const e = document.createElement("span"); e.className = "tok"; e.textContent = s; return e; });
-const txt = $("#txt");
-function renderText() {
-  const t = txt.value;
-  const toks = tokenize(t);
-  const words = (t.match(/[\p{L}\p{N}][\p{L}\p{M}\p{N}'’-]*/gu) || []).length;
-  const box = $("#toks");
-  box.replaceChildren(...tokChips(toks.slice(0, 400)));
-  $("#sWords").textContent = fmt(words);
-  $("#sToks").textContent = fmt(toks.length);
-  $("#sChars").textContent = fmt([...t].length);
-  $("#sRatio").textContent = words ? fmt(toks.length / words, 1) : "0";
-}
-txt.addEventListener("input", renderText);
-
-// ­ : un trait d'union qui ne se voit que si le mot long doit passer à la ligne.
-$("#examples").replaceChildren(...["chat", "maison", "incroyable", "anti­constitution­nellement", "2026", "Nouméa"].map((w) => {
-  const d = document.createElement("div"); d.className = "ex";
-  const n = tokenize(w.replace(/­/g, "")).length;
-  d.innerHTML = `<code></code><span class="n">${n} token${n > 1 ? "s" : ""}</span>`;
-  d.querySelector("code").textContent = w;
-  return d;
-}));
-
-// Devine d'abord
-guess($("#tokGuess"), {
-  q: "combien de tokens pour « anti­constitution­nellement » ?",
-  options: [["3", "3"], ["7", "7"], ["9", "9"]], a: "7",
-  why: "7 tokens. Un mot long et rare est coupé en plusieurs morceaux.",
-  lock: $("#examples"),
-});
-// Jeu : le compte est bon. Une phrase qui fait pile le bon nombre de tokens.
-const CB = [[5, "Un petit bonjour"], [12, "Une question à poser à l'IA"], [20, "Un message pour ton équipe"]];
-const cb = { round: 0, won: 0, tries: 0 };
-function cbRound() {
-  const [goal, what] = CB[cb.round];
-  cb.tries = 0;
-  $("#cbStep").textContent = `Manche ${cb.round + 1} sur ${CB.length}`;
-  $("#cbWhat").textContent = `${what}, en ${goal} tokens pile`;
-  $("#cbTxt").value = "";
-  $("#cbTxt").readOnly = false;
-  $("#cbToks").replaceChildren();
-  $("#cbResult").textContent = "";
-  $("#cbCheck").hidden = $("#cbSkip").hidden = false;
-  $("#cbNext").hidden = true;
-}
-// Fin de manche : gagnée ou passée. Renvoie le texte à ajouter à la dernière manche.
-function cbEnd(ok) {
-  if (ok) cb.won++;
-  $("#cbScore").textContent = `${cb.won} / ${CB.length}`;
-  $("#cbTxt").readOnly = true;
-  $("#cbCheck").hidden = $("#cbSkip").hidden = true;
-  const last = cb.round === CB.length - 1;
-  rich($("#cbNext"), last ? "{rotate-left} Rejouer" : "Manche suivante {arrow-right}");
-  $("#cbNext").hidden = false;
-  $("#cbNext").focus();
-  if (!last) return "";
-  if (cb.won === CB.length) confetti("{bullseye}");
-  return cb.won === CB.length ? " {trophy} 3 manches sur 3 : tu sais compter comme l'IA !" : ` Score : ${cb.won} sur ${CB.length}. Rejoue pour viser 3 sur 3.`;
-}
-$("#cbCheck").addEventListener("click", () => {
-  const [goal] = CB[cb.round], toks = tokenize($("#cbTxt").value.trim());
-  if (!toks.length) { rich($("#cbResult"), "{pen} Écris d'abord ta phrase."); return; }
-  cb.tries++;
-  $("#cbToks").replaceChildren(...tokChips(toks));
-  const d = toks.length - goal;
-  if (d) {
-    rich($("#cbResult"), `{circle-xmark} ${toks.length} tokens : ${d < 0 ? `il en manque ${-d}` : `${d} de trop`}. Regarde le découpage, change un mot, puis vérifie encore.`);
-    return;
+  for (const d of [0, 50, 100, 150, 200]) {
+    const t = el("text", { x: x(d), y: H - m.b + 22, "text-anchor": d === 0 ? "start" : d === 200 ? "end" : "middle" }, axis);
+    t.textContent = d;
   }
-  const end = cbEnd(true);
-  rich($("#cbResult"), `{circle-check} Le compte est bon : ${goal} tokens${cb.tries > 1 ? `, en ${cb.tries} essais` : ", du premier coup"} !` + end);
-});
-$("#cbSkip").addEventListener("click", () => { const end = cbEnd(false); rich($("#cbResult"), "{forward} Manche passée." + end); });
-$("#cbNext").addEventListener("click", () => {
-  if (cb.round === CB.length - 1) { cb.round = cb.won = 0; $("#cbScore").textContent = `0 / ${CB.length}`; }
-  else cb.round++;
-  cbRound();
-  $("#cbTxt").focus();
-});
-// Le découpage affiché ne vaut plus quand on change la phrase.
-$("#cbTxt").addEventListener("input", () => $("#cbToks").replaceChildren());
+  const xl = el("text", { x: W - m.r, y: H - 2, "text-anchor": "end" }, axis);
+  xl.textContent = "messages par jour";
+
+  // La droite de l'API est coupée en haut du graphique si elle dépasse.
+  const dEnd = Math.min(xMax, cpm > 0 ? yMax / (cpm * days) : xMax);
+  el("path", { class: "a-api", d: `M${x(0)},${y(0)} L${x(dEnd)},${y(cpm * days * dEnd)} L${x(dEnd)},${y(0)} Z` });
+  el("line", { class: "l-plan", x1: x(0), x2: x(xMax), y1: y(plan), y2: y(plan) });
+  el("path", { class: "l-api", d: `M${x(0)},${y(0)} L${x(dEnd)},${y(cpm * days * dEnd)}` });
+
+  const tp = el("text", { class: "t-lab t-plan", x: W - m.r, y: y(plan) - 8, "text-anchor": "end" });
+  tp.textContent = "Forfait " + money(plan);
+  const ta = el("text", { class: "t-lab t-api", x: x(dEnd) - 6, y: Math.max(m.t - 8, y(cpm * days * dEnd) - 10), "text-anchor": "end" });
+  ta.textContent = "API";
+
+  if (even <= xMax && even > 0) {
+    el("line", { class: "l-even", x1: x(even), x2: x(even), y1: m.t, y2: H - m.b });
+    const right = x(even) < W * 0.6;
+    const te = el("text", { class: "t-even", x: x(even) + (right ? 8 : -8), y: m.t + 4, "text-anchor": right ? "start" : "end" });
+    te.textContent = "Bascule : " + fmt(Math.ceil(even)) + " / jour";
+  }
+  el("circle", { class: "dot-now", cx: x(perDay), cy: y(cpm * days * perDay), r: 9 });
+  box.replaceChildren(svg);
+}
+
+["perDay", "days", "plan", "inP", "outP", "cache"].forEach((id) => $("#" + id).addEventListener("input", render));
+st.size = initSeg($("#segSize"), (v) => { st.size = v; render(); });
+initSeg($("#segModel"), (v) => { $("#inP").value = PRICES[v][0]; $("#outP").value = PRICES[v][1]; render(); });
+initRanges();
+render();
+// Jeu : fais ton pari. La bonne réponse vient du calcul, sauf pour le robot : le forfait ne marche pas dans un outil automatique.
+const BET_PLAN = 20;
+const cpmOf = (size, model) => (SIZES[size].inTok * PRICES[model][0] + SIZES[size].outTok * PRICES[model][1]) / 1e6;
+const PROFILES = [
+  { who: "{laptop-code} Tom, développeur. L'appli de réservation qu'il a créée envoie 50 petites questions par jour à l'IA (modèle standard), 22 jours par mois.",
+    perDay: 50, days: 22, size: "short", model: "standard", a: "api",
+    why: (api) => `API : ${money(api)} par mois, contre ${BET_PLAN} $ pour le forfait. Et l'API marche dans son appli.` },
+  { who: "{user-tie} Sophie, responsable d'agence. 40 messages moyens par jour dans l'appli de l'IA (modèle standard), 22 jours par mois.",
+    perDay: 40, days: 22, size: "mid", model: "standard", a: "plan",
+    why: (api) => `Avec l'API, ce serait ${money(api)} par mois. Le forfait coûte moins cher, et la facture ne bouge pas.` },
+  { who: "{flask} Marc, développeur. 80 gros travaux par jour avec le modèle expert, 22 jours par mois.",
+    perDay: 80, days: 22, size: "long", model: "expert", a: "plan",
+    why: (api) => `Avec l'API : ${money(api)} par mois ! Le forfait coûte bien moins cher. Mais avec autant de gros travaux, Marc atteindra la limite et devra faire des pauses.` },
+  { who: "{robot} Le robot de l'agence. Un outil qui trie 200 e-mails par jour, tout seul, avec le modèle rapide, 31 jours par mois.",
+    perDay: 200, days: 31, size: "short", model: "rapide", a: "api",
+    why: (api) => `Piège ! Le forfait ne marche que dans l'appli de l'IA, avec un humain. Un robot passe par l'API : environ ${money(api)} par mois. On peut fixer un plafond de dépense.` },
+];
+function applyProfile(P) {
+  $(`#segModel button[data-v="${P.model}"]`).click();
+  $(`#segSize button[data-v="${P.size}"]`).click();
+  $("#cache").checked = false;
+  $("#plan").value = BET_PLAN;
+  for (const [id, v] of [["perDay", P.perDay], ["days", P.days]]) { const r = $("#" + id); r.value = v; paintRange(r); }
+  render();
+}
+{
+  const firsts = new Map();
+  PROFILES.forEach((P, i) => {
+    const d = h("div", "qi");
+    $("#bets").append(d);
+    ask(d, { q: P.who, options: [["plan", "{credit-card} Forfait"], ["api", "{receipt} API"]], a: P.a,
+      why: () => P.why(P.perDay * P.days * cpmOf(P.size, P.model)),
+      onShow(ok, first) {
+        applyProfile(P);
+        if (!first) return;
+        firsts.set(i, ok);
+        const good = [...firsts.values()].filter(Boolean).length;
+        $("#betScore").textContent = `${good} / ${PROFILES.length}`;
+        if (firsts.size < PROFILES.length) return;
+        rich($("#betResult"), (good === PROFILES.length ? "{trophy} 4 sur 4 ! " : `${good} sur 4. `) +
+          "La règle : petit usage ou outil automatique, l'API. Gros usage dans l'appli de l'IA, le forfait.");
+        if (good === PROFILES.length) confetti("{dice}");
+      } });
+  });
+}
 
 // Défi final
 initDefi([
-  { q: "Pour l'IA, un token, c'est…", a: "bout",
-    options: [["mot", "Un mot entier"], ["bout", "Un petit morceau de mot"], ["phrase", "Une phrase"]],
-    why: "Un token est un petit morceau de texte, souvent 3 ou 4 lettres. Un mot long en fait plusieurs." },
-  { q: "Ton texte fait 100 mots. Combien de tokens, à peu près ?", a: "130",
-    options: [["50", "50 tokens"], ["130", "130 tokens"], ["1000", "1 000 tokens"]],
-    why: "Un peu plus que de mots : les mots longs comptent pour plusieurs tokens, et la ponctuation aussi." },
-  { q: "Les espaces et la ponctuation…", a: "yes",
-    options: [["yes", "Comptent aussi"], ["no", "Ne comptent pas"]],
-    why: "Un point d'exclamation ou une virgule, c'est aussi un token, ou un bout de token." },
-  { q: "Un roman de 300 pages fait environ…", a: "150k",
-    options: [["1500", "1 500 tokens"], ["150k", "150 000 tokens"], ["15M", "15 millions de tokens"]],
-    why: "Environ 150 000 tokens. Il tient tout juste dans la mémoire de l'IA (voir la fiche suivante)." },
+  { q: "Tu as atteint la limite de ton forfait. Que se passe-t-il ?", a: "wait",
+    options: [["pay", "Je paie un supplément"], ["wait", "Je fais une pause"], ["stop", "Mon compte est fermé"]],
+    why: "Le prix ne bouge pas. Mais il faut attendre : la limite revient après quelques heures." },
+  { q: "Tu veux une facture qui ne change jamais.", a: "plan",
+    options: [["plan", "{credit-card} Forfait"], ["api", "{receipt} API"]],
+    why: "Le forfait coûte le même prix chaque mois." },
+  { q: "Avec l'API, ta conversation devient très longue. Chaque nouveau message…", a: "more",
+    options: [["less", "Coûte moins cher"], ["same", "Coûte pareil"], ["more", "Coûte plus cher"]],
+    why: "L'IA relit toute la conversation à chaque fois. Plus de tokens lus, donc plus cher (voir « La Mémoire qui Déborde »)." },
+  { q: "Ton outil interne doit appeler l'IA tout seul, la nuit.", a: "api",
+    options: [["plan", "{credit-card} Forfait"], ["api", "{receipt} API"]],
+    why: "Le forfait marche dans l'appli de l'IA. Un outil automatique passe par l'API." },
 ]);
-
-renderText();
-cbRound();
+if ("ResizeObserver" in window) {
+  let w = 0;
+  new ResizeObserver(([e]) => { const nw = Math.round(e.contentRect.width); if (nw !== w) { w = nw; render(); } }).observe($("#chart"));
+}
 </script>

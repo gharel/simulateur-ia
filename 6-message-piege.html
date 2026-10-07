@@ -460,7 +460,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     <section class="card hero s4">
       <div class="hero-grid">
         <div class="ctl">
-          <span class="eyebrow">Comprendre l'IA · Fiche 6 sur 8</span>
+          <span class="eyebrow">Comprendre l'IA · Fiche 6 sur 9</span>
           <h1>Le Message<br>Piégé</h1>
           <p class="lead">Un e-mail ou une page web peut cacher des ordres. Si l'IA les lit, elle peut obéir à un inconnu.</p>
         </div>
@@ -635,7 +635,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
   </div>
   <footer class="foot">
-    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a aria-current="page">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils de l'IA</a><a href="8-forfait-api.html">8 Forfait ou API</a></nav>
+    <nav class="series" aria-label="Les 9 fiches"><strong>Comprendre l’IA en 9 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a aria-current="page">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils de l'IA</a><a href="8-agent.html">8 Créer son agent</a><a href="9-forfait-api.html">9 Forfait ou API</a></nav>
     <span>Exemples fabriqués pour comprendre. Les noms, adresses et chiffres sont inventés. Les risques sont des estimations, pas des mesures.</span>
     <span>L'idée des « 3 ingrédients » vient du chercheur Simon Willison, qui parle de « lethal trifecta ».</span>
     <div class="modes">
@@ -670,7 +670,7 @@ const FICHE = "piege";
 const BADGES = {
   tokens: ["{coins}", "Maître des tokens"], memoire: ["{memory}", "As de la mémoire"], cerveau: ["{brain}", "Bon Cerveau"],
   bobards: ["{user-secret}", "Détective anti-bobards"], complaisance: ["{scale-balanced}", "Esprit critique"], piege: ["{shield-halved}", "Gardien anti-piège"],
-  outils: ["{toolbox}", "As de la boîte à outils"], forfait: ["{calculator}", "Pro du budget"],
+  outils: ["{toolbox}", "As de la boîte à outils"], agent: ["{robot}", "Créateur d'agent"], forfait: ["{calculator}", "Pro du budget"],
 };
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
@@ -793,7 +793,7 @@ function guess(box, { lock, q, ...opts }) {
 }
 
 // Pluie d'icônes aux couleurs des fiches
-const CONFETTI_COLORS = ["#C6FF00", "#4DA3FF", "#FF2E93", "#FF6B00", "#FF9AD5", "#FFE600", "#00E5FF", "#B14EFF"];
+const CONFETTI_COLORS = ["#C6FF00", "#4DA3FF", "#FF2E93", "#FF6B00", "#FF9AD5", "#FFE600", "#00E5FF", "#3CF0B4", "#B14EFF"];
 function confetti(ic) {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const box = h("div", "confetti");

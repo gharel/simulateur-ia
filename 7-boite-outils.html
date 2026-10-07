@@ -389,7 +389,7 @@ td.c, th.c { text-align: center; }
     <section class="card hero s4">
       <div class="hero-grid">
         <div class="ctl">
-          <span class="eyebrow">Comprendre l'IA · Fiche 7 sur 8</span>
+          <span class="eyebrow">Comprendre l'IA · Fiche 7 sur 9</span>
           <h1>La Boîte<br>à Outils<br>de l'IA</h1>
           <p class="lead">Écris un bon prompt. Puis donne à l'IA les bons outils.</p>
         </div>
@@ -452,7 +452,7 @@ td.c, th.c { text-align: center; }
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-arrows-to-circle"></i></span><h2>Répondre ou agir</h2></div>
       <div class="lab">
         <div class="lab-col">
-          <p>Une IA peut <strong>répondre</strong> dans la conversation. Elle peut aussi <strong>agir</strong> : faire une tâche en plusieurs étapes, sur tes fichiers. On parle alors d'un <strong>agent</strong>.</p>
+          <p>Une IA peut <strong>répondre</strong> dans la conversation. Elle peut aussi <strong>agir</strong> : faire une tâche en plusieurs étapes, sur tes fichiers. On parle alors d'un <strong>agent</strong>. Pour créer le tien : voir « L'Agent sur Mesure ».</p>
           <div class="lab-part">
             <div class="merge">
               <span class="chip"><i class="fa-solid fa-comments" aria-hidden="true"></i> Chat</span>
@@ -587,14 +587,14 @@ td.c, th.c { text-align: center; }
       <button type="button" class="btn reveal" id="defiReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Rejouer le défi</button>
     </section>
 
-    <a class="card s4 next" href="8-forfait-api.html">
-      <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>8 · Forfait ou Compteur ?</strong></span>
+    <a class="card s4 next" href="8-agent.html">
+      <span class="ctl"><span class="eyebrow">Fiche suivante</span><strong>8 · L'Agent sur Mesure</strong></span>
       <span class="emo" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
     </a>
 
   </div>
   <footer class="foot">
-    <nav class="series" aria-label="Les 8 fiches"><strong>Comprendre l’IA en 8 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a aria-current="page">7 Les outils de l'IA</a><a href="8-forfait-api.html">8 Forfait ou API</a></nav>
+    <nav class="series" aria-label="Les 9 fiches"><strong>Comprendre l’IA en 9 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a aria-current="page">7 Les outils de l'IA</a><a href="8-agent.html">8 Créer son agent</a><a href="9-forfait-api.html">9 Forfait ou API</a></nav>
     <span>Les fonctions disponibles changent selon ton abonnement et ton appareil.</span>
     <div class="modes">
       <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
@@ -635,7 +635,7 @@ const FICHE = "outils";
 const BADGES = {
   tokens: ["{coins}", "Maître des tokens"], memoire: ["{memory}", "As de la mémoire"], cerveau: ["{brain}", "Bon Cerveau"],
   bobards: ["{user-secret}", "Détective anti-bobards"], complaisance: ["{scale-balanced}", "Esprit critique"], piege: ["{shield-halved}", "Gardien anti-piège"],
-  outils: ["{toolbox}", "As de la boîte à outils"], forfait: ["{calculator}", "Pro du budget"],
+  outils: ["{toolbox}", "As de la boîte à outils"], agent: ["{robot}", "Créateur d'agent"], forfait: ["{calculator}", "Pro du budget"],
 };
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
@@ -758,7 +758,7 @@ function guess(box, { lock, q, ...opts }) {
 }
 
 // Pluie d'icônes aux couleurs des fiches
-const CONFETTI_COLORS = ["#C6FF00", "#4DA3FF", "#FF2E93", "#FF6B00", "#FF9AD5", "#FFE600", "#00E5FF", "#B14EFF"];
+const CONFETTI_COLORS = ["#C6FF00", "#4DA3FF", "#FF2E93", "#FF6B00", "#FF9AD5", "#FFE600", "#00E5FF", "#3CF0B4", "#B14EFF"];
 function confetti(ic) {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const box = h("div", "confetti");
