@@ -255,7 +255,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .locked > :not(.lock-tip) { filter: blur(7px); opacity: .5; }
 .unlocking > * { transition: filter .5s ease, opacity .5s ease; }
 .lock-tip { position: absolute; inset: 0; z-index: 2; display: flex; justify-content: center; align-items: flex-start; padding: 8px; pointer-events: none; }
-.lock-tip span {
+.lock-tip > span {
   background: var(--surface); color: var(--fg); border: 2px solid var(--accent); border-radius: 99px;
   padding: 6px 14px; font-weight: 700; font-size: .9rem; text-align: center; box-shadow: 0 6px 20px rgb(0 0 0 / .3);
 }

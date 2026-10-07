@@ -32,7 +32,8 @@ async function open(page, f, query = "") {
 const iconsReady = (page) => page.waitForFunction(() => !document.querySelector("i[class*='fa-']"), null, { timeout: 15_000 });
 
 // Ce qui ne doit jamais s'afficher : un jeton {icône} brut, un emoji, une icône inconnue,
-// une mauvaise coupure de ligne (ponctuation seule en début de ligne, mot coupé… voir coupures.js).
+// une mauvaise coupure de ligne (ponctuation seule en début de ligne, mot coupé… voir coupures.js),
+// un cadre en double (une règle « .x span » qui habille aussi le <span class="nobr"> d'une icône et de son mot).
 async function displayProblems(page) {
   const text = await page.locator("body").innerText();
   return {
@@ -40,9 +41,13 @@ async function displayProblems(page) {
     emoji: text.match(new RegExp(PICTO.source, "gu")) || [],
     iconesInconnues: await page.locator("svg.svg-inline--fa .missing").count(),
     coupures: await page.evaluate(lineBreakIssues),
+    cadres: await page.evaluate(() => [...document.querySelectorAll(".nobr")].filter((e) => {
+      const cs = getComputedStyle(e);
+      return parseFloat(cs.borderTopWidth) || parseFloat(cs.paddingLeft) || cs.boxShadow !== "none" || cs.backgroundColor !== "rgba(0, 0, 0, 0)";
+    }).map((e) => e.textContent.trim())),
   };
 }
-const NO_PROBLEM = { jetons: [], emoji: [], iconesInconnues: 0, coupures: [] };
+const NO_PROBLEM = { jetons: [], emoji: [], iconesInconnues: 0, coupures: [], cadres: [] };
 
 // Joue avec toute la page : répond aux « Devine d'abord », allume la lampe, clique partout, bouge les curseurs.
 // Pas les boutons des modes (ils rechargent la page) ni l'impression.
