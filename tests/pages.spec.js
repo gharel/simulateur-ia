@@ -14,6 +14,10 @@ for (const f of PAGES) {
       await open(page, f);
       const extra = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(extra).toBeLessThanOrEqual(1);
+      // Rien ne défile de côté non plus : sur téléphone, un tableau trop large passe en blocs, une ligne par case.
+      const sideways = await page.evaluate(() => [...document.querySelectorAll("main :not(textarea)")]
+        .filter((e) => /auto|scroll/.test(getComputedStyle(e).overflowX) && e.scrollWidth > e.clientWidth + 1).map((e) => e.className));
+      expect(sideways).toEqual([]);
     });
 
     test("affiche le logo et la mention Skazy Formation", async ({ page }) => {

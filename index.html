@@ -35,9 +35,10 @@
   --fg: #12121A; --muted: #55556B; --gold: #8A5A00; color-scheme: light;
 }
 * { box-sizing: border-box; }
+/* text-wrap: pretty : pas de mot seul sur la dernière ligne (« Commencer par / la fiche 1 »). Les grands titres sont équilibrés (balance). */
 body {
   margin: 0; background: var(--bg); color: var(--fg);
-  font-family: var(--font-body); font-size: 18px; line-height: 1.6;
+  font-family: var(--font-body); font-size: 18px; line-height: 1.6; text-wrap: pretty;
   -webkit-font-smoothing: antialiased;
 }
 .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; }
@@ -59,7 +60,8 @@ body {
 .wide { grid-column: span 6; background: var(--surface); border: 1px solid var(--line); padding: 32px; gap: 20px; }
 /* Le titre d'une partie colle à ses fiches, loin de la partie d'avant. */
 .part { grid-column: 1 / -1; display: grid; gap: 4px; margin-top: 24px; margin-bottom: calc(16px - var(--bento-gap)); }
-.part h2 { font-size: 1.35rem; }
+/* « Comprendre comment / elle marche » : pas de mot seul sur la dernière ligne. */
+.part h2 { font-size: 1.35rem; text-wrap: pretty; }
 @media (max-width: 900px) {
   .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero, .wide { grid-column: span 2; }
@@ -72,9 +74,8 @@ body {
   .part { margin-top: 16px; }
 }
 h1, h2 { font-family: var(--font-display); font-weight: 400; line-height: 1.15; margin: 0; text-wrap: balance; }
-h1 { font-size: clamp(2.5rem, 7vw, 5rem); line-height: 1.02; text-transform: uppercase; letter-spacing: -.02em; }
-/* Sur un petit téléphone, « COMPRENDRE » tient dans la carte. */
-@media (max-width: 400px) { h1 { font-size: 10vw; } }
+/* « COMPRENDRE L'IA » reste sur une ligne : il fait environ 10 fois la taille du texte, et la carte prend 72 px de marges sur téléphone. */
+h1 { font-size: min(clamp(2.5rem, 7vw, 5rem), (100vw - 72px) / 10.4); line-height: 1.02; text-transform: uppercase; letter-spacing: -.02em; }
 h2 { font-size: 1.6rem; }
 p { margin: 0; max-width: 60ch; }
 .eyebrow { font-size: .78rem; font-weight: 700; line-height: 1.4; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
@@ -150,7 +151,7 @@ p { margin: 0; max-width: 60ch; }
 }
 .license.locked .lic-body { filter: blur(3px); opacity: .55; }
 .lic-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; flex-wrap: wrap; }
-.lic-title { font-family: var(--font-display); font-size: clamp(1.4rem, 3.4vw, 2rem); line-height: 1; text-transform: uppercase; }
+.lic-title { font-family: var(--font-display); font-size: clamp(1.4rem, 3.4vw, 2rem); line-height: 1; text-transform: uppercase; text-wrap: balance; }
 .lic-kicker { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: #55556B; }
 .lic-photo { width: 64px; height: 64px; border-radius: 14px; background: #14141C; color: #FBFAF4; display: grid; place-items: center; font-size: 2rem; flex: none; }
 .lic-body { display: grid; gap: 14px; }
@@ -165,9 +166,10 @@ p { margin: 0; max-width: 60ch; }
 .lic-badges .st { color: #8A5A00; letter-spacing: .06em; }
 .lic-badges .off { color: #55556B; }
 .lic-badges .off b, .lic-badges .off .st { opacity: .35; filter: grayscale(1); }
+/* « Encore 9 badges » ne se coupe pas : sur téléphone, le texte rapetisse avec l'écran pour tenir dans le permis. */
 .lock-msg {
   position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px;
-  font-family: var(--font-display); font-size: 1.5rem; line-height: 1.15; color: #14141C;
+  font-family: var(--font-display); font-size: min(1.5rem, 5.2vw); line-height: 1.15; color: #14141C;
 }
 .lock-msg[hidden] { display: none; }
 .lic-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px 14px; flex-wrap: wrap; padding-top: 12px; border-top: 1.5px solid #D9D9E5; font-size: .82rem; font-weight: 700; color: #55556B; }

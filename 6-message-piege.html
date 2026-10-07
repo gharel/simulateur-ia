@@ -86,14 +86,17 @@ body {
   border: 2px solid var(--on-accent); border-radius: 18px; padding: 22px 24px;
   display: grid; gap: 8px;
 }
-.word-card strong { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1.05; }
+/* Sur un petit téléphone, le mot à connaître (« Hallucination ») rapetisse avec l'écran pour tenir dans la carte. */
+.word-card strong { font-family: var(--font-display); font-weight: 400; font-size: min(2rem, 8.8vw); line-height: 1.05; }
 .word-card p { font-weight: 700; line-height: 1.5; }
 .word-card p + strong { margin-top: 14px; }
 
 h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.15; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
-h1 { font-size: clamp(2.7rem, 8vw, 5.6rem); line-height: 1.02; text-transform: uppercase; letter-spacing: -.02em; }
+/* Chaque ligne du titre (entre deux <br>) reste entière : si elle est trop large, le titre rapetisse (voir fit() dans le script). */
+h1 { min-width: 0; font-size: clamp(2.7rem, 8vw, 5.6rem); line-height: 1.02; text-transform: uppercase; letter-spacing: -.02em; }
 h2 { font-size: 1.5rem; }
 h3 { font-size: 1.15rem; }
+@media (max-width: 640px) { h2 { font-size: 1.3rem; } }
 .eyebrow { font-size: .78rem; font-weight: 700; line-height: 1.4; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
 .lead { font-size: 1.3rem; font-weight: 700; line-height: 1.45; max-width: 36ch; margin: 0; }
 p { margin: 0; max-width: 65ch; }
@@ -165,7 +168,7 @@ textarea:focus, input[type="number"]:focus, input[type="text"]:focus { border-co
 
 /* Jauges */
 .meter { display: grid; gap: 8px; }
-.meter-top { display: flex; justify-content: space-between; gap: 12px; font-weight: 700; }
+.meter-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 12px; font-weight: 700; }
 .track { height: 16px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
 .fill { height: 100%; width: 0; border-radius: 99px; background: var(--accent); transition: width .45s ease; }
 
@@ -179,7 +182,8 @@ textarea:focus, input[type="number"]:focus, input[type="text"]:focus { border-co
 
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
 .stat { background: var(--surface-2); border-radius: 16px; padding: 16px; display: grid; gap: 6px; align-content: start; }
-.stat b { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; line-height: 1.05; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+/* Un grand nombre ne passe pas à la ligne : s'il est trop large pour la case, il rapetisse (voir fit() dans le script). */
+.stat b { min-width: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; line-height: 1.05; color: var(--accent-text); font-variant-numeric: tabular-nums; }
 .stat span { font-size: .9rem; line-height: 1.4; color: var(--muted); }
 
 /* À retenir */
@@ -196,6 +200,20 @@ table { width: 100%; border-collapse: collapse; font-size: 1rem; }
 th, td { text-align: left; padding: 14px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
 th { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Sur téléphone, le tableau ne tient pas en largeur : chaque ligne devient un bloc.
+   La 1re case donne son titre, les autres rappellent le nom de leur colonne (data-label, voir le script). */
+@media (max-width: 640px) {
+  .tbl-wrap :is(table, tbody, tr, th, td) { display: block; }
+  .tbl-wrap thead { display: none; }
+  .tbl-wrap tr { display: grid; gap: 6px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .tbl-wrap tr > :is(td, th) { padding: 0; border: 0; text-align: left; white-space: normal; }
+  .tbl-wrap tr > :first-child { font-weight: 700; font-size: 1.05rem; color: var(--fg); text-transform: none; letter-spacing: 0; }
+  .tbl-wrap td[data-label] { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 12px; align-items: baseline; justify-items: start; }
+  .tbl-wrap td[data-label]::before {
+    content: attr(data-label); font-size: .75rem; font-weight: 700; line-height: 1.4;
+    text-transform: uppercase; letter-spacing: .1em; color: var(--muted);
+  }
+}
 
 .foot { margin-top: clamp(48px, 5vw, 64px); display: grid; gap: 16px; color: var(--muted); font-size: .9rem; line-height: 1.55; }
 .foot strong { color: var(--fg); }
@@ -1083,9 +1101,75 @@ function tidyText(node) {
   if (t !== node.data) node.data = t;
   glue(node);
 }
+// Un texte qui ne doit pas passer à la ligne rapetisse s'il est trop large pour sa case, au lieu de déborder :
+// une ligne d'un titre h1 (« OU COMPTEUR ? » sur téléphone), un grand nombre dans une case (« 4 040 000 »).
+const FIT = "h1, .stat b";
+function fit(el) {
+  el.style.fontSize = el.style.whiteSpace = "";
+  if (!el.clientWidth) return;
+  el.style.whiteSpace = "nowrap";
+  const over = el.scrollWidth / el.clientWidth;
+  if (over > 1) el.style.fontSize = (parseFloat(getComputedStyle(el).fontSize) / over) * 0.98 + "px";
+  el.style.whiteSpace = "";
+}
+// Un titre ou un bouton ne laisse pas un mot seul sur une ligne (« Ça fait combien de / tokens ? »).
+// On essaie les façons de couper du navigateur (text-wrap) et on garde la première qui n'en laisse pas.
+const LONE = "h2, h3, .next strong, button, .btn, .pill, .sw > span, .lock-tip > span";
+function hasLoneWord(el) {
+  const r = document.createRange(), blocks = new Map();
+  const tw = document.createTreeWalker(el, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+  let seg = 0;
+  for (let n; (n = tw.nextNode());) {
+    if (n.nodeName === "BR") seg++;
+    if (n.nodeType !== 3 || n.parentElement.closest("svg")) continue;
+    let b = n.parentElement;
+    while (b !== el && /^(inline|contents)$/.test(getComputedStyle(b).display)) b = b.parentElement;
+    if (!blocks.has(b)) blocks.set(b, []);
+    const lines = blocks.get(b);
+    for (const m of n.data.matchAll(/\S+/g)) {
+      if (!/[\p{L}\p{N}]/u.test(m[0])) continue;
+      r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length);
+      const box = r.getClientRects()[0], last = lines.at(-1);
+      if (!box) continue;
+      if (last?.seg === seg && Math.abs(box.top - last.top) < box.height / 2) last.n++;
+      else lines.push({ seg, top: box.top, n: 1 });
+    }
+  }
+  // Avec 3 mots ou moins (entre deux <br>), un texte sur 2 lignes laisse forcément un mot seul :
+  // là, c'est la largeur ou la taille du texte qu'il faut changer, pas la coupure.
+  const words = (ls, seg) => ls.reduce((s, l) => s + (l.seg === seg ? l.n : 0), 0);
+  return [...blocks.values()].some((ls) => ls.some((l) => l.n === 1 && words(ls, l.seg) >= 4));
+}
+function unlone(el) {
+  el.style.textWrap = "";
+  if (!el.getClientRects().length || !hasLoneWord(el)) return;
+  for (const w of ["balance", "pretty", "wrap"]) { el.style.textWrap = w; if (!hasLoneWord(el)) return; }
+  // La case est trop étroite : le mot seul va au moins à la fin, pas au milieu.
+  el.style.textWrap = "wrap";
+}
+const refit = (el) => (el.matches(FIT) ? fit(el) : unlone(el));
+const fitAll = () => $$(FIT + ", " + LONE).forEach(refit);
 tidyText(document.body);
-new MutationObserver((ms) => ms.forEach((m) => (m.type === "characterData" ? tidyText(m.target) : m.addedNodes.forEach(tidyText))))
-  .observe(document.body, { childList: true, characterData: true, subtree: true });
+fitAll();
+document.fonts.ready.then(fitAll);
+let fitRaf;
+addEventListener("resize", () => { cancelAnimationFrame(fitRaf); fitRaf = requestAnimationFrame(fitAll); });
+new MutationObserver((ms) => {
+  const todo = new Set();
+  for (const m of ms) {
+    if (m.type === "characterData") tidyText(m.target); else m.addedNodes.forEach(tidyText);
+    const el = m.target.nodeType === 1 ? m.target : m.target.parentElement;
+    for (const sel of [FIT, LONE]) { const f = el?.closest(sel); if (f) todo.add(f); }
+    m.addedNodes.forEach((n) => n.nodeType === 1 && [n, ...n.querySelectorAll(FIT + ", " + LONE)].forEach((e) => e.matches(FIT + ", " + LONE) && todo.add(e)));
+  }
+  todo.forEach(refit);
+}).observe(document.body, { childList: true, characterData: true, subtree: true });
+
+// Sur téléphone, chaque ligne d'un tableau devient un bloc (voir le CSS) : chaque case garde le nom de sa colonne.
+$$(".tbl-wrap table").forEach((t) => {
+  const heads = $$("thead th", t).map((th) => th.textContent.trim() || th.querySelector("[aria-label]")?.getAttribute("aria-label") || "");
+  $$("tbody tr", t).forEach((tr) => [...tr.children].forEach((c, i) => { if (i && heads[i]) c.dataset.label = heads[i]; }));
+});
 
 // Boutons des modes, en bas de page. Atelier : texte plus gros, réponses révélées par l'animateur.
 // Démonstration : rien n'est flou. Le choix suit d'une fiche à l'autre.

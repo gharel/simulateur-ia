@@ -1,6 +1,7 @@
 // Mauvaises coupures de ligne, mesurées dans la page affichée :
 // une ponctuation seule en début de ligne, « seul en fin de ligne, un mot coupé en deux,
-// un nombre séparé du mot qui le suit, une icône séparée de son mot.
+// un nombre séparé du mot qui le suit, une icône séparée de son mot,
+// un mot seul sur sa ligne dans un titre ou un bouton, une ligne de titre h1 coupée en deux.
 // À lancer avec page.evaluate(lineBreakIssues). Renvoie [{ coupure, ou, texte }], texte avec ⏎ à la coupure.
 async function lineBreakIssues() {
   await document.fonts.ready;
@@ -69,6 +70,41 @@ async function lineBreakIssues() {
     const t = sib.data, r = rectOf(sib, next ? t.length - t.trimStart().length : t.trimEnd().length - 1), b = svg.getBoundingClientRect();
     if (r && Math.abs((r.top + r.bottom) / 2 - (b.top + b.bottom) / 2) > Math.max(r.height, b.height) / 2)
       out.push({ coupure: "icône séparée de son texte", ou: name(svg.parentElement), texte: (next ? "[icône]⏎" + t.slice(0, 30) : t.slice(-30) + "⏎[icône]").replace(/\s+/g, " ") });
+  }
+  // Un titre ou un bouton ne laisse pas un mot seul sur une ligne (« COMPRENDRE / L'IA »).
+  // Les lignes d'un titre h1 (entre deux <br>) restent entières. Avec 3 mots ou moins, un texte sur 2 lignes
+  // laisse forcément un mot seul : c'est permis, sauf dans un h1.
+  for (const el of document.querySelectorAll("h1, h2, h3, .next strong, button, .btn, .pill, .sw > span, .lock-tip > span, .lic-title")) {
+    if (!isText(el)) continue;
+    const blocks = new Map();
+    const tw = document.createTreeWalker(el, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+    let seg = 0;
+    for (let n; (n = tw.nextNode());) {
+      if (n.nodeName === "BR") seg++;
+      if (n.nodeType !== 3 || n.parentElement.closest("svg")) continue;
+      let b = n.parentElement;
+      while (b !== el && /^(inline|contents)$/.test(getComputedStyle(b).display)) b = b.parentElement;
+      if (!blocks.has(b)) blocks.set(b, []);
+      for (const m of n.data.matchAll(/\S+/g)) {
+        if (!LETTER.test(m[0])) continue;
+        range.setStart(n, m.index); range.setEnd(n, m.index + m[0].length);
+        const r = range.getClientRects()[0];
+        if (r) blocks.get(b).push({ w: m[0], seg, top: r.top, h: r.height });
+      }
+    }
+    for (const words of blocks.values()) {
+      for (const seg of new Set(words.map((w) => w.seg))) {
+        const lines = [];
+        for (const w of words.filter((w) => w.seg === seg)) {
+          const l = lines.at(-1);
+          if (l && Math.abs(w.top - l.top) < w.h / 2) l.words.push(w.w); else lines.push({ top: w.top, words: [w.w] });
+        }
+        const texte = lines.map((l) => l.words.join(" ")).join(" ⏎ ");
+        if (el.tagName === "H1" && lines.length > 1) out.push({ coupure: "ligne de titre coupée", ou: name(el), texte });
+        else if (lines.length > 1 && lines.flatMap((l) => l.words).length >= 4 && lines.some((l) => l.words.length === 1))
+          out.push({ coupure: "mot seul sur sa ligne", ou: name(el), texte });
+      }
+    }
   }
   return out;
 }

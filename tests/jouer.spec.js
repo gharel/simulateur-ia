@@ -1,6 +1,6 @@
 // On joue avec les pages : clics partout, défi final, permis.
 const { test, expect } = require("@playwright/test");
-const { PAGES, FICHES, MOVED, NO_PROBLEM, url, open, iconsReady, displayProblems, playEverything } = require("./site");
+const { PAGES, FICHES, MOVED, NO_PROBLEM, url, open, iconsReady, displayProblems, playEverything, maxEverything } = require("./site");
 const { contrastIssues } = require("./contrast");
 
 for (const f of PAGES) {
@@ -12,6 +12,18 @@ for (const f of PAGES) {
       expect(await displayProblems(page)).toEqual(NO_PROBLEM);
     });
   }
+}
+
+// Les jeux poussés au maximum : les nombres deviennent longs (« 4 040 000 » tokens lus), ils restent dans leurs cases.
+// Sur téléphone, on prend un petit écran (360 px) : c'est là que les cases sont les plus étroites.
+for (const f of FICHES) {
+  test(`${f} : au maximum, les nombres tiennent dans leurs cases`, async ({ page, isMobile }) => {
+    if (isMobile) await page.setViewportSize({ width: 360, height: 780 });
+    const errors = await open(page, f);
+    await maxEverything(page);
+    expect(errors).toEqual([]);
+    expect((await displayProblems(page)).debordements).toEqual([]);
+  });
 }
 
 // Si le système demande moins d'animations, rien ne bouge : ni animation CSS, ni transition, ni animation lancée en JS.
