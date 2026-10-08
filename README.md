@@ -64,8 +64,11 @@ En haut de chaque fiche, le bouton « Accueil » ramène à la page d'accueil.
 ## Skazy Formation
 
 Les fiches sont une ressource [Skazy Formation](https://formation.skazy.nc/).
-Chaque page affiche le logo en haut et une mention en bas, avec un lien vers formation.skazy.nc. Le permis imprimé porte aussi le logo.
+En haut de chaque page, le bandeau : le logo (un lien vers formation.skazy.nc), un filet, la pastille de l'outil et son nom, « Comprendre l'IA ». Sur téléphone, le nom laisse la place au bouton Accueil des fiches : la pastille reste. En bas, une mention avec un lien vers formation.skazy.nc. Le permis imprimé porte aussi le logo.
 Le logo est un SVG intégré dans la page : le mot « skazy » prend la couleur du texte (clair ou sombre selon le thème), « formation » reste vert `#00997A`.
+
+Chaque outil Skazy Formation a sa couleur de l'arc-en-ciel, dans cet ordre : Quiz rouge, Mini-jeux orange, Vigie jaune, Atelier d’exercices IA vert, Comprendre l'IA bleu, Prompthèque violet. Le favicon (pictogramme blanc sur un dégradé de cette couleur) sert aussi de pastille dans le bandeau : logo Skazy Formation, filet, pastille, nom de l'outil. Titre d'onglet : « Page · Nom · Skazy Formation ».
+Ici, le favicon (`favicon.svg`, et ses copies `favicon-32.png` et `apple-touch-icon.png`) montre des curseurs blancs sur un dégradé bleu. Les onglets s'appellent « Comprendre l'IA · Skazy Formation » pour l'accueil, et par exemple « Le Sac à Tokens · Comprendre l'IA · Skazy Formation » pour une fiche.
 
 ## Technique
 

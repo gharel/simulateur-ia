@@ -13,7 +13,7 @@ Consignes pour les agents (Claude Code, Codex…) qui travaillent sur ce dépôt
 - `index.html` : l'accueil, la progression, le permis à imprimer.
 - `1-tokens.html` à `9-forfait-api.html` : les fiches, dans l'ordre du parcours.
 - `2-modele-effort.html`, `3-hallucinations.html`, `4-boite-outils.html`, `5-forfait-api.html` : les adresses du parcours en 6 fiches. `8-forfait-api.html` : celle du parcours en 8 fiches. Ce sont de petites pages qui renvoient vers la nouvelle fiche, en gardant `?atelier=1` et `?demo=1`. Ne les supprime pas : des liens circulent.
-- `favicon.svg` : l'icône de l'onglet, des curseurs (`sliders` de Font Awesome) en blanc sur un dégradé cyan-bleu. Chaque outil Skazy Formation a sa couleur (jeu-formation orange-rose, exercices-ia vert, prompts rose-violet) : garde-la pour qu'on les distingue dans les onglets. `favicon-32.png` et `apple-touch-icon.png` (180 px) en sont des copies, pour Safari et l'écran d'accueil des téléphones. Les liens sont relatifs, pour marcher sous `/simulateur-ia/` sur GitHub Pages.
+- `favicon.svg` : l'icône de l'onglet, des curseurs (`sliders` de Font Awesome) en blanc sur un dégradé bleu (de `#29c9fa` à `#135ae4`), la couleur de l'outil (voir « Bandeau et titres » plus bas). Elle sert aussi de pastille dans le bandeau. `favicon-32.png` et `apple-touch-icon.png` (180 px, carré plein : iOS arrondit lui-même les coins) en sont des copies, pour Safari et l'écran d'accueil des téléphones : refais-les si le favicon change. Les liens sont relatifs, pour marcher sous `/simulateur-ia/` sur GitHub Pages.
 - `tests/` : les tests Playwright. `playwright.config.js` les lance sur bureau (1280 px) et sur téléphone (Pixel 7).
 - `README.md` : le contenu des fiches et le mode d'emploi des icônes.
 
@@ -27,7 +27,7 @@ npm test
 
 - Les tests ouvrent les pages en `file://`. Ils ont besoin d'internet : Font Awesome et les polices viennent de CDN.
 - Une seule page : `npx playwright test -g "4-hallucinations"`. Sous Windows, n'écris pas de `|` dans `-g` : lance une commande par page.
-- Les tests vérifient : pas d'emoji, blocs communs identiques, pages sans erreur JS, icônes connues, logo et lien Skazy Formation, bouton Accueil, pas de défilement horizontal, pas de grand vide en bas des cartes, pas de mauvaise coupure de ligne, pas de mot seul sur sa ligne dans un titre ou un bouton, pas de texte qui dépasse de sa case (aussi avec les jeux au maximum), zones floutées après leur question, mode démonstration, contraste de chaque texte, mode nuit des navigateurs sans effet, jeux et défis qui fonctionnent, réflexes et « Devine d'abord » dans chaque fiche, fiches de longueur proche.
+- Les tests vérifient : pas d'emoji, blocs communs identiques, pages sans erreur JS, icônes connues, logo et lien Skazy Formation, pastille et nom de l'outil, titres d'onglet, bouton Accueil, pas de défilement horizontal, pas de grand vide en bas des cartes, pas de mauvaise coupure de ligne, pas de mot seul sur sa ligne dans un titre ou un bouton, pas de texte qui dépasse de sa case (aussi avec les jeux au maximum), zones floutées après leur question, mode démonstration, contraste de chaque texte, mode nuit des navigateurs sans effet, jeux et défis qui fonctionnent, réflexes et « Devine d'abord » dans chaque fiche, fiches de longueur proche.
 - Si tu changes une mise en page, regarde aussi le rendu toi-même, sur bureau et sur téléphone (captures Playwright).
 
 ## Règles
@@ -77,7 +77,10 @@ npm test
   - Le test (`tests/coupures.js`) mesure chaque ligne affichée, sur bureau et sur téléphone, avant et après avoir joué.
 - **« Devine d'abord ».** La question vient avant les zones qu'elle floute, sur téléphone aussi. `guess()` floute les zones et y ajoute le message « Réponds d'abord à la question ». Pour flouter une zone, passe toujours par `lockZones()` : le mode démonstration (`?demo=1`) doit pouvoir tout montrer.
 - **Modes.** Atelier (`?atelier=1`) et démonstration (`?demo=1`) se gardent dans le navigateur et se transmettent dans les liens entre pages. Les boutons et leur explication sont en bas de chaque page.
-- **Logo Skazy Formation.** C'est un SVG intégré dans chaque page. Ne le redessine pas.
+- **Bandeau et titres.** Chaque outil Skazy Formation a sa couleur de l'arc-en-ciel, dans cet ordre : Quiz rouge, Mini-jeux orange, Vigie jaune, Atelier d’exercices IA vert, Comprendre l'IA bleu, Prompthèque violet. Le favicon (pictogramme blanc sur un dégradé de cette couleur) sert aussi de pastille dans le bandeau : logo Skazy Formation, filet, pastille, nom de l'outil. Titre d'onglet : « Page · Nom · Skazy Formation ».
+  - Ici : « Le Sac à Tokens · Comprendre l'IA · Skazy Formation », « Comprendre l'IA · Skazy Formation » pour l'accueil, « … a changé d'adresse · Comprendre l'IA · Skazy Formation » pour une redirection. Un point médian entre les parties, pas de tiret.
+  - Le logo Skazy Formation est un SVG intégré dans chaque page. Ne le redessine pas, ne le recolore pas. Son lien vers formation.skazy.nc ne contient que le logo. À côté, hors du lien : le filet, la pastille (`<img src="favicon.svg" width="28" height="28" alt="">`, décorative) et le nom « Comprendre l'IA » en gras.
+  - Sur téléphone, la pastille reste toujours. Le nom se masque quand la place manque : sur les fiches, à cause du bouton Accueil.
 - **Fins de ligne.** Le dépôt est en LF, l'arbre de travail Windows en CRLF (`core.autocrlf=true`). Ne convertis pas les fichiers.
 
 ## Publier

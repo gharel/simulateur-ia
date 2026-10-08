@@ -20,9 +20,12 @@ for (const f of PAGES) {
       expect(sideways).toEqual([]);
     });
 
-    test("affiche le logo et la mention Skazy Formation", async ({ page }) => {
+    test("affiche le logo, la pastille de l'outil et la mention Skazy Formation", async ({ page, isMobile }) => {
       await open(page, f);
       await expect(page.locator(`.brand a[href="${SKAZY}"] .brand-logo`)).toBeVisible();
+      // La pastille reste toujours ; sur téléphone, le nom peut laisser la place au bouton Accueil.
+      await expect(page.locator('.brand-tool img[src="favicon.svg"]')).toBeVisible();
+      if (!isMobile || f === "index.html") await expect(page.locator(".brand-name")).toBeVisible();
       await expect(page.locator(`.brand-foot a[href="${SKAZY}"]`)).toBeVisible();
     });
 

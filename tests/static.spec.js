@@ -28,11 +28,13 @@ for (const [name, cut] of Object.entries(BLOCKS)) {
   });
 }
 
-test("logo et mention Skazy Formation identiques sur toutes les pages", () => {
-  const logo = (t) => (t.match(/<header class="brand">[\s\S]*?(<a href="https:\/\/formation\.skazy\.nc\/"[\s\S]*?<\/a>)\n\s*<\/header>/) || [, ""])[1];
+test("logo, pastille et mention Skazy Formation identiques sur toutes les pages", () => {
+  // En haut : le logo (seul dans son lien vers formation.skazy.nc), puis la pastille (le favicon) et le nom de l'outil.
+  const logo = (t) => (t.match(/<header class="brand">[\s\S]*?(<div class="brand-id">\n\s*<a href="https:\/\/formation\.skazy\.nc\/"[\s\S]*?<\/div>)\n\s*<\/header>/) || [, ""])[1];
   const foot = (t) => (t.match(/<span class="brand-foot">.*?<\/span>/) || [""])[0];
   const ref = read(PAGES[0]);
   expect(logo(ref)).toContain(`href="${SKAZY}"`);
+  expect(logo(ref)).toMatch(/<a href="[^"]+" target="_blank" rel="noopener" aria-label="[^"]+">\n\s*<svg class="brand-logo"[^\n]*<\/svg>\n\s*<\/a>\n\s*<span class="brand-tool"><img src="favicon\.svg" width="28" height="28" alt=""><span class="brand-name">Comprendre l'IA<\/span><\/span>\n\s*<\/div>$/);
   expect(foot(ref)).toContain(`href="${SKAZY}"`);
   expect(foot(ref)).toContain("© ");
   expect(foot(ref)).toContain("Usage réservé aux stagiaires de Skazy Formation");
@@ -40,6 +42,12 @@ test("logo et mention Skazy Formation identiques sur toutes les pages", () => {
     expect(logo(read(f)), f).toBe(logo(ref));
     expect(foot(read(f)), f).toBe(foot(ref));
   }
+});
+
+// Titre d'onglet commun aux outils Skazy Formation : « Page · Comprendre l'IA · Skazy Formation » (l'accueil, sans « Page · »).
+test("chaque titre d'onglet suit la règle des outils Skazy Formation", () => {
+  expect(read("index.html")).toContain("<title>Comprendre l'IA · Skazy Formation</title>");
+  for (const f of [...FICHES, ...Object.keys(MOVED)]) expect(read(f), f).toMatch(/<title>[^<·—]+ · Comprendre l'IA · Skazy Formation<\/title>/);
 });
 
 test("aucune page n'est référencée par les moteurs de recherche", () => {
@@ -57,8 +65,9 @@ test("chaque page a son favicon, et les fichiers existent", () => {
 });
 
 test("chaque fiche a un bouton Accueil en haut, et l'accueil a le mode démonstration", () => {
-  for (const f of FICHES) expect(read(f), f).toMatch(/<header class="brand">\n\s*<a class="home" href="index\.html">[\s\S]*?Accueil<\/a>\n\s*<a href="https:\/\/formation\.skazy\.nc\/"/);
+  for (const f of FICHES) expect(read(f), f).toMatch(/<header class="brand">\n\s*<a class="home" href="index\.html">[\s\S]*?Accueil<\/a>\n\s*<div class="brand-id">\n\s*<a href="https:\/\/formation\.skazy\.nc\/"/);
   const home = read("index.html");
+  expect(home).toMatch(/<header class="brand">\n\s*<div class="brand-id">\n\s*<a href="https:\/\/formation\.skazy\.nc\/"/);
   expect(home).not.toContain('class="home"');
   expect(home).toContain('id="demoBtn"');
   expect(home).toContain('class="modes-help"');
