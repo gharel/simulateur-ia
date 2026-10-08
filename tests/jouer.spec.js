@@ -143,23 +143,60 @@ test("2-memoire.html : le context rot, plus le texte est long, plus l'IA rate de
   await expect(page.locator("#focusBars .hb-n")).toHaveText(["90", "81", "62"]);
 });
 
-test("2-memoire.html : la mémoire se compresse chaque fois qu'elle est pleine, et les documents la remplissent plus vite", async ({ page }) => {
+test("2-memoire.html : la mémoire se remplit, se compresse 2 fois, et l'IA perd l'allergie", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await open(page, "2-memoire.html");
-  // 300 messages moyens : la mémoire de 200 000 tokens a été pleine une fois.
-  await expect(page.locator("#sCmp")).toHaveText("1");
-  // 400 messages et 4 documents de 10 000 tokens : 362 000 tokens. La mémoire se remplit, se compresse, et recommence.
-  await page.locator("#nMsg").fill("400");
-  await page.locator("#nDoc").fill("4");
-  await expect(page.locator("#lRaw")).toHaveText(/362\s000\stokens/);
-  await expect(page.locator("#sCmp")).toHaveText("2");
-  await expect(page.locator("#sCmpL")).toHaveText("compressions");
-  // Les documents collés au début sont dans le résumé : leurs cases sont vides.
-  await expect(page.locator("#status")).toContainText("tes 4 documents");
-  await expect(page.locator("#dots .dot.doc.old")).toHaveCount(4);
-  // Avec une mémoire de 1 million de tokens, tout tient.
+  const proc = page.locator("#memProc"), next = proc.locator(".proc-nav .go"), win = page.locator("#win");
+  const allergy = page.locator("#facts li").nth(2), answer = page.locator("#memChat .cb.ai");
+  // Message 50 : le catalogue et les messages sont en entier.
+  await expect(win.locator(".wb.doc")).toHaveCount(1);
+  await expect(win.locator(".wb.sum")).toHaveCount(0);
+  await expect(page.locator("#winCmp")).toHaveText("Aucune compression");
+  // Message 250 : le 5e bloc ne tient plus. Le catalogue et les messages 1 à 150 deviennent un résumé.
+  await next.click();
+  await next.click();
+  await expect(page.locator("#winCmp")).toHaveText(/1\scompression$/);
+  await expect(win.locator(".wb.sum")).toHaveText(/1\sà\s150/);
+  await expect(win.locator(".wb.doc")).toHaveCount(0);
+  await expect(win.locator(".wb.msg")).toHaveCount(2);
+  await expect(page.locator("#sumTxt")).toContainText("allergique");
+  // Message 400 : la mémoire s'est remplie à nouveau. Le 2e résumé résume aussi le 1er : l'allergie disparaît.
+  await next.click();
+  await expect(page.locator("#winCmp")).toHaveText(/2\scompressions/);
+  await expect(win.locator(".wb.sum")).toHaveText(/1\sà\s300/);
+  await expect(page.locator("#sumTxt")).not.toContainText("allergique");
+  await expect(allergy).toHaveClass(/lost/);
+  // Ta question : l'IA propose des fruits de mer. Le rappel, juste avant la question, corrige la réponse.
+  await next.click();
+  await expect(answer).toContainText("plateau de fruits de mer");
+  await next.click();
+  await expect(answer).toContainText("sans fruits de mer");
+  await expect(allergy).not.toHaveClass(/lost/);
+  // Avec 1 million de tokens : pas de compression, l'IA a encore l'allergie.
   await page.locator('#segWin button[data-v="1000000"]').click();
-  await expect(page.locator("#sCmp")).toHaveText("0");
-  await expect(page.locator("#dots .dot.old")).toHaveCount(0);
+  await proc.locator(".proc-rail button").nth(4).click();
+  await expect(page.locator("#winCmp")).toHaveText("Aucune compression");
+  await expect(win.locator(".wb.sum")).toHaveCount(0);
+  await expect(answer).toContainText("Pas de fruits de mer");
+});
+
+// À chaque étape, avec les 2 tailles de mémoire : rien ne dépasse, rien n'est mal coupé, chaque texte se lit.
+// Sur téléphone, on prend un petit écran (360 px) : c'est là que la fenêtre et les infos du devis sont les plus étroites.
+test("2-memoire.html : la mémoire pas à pas reste lisible à chaque étape", async ({ page, isMobile }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  if (isMobile) await page.setViewportSize({ width: 360, height: 780 });
+  await open(page, "2-memoire.html", "?demo=1");
+  const rail = page.locator("#memProc .proc-rail button");
+  for (const size of ["200000", "1000000"]) {
+    await page.locator(`#segWin button[data-v="${size}"]`).click();
+    for (let i = 0; i < 6; i++) {
+      await rail.nth(i).click();
+      await iconsReady(page);
+      const where = `${size} tokens, étape ${i + 1}`;
+      expect(await displayProblems(page), where).toEqual(NO_PROBLEM);
+      expect(await contrastIssues(page), where).toEqual([]);
+    }
+  }
 });
 
 test("2-memoire.html : ta journée, la suite d'une tâche continue la conversation, une autre tâche en ouvre une nouvelle", async ({ page }) => {

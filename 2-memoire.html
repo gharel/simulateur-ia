@@ -382,25 +382,63 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 @media (max-width: 900px) { .mem { grid-template-columns: minmax(0, 1fr); } }
 .controls { display: grid; gap: 28px; align-content: start; }
 .viz { display: grid; gap: 28px; align-content: start; }
-.stacks { display: grid; gap: 16px; }
 .viz > .small.muted { margin-top: -14px; }
 .status { padding: 16px 20px 16px 24px; border-radius: 14px; font-weight: 700; line-height: 1.5; background: var(--surface-2); }
 .status.ok { box-shadow: inset 4px 0 0 var(--ok); }
 .status.warn { box-shadow: inset 4px 0 0 var(--warn); }
 .status.squeeze { box-shadow: inset 4px 0 0 var(--accent); }
 
-.stack-wrap { position: relative; margin-bottom: 18px; }
-.stack { display: flex; height: 30px; border-radius: 10px; overflow: hidden; background: var(--surface-2); }
-.stack span { height: 100%; transition: width .45s ease; }
-.c-sys { background: var(--muted); }
-.c-msg { background: var(--accent); }
-.c-over { background: repeating-linear-gradient(45deg, var(--bad) 0 8px, color-mix(in oklab, var(--bad) 45%, var(--surface)) 8px 16px); }
+/* Le résumé des vieux messages : hachuré (la légende et les barres de « L'IA relit tout »). */
 .c-sum { background: repeating-linear-gradient(45deg, var(--warn) 0 6px, color-mix(in oklab, var(--warn) 40%, var(--surface)) 6px 12px); }
-/* Les documents : une part par document, séparées par un trait (--n : le nombre de documents). */
-.c-doc { background: linear-gradient(90deg, var(--doc) calc(100% - 2px), transparent 0) left / calc(100% / var(--n, 1)) 100% repeat-x; }
-.legend i.c-doc { background: var(--doc); }
-.limit { position: absolute; top: -6px; bottom: -6px; width: 3px; background: var(--fg); border-radius: 2px; transition: left .45s ease; }
-.limit::after { content: "limite"; position: absolute; top: calc(100% + 2px); left: 50%; transform: translateX(-50%); font-size: .75rem; font-weight: 700; color: var(--fg); }
+/* La mémoire pas à pas. Sur bureau : à gauche la taille de la mémoire, la fenêtre et les boutons ;
+   à droite l'étape, ce que l'IA sait, le résumé et la réponse. Sur téléphone : l'étape, la fenêtre, ce que l'IA sait,
+   le résumé, la réponse, puis les boutons. */
+.mem-pas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px 48px; align-items: start; }
+.win-col, .win-side { display: grid; gap: 20px; align-content: start; }
+@media (min-width: 901px) { .mem-pas { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); } }
+@media (max-width: 900px) { .win-col, .win-side { display: contents; } .mem-pas .proc-txt { order: -1; } .mem-pas .proc-nav { order: 1; } }
+.win-part { display: grid; gap: 10px; }
+.win-part > .bar-label { margin-bottom: 0; }
+/* La fenêtre de contexte : une boîte de taille fixe. Les blocs de messages s'y empilent. Pleine, elle déborde :
+   les vieux blocs s'écrasent en un court résumé, et les derniers retombent. --h : la hauteur de la boîte. */
+.win {
+  --h: 340px; position: relative; height: var(--h); margin-top: 26px; display: flex; flex-direction: column-reverse;
+  border: 2px solid var(--line); border-top: 4px solid var(--fg); border-radius: 0 0 14px 14px; background: var(--surface);
+}
+@media (max-width: 640px) { .win { --h: 250px; } }
+.win-full { position: absolute; top: -13px; right: 12px; z-index: 2; padding: 0 8px; border-radius: 6px; background: var(--surface); font-size: .78rem; font-weight: 700; line-height: 22px; }
+.wb { flex: none; display: flex; align-items: center; justify-content: center; padding: 0 10px; overflow: hidden; font-size: .85rem; font-weight: 700; line-height: 1.2; text-align: center; }
+.wb.sys, .wb.doc, .wb.sum { height: 32px; background: var(--surface-2); color: var(--fg); }
+.wb.sys { box-shadow: inset 6px 0 0 var(--muted); border-radius: 0 0 12px 12px; }
+.wb.doc { box-shadow: inset 6px 0 0 var(--doc); }
+.wb.sum { box-shadow: inset 6px 0 0 var(--warn); outline: 2px dashed var(--warn); outline-offset: -2px; }
+.wb.msg { background: var(--accent); color: var(--on-accent); box-shadow: inset 0 -2px 0 var(--surface); }
+.wb.cap { height: 30px; background: none; color: var(--fg); }
+/* Un bloc arrive d'en haut. Celui qui ne tient plus est entouré de rouge, le temps que les vieux blocs s'écrasent. */
+.wb.new { --rise: -18px; animation: rise .4s ease backwards; }
+.wb.over { outline: 3px solid var(--bad); outline-offset: -3px; }
+.wb.ghost, .wb.sum.grow { transition: height .45s ease .45s; }
+.win-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.win-foot .pill { white-space: nowrap; }
+.facts-part { display: grid; gap: 12px; }
+.facts-part h3 .svg-inline--fa { color: var(--accent-text); margin-right: 6px; }
+.facts { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.facts li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 12px 8px 14px; border-radius: 12px; border: 2px solid var(--line); font-weight: 700; line-height: 1.4; }
+.facts li > span:first-child { flex: 1 1 auto; }
+.facts li > span:first-child .svg-inline--fa { color: var(--accent-text); margin-right: 8px; }
+.facts .pill { margin-left: auto; padding: 4px 10px; font-size: .85rem; white-space: nowrap; }
+.facts li.lost > span:first-child { color: var(--muted); text-decoration: line-through; }
+.facts li.lost > span:first-child .svg-inline--fa { color: var(--muted); }
+.facts li.pop { animation: pop .35s ease .45s backwards; }
+.facts li.shake { animation: shake .4s ease .45s; }
+.sum-card { display: grid; gap: 6px; padding: 14px 18px 14px 22px; border-radius: 14px; background: var(--surface-2); outline: 2px dashed var(--warn); outline-offset: -2px; font-weight: 700; line-height: 1.5; }
+.sum-card .who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.sum-card.pop { animation: pop .35s ease .45s backwards; }
+.mem-chat { display: grid; gap: 10px; }
+.mem-chat:empty { display: none; }
+.mem-chat .cb.me { justify-self: end; }
+.mem-chat .cb.ai { justify-self: start; background: var(--surface-2); }
+.cb.right { outline: 3px solid var(--ok); outline-offset: 3px; }
 .bar-label { display: flex; justify-content: space-between; gap: 4px 12px; font-weight: 700; margin-bottom: 10px; flex-wrap: wrap; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: .9rem; color: var(--muted); }
 .legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; }
@@ -416,10 +454,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .b-sys { background: var(--muted); }
 .b-old { background: color-mix(in oklab, var(--accent) 50%, var(--surface)); }
 .b-new { background: var(--accent); }
-
-.dots { display: flex; flex-wrap: wrap; gap: 3px; }
-.dot { width: 10px; height: 10px; border-radius: 3px; background: var(--accent); }
-.dot.old { background: transparent; box-shadow: inset 0 0 0 1.5px var(--warn); }
 
 /* Jeu : ta journée */
 .day-card { background: var(--surface-2); border-radius: 16px; padding: 22px 22px 22px 26px; display: grid; gap: 16px; box-shadow: inset 4px 0 0 var(--accent); }
@@ -439,9 +473,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .conv-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-weight: 700; font-size: .9rem; }
 .conv-top > span:last-child { color: var(--accent-text); font-variant-numeric: tabular-nums; }
 .conv .track { height: 18px; }
-.dot.sys { width: 23px; background: var(--muted); }
-.dot.doc { width: 23px; background: var(--doc); }
-.dot.doc.old { background: transparent; }
 
 /* Animation : ce que tu vois, ce que l'IA relit à chaque envoi */
 .btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
@@ -598,75 +629,34 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>La mémoire de travail de l'IA</h2></div>
-      <p>L'IA a une mémoire de taille fixe. On l'appelle la <strong>fenêtre de contexte</strong>.
-        Toute la conversation doit tenir dedans, avec tes documents. Si elle déborde, l'appli fait de la place. Elle garde les consignes et les derniers messages.
-        <strong>Les vieux messages deviennent un court résumé, ou ils sont oubliés. Des détails se perdent.</strong> Résumer pour faire de la place, c'est la <strong>compression</strong>.
-        Elle recommence chaque fois que la mémoire est pleine.</p>
-      <div class="mem">
-        <div class="controls stick">
-          <div class="ctl">
-            <div class="ctl-row"><label for="nMsg">Nombre de messages</label><span class="ctl-val" id="vMsg">300</span></div>
-            <input type="range" id="nMsg" min="1" max="400" value="300">
-            <div class="ctl-ends"><span>1 message</span><span>400 messages</span></div>
-          </div>
-          <div class="ctl">
-            <span>Taille d'un message</span>
-            <div class="seg" id="segPer" role="group" aria-label="Taille d'un message">
-              <button type="button" data-v="150" aria-pressed="false">Court</button>
-              <button type="button" data-v="800" aria-pressed="true">Moyen</button>
-              <button type="button" data-v="2000" aria-pressed="false">Long</button>
-            </div>
-            <span class="small muted" id="perHint">≈ 800 tokens par message (question + réponse)</span>
-          </div>
-          <div class="ctl">
-            <div class="ctl-row"><label for="nDoc">Documents collés au début</label><span class="ctl-val" id="vDoc">0</span></div>
-            <input type="range" id="nDoc" min="0" max="10" value="0">
-            <div class="ctl-ends"><span>Aucun</span><span>10 documents</span></div>
-            <span class="small muted">1 document de 20 pages ≈ 10 000 tokens. L'IA le relit à chaque message.</span>
-          </div>
-          <div class="ctl">
-            <span>Taille de la mémoire</span>
-            <div class="seg" id="segWin" role="group" aria-label="Taille de la mémoire">
-              <button type="button" data-v="200000" aria-pressed="true">200 000 tokens</button>
-              <button type="button" data-v="1000000" aria-pressed="false">1 million</button>
-            </div>
-            <span class="small muted">200 000 tokens ≈ un gros roman. 1 million ≈ 5 à 7 romans.</span>
-          </div>
-        </div>
-
-        <div class="viz">
-          <div class="stats">
-            <div class="stat"><b id="sFill">0 %</b><span>mémoire remplie, sans compression</span></div>
-            <div class="stat"><b id="sCmp">0</b><span id="sCmpL">compression</span></div>
-            <div class="stat"><b id="sReread">0</b><span>tokens relus à chaque nouveau message</span></div>
-          </div>
-
-          <div class="stacks">
-            <div>
-              <div class="bar-label"><span>Sans compression</span><span class="muted" id="lRaw"></span></div>
-              <div class="stack-wrap">
-                <div class="stack"><span class="c-sys" id="rSys"></span><span class="c-doc" id="rDoc"></span><span class="c-msg" id="rMsg"></span><span class="c-over" id="rOver"></span></div>
-                <div class="limit" id="rLimit"></div>
+      <p>La mémoire de l'IA a une taille fixe : c'est la <strong>fenêtre de contexte</strong>. Quand elle est pleine, l'appli résume les vieux messages pour faire de la place : c'est la <strong>compression</strong>.
+        Suis une longue conversation, étape par étape, et regarde ce que l'IA sait encore.</p>
+      <div class="proc" id="memProc">
+        <div class="mem-pas">
+          <div class="win-col">
+            <div class="ctl">
+              <span>Taille de la mémoire</span>
+              <div class="seg" id="segWin" role="group" aria-label="Taille de la mémoire">
+                <button type="button" data-v="200000" aria-pressed="true">200 000 tokens</button>
+                <button type="button" data-v="1000000" aria-pressed="false">1 million</button>
               </div>
+              <span class="small muted">200 000 tokens ≈ un gros roman. 1 million ≈ 5 à 7 romans.</span>
             </div>
-            <div>
-              <div class="bar-label"><span>Avec compression</span><span class="muted" id="lCmp"></span></div>
-              <div class="stack"><span class="c-sys" id="cSys"></span><span class="c-sum" id="cSum"></span><span class="c-doc" id="cDoc"></span><span class="c-msg" id="cMsg"></span></div>
+            <div class="win-part">
+              <div class="bar-label"><span id="winMsg"></span><span class="muted" id="winTok"></span></div>
+              <div class="win" id="win" role="img"></div>
+              <div class="win-foot"><span class="pill" id="winCmp"></span><span class="small muted">1 bloc bleu = 50 messages ≈ 40 000 tokens</span></div>
             </div>
-            <div class="legend">
-              <span><i class="c-sys"></i>Consignes de départ</span>
-              <span><i class="c-doc"></i>Documents</span>
-              <span><i class="c-msg"></i>Messages gardés en entier</span>
-              <span><i class="c-sum"></i>Résumé des vieux messages</span>
-              <span><i class="c-over"></i>Ça déborde</span>
-            </div>
+            <div class="proc-nav"></div>
           </div>
-
-          <div class="status" id="status" aria-live="polite"></div>
-
-          <div class="ctl">
-            <span class="small muted">Le gris = les consignes. Un rectangle violet = 1 document. Un carré bleu = 1 message. Une case vide a été résumée.</span>
-            <div class="dots" id="dots" aria-hidden="true"></div>
+          <div class="win-side">
+            <div class="proc-txt"></div>
+            <div class="facts-part">
+              <h3><i class="fa-solid fa-list-check" aria-hidden="true"></i> Ce que l'IA sait de ton devis</h3>
+              <ul class="facts" id="facts"></ul>
+            </div>
+            <div class="sum-card" id="sumCard"><span class="who">Le résumé que l'IA garde</span><span id="sumTxt"></span></div>
+            <div class="mem-chat" id="memChat"></div>
           </div>
         </div>
       </div>
@@ -726,7 +716,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <div class="check cols" id="check">
         <label><input type="checkbox" id="c1"><span>Nouveau sujet ? J'ouvre une nouvelle conversation.</span></label>
         <label><input type="checkbox" id="c2"><span>Conversation trop longue ? Je demande un résumé. Puis je le colle dans une nouvelle conversation.</span></label>
-        <label><input type="checkbox" id="c3"><span>L'info importante : je la mets au début, ou je la redis juste avant ma question.</span></label>
+        <label><input type="checkbox" id="c3"><span>L'info importante : je la redis juste avant ma question.</span></label>
         <label><input type="checkbox" id="c4"><span>Je donne seulement les documents utiles.</span></label>
         <label><input type="checkbox" id="c5"><span>Je me souviens que l'IA relit tout à chaque message, même un long document collé au début.</span></label>
         <label><input type="checkbox" id="c6"><span>Si l'IA a oublié un détail, je le lui redonne.</span></label>
@@ -1223,83 +1213,158 @@ function tokenize(text) {
   return out;
 }
 
-// Mémoire de travail. Les documents sont collés au début de la conversation : 20 pages ≈ 10 000 tokens (1 page ≈ 500 tokens).
-const SYS = 2000, DOC = 10000;
-const mem = { n: 300, per: 800, docs: 0, W: 200000 };
-const PER_HINT = { 150: "≈ 150 tokens par message (petite question, petite réponse)", 800: "≈ 800 tokens par message (question + réponse)", 2000: "≈ 2 000 tokens par message (longue question, longue réponse)" };
-const pct = (a, b) => (a / b) * 100 + "%";
-
-// La conversation avance message par message. Dès que la mémoire est pleine (95 %), l'appli compresse :
-// elle garde les consignes et les derniers messages (40 % de la mémoire). Le reste (vieux messages, documents, résumé d'avant)
+// La mémoire pas à pas : une longue conversation sur le devis d'un voyage, 50 messages à la fois.
+// 1 bloc de 50 messages ≈ 40 000 tokens (800 par message). Dès que la mémoire dépasse 95 %, l'appli compresse :
+// elle garde les consignes et les derniers blocs (40 % de la mémoire). Le reste (vieux messages, catalogue, résumé d'avant)
 // devient un court résumé. Puis la mémoire se remplit à nouveau, et ça recommence.
-function simMem({ n, per, docs, W }) {
-  const keep = Math.max(1, Math.floor((0.4 * W) / per)), summary = Math.max(2000, Math.round(0.02 * W));
-  let cmp = 0, kept = 0, used = SYS + docs * DOC;
-  for (let i = 0; i < n; i++) {
-    used += per; kept++;
-    if (used > 0.95 * W) { cmp++; kept = Math.min(kept, keep); used = SYS + summary + kept * per; }
+const SYS = 2000, CATALOG = 10000, BLOCK = 50, BLOCK_TOK = 40000, SUMMARY = 4000;
+const MEM_N = [50, 200, 250, 400, 400, 400];
+const pct = (a, b) => (a / b) * 100 + "%";
+let memW = 200000;
+const big = () => memW >= 1e6;
+// La mémoire après n messages : blocks, le 1er message de chaque bloc gardé en entier ; sumTo, le dernier message résumé.
+function memAt(n, W = memW) {
+  const keep = Math.max(1, Math.floor((0.4 * W) / BLOCK_TOK));
+  let doc = CATALOG, sum = 0, cmp = 0, sumTo = 0, blocks = [];
+  for (let m = BLOCK; m <= n; m += BLOCK) {
+    blocks.push(m - BLOCK + 1);
+    if (SYS + doc + sum + blocks.length * BLOCK_TOK > 0.95 * W) {
+      blocks = blocks.slice(-keep); sumTo = blocks[0] - 1; doc = 0; sum = SUMMARY; cmp++;
+    }
   }
-  return { cmp, kept, used, summary: cmp ? summary : 0 };
+  return { n, blocks, doc, sum, cmp, sumTo, used: SYS + doc + sum + blocks.length * BLOCK_TOK };
+}
+const fillOf = (n) => fmt((memAt(n).used / memW) * 100);
+// Avec 1 million de tokens : le message où viendrait la 1re compression.
+const firstCmp = () => { let n = BLOCK; while (!memAt(n).cmp) n += BLOCK; return n; };
+
+// Ce que l'IA sait du devis. lost : la compression qui fait disparaître l'info (0 : jamais).
+const FACTS = [
+  { t: "{users} 12 personnes", lost: 0 },
+  { t: "{calendar-days} Du 3 au 7 mars", lost: 2 },
+  { t: "{triangle-exclamation} Une cliente allergique aux fruits de mer", lost: 2, key: true },
+  { t: "{wallet} Budget : 2,4 millions F", lost: 0 },
+  { t: "{hotel} Les prix des chambres (catalogue)", lost: 1 },
+];
+const FACT_STATE = {
+  full: ["ok", "{circle-check} En entier"], sum: ["warn", "{compress} Dans le résumé"],
+  lost: ["bad", "{circle-xmark} Perdu"], again: ["ok", "{rotate-left} Redit"],
+};
+// Le résumé que l'IA garde, après 0, 1 ou 2 compressions. Le 2e résume aussi le 1er : il est plus court.
+const MEM_SUMS = [
+  "Pas encore de résumé : l'IA a toute la conversation en entier.",
+  "« Devis île des Pins : 12 personnes, du 3 au 7 mars, budget 2,4 millions F. Une cliente est allergique aux fruits de mer. Catalogue : 3 hôtels. »",
+  "« Devis île des Pins : 12 personnes en mars, budget 2,4 millions F. »",
+];
+const MEM_Q = "Propose un dîner pour le groupe.";
+const MEM_A = {
+  bad: "Un grand plateau de fruits de mer, face au lagon !",
+  good: "Un bougna au poulet. Pas de fruits de mer : une cliente est allergique.",
+  again: "Un bougna au poulet, sans fruits de mer.",
+};
+
+const MEM_STEPS = [
+  { label: "50 messages", title: "Le début : tu donnes tout à l'IA",
+    text: "Tu prépares le devis d'un voyage à l'île des Pins. Tu colles le catalogue de l'hôtel. Puis tu donnes les infos : 12 personnes, du 3 au 7 mars, un budget de 2,4 millions F, une cliente allergique aux fruits de mer." },
+  { label: "200 messages", title: "La mémoire se remplit",
+    text: () => `Chaque message prend de la place. Au message 200, la mémoire est remplie à ${fillOf(200)} %.` +
+      (big() ? " Il reste beaucoup de place." : " L'IA relit encore tout, en entier.") },
+  { label: "250 messages", title: () => (big() ? "Toujours de la place" : "Pleine : 1re compression"),
+    text: () => (big() ? `Au message 250, la mémoire est remplie à ${fillOf(250)} %. Pas besoin de compression : l'IA garde tout en entier.`
+      : "Les messages 201 à 250 ne tiennent plus. L'appli garde les consignes et les 100 derniers messages. Le catalogue et les 150 premiers messages deviennent un court résumé. Les prix des chambres ? Perdus.") },
+  { label: "400 messages", title: () => (big() ? "Toujours pas pleine" : "Encore pleine : 2e compression"),
+    text: () => (big() ? `Au message 400, la mémoire est remplie à ${fillOf(400)} %. Avec 1 million de tokens, la 1re compression viendrait vers le message ${fmt(firstCmp())}.`
+      : "La mémoire se remplit à nouveau. Au message 400, elle est encore pleine : l'appli refait un résumé, qui résume aussi l'ancien. Il est encore plus court : l'allergie et les dates exactes ont disparu.") },
+  { label: "Ta question", title: "Tu poses ta question",
+    text: () => (big() ? "L'IA a encore le message sur l'allergie : sa réponse est bonne. Mais dans une très longue conversation, elle peut quand même rater un détail (voir la carte suivante)."
+      : "L'IA propose des fruits de mer ! L'allergie était dans un vieux message. Deux résumés plus tard, elle a disparu, et l'IA ne te prévient pas.") },
+  { label: "Le bon réflexe", title: "Le bon réflexe : redis l'info importante",
+    text: "Juste avant ta question, redis l'info importante. Elle est dans ton dernier message : l'IA la lit en entier. Pour un long travail, demande un résumé, vérifie-le, puis colle-le dans une nouvelle conversation." },
+];
+
+// La fenêtre : de bas en haut, les consignes, le catalogue ou le résumé, puis les blocs de messages.
+// Un bloc a sa part de la place laissée aux messages (la hauteur de la fenêtre, moins les 2 bandes du bas).
+let memGen = 0;
+function drawWin(now, prev) {
+  const win = $("#win"), gen = ++memGen, frac = BLOCK_TOK / (memW - SYS - CATALOG), label = !big();
+  const band = (cls, text) => h("div", "wb " + cls, text);
+  const block = (start, cls = "") => {
+    const b = h("div", "wb msg" + cls, label ? `Messages ${fmt(start)} à ${fmt(start + BLOCK - 1)}` : null);
+    b.style.height = `calc((var(--h) - 70px) * ${frac})`;
+    return b;
+  };
+  const kids = [band("sys", "Consignes")], ghosts = [];
+  const squash = prev && now.cmp > prev.cmp, arrived = (s) => prev && s > prev.n;
+  let grow = null;
+  if (now.sum) {
+    const s = band("sum", `Résumé des messages 1 à ${fmt(now.sumTo)}`);
+    if (squash) { s.classList.add("grow"); s.style.height = "0px"; grow = s; }
+    kids.push(s);
+  }
+  // La compression de cette étape : ce qui va être résumé est encore là, puis s'écrase.
+  if (squash) {
+    if (prev.doc) ghosts.push(band("doc ghost", "Catalogue de l'hôtel"));
+    if (prev.sum) ghosts.push(band("sum ghost", `Résumé des messages 1 à ${fmt(prev.sumTo)}`));
+    for (let s = prev.blocks[0] || 1; s < now.blocks[0]; s += BLOCK) ghosts.push(block(s, " ghost" + (arrived(s) ? " new" : "")));
+    kids.push(...ghosts);
+  } else if (now.doc) kids.push(band("doc", "Catalogue de l'hôtel"));
+  const blocks = now.blocks.map((s) => block(s, arrived(s) ? " new" : ""));
+  kids.push(...blocks);
+  if (!label && blocks.length) kids.push(band("cap", `Messages ${fmt(now.blocks[0])} à ${fmt(now.n)}`));
+  win.replaceChildren(...kids, h("span", "win-full", "Mémoire pleine"));
+  win.setAttribute("aria-label", `La mémoire au message ${fmt(now.n)} : remplie à ${fmt((now.used / memW) * 100)} %. ` +
+    (now.cmp ? `${fmt(now.cmp)} compression${now.cmp > 1 ? "s" : ""} : les messages 1 à ${fmt(now.sumTo)} ne sont plus qu'un résumé.` : "Tout est en entier."));
+  if (!squash) return;
+  // Le dernier bloc ne tient plus : il dépasse le trait. Puis les vieux blocs s'écrasent, et tout retombe.
+  const top = blocks.at(-1);
+  top.classList.add("over");
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (gen !== memGen) return;
+    ghosts.forEach((g) => (g.style.height = "0px"));
+    grow.style.height = "";
+  }));
+  setTimeout(() => { if (gen !== memGen) return; ghosts.forEach((g) => g.remove()); top.classList.remove("over"); }, 1000);
 }
 
-function renderMem() {
-  const { n, per, docs, W } = mem;
-  const docTok = docs * DOC, msgs = n * per, total = SYS + docTok + msgs;
-  const { cmp, kept, used, summary } = simMem(mem), old = n - kept;
+const memProc = procedure($("#memProc"), MEM_STEPS, (i, from) => {
+  const n = MEM_N[i], now = memAt(n);
+  // On anime seulement quand on avance d'une étape : le geste montre ce qui change.
+  const anim = from !== null && i === from + 1 && !STILL(), prev = anim ? memAt(MEM_N[from]) : null;
+  drawWin(now, anim && n > prev.n ? prev : null);
+  $("#winMsg").textContent = `Message ${fmt(n)}`;
+  $("#winTok").textContent = `${fmt(now.used)} tokens sur ${fmt(memW)}`;
+  const pill = $("#winCmp");
+  pill.className = "pill" + (now.cmp ? " warn" : "");
+  rich(pill, now.cmp ? `{compress} ${fmt(now.cmp)} compression${now.cmp > 1 ? "s" : ""}` : "Aucune compression");
+  if (anim && now.cmp > prev.cmp) replay(pill);
 
-  $("#vMsg").textContent = fmt(n);
-  $("#vDoc").textContent = fmt(docs);
-  $("#perHint").textContent = PER_HINT[per];
-  $("#sFill").textContent = fmt((total / W) * 100) + " %";
-  $("#sCmp").textContent = fmt(cmp);
-  $("#sCmpL").textContent = cmp > 1 ? "compressions" : "compression";
-  $("#sReread").textContent = fmt(used);
-  $("#lRaw").textContent = fmt(total) + " tokens";
+  // Les infos du devis : en entier, dans le résumé, perdues. Au bon réflexe, l'allergie est redite.
+  const cmp = Math.min(now.cmp, 2), was = anim ? Math.min(prev.cmp, 2) : null;
+  const stateOf = (f, c, k) => (k === 5 && f.key ? "again" : !c ? "full" : f.lost && c >= f.lost ? "lost" : "sum");
+  $("#facts").replaceChildren(...FACTS.map((f) => {
+    const st = stateOf(f, cmp, i), [cls, txt] = FACT_STATE[st];
+    const li = h("li", st === "lost" ? "lost" : "");
+    li.append(h("span", "", f.t), h("span", "pill " + cls, txt));
+    if (anim && stateOf(f, was, from) !== st) li.classList.add(st === "lost" ? "shake" : "pop");
+    // À ta question, l'allergie perdue tremble : c'est elle qui manque.
+    if (anim && i === 4 && f.key && st === "lost") li.classList.add("shake");
+    return li;
+  }));
+  rich($("#sumTxt"), MEM_SUMS[cmp]);
+  $("#sumTxt").classList.toggle("muted", !cmp);
+  if (anim && cmp !== was) replay($("#sumCard"), "pop");
 
-  // Sans compression : tout reste, et ce qui dépasse la mémoire déborde.
-  const scale = Math.max(total, W);
-  $("#rSys").style.width = pct(SYS, scale);
-  $("#rDoc").style.width = pct(docTok, scale);
-  for (const id of ["#rDoc", "#cDoc"]) $(id).style.setProperty("--n", Math.max(1, docs));
-  $("#rMsg").style.width = pct(Math.min(msgs, W - SYS - docTok), scale);
-  $("#rOver").style.width = pct(Math.max(0, total - W), scale);
-  $("#rLimit").style.left = `calc(${pct(W, scale)} - 2px)`;
-
-  // Avec compression : ce que la mémoire contient à ce message. Après une compression, les documents sont dans le résumé.
-  $("#cSys").style.width = pct(SYS, W);
-  $("#cSum").style.width = pct(summary, W);
-  $("#cDoc").style.width = pct(cmp ? 0 : docTok, W);
-  $("#cMsg").style.width = pct(kept * per, W);
-  $("#lCmp").textContent = cmp ? `${fmt(used)} tokens · ${fmt((used / W) * 100)} %` : "pas nécessaire";
-
-  const st = $("#status");
-  const theDocs = docs > 1 ? `tes ${fmt(docs)} documents` : "ton document";
-  if (cmp) {
-    st.className = "status squeeze";
-    rich(st, (cmp > 1 ? `{compress} ${fmt(cmp)} compressions ! Chaque fois que la mémoire est pleine, l'appli refait un résumé.` : "{compress} Compression ! La mémoire était pleine : l'appli a fait un résumé.") +
-      ` Elle garde les consignes et tes ${fmt(kept)} derniers messages. ` + (old > 1 ? `Les ${fmt(old)} plus vieux messages` : "Le plus vieux message") +
-      (docs ? `, et ${theDocs},` : "") + " ne sont plus qu'un court résumé : leurs détails se perdent." +
-      (cmp > 1 ? " Et chaque résumé résume aussi le résumé d'avant." : ""));
-  } else if (used / W > 0.7) {
-    st.className = "status warn";
-    rich(st, "{triangle-exclamation} La mémoire est presque pleine. Bientôt, l'appli devra résumer ou oublier les vieux messages" + (docs ? `, et ${theDocs}.` : "."));
-  } else {
-    st.className = "status ok";
-    rich(st, "{circle-check} Tout tient dans la mémoire. L'IA peut relire chaque message" + (docs ? ` et ${theDocs}` : "") + ". Mais dans une très longue conversation, elle fait moins attention aux détails (voir plus bas).");
+  // Ta question, puis ton rappel : la réponse dépend de ce que l'IA sait encore.
+  const chat = $("#memChat"), lost = stateOf(FACTS.find((f) => f.key), cmp, 4) === "lost";
+  chat.replaceChildren();
+  if (i >= 4) {
+    const again = i === 5, ans = again ? MEM_A.again : lost ? MEM_A.bad : MEM_A.good;
+    chat.append(rpBubble("me", "Toi", (again ? "Rappel : une cliente est allergique aux fruits de mer. " : "") + MEM_Q),
+      rpBubble("ai " + (again || !lost ? "right" : "lost"), "IA", ans));
   }
-
-  // Une case par morceau de la conversation. Vide : il a été résumé.
-  const frag = document.createDocumentFragment();
-  frag.appendChild(h("span", "dot sys"));
-  for (let i = 0; i < docs; i++) frag.appendChild(h("span", "dot doc" + (cmp ? " old" : "")));
-  for (let i = 0; i < n; i++) frag.appendChild(h("span", i < old ? "dot old" : "dot"));
-  $("#dots").replaceChildren(frag);
-}
-
-$("#nMsg").addEventListener("input", (e) => { mem.n = +e.target.value; renderMem(); });
-$("#nDoc").addEventListener("input", (e) => { mem.docs = +e.target.value; renderMem(); });
-mem.per = +initSeg($("#segPer"), (v) => { mem.per = +v; renderMem(); });
-mem.W = +initSeg($("#segWin"), (v) => { mem.W = +v; renderMem(); });
+});
+// La taille de la mémoire se choisit contre la fenêtre : on redessine l'étape en cours.
+initSeg($("#segWin"), (v) => { memW = +v; memProc.redraw(); });
 
 // Une part de barre, et ce qu'un échange contient de question (le reste est la réponse).
 function block(cls, w) { const s = document.createElement("span"); s.className = cls; s.style.width = w; return s; }
@@ -1610,5 +1675,4 @@ initDefi([
 ]);
 
 initRanges();
-renderMem();
 </script>
