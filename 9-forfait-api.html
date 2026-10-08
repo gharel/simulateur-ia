@@ -518,7 +518,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         Après ta réponse, le calculateur se règle sur le profil. Regarde la courbe juste en dessous.</p>
       <div class="quiz bets" id="bets"></div>
       <div class="result" id="betResult" aria-live="polite"></div>
-      <p class="small muted">Profils inventés pour comprendre. Calcul avec un forfait à 20 $ et les prix API de septembre 2026.</p>
+      <p class="small muted">Profils inventés pour comprendre. Calcul avec un forfait à 20 $ et les prix API vérifiés le 7 octobre 2026.</p>
     </section>
 
     <section class="card s4">
@@ -540,7 +540,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <label for="inP">API : lire 1 million de tokens<span class="unit"><input type="number" id="inP" min="0" step="0.1" value="2"></span></label>
         <label for="outP">API : écrire 1 million de tokens<span class="unit"><input type="number" id="outP" min="0" step="0.1" value="10"></span></label>
       </div>
-      <p class="small muted">Exemple avec les prix API publics de Claude, septembre 2026 : modèle rapide = 1 $ / 5 $, standard = 2 $ / 10 $, expert = 4 $ / 20 $. Choisir un modèle remplit ces cases. Le prix du forfait est un exemple : vérifie le tarif actuel.</p>
+      <p class="small muted">Exemple avec les prix API publics de Claude, vérifiés le 7 octobre 2026 : modèle rapide = 1 $ / 5 $, standard = 2 $ / 10 $, expert = 4 $ / 20 $. Choisir un modèle remplit ces cases. Le prix du forfait est un exemple : vérifie le tarif actuel.</p>
     </section>
 
     <section class="card s4">
@@ -552,7 +552,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           <input type="range" id="burst" min="0" max="120" step="5" value="20">
           <div class="ctl-ends" aria-hidden="true"><span>0</span><span>120 messages</span></div>
         </div>
-        <label class="sw" for="cap"><span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> API : je fixe un plafond de 2 $ par jour</span><input type="checkbox" id="cap"></label>
+        <label class="sw" for="cap"><span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> API : il me reste 2 $ avant mon plafond du mois</span><input type="checkbox" id="cap"></label>
       </div>
       <div class="versus">
         <div>
@@ -576,7 +576,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           <thead><tr><th></th><th><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Forfait</th><th><i class="fa-solid fa-receipt" aria-hidden="true"></i> API</th></tr></thead>
           <tbody>
             <tr><th>Prix</th><td>Fixe chaque mois</td><td>Selon les tokens utilisés</td></tr>
-            <tr><th>Limite</th><td>Un quota d'usage par période</td><td>Pas de pause, mais un budget</td></tr>
+            <tr><th>Limite</th><td>Un quota d'usage par période</td><td>Une limite par minute, et un plafond par mois</td></tr>
             <tr><th>Facture</th><td>Toujours la même</td><td>Change chaque mois</td></tr>
             <tr><th>Comment ?</th><td>Dans l'appli de l'IA (Claude, ChatGPT…)</td><td>Dans tes propres outils ou applis</td></tr>
             <tr><th>Pour qui ?</th><td>Particuliers, équipes</td><td>Développeurs, automatisations</td></tr>
@@ -598,14 +598,14 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           </tbody>
         </table>
       </div>
-      <p class="small muted">Attention au mot « Pro ». Chez Claude, c'est le forfait standard. Chez ChatGPT, c'est le gros forfait. Anthropic fabrique Claude, OpenAI fabrique ChatGPT. Noms vérifiés en octobre 2026 : ils changent souvent.</p>
+      <p class="small muted">Attention au mot « Pro ». Chez Claude, c'est le forfait standard. Chez ChatGPT, c'est le gros forfait. Enterprise, chez Claude : un prix par personne, plus l'usage payé au token. Anthropic fabrique Claude, OpenAI fabrique ChatGPT. Noms vérifiés en octobre 2026 : ils changent souvent.</p>
     </section>
 
     <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
-        <li><span>Forfait = prix fixe, mais une limite. Quand elle est atteinte, il faut attendre.</span></li>
-        <li><span>API = jamais de pause obligatoire, mais tu paies chaque token.</span></li>
+        <li><span>Forfait = prix fixe, mais une limite. Quand elle est atteinte, tu attends quelques heures, parfois quelques jours. Ou tu paies en plus, si ton forfait le permet.</span></li>
+        <li><span>API = pas de pause de plusieurs heures. Mais tu paies chaque token, et la dépense a un plafond par mois.</span></li>
         <li><span>À chaque message, l'IA relit la conversation. Une longue conversation coûte donc plus cher.</span></li>
       </ul>
     </section>
@@ -630,7 +630,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
   </div>
   <footer class="foot">
     <nav class="series" aria-label="Les 9 fiches"><strong>Comprendre l’IA en 9 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a href="5-complaisance.html">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils de l'IA</a><a href="8-agent.html">8 Créer son agent</a><a aria-current="page">9 Forfait ou API</a></nav>
-    <span>Calcul simplifié pour comprendre. La cache est comptée ici à 10 % du prix de lecture pour 80 % du texte relu.</span>
+    <span>Calcul simplifié pour comprendre. La cache est comptée ici à environ 10 % du prix de lecture pour 80 % du texte relu.</span>
     <div class="modes">
       <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
       <button type="button" class="btn" id="demoBtn" aria-pressed="false"><i class="fa-solid fa-lock-open" aria-hidden="true"></i> Mode démonstration : non</button>
@@ -1109,7 +1109,7 @@ function render() {
 }
 
 // Bloqué ou pas : des messages d'affilée. Le forfait a un quota pour 5 heures (en messages moyens : un gros message en use plus).
-// L'API ne s'arrête pas, sauf au plafond que tu fixes. Exemple : 40 messages moyens, plafond de 2 $.
+// L'API ne s'arrête pas, sauf au plafond du mois que tu fixes. Exemple : 40 messages moyens, et 2 $ restants avant ce plafond.
 const QUOTA = 40, QUOTA_USE = { short: 0.3, mid: 1, long: 5 }, CAP = 2;
 const dayWas = { blocked: false, capped: false };
 function renderDay(cpm, plan) {
@@ -1123,9 +1123,9 @@ function renderDay(cpm, plan) {
   $("#qTxt").textContent = blocked ? "Vide" : `${fmt(left)} message${left > 1 ? "s" : ""} restant${left > 1 ? "s" : ""}`;
   const qs = $("#qSt");
   qs.className = "status " + (blocked ? "bad" : "ok");
-  rich(qs, blocked ? `{hourglass-half} Pause au message ${fmt(fit + 1)}. Tu attends quelques heures que la limite revienne. Le prix ne bouge pas : ${money(plan)} par mois.`
+  rich(qs, blocked ? `{hourglass-half} Pause au message ${fmt(fit + 1)}. Tu attends quelques heures que la limite revienne. Ou quelques jours, si c'est la limite de la semaine. Le prix ne bouge pas : ${money(plan)} par mois.`
     : `{circle-check} Ça marche. Le prix ne bouge pas : ${money(plan)} par mois.`);
-  // API : la facture monte. Avec un plafond, elle s'arrête au plafond, et l'API aussi.
+  // API : la facture monte. Avec un plafond, elle s'arrête au plafond, et l'API aussi, jusqu'au mois suivant.
   const stopAt = cpm > 0 ? Math.floor(CAP / cpm) : Infinity, capped = cap && n > stopAt;
   const bill = (capped ? stopAt : n) * cpm, top = Math.max(120 * cpm, CAP * 1.25);
   const b = $("#bFill");
@@ -1136,9 +1136,9 @@ function renderDay(cpm, plan) {
   $("#capMark").style.left = (CAP / top) * 100 + "%";
   const bs = $("#bSt");
   bs.className = "status " + (capped ? "warn" : "ok");
-  rich(bs, capped ? `{ban} Plafond atteint au message ${fmt(stopAt + 1)} : l'API s'arrête jusqu'à demain. C'est toi qui l'as choisi.`
+  rich(bs, capped ? `{ban} Plafond atteint au message ${fmt(stopAt + 1)} : l'API s'arrête jusqu'au mois prochain. Ou tu montes ton plafond. C'est toi qui l'as choisi.`
     : !n ? "{circle-check} Pas encore de message, pas de facture."
-    : `{circle-check} Pas de pause. Mais la facture monte : ${money(bill)} aujourd'hui.` + (cap ? "" : " Sans plafond, rien ne l'arrête."));
+    : `{circle-check} Pas de pause. Mais la facture monte : ${money(bill)} aujourd'hui.` + (cap ? "" : " Sans plafond à toi, elle peut monter très haut."));
   // Le message qui annonce un blocage tremble, au moment où il arrive.
   if (blocked && !dayWas.blocked) replay(qs, "hit");
   if (capped && !dayWas.capped) replay(bs, "hit");
@@ -1220,7 +1220,8 @@ st.size = initSeg($("#segSize"), (v) => { st.size = v; render(); });
 initSeg($("#segModel"), (v) => { $("#inP").value = PRICES[v][0]; $("#outP").value = PRICES[v][1]; render(); });
 initRanges();
 render();
-// Jeu : fais ton pari. La bonne réponse vient du calcul, sauf pour le robot : le forfait ne marche pas dans un outil automatique.
+// Jeu : fais ton pari. La bonne réponse vient du calcul, sauf pour le robot : c'est l'outil de l'agence, il passe par l'API.
+// Le forfait marche seulement dans l'appli de l'IA, même pour ses tâches planifiées.
 const BET_PLAN = 20;
 const cpmOf = (size, model) => (SIZES[size].inTok * PRICES[model][0] + SIZES[size].outTok * PRICES[model][1]) / 1e6;
 const PROFILES = [
@@ -1235,7 +1236,7 @@ const PROFILES = [
     why: (api) => `Avec l'API : ${money(api)} par mois ! Le forfait coûte bien moins cher. Mais avec ses gros travaux, Marc touchera parfois la limite : il devra faire des pauses.` },
   { who: "{robot} Le robot de l'agence. Un outil qui trie 200 e-mails par jour, tout seul, avec le modèle rapide, 31 jours par mois.",
     perDay: 200, days: 31, size: "short", model: "rapide", a: "api",
-    why: (api) => `Piège ! Le forfait ne marche que dans l'appli de l'IA, avec un humain. Un robot passe par l'API : environ ${money(api)} par mois. On peut fixer un plafond de dépense. Le calculateur dit que le forfait coûte moins cher, mais un robot ne peut pas s'en servir.` },
+    why: (api) => `Piège ! Le robot de l'agence est votre propre outil : il doit passer par l'API. Le forfait marche seulement dans l'appli de l'IA, même pour ses tâches planifiées. Avec l'API : environ ${money(api)} par mois. On peut fixer un plafond de dépense. Le calculateur dit que le forfait coûte moins cher, mais le robot ne peut pas s'en servir.` },
 ];
 function applyProfile(P) {
   $(`#segModel button[data-v="${P.model}"]`).click();
@@ -1262,7 +1263,7 @@ function applyProfile(P) {
         if (ok) replay($("#betScore"));
         if (firsts.size < PROFILES.length) return;
         rich($("#betResult"), (good === PROFILES.length ? "{trophy} 4 sur 4 ! " : `${good} sur 4. `) +
-          "La règle : petit usage ou outil automatique, l'API. Gros usage dans l'appli de l'IA, le forfait.");
+          "La règle : petit usage ou ton propre outil, l'API. Gros usage dans l'appli de l'IA, le forfait.");
         if (good === PROFILES.length) confetti("{dice}");
       } });
   });
@@ -1272,7 +1273,7 @@ function applyProfile(P) {
 initDefi([
   { q: "Tu as atteint la limite de ton forfait, sans option payante. Que se passe-t-il ?", a: "wait",
     options: [["pay", "Je paie un supplément"], ["wait", "Je fais une pause"], ["stop", "Mon compte est fermé"]],
-    why: "Le prix ne bouge pas. Mais il faut attendre : la limite revient après quelques heures." },
+    why: "Le prix ne bouge pas. Mais il faut attendre : quelques heures, ou quelques jours si c'est la limite de la semaine. En attendant, certaines applis passent à un modèle plus petit." },
   { q: "Tu veux une facture qui ne change jamais.", a: "plan",
     options: [["plan", "{credit-card} Forfait"], ["api", "{receipt} API"]],
     why: "Le forfait coûte le même prix chaque mois." },
@@ -1281,7 +1282,7 @@ initDefi([
     why: "L'IA relit toute la conversation à chaque fois. Plus de tokens lus, donc plus cher (voir « La Mémoire qui Déborde »)." },
   { q: "Ton outil interne doit appeler l'IA tout seul, la nuit.", a: "api",
     options: [["plan", "{credit-card} Forfait"], ["api", "{receipt} API"]],
-    why: "Le forfait marche dans l'appli de l'IA. Un outil automatique passe par l'API." },
+    why: "Le forfait marche dans l'appli de l'IA. Ton propre outil passe par l'API." },
 ]);
 if ("ResizeObserver" in window) {
   let w = 0;

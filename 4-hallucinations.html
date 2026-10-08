@@ -648,7 +648,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <div class="legend"><span><i class="key rk-ok"></i>Justes</span><span><i class="key rk-idk"></i>« Je ne sais pas »</span><span><i class="key rk-bad"></i>Faux</span></div>
         <p class="verdict" id="verdict" aria-live="polite"></p>
       </div>
-      <p class="small muted">Chiffres publiés par OpenAI en septembre 2025, sur un test de questions courtes sur des faits (le test SimpleQA). Ici, on les ramène à 100 questions : 22 % justes = 22 bonnes réponses = 22 points.</p>
+      <p class="small muted">Chiffres d'OpenAI (août 2025, repris en septembre 2025). Le test SimpleQA pose des questions courtes sur des faits. Les IA répondaient sans recherche web. Ce sont des modèles de 2025. Ici, on ramène tout à 100 questions : 22 % justes = 22 bonnes réponses = 22 points.</p>
     </section>
 
     <section class="card s4">
@@ -665,7 +665,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         </div>
         <div class="result" id="hlResult" aria-live="polite"></div>
       </div>
-      <p class="small muted">Exemple fabriqué pour comprendre. Les noms, les dates, les chiffres et les liens sont inventés.</p>
+      <p class="small muted">Exemple fabriqué pour comprendre. Les phrases à vérifier sont inventées. Certaines ressemblent beaucoup à la réalité : c'est le piège.</p>
     </section>
 
     <section class="card s4">
@@ -675,7 +675,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <div class="track"><div class="fill" id="chkFill"></div></div>
       </div>
       <div class="check cols" id="check">
-        <label><input type="checkbox" id="c1"><span>Je demande d'où vient l'information.</span></label>
+        <label><input type="checkbox" id="c1"><span>Je demande d'où vient l'information. Puis j'ouvre la source pour vérifier.</span></label>
         <label><input type="checkbox" id="c2"><span>Je vérifie les chiffres, les dates et les noms.</span></label>
         <label><input type="checkbox" id="c3"><span>Je donne mes propres documents.</span></label>
         <label><input type="checkbox" id="c4"><span>J'écris : « Si tu ne sais pas, dis-le. »</span></label>
@@ -688,7 +688,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
         <li><span>L'IA peut inventer des faits, des chiffres ou des noms. Ça s'appelle une hallucination.</span></li>
-        <li><span>Donne-lui des documents ou la recherche web. Le risque baisse beaucoup.</span></li>
+        <li><span>Donne-lui le bon document, ou la recherche web. Le risque baisse beaucoup, mais pas jusqu'à zéro.</span></li>
         <li><span>Elle devine plutôt que de dire « je ne sais pas » : les tests la récompensent quand elle devine.</span></li>
       </ul>
     </section>
@@ -1184,7 +1184,8 @@ function factors(s) {
     doc: 0.35,
     web: s.level === 4 ? 0.25 : 0.55,
     idk: 0.7,
-    src: 0.8,
+    // Demander les sources aide seulement avec un document ou la recherche web. Sans eux, l'IA peut inventer une source.
+    src: s.doc || s.web ? 0.8 : 1,
     crea: 0.85 + (s.crea / 100) * 0.6,
   };
 }
@@ -1235,11 +1236,12 @@ function render() {
     { key: "doc", label: "{paperclip} Donner un document", v: 1 - f.doc },
     { key: "web", label: "{globe} Activer la recherche web", v: 1 - f.web },
     { key: "idk", label: "{hand} Autoriser « je ne sais pas »", v: 1 - f.idk },
-    { key: "src", label: "{link} Demander les sources", v: 1 - f.src },
+    { key: "src", label: "{link} Demander les sources", v: 1 - f.src,
+      note: "Demander les sources aide seulement si l'IA a un document ou la recherche web. Sinon, elle peut inventer une source. Ouvre toujours le lien." },
   ];
   const up = f.crea - 1;
   const box = $("#levers");
-  box.replaceChildren(...rows.map((r) => lever(r.label, "− " + Math.round(r.v * 100) + " %", r.v, s[r.key] ? "on" : "")));
+  box.replaceChildren(...rows.map((r) => lever(r.label, (r.v ? "− " : "") + Math.round(r.v * 100) + " %", r.v, s[r.key] ? "on" : "", r.note)));
   box.appendChild(up >= 0
     ? lever("{palette} Demander de l'imagination", "+ " + Math.round(up * 100) + " %", up, "up")
     : lever("{bullseye} Demander des faits précis", "− " + Math.round(-up * 100) + " %", -up, "on"));
@@ -1254,13 +1256,15 @@ function sent(t, c, says) {
   e.append(m, t);
   return e;
 }
-function lever(label, val, ratio, cls) {
+// Un levier : son nom, son effet sur le risque, sa barre. note : une phrase qui explique, sous la barre.
+function lever(label, val, ratio, cls, note) {
   const d = document.createElement("div");
   d.className = "lever " + cls;
   d.innerHTML = `<div class="meter-top"><span></span><span></span></div><div class="track"><div class="fill"></div></div>`;
   const spans = d.querySelectorAll(".meter-top span");
   rich(spans[0], label); spans[1].textContent = val;
   d.querySelector(".fill").style.width = Math.max(3, ratio * 100) + "%";
+  if (note) d.append(h("span", "small muted", note));
   return d;
 }
 
@@ -1311,7 +1315,7 @@ const WHY_STEPS = [
       : "1998 n'a que 9 chances sur 100. Elle l'écrit quand même : c'est le premier de la liste.") },
   { label: "Ça a l'air sûr", title: "La réponse a l'air sûre",
     text: () => (isKnown() ? "La réponse est juste. Elle a l'air sûre, et elle l'est."
-      : "La réponse a l'air aussi sûre que l'autre. Mais elle peut être fausse : 1998 n'avait que 9 chances sur 100.") },
+      : "La réponse a l'air aussi sûre que l'autre. Mais elle peut être fausse : 1998 n'avait que 9 chances sur 100. Si tu reposes la question, elle peut écrire une autre année.") },
 ];
 const whyProc = procedure($("#whyProc"), WHY_STEPS, (i, from) => {
   const N = NEXT[nextQ], [top, odds] = N.words[0];
@@ -1343,7 +1347,8 @@ const whyProc = procedure($("#whyProc"), WHY_STEPS, (i, from) => {
 initSeg($("#segNext"), (v) => { nextQ = v; whyProc.go(0, true); });
 
 // Pourquoi elle devine : le classement compte les bonnes réponses, pas les erreurs.
-// Chiffres publiés par OpenAI (septembre 2025), test SimpleQA, en % des questions.
+// Chiffres d'OpenAI, en % des questions : test SimpleQA sans recherche web (GPT-5 System Card, tableau 8, août 2025),
+// repris en septembre 2025 dans « Why language models hallucinate ». Des modèles de 2025.
 const RANK = [
   { kind: "Modèle prudent", name: "gpt-5-thinking-mini", ok: 22, idk: 52, bad: 26 },
   { kind: "Modèle qui devine", name: "o4-mini", ok: 24, idk: 1, bad: 75 },
@@ -1426,7 +1431,7 @@ guess($("#rankGuess"), {
 const HL = [
   { q: "Prépare une fiche pratique pour un client qui part à l'île des Pins.", s: [
     ["L'île des Pins est une destination appréciée pour ses plages.", false, "Une idée générale, facile à confirmer."],
-    ["Le vol depuis Nouméa dure exactement 25 minutes.", true, "Une durée précise : vérifie sur le site de la compagnie."],
+    ["Le vol depuis Nouméa dure exactement 25 minutes.", true, "Une durée précise : vérifie sur le site de la compagnie. Le vrai vol dure environ une demi-heure. C'est presque vrai, et c'est ça le piège."],
     ["Pense à prendre de la crème solaire et un chapeau.", false, "Un conseil de bon sens."],
     ["Depuis 2024, une taxe de séjour de 1 500 XPF est obligatoire.", true, "Une date, un montant, une règle : à vérifier sur une source officielle."],
     ["Le guide Marcel Dupont propose des balades en pirogue tous les mardis.", true, "Un nom et un jour précis : l'IA peut inventer des personnes."],
@@ -1437,7 +1442,7 @@ const HL = [
     ["La loi du 12 mars 2019 impose un remboursement sous 14 jours.", true, "Une loi avec une date : l'IA invente souvent ce genre de référence."],
     ["Il vaut mieux écrire ces règles clairement sur le devis.", false, "Un conseil, pas un fait."],
     ["D'après une étude de 2023, 68 % des clients annulent moins de 7 jours avant.", true, "Une étude et un pourcentage, sans source : à vérifier."],
-    ["Le site officiel regles-voyage-officiel.exemple.com confirme ces règles.", true, "Un lien et le mot « officiel » : l'IA peut inventer des adresses web."],
+    ["Le site officiel regles-voyage-officiel.example confirme ces règles.", true, "Un lien et le mot « officiel » : l'IA peut inventer des adresses web."],
     ["En cas de doute, demande conseil à un juriste.", false, "Un bon réflexe, rien à vérifier."],
   ] },
   { q: "Écris un petit texte sur l'histoire de notre quartier, pour la vitrine.", s: [

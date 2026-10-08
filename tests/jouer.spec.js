@@ -93,6 +93,49 @@ test("1-tokens.html : le compte est bon se gagne en 3 manches", async ({ page })
   await page.locator("#cbCheck").click();
   await expect(page.locator("#cbResult")).toContainText("2 de trop");
   await expect(page.locator("#cbToks .tok")).toHaveCount(7);
+  // Un nombre se coupe par paquets de 3 chiffres, comme chez les vrais découpeurs : 2026 = 202 + 6.
+  await page.locator("#cbTxt").fill("2026");
+  await page.locator("#cbCheck").click();
+  await expect(page.locator("#cbToks .tok")).toHaveText(["202", "6"]);
+});
+
+test("7-boite-outils.html : une info en trop qui ressemble à la bonne peut tromper l'IA", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await open(page, "7-boite-outils.html");
+  const answer = page.locator("#dAnswer"), pill = page.locator("#dPill");
+  await expect(answer).toContainText("35 €");
+  await expect(pill).toHaveClass(/ok/);
+  // L'anecdote gêne peu. L'ancien prix ressemble au bon : il passe dans la réponse.
+  await page.locator('label[for="dAnec"]').click();
+  await expect(page.locator("#dPrompt .extra")).toHaveCount(1);
+  await expect(pill).not.toHaveClass(/warn|bad/);
+  await page.locator('label[for="dPrix"]').click();
+  await expect(answer).toContainText("30 €");
+  await expect(pill).toHaveClass(/warn/);
+  await page.locator('label[for="dDate"]').click();
+  await expect(answer).toContainText("15 octobre");
+  await expect(pill).toHaveClass(/bad/);
+  // Le schéma : à la dernière étape, l'IA peut prendre l'ancien prix.
+  for (let i = 0; i < 3; i++) await page.locator("#whyProc .proc-nav .go").click();
+  await expect(page.locator("#whySlot")).toHaveText("30 €");
+  // Les chercheurs : 4 documents qui ressemblent à la réponse, 27 bonnes réponses sur 100. Au hasard : 31.
+  await page.locator("#distGuess .qbtns button").first().click();
+  const four = page.locator("#noiseBars .hb").nth(3).locator(".hb-n");
+  await expect(four).toHaveText("27");
+  await page.locator('#segNoise button[data-v="rand"]').click();
+  await expect(four).toHaveText("31");
+});
+
+test("2-memoire.html : le context rot, plus le texte est long, plus l'IA rate de détails", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await open(page, "2-memoire.html");
+  await page.locator("#rotGuess .qbtns button").first().click();
+  const million = page.locator("#rotBars .hb").last().locator(".hb-n");
+  await expect(million).toHaveText("74");
+  await page.locator('#segRot button[data-v="before"]').click();
+  await expect(million).toHaveText("37");
+  await page.locator('#segFocus button[data-v="full"]').click();
+  await expect(page.locator("#focusBars .hb-n")).toHaveText(["90", "81", "62"]);
 });
 
 test("5-complaisance.html : choisir chaque version neutre donne 4 sur 4", async ({ page }) => {

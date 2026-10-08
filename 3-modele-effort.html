@@ -457,7 +457,7 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
           <strong>Modèle</strong>
           <p>Le « cerveau » de l'IA. Il y en a des petits et des grands.</p>
           <strong>Effort</strong>
-          <p>Le temps que l'IA prend pour réfléchir avant de répondre.</p>
+          <p>Le travail que l'IA fait pour te répondre. Plus d'effort : elle réfléchit plus, et elle va plus loin. Elle met aussi plus de temps.</p>
           <strong>Prompt</strong>
           <p>Ta demande : le message que tu écris à l'IA.</p>
         </div>
@@ -513,7 +513,7 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
         </div>
         <p class="prompt" id="askTxt" aria-live="polite"></p>
       </div>
-      <p class="small muted">Une demande précise dit ce que tu veux, pour qui et sous quelle forme. Elle donne aussi les informations utiles.</p>
+      <p class="small muted">Une demande précise dit ce que tu veux, pour qui et sous quelle forme. Elle donne les informations utiles, et rien de plus.</p>
     </section>
 
     <section class="card s3">
@@ -597,7 +597,7 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
           </tbody>
         </table>
       </div>
-      <p class="small muted">* Exemple avec les 3 modèles de Claude, tarifs publics de l'API de septembre 2026. Prix pour 1 million de tokens : lus / écrits. Il existe aussi des modèles encore plus puissants (10 $ / 50 $).</p>
+      <p class="small muted">* Exemple avec les 3 modèles de Claude. Tarifs publics de l'API, vérifiés le 7 octobre 2026. Prix pour 1 million de tokens : lus / écrits. Il existe aussi des modèles encore plus puissants (10 $ / 50 $).</p>
     </section>
 
     <section class="card s4" id="noms">
@@ -605,7 +605,7 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
       <p>Chaque IA donne ses propres noms à ses modèles. Dans les fiches, on utilise des mots qui marchent pour toutes les IA. Voici comment Claude et ChatGPT les appellent.</p>
       <div class="tbl-wrap">
         <table class="noms">
-          <thead><tr><th>Dans les fiches</th><th>Chez Claude</th><th>Chez ChatGPT</th></tr></thead>
+          <thead><tr><th>Dans les fiches</th><th>Chez Claude</th><th>Chez OpenAI (ChatGPT)</th></tr></thead>
           <tbody>
             <tr><td><strong>Modèle rapide</strong></td><td>Haiku</td><td>Luna</td></tr>
             <tr><td><strong>Modèle standard</strong></td><td>Sonnet</td><td>Terra</td></tr>
@@ -615,7 +615,8 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
           </tbody>
         </table>
       </div>
-      <p class="small muted">Anthropic fabrique Claude, OpenAI fabrique ChatGPT. Noms vérifiés en octobre 2026 : ils changent souvent.</p>
+      <p class="small muted">Dans ChatGPT, tu choisis surtout un niveau de réflexion : Instant, Medium, High ou Extra High. Sans abonnement payant, tu as le modèle rapide (Luna).
+        Anthropic fabrique Claude, OpenAI fabrique ChatGPT. Noms vérifiés en octobre 2026 : ils changent souvent.</p>
     </section>
 
     <section class="card s4 retenir">
@@ -1279,7 +1280,7 @@ initDefi([
     why: "Une tâche dure : l'expert, avec du temps pour réfléchir." },
   { q: "Tu dois résumer 500 avis clients, chaque jour.", a: "rapide",
     options: [["rapide", "Rapide"], ["expert", "Expert, effort max"]],
-    why: "Une tâche simple, en gros volume : le modèle rapide coûte plus de 20 fois moins cher que l'expert en effort max, et il va bien plus vite." },
+    why: "Une tâche simple, en gros volume : le modèle rapide suffit. Dans notre simulation, il coûte plus de 20 fois moins cher que l'expert en effort max. Chaque token coûte 4 fois moins cher. Et il ne passe pas de temps à réfléchir." },
   { q: "Monter l'effort, ça veut dire…", a: "think",
     options: [["fast", "L'IA répond plus vite"], ["think", "L'IA réfléchit plus longtemps"], ["model", "On change de modèle"]],
     why: "Plus d'effort = plus de tokens de réflexion. Plus lent et plus cher, mais utile pour les tâches difficiles." },

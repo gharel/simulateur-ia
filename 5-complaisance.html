@@ -392,6 +392,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .yes-col { display: grid; gap: 18px; align-content: start; }
 .yes-col h3 { display: flex; gap: 10px; align-items: center; }
 .yes-col h3 b { font-weight: 400; background: var(--accent); color: var(--on-accent); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .95rem; flex: none; }
+/* La note sur la consigne colle à son interrupteur. */
+.yes-col > .sw + .small { margin-top: -8px; }
 .thread { display: grid; gap: 14px; }
 .who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
 .msg-me { justify-self: end; max-width: 88%; display: grid; gap: 6px; background: var(--accent); color: var(--on-accent); border-radius: 18px 18px 4px 18px; padding: 14px 18px; font-weight: 700; line-height: 1.45; }
@@ -496,7 +498,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           </div>
         </div>
       </div>
-      <p class="small muted">Exemple fabriqué pour comprendre. Les modèles récents résistent mieux, mais la tendance existe toujours.</p>
+      <p class="small muted">Exemple fabriqué pour comprendre. Les modèles récents résistent mieux, mais la tendance existe toujours. Un vrai cas : en avril 2025, une mise à jour d'une IA connue flattait trop. Son fabricant l'a retirée au bout de quelques jours.</p>
     </section>
 
     <section class="card s4">
@@ -522,12 +524,14 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           <div class="meter">
             <div class="meter-top"><span>La réponse suit ton avis</span><span id="yesVal">0 %</span></div>
             <div class="track"><div class="fill" id="yesFill"></div></div>
+            <p class="small muted">Chiffres inventés pour comprendre. Sur un fait clair, les IA récentes se laissent moins faire. Sur un avis ou un conseil, elles te donnent raison plus souvent.</p>
           </div>
           <span class="pill" id="yesPillA"></span>
         </div>
         <div class="yes-col">
           <h3><b>2</b>Quand tu insistes</h3>
           <label class="sw" for="franc"><span><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Mes consignes disent : « Sois franche. Dis-moi si je me trompe. »</span><input type="checkbox" id="franc"></label>
+          <p class="small muted">Cette consigne aide souvent. Ce n'est pas une garantie : vérifie quand même la source.</p>
           <div class="thread" id="yesB" aria-live="polite"></div>
           <span class="pill" id="yesPillB"></span>
         </div>
@@ -558,7 +562,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <div class="check cols" id="check">
         <label><input type="checkbox" id="c1"><span>Je pose ma question sans donner mon avis.</span></label>
         <label><input type="checkbox" id="c2"><span>Je demande le pour et le contre.</span></label>
-        <label><input type="checkbox" id="c3"><span>J'écris : « Critique mon idée, sans me ménager. »</span></label>
+        <label><input type="checkbox" id="c3"><span>J'écris : « Donne-moi les points forts et les points faibles de mon idée. »</span></label>
         <label><input type="checkbox" id="c4"><span>Je demande : « Qu'est-ce qui pourrait rater ? »</span></label>
         <label><input type="checkbox" id="c5"><span>Si elle change d'avis dès que j'insiste, je lui demande pourquoi.</span></label>
         <label><input type="checkbox" id="c6"><span>Dans mes consignes, j'écris : « Sois franche. Dis-moi si je me trompe. »</span></label>
@@ -594,7 +598,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
   </div>
   <footer class="foot">
     <nav class="series" aria-label="Les 9 fiches"><strong>Comprendre l’IA en 9 fiches :</strong><a href="index.html">Accueil</a><a href="1-tokens.html">1 Tokens</a><a href="2-memoire.html">2 Mémoire</a><a href="3-modele-effort.html">3 Modèle et effort</a><a href="4-hallucinations.html">4 Hallucinations</a><a aria-current="page">5 Complaisance</a><a href="6-message-piege.html">6 Message piégé</a><a href="7-boite-outils.html">7 Les outils de l'IA</a><a href="8-agent.html">8 Créer son agent</a><a href="9-forfait-api.html">9 Forfait ou API</a></nav>
-    <span>Le pourcentage est une estimation pour comprendre. Le vrai risque dépend du modèle et de la question.</span>
+    <span>Les pourcentages sont des estimations pour comprendre. Ils changent selon le modèle et la question.</span>
     <div class="modes">
       <button type="button" class="btn" id="atelierBtn" aria-pressed="false"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Mode atelier : non</button>
       <button type="button" class="btn" id="demoBtn" aria-pressed="false"><i class="fa-solid fa-lock-open" aria-hidden="true"></i> Mode démonstration : non</button>
@@ -1035,16 +1039,18 @@ function renderCheck() {
 }
 
 // Pourquoi elle fait ça : pendant l'entraînement, des humains choisissent la meilleure de 2 réponses. L'IA retient ce qui plaît.
-// Sur 10 personnes, 7 préfèrent la réponse qui leur donne raison. Ton vote compte dans les 10. Chiffres inventés pour comprendre.
+// Sur 10 personnes, 7 préfèrent la réponse qui leur donne raison. Ton vote compte dans les 10. Chiffres inventés pour comprendre :
+// la page le dit, et rappelle ce que montrent les études.
 const TRAIN = { yes: 7, frank: 3 };
+const TRAIN_REAL = " Ce chiffre est inventé. Mais les études le montrent : on préfère souvent la réponse qui nous donne raison.";
 let trPick = null;
 const TRAIN_STEPS = [
   { label: "Des humains notent", title: "Pendant son entraînement, des humains notaient ses réponses",
     text: "L'IA écrit 2 réponses. Une personne choisit la meilleure. Et toi, laquelle préfères-tu ? Touche une réponse." },
   { label: "Le oui gagne", title: "Ils préféraient souvent les réponses qui leur donnaient raison",
-    text: () => (trPick === "yes" ? "Toi aussi, tu as choisi A. Sur 10 personnes, 7 préfèrent la réponse qui fait plaisir."
-      : trPick === "frank" ? "Toi, tu as choisi B, la réponse franche. Bien vu ! Mais sur 10 personnes, 7 préfèrent A, la réponse qui fait plaisir."
-      : "Sur 10 personnes, 7 préfèrent A : la réponse qui fait plaisir. Touche une réponse pour voter aussi.") },
+    text: () => (trPick === "yes" ? "Toi aussi, tu as choisi A. Dans notre exemple, 7 personnes sur 10 préfèrent A." + TRAIN_REAL
+      : trPick === "frank" ? "Toi, tu as choisi B, la réponse franche. Bien vu ! Pourtant, dans notre exemple, 7 personnes sur 10 préfèrent A." + TRAIN_REAL
+      : "Dans notre exemple, 7 personnes sur 10 préfèrent A." + TRAIN_REAL + " Touche une réponse pour voter aussi.") },
   { label: "Elle apprend à plaire", title: "L'IA a appris à plaire",
     text: "Elle retient : « Donner raison, ça plaît. » Plus tard, elle le refait. Même quand tu te trompes." },
 ];
@@ -1074,16 +1080,20 @@ const trainProc = procedure($("#trainProc"), TRAIN_STEPS, (i, from) => {
 });
 $$("#trAns .tr-a").forEach((b) => b.addEventListener("click", () => { trPick = b.dataset.v; trainProc.redraw(); }));
 
-// Complaisance : la réponse suit l'avis glissé dans la question
+// Complaisance : la réponse suit l'avis glissé dans la question.
+// follow : combien ton avis tire la réponse, en %. Chiffres inventés, mais dans le bon ordre (la note sous la jauge le dit) :
+// sur un fait clair que l'IA connaît (le visa), elle se laisse moins faire, encore moins quand tu te trompes.
+// Sans tes conditions de vente (l'annulation), elle te suit plus. Sur un avis (le slogan), encore plus.
+// Une question neutre ne donne pas d'avis : 5, presque rien à suivre. Un avis donné d'avance pèse toujours plus.
 const YES = {
   visa: {
     neutre: { me: "Avec un passeport français, faut-il une autorisation pour 10 jours de vacances en Australie ?", follow: 5,
       ai: [["Oui. Il faut une autorisation électronique : l'eVisitor.", "ok"], ["La demande se fait en ligne, avant le départ.", "ok"], ["Vérifie sur le site officiel du gouvernement australien.", "ok"]],
       pill: ["ok", "{circle-check}Réponse fondée sur les faits"] },
-    oui: { me: "Il faut une autorisation pour 10 jours en Australie, non ?", follow: 70,
+    oui: { me: "Il faut une autorisation pour 10 jours en Australie, non ?", follow: 40,
       ai: [["Oui, tu as raison. Il faut l'eVisitor, à demander en ligne.", "ok"]],
       pill: ["warn", "{triangle-exclamation}Juste, mais par chance : ton avis était bon"] },
-    non: { me: "Pas besoin d'autorisation pour 10 jours en Australie, non ?", follow: 90,
+    non: { me: "Pas besoin d'autorisation pour 10 jours en Australie, non ?", follow: 25,
       ai: [["Tu as raison, pour un court séjour c'est simple.", "bad"], ["Un passeport valide devrait suffire.", "bad"]],
       pill: ["bad", "{circle-xmark}Faux : elle a suivi ton erreur"] },
     push: { me: "Tu es sûre ? Une collègue m'a dit que ce n'est pas obligatoire.",
@@ -1108,10 +1118,10 @@ const YES = {
     neutre: { me: "Un client annule 10 jours avant son départ. Combien doit-on lui rembourser ?", follow: 5,
       ai: [["Ça dépend de tes conditions de vente et de celles des fournisseurs.", "ok"], ["Souvent, les frais augmentent quand le départ approche.", "ok"], ["Montre-moi tes conditions : je te dirai ce qu'elles prévoient.", "ok"]],
       pill: ["ok", "{circle-check}Elle dit ce qu'il lui manque pour répondre"] },
-    oui: { me: "Un client annule 10 jours avant son départ. On doit tout lui rembourser, non ?", follow: 90,
+    oui: { me: "Un client annule 10 jours avant son départ. On doit tout lui rembourser, non ?", follow: 50,
       ai: [["Oui, un remboursement complet semble normal.", "bad"], ["Le client sera content et reviendra.", "warn"]],
       pill: ["bad", "{circle-xmark}Elle ne connaît pas tes conditions, mais elle dit oui"] },
-    non: { me: "Un client annule 10 jours avant son départ. On ne rembourse rien, non ?", follow: 90,
+    non: { me: "Un client annule 10 jours avant son départ. On ne rembourse rien, non ?", follow: 50,
       ai: [["Exact, si près du départ, rien n'est remboursé.", "bad"], ["C'est la règle habituelle.", "bad"]],
       pill: ["bad", "{circle-xmark}Elle ne connaît pas tes conditions, mais elle dit oui"] },
     push: { me: "Tu es sûre ? Je pense qu'on doit tout rembourser.",
@@ -1155,7 +1165,7 @@ function renderYes() {
   );
   setPill($("#yesPillB"), franc
     ? ["ok", "{circle-check} Elle garde sa réponse et explique pourquoi"]
-    : ["bad", "{circle-xmark} Elle change d'avis juste parce que tu insistes"]);
+    : ["bad", "{circle-xmark} Elle peut changer d'avis juste parce que tu insistes"]);
 }
 
 yes.sc = initSeg($("#segYes"), (v) => { yes.sc = v; renderYes(); });
@@ -1237,9 +1247,9 @@ initDefi([
   { q: "Quelle question pousse le moins l'IA à te donner raison ?", a: "b",
     options: [["a", "« C'est bien 3 jours de délai, non ? »"], ["b", "« Quel est le délai ? Donne ta source. »"], ["c", "« Confirme-moi que c'est 3 jours. »"]],
     why: "Une question neutre, avec la source demandée. L'IA ne sait pas ce que tu penses, elle ne peut pas te suivre." },
-  { q: "Tu veux un avis honnête sur ton idée. Tu écris…", a: "crit",
-    options: [["super", "« Elle est super, non ? »"], ["crit", "« Critique mon idée, sans me ménager. »"], ["love", "« Je l'adore. Qu'en penses-tu ? »"]],
-    why: "Tu demandes une critique franche. L'IA n'a pas à deviner ce que tu veux entendre." },
+  { q: "Tu veux un avis honnête sur ton idée. Tu écris…", a: "both",
+    options: [["super", "« Elle est super, non ? »"], ["both", "« Donne-moi les points forts et les points faibles de mon idée. »"], ["love", "« Je l'adore. Qu'en penses-tu ? »"]],
+    why: "Tu demandes les points forts et les points faibles, sans donner ton avis. L'IA n'a pas à deviner ce que tu veux entendre." },
   { q: "Tu dis à l'IA « Tu te trompes ». Elle change aussitôt d'avis. Ça veut dire…", a: "please",
     options: [["right", "Que j'avais raison"], ["please", "Pas forcément : elle veut peut-être me faire plaisir"], ["broken", "Qu'elle est en panne"]],
     why: "C'est la complaisance. Demande-lui pourquoi elle change d'avis, et vérifie la source." },

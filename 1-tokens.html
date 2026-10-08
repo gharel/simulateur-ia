@@ -452,7 +452,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <div class="word-card">
           <span class="eyebrow">Le mot à connaître</span>
           <strong>Token</strong>
-          <p>Un petit morceau de mot. Souvent 3 ou 4 lettres.</p>
+          <p>Un petit morceau de texte : un mot court, ou un bout de mot long. Quelques lettres, en général.</p>
           <p>L'IA compte tout en tokens : ce qu'elle lit, ce qu'elle écrit, ce que ça coûte.</p>
         </div>
       </div>
@@ -477,7 +477,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     <section class="card s2">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-ruler"></i></span><h2>Court ou long ?</h2></div>
       <div id="tokGuess"></div>
-      <p>Un mot court = 1 token.<br>Un mot long = plusieurs tokens.</p>
+      <p>Un mot court ou très courant = 1 token.<br>Un mot long ou rare = plusieurs tokens.<br>Un nombre aussi est coupé : 2026 = 2 tokens (202 + 6).</p>
       <div class="examples" id="examples"></div>
       <p class="small muted">La ponctuation compte aussi. Une espace est collée au mot qui la suit.</p>
     </section>
@@ -485,7 +485,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></span><h2>Jeu : le compte est bon</h2><span class="pill" id="cbScore">0 / 3</span></div>
       <p>Écris une phrase qui fait <strong>exactement</strong> le bon nombre de tokens. Puis vérifie.</p>
-      <p class="small muted">Astuce : un mot court fait 1 token. Un mot long en fait plusieurs. La ponctuation compte aussi.</p>
+      <p class="small muted">Astuce : un mot court ou très courant fait 1 token. Un mot long ou rare en fait plusieurs. La ponctuation compte aussi.</p>
       <div class="cb-game">
         <div class="cb-goal"><span class="eyebrow" id="cbStep"></span><strong id="cbWhat"></strong></div>
         <label class="ctl" for="cbTxt">Ta phrase
@@ -514,14 +514,14 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           <button type="button" class="btn" id="sacEmpty"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Vider le sac</button>
         </div>
       </div>
-      <p class="small muted">Ordres de grandeur pour un texte en français. 200 000 tokens, c'est la taille de la mémoire de beaucoup d'IA (voir la fiche suivante).</p>
+      <p class="small muted">Ordres de grandeur pour un texte en français. 200 000 tokens, c'est une taille de mémoire courante. Selon l'IA et ton abonnement, elle va de quelques dizaines de milliers à 1 million de tokens (voir « La Mémoire qui Déborde »).</p>
     </section>
 
     <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
-        <li><span>L'IA lit et écrit en tokens. Un token = un petit bout de mot, souvent 3 ou 4 lettres.</span></li>
-        <li><span>Un mot court = 1 token. Un mot long ou rare = plusieurs tokens. La ponctuation compte aussi.</span></li>
+        <li><span>L'IA lit et écrit en tokens. Un token = un petit morceau de texte : un mot court, ou un bout de mot long.</span></li>
+        <li><span>Un mot court ou très courant = 1 token. Un mot long ou rare = plusieurs tokens. La ponctuation compte aussi.</span></li>
         <li><span>Tout se compte en tokens : ce que l'IA lit, ce qu'elle écrit, et ce que ça coûte.</span></li>
       </ul>
     </section>
@@ -975,11 +975,14 @@ $$(".tbl-wrap table").forEach((t) => {
 const COMMON = new Set("bonjour pouvez voyage demain travail comment pourquoi toujours beaucoup quelque maison bonsoir depuis pendant maintenant question réponse combien".split(" "));
 
 function tokenize(text) {
-  const parts = text.match(/\s*[\p{L}\p{M}\p{N}]+|\s*[^\s\p{L}\p{M}\p{N}]/gu) || [];
+  // Un nombre fait ses propres morceaux, même collé à des lettres : « 8h30 » = 8 + h + 30.
+  const parts = text.match(/\s*[\p{L}\p{M}]+|\s*\p{N}+|\s*[^\s\p{L}\p{M}\p{N}]/gu) || [];
   const out = [];
   for (const p of parts) {
     const lead = p.match(/^\s*/)[0].replace(/\s+/g, " ");
     const core = p.trimStart();
+    // Un nombre se coupe par paquets de 3 chiffres au plus, comme chez OpenAI : 2026 = 202 + 6, 1500 = 150 + 0.
+    if (/^\p{N}/u.test(core)) { core.match(/\p{N}{1,3}/gu).forEach((d, k) => out.push((k ? "" : lead) + d)); continue; }
     if (core.length <= 5 || !/\p{L}/u.test(core) || COMMON.has(core.toLowerCase())) { out.push(lead + core); continue; }
     let i = 0, k = 0;
     while (i < core.length) {
@@ -1032,7 +1035,7 @@ $("#examples").replaceChildren(...["chat", "maison", "incroyable", "anti­consti
 guess($("#tokGuess"), {
   q: "combien de tokens pour « anti­constitution­nellement » ?",
   options: [["3", "3"], ["7", "7"], ["9", "9"]], a: "7",
-  why: "7 tokens. Un mot long et rare est coupé en plusieurs morceaux.",
+  why: "Avec notre découpage simplifié : 7 tokens. Un vrai modèle en fait 4 ou 5. Un mot long et rare est coupé en plusieurs morceaux.",
   lock: $("#examples"),
 });
 // Jeu : le compte est bon. Une phrase qui fait pile le bon nombre de tokens.
@@ -1134,7 +1137,7 @@ function renderSac() {
   st.className = "status" + (!total ? "" : free >= 0 ? " ok" : " bad");
   rich(st, !total ? "{hand-pointer} Touche un texte pour le mettre dans le sac."
     : free >= 0 ? `{circle-check} Ça tient. Il reste ${fmt(free)} tokens de place : environ ${fmt(Math.floor(free / 500))} pages de livre.`
-    : `{circle-xmark} Ça déborde de ${fmt(-free)} tokens. L'IA ne peut pas tout lire d'un coup (voir la fiche suivante).`);
+    : `{circle-xmark} Ça déborde de ${fmt(-free)} tokens. L'IA ne peut pas tout lire d'un coup (voir « La Mémoire qui Déborde »).`);
   $("#sacEmpty").hidden = !total;
 }
 $("#sacEmpty").addEventListener("click", () => { sacGroups.length = 0; for (const k in sacCount) delete sacCount[k]; renderSac(); });
@@ -1143,17 +1146,17 @@ renderSac();
 // Défi final
 initDefi([
   { q: "Pour l'IA, un token, c'est…", a: "bout",
-    options: [["mot", "Un mot entier"], ["bout", "Un petit morceau de mot"], ["phrase", "Une phrase"]],
-    why: "Un token est un petit morceau de texte, souvent 3 ou 4 lettres. Un mot long en fait plusieurs." },
-  { q: "Ton texte fait 100 mots. Combien de tokens, à peu près ?", a: "130",
-    options: [["50", "50 tokens"], ["130", "130 tokens"], ["1000", "1 000 tokens"]],
-    why: "Un peu plus que de mots : souvent entre 1 et 2 tokens par mot. Les mots longs en font plusieurs, et la ponctuation compte aussi." },
+    options: [["mot", "Toujours un mot entier"], ["bout", "Un mot court ou un bout de mot"], ["phrase", "Une phrase"]],
+    why: "Un token est un petit morceau de texte. Un mot court ou très courant fait 1 token. Un mot long ou rare en fait plusieurs." },
+  { q: "Ton texte fait 100 mots. Combien de tokens, à peu près ?", a: "170",
+    options: [["50", "50 tokens"], ["170", "170 tokens"], ["1000", "1 000 tokens"]],
+    why: "Un peu moins de 2 tokens par mot, en français. Les mots longs et la ponctuation en ajoutent. En anglais, c'est un peu moins." },
   { q: "La ponctuation (! ? , .)…", a: "yes",
     options: [["yes", "Compte aussi"], ["no", "Ne compte pas"]],
     why: "Un point d'exclamation ou une virgule, c'est aussi un token, ou un bout de token. Une espace, elle, est collée au mot qui la suit." },
   { q: "Un roman de 300 pages fait environ…", a: "150k",
     options: [["1500", "1 500 tokens"], ["150k", "150 000 tokens"], ["15M", "15 millions de tokens"]],
-    why: "Environ 150 000 tokens. Il tient tout juste dans la mémoire de l'IA (voir la fiche suivante)." },
+    why: "Environ 150 000 tokens. Il tient tout juste dans un sac de 200 000 tokens (voir « La Mémoire qui Déborde »)." },
 ]);
 
 renderText();

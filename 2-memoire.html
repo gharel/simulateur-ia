@@ -491,6 +491,28 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 /* Chaque nouvel envoi ajoute une barre qui pousse depuis le bas. */
 @keyframes grow-up { from { transform: scaleY(0); } }
 .bars span.new { transform-origin: bottom; animation: grow-up .45s ease backwards; animation-delay: var(--d, 0ms); }
+
+/* Le context rot : deux graphiques côte à côte (l'un sous l'autre sur téléphone), puis ce qui aide. */
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 48px; }
+@media (max-width: 900px) { .duo { grid-template-columns: minmax(0, 1fr); } }
+.duo > .lab-part { display: grid; gap: 14px; align-content: start; }
+.duo h3 .svg-inline--fa, .note strong .svg-inline--fa { color: var(--accent-text); margin-right: 6px; }
+.note { background: var(--surface-2); border-radius: 18px; padding: 20px 22px; display: grid; gap: 10px; }
+.note p { line-height: 1.5; }
+.tips { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; max-width: 70ch; font-weight: 700; line-height: 1.5; }
+/* Graphiques en barres : une ligne par cas, le score à droite. Une barre s'allonge ou rétrécit (scaleX) quand on change de cas. */
+.chart { display: grid; gap: 14px; }
+.hb-head { display: flex; justify-content: space-between; gap: 12px; font-size: .85rem; font-weight: 700; color: var(--muted); }
+.hb-head span:last-child { white-space: nowrap; }
+.hbars { display: grid; gap: 10px; }
+.hb { display: grid; grid-template-columns: 5.4em minmax(0, 1fr) 2.4em; gap: 6px 12px; align-items: center; font-weight: 700; }
+.hb-l { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hbars.long .hb { grid-template-columns: minmax(0, 1fr) 2.4em; }
+.hbars.long .hb-l { grid-column: 1 / -1; text-align: left; white-space: normal; }
+.hb-t { position: relative; height: 18px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.hb-f { position: absolute; inset: 0; border-radius: 99px; background: var(--accent); transform-origin: left center; transform: scaleX(var(--v, 0)); transition: transform .5s ease; }
+.hb-n { font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; text-align: right; font-variant-numeric: tabular-nums; }
+.chart-msg { font-weight: 700; line-height: 1.5; }
 </style>
 
 <main class="wrap">
@@ -514,7 +536,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           <span class="eyebrow">Le mot à connaître</span>
           <strong>Fenêtre de contexte</strong>
           <p>La mémoire de travail de l'IA. Tout ce qu'elle lit doit tenir dedans.</p>
-          <p>Quand elle est pleine, l'IA résume. Et elle oublie des détails.</p>
+          <p>Quand elle est pleine, l'appli résume ou oublie les vieux messages. Des détails se perdent.</p>
         </div>
       </div>
     </section>
@@ -547,9 +569,10 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <span><i class="b-sys"></i>Consignes</span>
         <span><i class="b-old"></i>Messages d'avant, relus</span>
         <span><i class="b-new"></i>Nouveau message</span>
-        <span><i class="c-sum"></i>Résumé du milieu</span>
+        <span><i class="c-sum"></i>Résumé des vieux messages</span>
       </div>
-      <p class="small muted">Les consignes sont le texte que l'IA reçoit avant ta conversation. Tu ne les vois pas, mais elle les relit à chaque fois. Dans la vraie vie, elles font souvent des milliers de tokens.</p>
+      <p class="small muted">Les consignes sont le texte que l'IA reçoit avant ta conversation. Tu ne les vois pas, mais elle les relit à chaque fois. Dans la vraie vie, elles font souvent des milliers de tokens.
+        Certaines applis ont aussi une option « mémoire » : elles gardent des notes sur toi, et les ajoutent au début de chaque conversation. L'IA ne se souvient pas : c'est l'appli qui lui redonne ces notes.</p>
     </section>
 
     <section class="card s4">
@@ -592,8 +615,9 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
             <div class="legend"><span><i class="b-old"></i>Déjà lu aux envois d'avant</span><span><i class="b-new"></i>Lu à cet envoi</span></div>
           </div>
           <div class="status" id="convStatus" aria-live="polite"></div>
-          <p class="small muted">Chaque envoi lit un peu plus que le précédent. Le total, lui, grimpe de plus en plus vite : les spécialistes disent « quadratique ». 2 fois plus de messages, c'est 3 à 4 fois plus de tokens lus en tout.
-            Certains services gardent le début de la conversation en cache : la relecture coûte alors moins cher, mais elle remplit quand même la mémoire.</p>
+          <p class="small muted">Chaque envoi lit un peu plus que le précédent. Le total, lui, grimpe de plus en plus vite : les spécialistes disent « quadratique ». 2 fois plus de messages, c'est jusqu'à 4 fois plus de tokens lus en tout.
+            Certains services gardent le début de la conversation en cache : la relecture coûte alors moins cher, mais elle remplit quand même la mémoire.
+            Avec un abonnement, tu ne paies pas au token. Mais une longue conversation use plus vite ta limite.</p>
         </div>
       </div>
     </section>
@@ -623,8 +647,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>La mémoire de travail de l'IA</h2></div>
       <p>L'IA a une mémoire de taille fixe. On l'appelle la <strong>fenêtre de contexte</strong>.
-        Toute la conversation doit tenir dedans. Si elle déborde, l'IA fait un résumé : c'est la <strong>compression</strong>.
-        Elle garde le début (ses consignes) et la fin (les derniers messages). <strong>Le milieu devient un court résumé, et ses détails se perdent.</strong></p>
+        Toute la conversation doit tenir dedans. Si elle déborde, l'appli fait de la place. Elle garde les consignes et les derniers messages.
+        <strong>Les vieux messages deviennent un court résumé, ou ils sont oubliés. Des détails se perdent.</strong> Résumer pour faire de la place, c'est la <strong>compression</strong>.</p>
       <div class="mem">
         <div class="controls stick">
           <div class="ctl">
@@ -647,7 +671,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
               <button type="button" data-v="200000" aria-pressed="true">200 000 tokens</button>
               <button type="button" data-v="1000000" aria-pressed="false">1 million</button>
             </div>
-            <span class="small muted">200 000 tokens ≈ un gros roman. 1 million ≈ 5 romans.</span>
+            <span class="small muted">200 000 tokens ≈ un gros roman. 1 million ≈ 5 à 7 romans.</span>
           </div>
         </div>
 
@@ -673,7 +697,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
             <div class="legend">
               <span><i class="c-sys"></i>Consignes de départ</span>
               <span><i class="c-msg"></i>Messages gardés en entier</span>
-              <span><i class="c-sum"></i>Résumé du milieu</span>
+              <span><i class="c-sum"></i>Résumé des vieux messages</span>
               <span><i class="c-over"></i>Ça déborde</span>
             </div>
           </div>
@@ -681,10 +705,64 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           <div class="status" id="status" aria-live="polite"></div>
 
           <div class="ctl">
-            <span class="small muted">Le gris = les consignes. Chaque carré = 1 message. Les carrés vides, au milieu, sont résumés.</span>
+            <span class="small muted">Le gris = les consignes. Chaque carré = 1 message. Les carrés vides sont les vieux messages, résumés.</span>
             <div class="dots" id="dots" aria-hidden="true"></div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="card s4" id="rot">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-hourglass-half"></i></span><h2>Plus c'est long, moins c'est précis : le context rot</h2></div>
+      <p>Même quand tout tient dans sa mémoire, l'IA lit moins bien un très long texte. Elle rate plus souvent un détail.
+        Les spécialistes appellent ça le <strong>context rot</strong> : le contexte qui s'abîme. Les fabricants d'IA le disent eux-mêmes : toutes les IA le font, plus ou moins.</p>
+      <div id="rotGuess"></div>
+      <div class="duo">
+        <div class="lab-part">
+          <h3><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Retrouver un détail dans un long texte</h3>
+          <p>Le test : une longue conversation contient 8 demandes qui se ressemblent. L'IA doit retrouver la bonne, et la recopier.</p>
+          <div class="chart" id="rotZone">
+            <div class="ctl">
+              <span>Choisis l'IA</span>
+              <div class="seg" id="segRot" role="group" aria-label="Choisis l'IA">
+                <button type="button" data-v="now" aria-pressed="true"><i class="fa-solid fa-bolt" aria-hidden="true"></i> La plus récente</button>
+                <button type="button" data-v="before" aria-pressed="false"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> Sa version d'avant</button>
+              </div>
+            </div>
+            <div class="hb-head"><span>Texte de… (tokens)</span><span>Score sur 100</span></div>
+            <div class="hbars" id="rotBars"></div>
+            <p class="chart-msg" id="rotMsg" aria-live="polite"></p>
+          </div>
+          <p class="small muted">8 000 tokens ≈ une longue conversation. 128 000 ≈ un roman. 1 million ≈ 5 à 7 romans.
+            Chiffres publiés par OpenAI en avril 2026, test MRCR. Le score dit à quel point la réponse ressemble à la bonne. Chaque longueur a ses propres questions : un score peut remonter un peu d'une ligne à l'autre. Chiffres arrondis. Modèles : GPT-5.5 (la plus récente) et GPT-5.4.</p>
+        </div>
+        <div class="lab-part">
+          <h3><i class="fa-solid fa-scissors" aria-hidden="true"></i> Seulement l'utile, ou toute la conversation ?</h3>
+          <p>Même question, même IA. Une fois avec seulement les passages utiles : 300 tokens. Une fois avec toute la conversation : 113 000 tokens.</p>
+          <div class="chart">
+            <div class="ctl">
+              <span>Ce que l'IA reçoit</span>
+              <div class="seg" id="segFocus" role="group" aria-label="Ce que l'IA reçoit">
+                <button type="button" data-v="focus" aria-pressed="true"><i class="fa-solid fa-scissors" aria-hidden="true"></i> Seulement l'utile</button>
+                <button type="button" data-v="full" aria-pressed="false"><i class="fa-solid fa-scroll" aria-hidden="true"></i> Toute la conversation</button>
+              </div>
+            </div>
+            <div class="hb-head"><span>Les IA testées</span><span>Score sur 100</span></div>
+            <div class="hbars long" id="focusBars"></div>
+            <p class="chart-msg" id="focusMsg" aria-live="polite"></p>
+          </div>
+          <p class="small muted">Chiffres de l'entreprise Chroma (juillet 2025), rapport « Context Rot », pas relu par d'autres chercheurs : 306 questions sur de longues conversations. Chiffres arrondis. Modèles : Gemini 2.5 Pro et o3, qui réfléchissent, et GPT-4.1.</p>
+        </div>
+      </div>
+      <div class="note">
+        <strong><i class="fa-solid fa-life-ring" aria-hidden="true"></i>Ce qui aide</strong>
+        <ul class="tips">
+          <li>Nouveau sujet ? Nouvelle conversation.</li>
+          <li>Conversation trop longue ? Demande un résumé. Puis colle-le dans une nouvelle conversation.</li>
+          <li>L'info importante : mets-la au début, ou redis-la juste avant ta question.</li>
+          <li>Donne seulement les documents utiles (voir « La Boîte à Outils de l'IA »).</li>
+        </ul>
+        <p>Les IA récentes tiennent plus longtemps. Mais toutes finissent par baisser. Une mémoire plus grande ne règle pas tout.</p>
       </div>
     </section>
 
@@ -693,7 +771,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <ul>
         <li><span>L'IA ne se souvient de rien. Chaque message renvoie toute la conversation, depuis le début.</span></li>
         <li><span>Plus la conversation est longue, plus chaque nouveau message coûte cher.</span></li>
-        <li><span>Sa mémoire a une taille fixe. Quand elle est pleine, l'IA garde le début et la fin, et résume le milieu. Les détails du milieu se perdent.</span></li>
+        <li><span>Sa mémoire a une taille fixe. Quand elle est pleine, l'appli résume ou oublie les vieux messages. Des détails se perdent.</span></li>
+        <li><span>Même quand tout tient, un très long texte rend l'IA moins précise : c'est le context rot.</span></li>
         <li><span>Pour un nouveau sujet, ouvre une nouvelle conversation. C'est plus rapide, moins cher et plus précis.</span></li>
       </ul>
     </section>
@@ -1146,11 +1225,14 @@ $$(".tbl-wrap table").forEach((t) => {
 const COMMON = new Set("bonjour merci aider pouvez voyage demain travail comment pourquoi toujours beaucoup quelque maison bonsoir parce depuis pendant maintenant question réponse peux-tu combien".split(" "));
 
 function tokenize(text) {
-  const parts = text.match(/\s*[\p{L}\p{M}\p{N}]+|\s*[^\s\p{L}\p{M}\p{N}]/gu) || [];
+  // Un nombre fait ses propres morceaux, même collé à des lettres : « 8h30 » = 8 + h + 30.
+  const parts = text.match(/\s*[\p{L}\p{M}]+|\s*\p{N}+|\s*[^\s\p{L}\p{M}\p{N}]/gu) || [];
   const out = [];
   for (const p of parts) {
     const lead = p.match(/^\s*/)[0].replace(/\s+/g, " ");
     const core = p.trimStart();
+    // Un nombre se coupe par paquets de 3 chiffres au plus, comme chez OpenAI : 2026 = 202 + 6, 1500 = 150 + 0.
+    if (/^\p{N}/u.test(core)) { core.match(/\p{N}{1,3}/gu).forEach((d, k) => out.push((k ? "" : lead) + d)); continue; }
     if (core.length <= 5 || !/\p{L}/u.test(core) || COMMON.has(core.toLowerCase())) { out.push(lead + core); continue; }
     let i = 0, k = 0;
     while (i < core.length) {
@@ -1203,13 +1285,13 @@ function renderMem() {
   const st = $("#status");
   if (compress) {
     st.className = "status squeeze";
-    rich(st, `{compress} Compression ! L'IA garde le début (ses consignes) et la fin (les ${fmt(kept)} derniers messages). Les ${fmt(n - kept)} messages du milieu deviennent un court résumé : leurs détails se perdent.`);
+    rich(st, `{compress} Compression ! L'appli garde les consignes et les ${fmt(kept)} derniers messages. Les ${fmt(n - kept)} plus vieux messages deviennent un court résumé : leurs détails se perdent. Selon l'appli, ils peuvent aussi être oubliés.`);
   } else if (fill > 0.7) {
     st.className = "status warn";
-    rich(st, "{triangle-exclamation} La mémoire est presque pleine. Bientôt, l'IA devra résumer le milieu de la conversation.");
+    rich(st, "{triangle-exclamation} La mémoire est presque pleine. Bientôt, l'appli devra résumer ou oublier les vieux messages.");
   } else {
     st.className = "status ok";
-    rich(st, "{circle-check} Tout tient dans la mémoire. L'IA se souvient de chaque message.");
+    rich(st, "{circle-check} Tout tient dans la mémoire. L'IA peut relire chaque message. Mais dans une très longue conversation, elle fait moins attention aux détails (voir plus bas).");
   }
 
   const dots = $("#dots");
@@ -1282,7 +1364,7 @@ $("#btnReset").addEventListener("click", () => setSend(1));
 conv.per = +initSeg($("#segSend"), (v) => { conv.per = +v; renderConv(); });
 
 // Animation : à chaque envoi, l'IA reçoit toute la conversation depuis le début, puis elle oublie tout.
-// Après le 4e envoi, la mémoire est pleine : le milieu devient un résumé, et un détail se perd.
+// Après le 4e envoi, la mémoire est pleine : les vieux messages deviennent un résumé, et un détail se perd.
 const RP_SYS = "Tu es un assistant poli. Réponds en français.";
 const RP = [
   ["Bonjour !", "Bonjour ! Comment puis-je t'aider ?"],
@@ -1292,7 +1374,7 @@ const RP = [
   ["Une autre idée ?", "Une journée au phare Amédée, en bateau !"],
 ];
 const RP_SUM = "Il a dit bonjour. Il cherche une sortie pour le week-end.";
-const RP_MID = 3; // les 3 premiers échanges forment le milieu, résumé par la compression
+const RP_MID = 3; // les 3 premiers échanges sont les vieux messages, résumés par la compression
 const RP_LOST = 2; // l'échange qui contient « Je n'aime pas le bateau »
 const RP_STEPS = [0, 1, 2, 3, "cmp", 4];
 const RP_CLS = { sys: "b-sys", old: "b-old", new: "b-new", sum: "c-sum" };
@@ -1300,7 +1382,7 @@ const ntok = (t) => tokenize(t).length;
 const rpPast = (from, to) => RP.slice(from, to).flatMap(([me, ai]) => [{ kind: "old", who: "Toi", t: me }, { kind: "old", who: "IA", t: ai }]);
 // Ce que l'IA lit à l'envoi k : consignes, échanges d'avant (ou leur résumé), nouveau message.
 function rpPacket(k) {
-  const before = k > RP_MID ? [{ kind: "sum", who: "Résumé du milieu", t: RP_SUM }, ...rpPast(RP_MID, k)] : rpPast(0, k);
+  const before = k > RP_MID ? [{ kind: "sum", who: "Résumé des vieux messages", t: RP_SUM }, ...rpPast(RP_MID, k)] : rpPast(0, k);
   return [{ kind: "sys", who: "Consignes", t: RP_SYS }, ...before, { kind: "new", who: "Toi · nouveau message", t: RP[k][0] }];
 }
 const rpSize = (lines) => lines.reduce((s, l) => s + ntok(l.t), 0);
@@ -1364,7 +1446,7 @@ async function rpSend(k, gen) {
   const n = fmt(rpSize(lines));
   if (last) {
     $$(".cb.me", chat)[RP_LOST].classList.add("lost");
-    rpSay("bad", "{triangle-exclamation} L'IA propose du bateau ! « Je n'aime pas le bateau » était au milieu de la conversation. Le résumé l'a perdu.");
+    rpSay("bad", "{triangle-exclamation} L'IA propose du bateau ! « Je n'aime pas le bateau » était dans un vieux message. Le résumé l'a perdu.");
     return;
   }
   $("#rpRead").append(h("p", "rp-foot", "{eraser} Après sa réponse, l'IA oublie tout."));
@@ -1373,23 +1455,23 @@ async function rpSend(k, gen) {
     : `{rotate} Envoi ${k + 1} : l'IA a tout relu depuis le début, soit ${n} tokens. Puis elle a encore tout oublié.`);
 }
 
-// La mémoire est pleine : début et fin gardés, le milieu devient un court résumé.
+// La mémoire est pleine : les consignes et le dernier échange sont gardés, les vieux messages deviennent un court résumé.
 async function rpCompress(gen) {
   const box = $("#rpRead");
   const zone = (cls, t) => h("p", "rl-zone " + cls, t);
-  const mid = rpPast(0, RP_MID).map(rpLine), zMid = zone("mid", "{compress} Milieu : va être résumé");
-  box.replaceChildren(zone("", "Début : gardé"), rpLine({ kind: "sys", who: "Consignes", t: RP_SYS }), zMid, ...mid,
-    zone("", "Fin : gardée"), ...rpPast(RP_MID, RP_MID + 1).map(rpLine));
+  const mid = rpPast(0, RP_MID).map(rpLine), zMid = zone("mid", "{compress} Vieux messages : vont être résumés");
+  box.replaceChildren(zone("", "Consignes : gardées"), rpLine({ kind: "sys", who: "Consignes", t: RP_SYS }), zMid, ...mid,
+    zone("", "Derniers messages : gardés"), ...rpPast(RP_MID, RP_MID + 1).map(rpLine));
   rpSay("warn", "{forward} Imagine : la conversation continue longtemps. La mémoire de l'IA est pleine.");
   await rpWait(1600);
   if (gen !== rp.gen) return;
   mid.forEach((el, i) => { el.style.animationDelay = i * 90 + "ms"; el.classList.add("squash"); });
   await rpWait(500 + mid.length * 90);
   if (gen !== rp.gen) return;
-  mid[0].before(rpLine({ kind: "sum", who: "Résumé du milieu", t: RP_SUM }));
+  mid[0].before(rpLine({ kind: "sum", who: "Résumé des vieux messages", t: RP_SUM }));
   mid.forEach((el) => el.remove());
-  rich(zMid, "{compress} Milieu : résumé, des détails se perdent");
-  rpSay("warn", "{compress} Compression : l'IA garde le début (ses consignes) et la fin (le dernier échange). Le milieu devient un court résumé. Toi, tu vois toujours toute la conversation.");
+  rich(zMid, "{compress} Vieux messages : résumés, des détails se perdent");
+  rpSay("warn", "{compress} Compression : l'appli garde les consignes et le dernier échange. Les vieux messages deviennent un court résumé. Toi, tu vois toujours toute la conversation.");
 }
 
 function rpButton() {
@@ -1442,7 +1524,7 @@ const DAY = [
     bad: "L'IA ne connaît plus le devis. Tu dois tout lui réexpliquer, et elle risque d'oublier des détails." },
   { q: "Nouveau sujet : le planning de l'équipe pour la semaine.", subject: "{calendar-days} Le planning", n: 10, same: false,
     good: "Le planning n'a rien à voir avec le devis. L'IA repart légère.",
-    bad: "L'IA relit tout le devis à chaque message sur le planning. Ça coûte cher, et elle peut mélanger les sujets." },
+    bad: "L'IA relit tout le devis à chaque message sur le planning. Ça coûte cher. Et le devis devient une info en trop : elle peut mélanger les sujets (voir « La Boîte à Outils de l'IA »)." },
   { q: "Nouveau sujet : un e-mail à un fournisseur de bungalows.", subject: "{envelope} L'e-mail au fournisseur", n: 8, same: false,
     good: "Nouveau sujet, nouvelle conversation. Bien joué !",
     bad: "L'IA relit le devis et le planning pour écrire un simple e-mail. Que des tokens pour rien." },
@@ -1520,6 +1602,55 @@ function startDay() {
 startDay();
 renderDay();
 
+// Le context rot : plus le texte est long, plus l'IA rate de détails, même quand tout tient.
+// Graphiques en barres : une barre par cas. Changer de cas allonge ou rétrécit les barres, et les nombres suivent.
+function hbar(label) {
+  const r = h("div", "hb"), t = h("span", "hb-t"), f = h("span", "hb-f"), n = h("b", "hb-n");
+  t.append(f);
+  r.append(h("span", "hb-l", label), t, n);
+  return { r, f, n };
+}
+function barChart(box, labels) {
+  const bars = labels.map((l) => { const b = hbar(l); box.append(b.r); return b; });
+  box.setAttribute("role", "img");
+  return (values) => {
+    bars.forEach((b, i) => { b.f.style.setProperty("--v", values[i] / 100); countTo(b.n, values[i]); });
+    box.setAttribute("aria-label", labels.map((l, i) => `${l} : ${values[i]} sur 100`).join(", "));
+  };
+}
+// OpenAI, avril 2026, test MRCR (8 demandes cachées), par longueur de texte : GPT-5.5 (la plus récente) et GPT-5.4. Chiffres arrondis.
+const ROT = {
+  len: ["8 000", "16 000", "32 000", "64 000", "128 000", "256 000", "512 000", "1 million"],
+  now: [98, 93, 97, 90, 83, 88, 82, 74],
+  before: [97, 91, 97, 91, 86, 79, 58, 37],
+  msg: {
+    now: "La plus récente : 98 sur 100 avec un texte court, 74 avec 1 million de tokens. Elle tient longtemps, mais elle baisse.",
+    before: "Sa version d'avant : 97 sur 100 avec un texte court, 37 avec 1 million de tokens. 2 fois et demie moins !",
+  },
+};
+const drawRot = barChart($("#rotBars"), ROT.len);
+function renderRot(v) { drawRot(ROT[v]); $("#rotMsg").textContent = ROT.msg[v]; }
+renderRot(initSeg($("#segRot"), renderRot));
+// Chroma, « Context Rot », juillet 2025 : même question avec seulement l'utile (300 tokens) ou toute la conversation (113 000 tokens).
+const FOCUS = {
+  ais: ["Une grande IA qui réfléchit", "Une autre IA qui réfléchit", "Une IA qui ne réfléchit pas"],
+  focus: [96, 94, 87],
+  full: [90, 81, 62],
+  msg: {
+    focus: "Avec seulement l'utile, les 3 IA répondent presque toujours juste.",
+    full: "Avec toute la conversation, les 3 IA font moins bien. Celle qui ne réfléchit pas perd le plus : de 87 à 62.",
+  },
+};
+const drawFocus = barChart($("#focusBars"), FOCUS.ais);
+function renderFocus(v) { drawFocus(FOCUS[v]); $("#focusMsg").textContent = FOCUS.msg[v]; }
+renderFocus(initSeg($("#segFocus"), renderFocus));
+guess($("#rotGuess"), {
+  q: "une IA récente retrouve un détail caché dans un texte de 8 000 tokens : score 98 sur 100. Et dans un texte de 1 million de tokens ?",
+  options: [["98", "Toujours 98"], ["74", "Environ 74"], ["10", "Environ 10"]], a: "74",
+  why: "Environ 74 : elle tient longtemps, mais elle baisse. Sa version d'avant tombait à 37. Plus le texte est long, plus l'IA rate de détails.",
+  lock: $("#rotZone"),
+});
+
 // Défi final
 initDefi([
   { q: "Tu as fini ton devis. Tu passes au planning de l'équipe. Que fais-tu ?", a: "new",
@@ -1529,8 +1660,11 @@ initDefi([
     options: [["less", "Coûte moins cher"], ["same", "Coûte pareil"], ["more", "Coûte beaucoup plus"]],
     why: "L'IA relit les 50 messages d'avant. Elle lit beaucoup plus de tokens." },
   { q: "La mémoire de l'IA est pleine. Que se passe-t-il ?", a: "sum",
-    options: [["stop", "Elle s'arrête net"], ["sum", "Elle résume le milieu de la conversation"], ["all", "Elle garde tout"]],
-    why: "C'est la compression : l'IA garde le début et la fin, et un court résumé remplace le milieu. Les détails du milieu se perdent." },
+    options: [["grow", "Elle agrandit sa mémoire toute seule"], ["sum", "Elle résume ou oublie les vieux messages"], ["all", "Elle garde tout"]],
+    why: "Selon l'appli, les vieux messages sont résumés ou oubliés. Parfois, l'appli bloque la conversation. Dans tous les cas, des détails se perdent." },
+  { q: "Ta conversation tient encore dans la mémoire de l'IA, mais elle est très longue. Alors…", a: "rot",
+    options: [["same", "L'IA est aussi précise qu'au début"], ["rot", "L'IA peut rater plus de détails"], ["stop", "L'IA ne répond plus"]],
+    why: "C'est le context rot : plus il y a de texte, plus l'IA rate de détails, même quand tout tient. Nouveau sujet ? Nouvelle conversation." },
   { q: "Tu colles un document de 50 pages au début de la conversation. Ensuite…", a: "each",
     options: [["once", "L'IA le lit une seule fois"], ["each", "L'IA le relit à chaque message"], ["free", "Il ne compte pas"]],
     why: "Le document fait partie de la conversation. Chaque nouveau message le relit, et ça se paie." },

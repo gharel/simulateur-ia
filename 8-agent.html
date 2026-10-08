@@ -642,7 +642,7 @@ code, pre { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
           <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-file-lines"></i></span><span class="tag">À écrire d'abord</span></span>
           <code class="nm">AGENTS.md</code>
           <span class="meta">= tes consignes</span>
-          <span>Le format commun : la plupart des agents savent le lire. L'agent le relit au début de chaque tâche. Garde-le court : moins de 200 lignes.</span>
+          <span>Le format commun : la plupart des agents savent le lire. L'agent le relit au début de chaque conversation. Garde-le court : moins de 200 lignes. Relis ses consignes : enlève les vieilles et celles qui se contredisent.</span>
         </div>
         <div class="file">
           <span class="top"><span class="ic" aria-hidden="true"><i class="fa-solid fa-scroll"></i></span></span>
@@ -691,7 +691,7 @@ code, pre { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
           <div class="status" id="readStatus" aria-live="polite"></div>
         </div>
       </div>
-      <p class="small muted">Nombres de lignes inventés pour comprendre. Ces fiches sont faites avec un agent de code : leur fichier <a href="https://github.com/gharel/simulateur-ia/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a> fait moins de 100 lignes.</p>
+      <p class="small muted">Nombres de lignes inventés pour comprendre. Chemin simplifié : le vrai nom du dossier des Skills change selon l'agent (voir en bas de la fiche). Ces fiches sont faites avec un agent de code : leur fichier <a href="https://github.com/gharel/simulateur-ia/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a> fait moins de 100 lignes.</p>
     </section>
 
     <section class="card s4">
@@ -732,14 +732,14 @@ code, pre { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
         </table>
       </div>
       <p class="small muted">Anthropic fabrique Claude, OpenAI fabrique ChatGPT. Noms vérifiés en octobre 2026 : ils changent souvent.
-        Chez ChatGPT, les GPT personnalisés s'arrêtent : OpenAI les remplace par les agents et les plugins. Les noms de l'agent, des Skills et des Connecteurs sont dans « La Boîte à Outils de l'IA ».</p>
+        Chez ChatGPT, les GPT personnalisés s'arrêtent le 11 décembre 2026. OpenAI les transforme en plugins. Chez Claude, le dossier des Skills s'appelle « .claude/skills ». Les noms de l'agent, des Skills et des Connecteurs sont dans « La Boîte à Outils de l'IA ».</p>
     </section>
 
     <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
         <li><span>Un agent travaille en boucle : il regarde, décide, agit et vérifie, jusqu'au but.</span></li>
-        <li><span>Ses consignes vont dans un seul fichier, AGENTS.md. Court et clair : il le relit à chaque tâche.</span></li>
+        <li><span>Ses consignes vont dans un seul fichier, AGENTS.md. Court et clair : il le relit à chaque conversation.</span></li>
         <li><span>Donne-lui le moins d'outils possible. Il prépare, et toi, tu valides ce qui compte.</span></li>
         <li><span>Teste-le sur de vrais cas. S'il se trompe, corrige ses consignes.</span></li>
       </ul>
@@ -1517,7 +1517,7 @@ const buildProc = procedure($("#buildProc"), BUILD_STEPS, (i) => {
 paintForm();
 paintPlan();
 
-// Ce que l'agent lit, dans l'ordre, et la place que ça prend dans sa mémoire. AGENTS.md est lu au début de chaque tâche.
+// Ce que l'agent lit, dans l'ordre, et la place que ça prend dans sa mémoire. AGENTS.md est lu au début de chaque conversation.
 // Si la méthode des devis est dedans, il la relit à chaque fois, même pour une question simple.
 // Rangée dans une Skill, il l'ouvre seulement pour un devis. Les prix, seulement pour un devis. Nombres de lignes inventés.
 const LINES = { rules: 80, method: 300, docs: 120 };
@@ -1556,8 +1556,8 @@ function renderRead() {
   const st = $("#readStatus");
   st.className = "status " + (inAgents ? "warn" : "ok");
   rich(st, inAgents
-    ? (devis ? "{triangle-exclamation} Ça marche : il trouve la méthode dans AGENTS.md. Mais ce fichier fait 380 lignes, et il le relit au début de chaque tâche, même pour une question simple. Range la méthode dans une Skill."
-      : "{triangle-exclamation} Il relit les 380 lignes d'AGENTS.md. Les 300 lignes de la méthode des devis ne servent à rien pour cette question, mais elles prennent de la place dans sa mémoire.")
+    ? (devis ? "{triangle-exclamation} Ça marche : il trouve la méthode dans AGENTS.md. Mais ce fichier fait 380 lignes, et il le relit au début de chaque conversation, même pour une question simple. Range la méthode dans une Skill."
+      : "{triangle-exclamation} Il relit les 380 lignes d'AGENTS.md. Les 300 lignes de la méthode des devis ne servent à rien pour cette question. Elles prennent de la place dans sa mémoire, et elles peuvent le distraire : un fichier trop long est moins bien suivi.")
     : (devis ? "{circle-check} Il lit AGENTS.md, puis il ouvre la méthode des devis, puis les prix. Chaque fichier arrive quand il sert."
       : "{circle-check} Il lit seulement AGENTS.md : 80 lignes. La méthode des devis reste fermée : elle ne prend pas de place dans sa mémoire."));
 }
@@ -1686,8 +1686,8 @@ guess($("#loopGuess"), {
 });
 guess($("#fileGuess"), {
   q: "Quand ton agent lit-il son fichier de consignes ?",
-  options: [["once", "Une seule fois, le premier jour"], ["ask", "Seulement si tu le lui demandes"], ["each", "Au début de chaque tâche"]], a: "each",
-  why: "Il le relit à chaque tâche : le fichier prend de la place dans sa mémoire (voir « La Mémoire qui Déborde »). Garde-le court : moins de 200 lignes. Une méthode longue va dans une Skill.",
+  options: [["once", "Une seule fois, le premier jour"], ["ask", "Seulement si tu le lui demandes"], ["each", "Au début de chaque conversation"]], a: "each",
+  why: "Il le relit à chaque conversation : le fichier prend de la place dans sa mémoire (voir « La Mémoire qui Déborde »). Garde-le court : moins de 200 lignes. Une méthode longue va dans une Skill.",
   lock: [$("#fileCards"), $("#readLab")],
 });
 
@@ -1698,7 +1698,7 @@ initDefi([
     why: "Il regarde, décide, agit et vérifie. Puis il recommence, jusqu'au but." },
   { q: "Tu utilises 2 agents, de 2 marques différentes. Où écris-tu tes consignes ?", a: "one",
     options: [["two", "Dans 2 fichiers, à recopier"], ["one", "Dans un seul fichier AGENTS.md"], ["msg", "Dans chaque message"]],
-    why: "AGENTS.md est le format commun : la plupart des agents savent le lire. Un seul fichier suffit, quel que soit ton agent." },
+    why: "AGENTS.md est le format commun : la plupart des agents savent le lire. Un seul fichier suffit pour presque tous les agents." },
   { q: "Ton agent lit les e-mails des clients. Quelle limite lui donner ?", a: "draft",
     options: [["send", "Il envoie seul, c'est plus rapide"], ["none", "Aucune : il est malin"], ["draft", "Il prépare, et je valide avant d'envoyer"]],
     why: "Il lit des e-mails venus de l'extérieur : un ordre caché peut le piéger. Garde la main sur l'envoi." },
@@ -1706,8 +1706,8 @@ initDefi([
     options: [["ask", "Poser la question"], ["pick", "Choisir une date"], ["skip", "Ignorer la demande"]],
     why: "Une date choisie au hasard, c'est une invention. Écris-le dans ses consignes : « S'il manque une info, pose la question. »" },
   { q: "Ton fichier de consignes fait 40 pages. C'est une bonne idée ?", a: "no",
-    options: [["yes", "Oui : plus il en sait, mieux c'est"], ["no", "Non : il le relit à chaque tâche, et l'important se perd"]],
-    why: "Il le relit à chaque tâche, et le fichier prend de la place dans sa mémoire. Moins de 200 lignes. Une méthode longue va dans une Skill." },
+    options: [["yes", "Oui : plus il en sait, mieux c'est"], ["no", "Non : il le relit à chaque conversation, et l'important se perd"]],
+    why: "Il le relit à chaque conversation, et le fichier prend de la place dans sa mémoire. Les consignes en trop peuvent aussi le distraire (voir « La Boîte à Outils de l'IA »). Moins de 200 lignes. Une méthode longue va dans une Skill." },
   { q: "Ton agent s'est trompé dans un devis. Que fais-tu ?", a: "fix",
     options: [["fix", "Je corrige ses consignes, puis je le teste encore"], ["hand", "Je corrige le devis à la main, à chaque fois"], ["stop", "J'arrête : l'IA ne marche pas"]],
     why: "Ajoute la consigne qui manquait. La prochaine fois, il fera juste." },

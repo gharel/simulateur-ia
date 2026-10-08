@@ -451,6 +451,48 @@ td.c, th.c { text-align: center; }
 .do li:nth-child(3) { animation-delay: .3s; }
 #canList li { animation: rise .4s ease backwards; }
 .sent.flip { animation: pop .5s ease; }
+
+/* Les infos en trop : une info en trop est hachurée dans le prompt, comme « La méthode, pour rien » dans « L'Agent sur Mesure ». */
+.msg-me .extra {
+  margin: 0 -8px; padding: 2px 8px; border-radius: 8px; border: 2px dashed color-mix(in oklab, var(--on-accent) 60%, transparent);
+  background: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--on-accent) 12%, transparent) 0 6px, transparent 6px 12px);
+}
+.msg-me .extra.new { animation: pop .4s ease; }
+.tips { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; max-width: 70ch; font-weight: 700; line-height: 1.5; }
+
+/* Pourquoi une info piège trompe : les phrases du prompt, puis la réponse. Ce qui change est juste au-dessus des boutons. */
+.why-rows { display: grid; gap: 8px; }
+.why-row { padding: 10px 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); font-weight: 700; line-height: 1.45; }
+.why-row .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
+.why-row.lit { border-color: color-mix(in oklab, var(--accent) 50%, var(--line)); }
+.why-row.hit { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, var(--surface)); }
+.why-row.trap { border-color: var(--warn); background: color-mix(in oklab, var(--warn) 14%, var(--surface)); }
+.why-row.off { color: var(--muted); }
+.why-row.off .svg-inline--fa { color: var(--muted); }
+.why-row.pop { animation: pop .4s ease; }
+.why-ans { justify-self: start; max-width: 94%; }
+.why-sent { font-weight: 700; line-height: 1.6; }
+.why-slot { display: inline-block; min-width: 3.5em; padding: 0 8px; border-radius: 8px; border: 2px dashed var(--line); text-align: center; }
+.why-slot.trap { border: 2px solid var(--warn); background: color-mix(in oklab, var(--warn) 18%, var(--surface-2)); }
+@keyframes drop { from { transform: translateY(-16px) scale(.6); } }
+.why-slot.drop { animation: drop .45s cubic-bezier(.3, 1.4, .6, 1); }
+
+/* Graphiques en barres : une ligne par cas, le score à droite. Une barre s'allonge ou rétrécit (scaleX) quand on change de cas. */
+.chart { display: grid; gap: 14px; }
+.hb-head { display: flex; justify-content: space-between; gap: 12px; font-size: .85rem; font-weight: 700; color: var(--muted); }
+.hb-head span:last-child { white-space: nowrap; }
+.hbars { display: grid; gap: 10px; }
+.hb { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) 2.4em; gap: 6px 12px; align-items: center; font-weight: 700; }
+.hb-l { font-family: var(--font-display); font-weight: 400; text-align: right; font-variant-numeric: tabular-nums; }
+.hbars.long .hb { grid-template-columns: minmax(0, 1fr) 2.4em; }
+.hbars.long .hb-l { grid-column: 1 / -1; font-family: inherit; font-weight: 700; text-align: left; }
+.hb-t { position: relative; height: 18px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.hb-f { position: absolute; inset: 0; border-radius: 99px; background: var(--accent); transform-origin: left center; transform: scaleX(var(--v, 0)); transition: transform .5s ease; }
+.hb-f.trap { background: var(--warn); }
+.hb-t .base { position: absolute; top: 0; bottom: 0; left: 56%; width: 3px; margin-left: -1px; background: var(--fg); }
+.hb-n { font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; text-align: right; font-variant-numeric: tabular-nums; }
+.legend .k-base { display: inline-block; width: 3px; height: 14px; margin-right: 8px; vertical-align: -2px; background: var(--fg); }
+.chart-msg { font-weight: 700; line-height: 1.5; }
 </style>
 
 <main class="wrap">
@@ -473,7 +515,7 @@ td.c, th.c { text-align: center; }
         <div class="word-card">
           <span class="eyebrow">En résumé</span>
           <strong>3 morceaux</strong>
-          <p>pour un bon prompt : contexte, action, objectif.</p>
+          <p>pour un bon prompt : contexte, action, objectif. Et rien en trop.</p>
           <strong>3 outils</strong>
           <p>pour aider l'IA : Projet, Skill, Connecteur.</p>
           <strong>Claude ou ChatGPT ?</strong>
@@ -525,6 +567,97 @@ td.c, th.c { text-align: center; }
       <p class="small muted">Exemple fabriqué pour comprendre. Tu réécris le même contexte à chaque fois ? Range-le dans un Projet (voir plus bas).</p>
     </section>
 
+    <section class="card s4" id="distr">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-filter"></i></span><h2>Les infos en trop : les distracteurs</h2></div>
+      <p>Ce que tu ne dis pas, l'IA le devine. Ce que tu dis en trop, elle peut s'en servir. Une info qui ne sert pas à ta demande peut la tromper. Les spécialistes l'appellent un <strong>distracteur</strong>.</p>
+      <div class="lab">
+        <div class="lab-col">
+          <div class="lab-part">
+            <h3>Ajoute des infos en trop</h3>
+            <p class="small muted">Lucie reprend son bon prompt, avec le prix de cette année : 35 €. Ajoute des infos qui ne servent pas, et regarde la réponse.</p>
+            <div class="switches">
+              <label class="sw" for="dAnec"><span class="lbl"><span><i class="fa-solid fa-cloud-rain" aria-hidden="true"></i> Une anecdote</span><small>« Il a beaucoup plu ce week-end. »</small></span><input type="checkbox" id="dAnec"></label>
+              <label class="sw" for="dDate"><span class="lbl"><span><i class="fa-solid fa-calendar-day" aria-hidden="true"></i> Une autre date</span><small>« Le club de tennis fait payer avant le 15 octobre. »</small></span><input type="checkbox" id="dDate"></label>
+              <label class="sw" for="dPrix"><span class="lbl"><span><i class="fa-solid fa-tag" aria-hidden="true"></i> L'ancien prix</span><small>« L'an dernier, la cotisation était de 30 €. »</small></span><input type="checkbox" id="dPrix"></label>
+            </div>
+            <div class="meter">
+              <div class="meter-top"><span>Le risque que l'IA se trompe</span><span id="dVal"></span></div>
+              <div class="track"><div class="fill" id="dFill"></div></div>
+            </div>
+            <span class="pill" id="dPill"></span>
+          </div>
+        </div>
+        <div class="lab-col">
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Ton prompt</h3>
+            <div class="msg-me" id="dPrompt" aria-live="polite"></div>
+          </div>
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-envelope" aria-hidden="true"></i> Une réponse possible de l'IA</h3>
+            <div class="bubble" id="dAnswer" aria-live="polite"></div>
+            <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Vient de ta demande</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Vient d'une info en trop</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="small muted">Exemple fabriqué pour comprendre. Souvent, l'IA trie bien. Mais plus il y a d'infos pièges, plus le risque monte.</p>
+
+      <h3>Pourquoi une info piège trompe l'IA</h3>
+      <p>Lucie a laissé l'ancien prix dans son prompt. Suis l'IA, étape par étape.</p>
+      <div class="proc" id="whyProc">
+        <div class="why-rows" id="whyRows"></div>
+        <div class="bubble why-ans"><span class="who">L'IA</span><span class="why-sent">Merci de payer votre cotisation : <span class="why-slot" id="whySlot">…</span></span></div>
+      </div>
+
+      <h3>Ce que mesurent les chercheurs</h3>
+      <p>Des chercheurs ont posé 10 000 questions de culture générale à une petite IA. Elle avait toujours le bon document pour répondre. Puis ils ont ajouté d'autres documents : des documents qui ressemblent à la réponse sans la donner, ou des documents pris au hasard.</p>
+      <div id="distGuess"></div>
+      <div class="lab">
+        <div class="lab-col">
+          <div class="lab-part">
+            <div class="chart" id="noiseZone">
+              <div class="ctl">
+                <span>Les documents en trop</span>
+                <div class="seg" id="segNoise" role="group" aria-label="Les documents en trop">
+                  <button type="button" data-v="sim" aria-pressed="true"><i class="fa-solid fa-clone" aria-hidden="true"></i> Ils ressemblent à la réponse</button>
+                  <button type="button" data-v="rand" aria-pressed="false"><i class="fa-solid fa-shuffle" aria-hidden="true"></i> Pris au hasard</button>
+                </div>
+              </div>
+              <div class="hb-head"><span>En trop</span><span>Bonnes réponses sur 100</span></div>
+              <div class="hbars" id="noiseBars"></div>
+              <div class="legend"><span><i class="k-base"></i>Le trait : sans document en trop (56)</span></div>
+              <p class="chart-msg" id="noiseMsg" aria-live="polite"></p>
+            </div>
+            <p class="small muted">Chiffres de chercheurs (2024) : une petite IA de 2023, 10 000 questions de culture générale, avec des pages de Wikipédia. Le bon document est loin de la question. Chiffres arrondis. Source : Cuconasu et al., « The Power of Noise », SIGIR 2024, tableaux 1 et 2 (modèle Llama 2).</p>
+          </div>
+        </div>
+        <div class="lab-col">
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-robot" aria-hidden="true"></i> Et les IA récentes ?</h3>
+            <p>Une étude de 2026 a testé des IA récentes, qui réfléchissent avant de répondre. Voici une des meilleures.</p>
+            <div class="chart">
+              <div class="hb-head"><span>Ce qu'on ajoute</span><span>Score sur 100</span></div>
+              <div class="hbars long" id="recentBars"></div>
+              <p class="chart-msg">Les IA récentes résistent mieux. Mais pas totalement. <strong>Le pire piège reste ce qui ressemble à la réponse.</strong></p>
+            </div>
+            <p class="small muted">Chiffres d'une étude de janvier 2026, pas encore relue par d'autres chercheurs : des IA qui réfléchissent, sur 11 tests. Les 7 IA testées montrent la même chose. Source : Lee et al., « Lost in the Noise », 2026, tableau 1 (modèle Gemini 2.5 Pro).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong><i class="fa-solid fa-broom" aria-hidden="true"></i>Ce qui marche</strong>
+        <ul class="tips">
+          <li>Enlève toi-même ce qui ne sert pas.</li>
+          <li>Tu colles un long texte ? Mets-le d'abord. Écris ta question à la fin.</li>
+          <li>Demande : « Recopie d'abord les phrases utiles, puis réponds. »</li>
+          <li>Tu changes de sujet ? Ouvre une nouvelle conversation (voir « La Mémoire qui Déborde »).</li>
+          <li>Écrire « ignore ce qui ne sert pas » aide parfois. Ce n'est pas une protection.</li>
+        </ul>
+        <p>Attention : le contexte utile aide toujours. Garde ce qui sert à ta demande. Enlève le reste.</p>
+      </div>
+      <p class="small muted">Un avis glissé dans ta question est aussi une info piège (voir « L'IA qui Dit Oui »). Un ordre caché exprès, c'est autre chose : voir « Le Message Piégé ».</p>
+    </section>
+
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-arrows-to-circle"></i></span><h2>Répondre ou agir</h2></div>
       <div class="lab">
@@ -560,7 +693,7 @@ td.c, th.c { text-align: center; }
           </div>
         </div>
       </div>
-      <p class="small muted">Chez Claude, annoncé par Anthropic en septembre 2026. Le changement arrive peu à peu : d'abord pour les abonnements Pro et Max, puis Team et Free. Tes conversations, Projets, Skills et Connecteurs sont gardés. Chez ChatGPT, l'agent s'appelle Work : voir le tableau en bas de la fiche.</p>
+      <p class="small muted">Chez Claude, annoncé par Anthropic en septembre 2026. Le changement arrive peu à peu : d'abord pour les abonnements Pro et Max, puis Team et Free. Enterprise viendra plus tard. Tes conversations, Projets, Skills et Connecteurs sont gardés. Chez ChatGPT, l'agent s'appelle Work : voir le tableau en bas de la fiche.</p>
     </section>
 
     <section class="card s4">
@@ -605,10 +738,10 @@ td.c, th.c { text-align: center; }
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-toolbox"></i></span><h2>Les risques de chaque outil</h2></div>
       <p>Un ordre caché dans un e-mail ou une page web peut piéger l'IA (voir « Le Message Piégé »).
-        Le danger grandit quand l'IA réunit trois ingrédients : <strong>tes données</strong>, <strong>un contenu venu de l'extérieur</strong>, et <strong>le droit d'agir seule</strong>.</p>
+        Le danger grandit quand l'IA réunit trois ingrédients : <strong>tes données</strong>, <strong>un contenu venu de l'extérieur</strong>, et <strong>le droit d'agir ou d'envoyer des infos dehors</strong>.</p>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>Usage</th><th class="c"><span role="img" aria-label="Mes données"><i class="fa-solid fa-lock"></i></span></th><th class="c"><span role="img" aria-label="Contenu extérieur"><i class="fa-solid fa-inbox"></i></span></th><th class="c"><span role="img" aria-label="Peut agir"><i class="fa-solid fa-bolt"></i></span></th><th>Risque</th></tr></thead>
+          <thead><tr><th>Usage</th><th class="c"><span role="img" aria-label="Mes données"><i class="fa-solid fa-lock"></i></span></th><th class="c"><span role="img" aria-label="Contenu extérieur"><i class="fa-solid fa-inbox"></i></span></th><th class="c"><span role="img" aria-label="Peut agir ou envoyer dehors"><i class="fa-solid fa-bolt"></i></span></th><th>Risque</th></tr></thead>
           <tbody>
             <tr><td>Tu écris toi-même ton texte</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td><span class="pill ok">Très faible</span></td></tr>
             <tr><td>Tu colles un e-mail ou un PDF reçu</td><td class="c">–</td><td class="c"><span role="img" aria-label="Oui"><i class="fa-solid fa-circle-check"></i></span></td><td class="c">–</td><td><span class="pill ok">Faible</span></td></tr>
@@ -619,7 +752,8 @@ td.c, th.c { text-align: center; }
           </tbody>
         </table>
       </div>
-      <p class="small muted">Un connecteur, ou un agent qui agit sur tes fichiers, peut ajouter <span role="img" aria-label="l'accès à tes données"><i class="fa-solid fa-lock"></i></span> et <span role="img" aria-label="le droit d'agir seule"><i class="fa-solid fa-bolt"></i></span>.
+      <p class="small muted">Un connecteur, ou un agent qui agit sur tes fichiers, peut ajouter <span role="img" aria-label="l'accès à tes données"><i class="fa-solid fa-lock"></i></span> et <span role="img" aria-label="le droit d'agir ou d'envoyer dehors"><i class="fa-solid fa-bolt"></i></span>.
+        Attention : même en lecture seule, un assistant qui peut ouvrir des liens peut envoyer tes données dehors.
         Par défaut, l'IA te demande la permission avant d'agir. Un réglage lui permet de continuer sans demander : garde-le pour les tâches sans risque. Plus l'IA a de pouvoir, plus ce qu'elle lit compte.</p>
     </section>
 
@@ -631,11 +765,11 @@ td.c, th.c { text-align: center; }
           <thead><tr><th>Dans les fiches</th><th>Chez Claude</th><th>Chez ChatGPT</th></tr></thead>
           <tbody>
             <tr><td><strong>Chat</strong></td><td>Chat</td><td>Chat</td></tr>
-            <tr><td><strong>Agent</strong></td><td>Cowork</td><td>Work</td></tr>
+            <tr><td><strong>Agent</strong></td><td>Cowork (devient Claude, peu à peu)</td><td>Work</td></tr>
             <tr><td><strong>Agent de code</strong></td><td>Code</td><td>Codex</td></tr>
             <tr><td><strong>Projet</strong></td><td>Projets</td><td>Projets</td></tr>
-            <tr><td><strong>Skill</strong></td><td>Compétences</td><td>Plugins</td></tr>
-            <tr><td><strong>Connecteur</strong></td><td>Connecteurs</td><td>Apps ou plugins</td></tr>
+            <tr><td><strong>Skill</strong></td><td>Compétences</td><td>Compétences (rangées dans Plugins)</td></tr>
+            <tr><td><strong>Connecteur</strong></td><td>Connecteurs</td><td>Apps (rangées dans Plugins)</td></tr>
           </tbody>
         </table>
       </div>
@@ -646,6 +780,7 @@ td.c, th.c { text-align: center; }
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
         <li><span>Un bon prompt = le contexte + une action précise + l'objectif.</span></li>
+        <li><span>Enlève les infos qui ne servent pas. Une info en trop peut tromper l'IA, surtout si elle ressemble à la bonne.</span></li>
         <li><span>L'IA répond, ou elle agit comme un agent, selon ta demande. L'agent de code reste à part, pour créer des logiciels.</span></li>
         <li><span>Projet = ton contexte et tes documents. Skill = ta méthode. Connecteur = un accès à tes autres outils.</span></li>
         <li><span>Claude, ChatGPT… Chaque IA a ses propres noms, mais les outils se ressemblent.</span></li>
@@ -1138,6 +1273,133 @@ function renderPrompt() {
 }
 ["#ppCtx", "#ppAct", "#ppObj"].forEach((s) => $(s).addEventListener("change", renderPrompt));
 
+// Les infos en trop : une info qui ressemble à la bonne (une autre date, l'ancien prix) peut se glisser dans la réponse.
+// Une info sans rapport (l'anecdote) gêne peu. Exemple fabriqué : souvent, l'IA trie bien.
+const DX = {
+  anec: "{cloud-rain} Il a beaucoup plu ce week-end.",
+  date: "{calendar-day} Le club de tennis fait payer avant le 15 octobre.",
+  prix: "{tag} L'an dernier, la cotisation était de 30 €.",
+};
+const DX_PILL = [
+  ["ok", "{circle-check} Rien en trop : l'IA a ce qu'il faut"],
+  ["", "{circle-info} Une info sans rapport : elle gêne peu"],
+  ["warn", "{triangle-exclamation} Une info qui ressemble à la bonne : le piège le plus fort"],
+  ["bad", "{circle-xmark} 2 infos pièges : relis tout"],
+];
+function renderDistr() {
+  const on = { anec: $("#dAnec").checked, date: $("#dDate").checked, prix: $("#dPrix").checked };
+  const was = renderDistr.on || on;
+  renderDistr.on = on;
+  // Le prompt : chaque info en trop arrive à côté de ce qu'elle imite. Celle qu'on vient d'ajouter saute.
+  const extra = (k) => (on[k] ? [h("span", "extra" + (was[k] ? "" : " new"), DX[k])] : []);
+  $("#dPrompt").replaceChildren(
+    h("span", "who", "Toi"),
+    h("span", "", "{user} Je suis Lucie, la secrétaire d'un club de randonnée. J'écris aux 40 membres."), ...extra("anec"),
+    h("span", "", "{hand-pointer} Écris un mail pour rappeler de payer la cotisation de l'année."),
+    h("span", "", "{tag} La cotisation de cette année est de 35 €."), ...extra("prix"),
+    h("span", "", "{bullseye} Le but : que tout le monde ait payé avant le 30 novembre. Ton amical, 5 lignes au plus."), ...extra("date"),
+  );
+  // La réponse : une ligne qui vient d'une info en trop est signalée. Une ligne qui vient de changer saute.
+  const line = (fromExtra, text, changed) => h("span", "sent " + (fromExtra ? "warn" : "ok") + (changed ? " flip" : ""), (fromExtra ? "{triangle-exclamation} " : "{circle-check} ") + text);
+  $("#dAnswer").replaceChildren(
+    h("span", "who", "L'IA"),
+    line(false, "Bonjour à toutes et à tous,"),
+    ...(on.anec ? [line(true, "Quel week-end pluvieux ! J'espère que vous allez bien.", !was.anec)] : []),
+    line(on.prix, `C'est le moment de payer votre cotisation au club : ${on.prix ? 30 : 35} €.`, on.prix !== was.prix),
+    line(on.date, `Merci de payer avant le ${on.date ? "15 octobre" : "30 novembre"}. À très bientôt.`, on.date !== was.date),
+    line(false, "Lucie, secrétaire du club de randonnée"),
+  );
+  // Le risque (inventé pour comprendre) : une info sans rapport le monte un peu, une info qui ressemble à la bonne beaucoup.
+  const traps = on.date + on.prix, risk = 10 + (on.anec ? 8 : 0) + traps * 30;
+  $("#dVal").textContent = risk < 30 ? "faible" : risk < 60 ? "moyen" : "élevé";
+  $("#dFill").style.width = risk + "%";
+  $("#dFill").className = "fill " + (risk < 30 ? "ok" : risk < 60 ? "warn" : "bad");
+  const [cls, txt] = DX_PILL[traps ? traps + 1 : on.anec ? 1 : 0];
+  $("#dPill").className = "pill " + cls;
+  rich($("#dPill"), txt);
+}
+["#dAnec", "#dDate", "#dPrix"].forEach((s) => $(s).addEventListener("change", renderDistr));
+
+// Pourquoi une info piège trompe : l'IA lit tout, cherche un prix, en trouve deux qui se ressemblent, et peut prendre le mauvais.
+const WHY_ROWS = [
+  ["ctx", "{user} Je suis Lucie, la secrétaire d'un club de randonnée."],
+  ["anec", "{cloud-rain} Il a beaucoup plu ce week-end."],
+  ["act", "{hand-pointer} Écris un mail pour rappeler de payer la cotisation."],
+  ["p35", "{tag} La cotisation de cette année est de 35 €."],
+  ["p30", "{tag} L'an dernier, la cotisation était de 30 €."],
+];
+const whyRows = WHY_ROWS.map(([k, text]) => { const r = h("div", "why-row", text); r.dataset.k = k; $("#whyRows").append(r); return r; });
+// L'état de chaque phrase, étape par étape.
+const WHY_STATE = [
+  () => "lit",
+  (k) => (k === "p35" || k === "p30" ? "hit" : "off"),
+  (k) => (k === "p35" || k === "p30" ? "trap" : "off"),
+  (k) => (k === "p30" ? "trap" : k === "p35" ? "hit" : "off"),
+];
+const WHY_STEPS = [
+  { label: "Elle lit tout", title: "L'IA lit tout ton prompt", text: "Pour elle, chaque phrase compte. Même celle qui ne sert à rien." },
+  { label: "Elle cherche", title: "Elle cherche ce qui répond", text: "Ta demande : rappeler de payer la cotisation. Il lui faut un prix. Deux phrases parlent d'un prix. L'anecdote, elle, ne la gêne presque pas." },
+  { label: "Ça se ressemble", title: "Deux prix se ressemblent", text: "35 € et 30 € : le même club, la même cotisation. Seuls les mots « l'an dernier » disent que 30 € est l'ancien prix." },
+  { label: "Elle choisit", title: "Elle peut prendre le mauvais", text: "Souvent, elle prend le bon prix. Mais parfois, elle écrit 30 €. Enlève l'ancien prix : plus de piège." },
+];
+procedure($("#whyProc"), WHY_STEPS, (i, from) => {
+  whyRows.forEach((r) => {
+    const state = WHY_STATE[i](r.dataset.k), changed = from !== null && state !== WHY_STATE[from](r.dataset.k);
+    r.className = "why-row " + state;
+    if (changed && state !== "off") replay(r, "pop");
+  });
+  const slot = $("#whySlot");
+  slot.textContent = i === 3 ? "30 €" : "…";
+  slot.classList.toggle("trap", i === 3);
+  if (i === 3 && from !== null) replay(slot, "drop");
+});
+
+// Ce que mesurent les chercheurs : bonnes réponses sur 100, selon le nombre de documents en trop.
+// Cuconasu et al., « The Power of Noise », SIGIR 2024, tableaux 1 et 2, le bon document loin de la question (Llama 2, 2023). Chiffres arrondis.
+const NOISE = { n: [0, 1, 2, 4, 8, 18], sim: [56, 46, 35, 27, 26, 23], rand: [56, 47, 38, 31, 31, 35] };
+const NOISE_MSG = {
+  sim: "Un seul document piège suffit : de 56 à 46 bonnes réponses sur 100. Avec 4 documents, 27 : 2 fois moins.",
+  rand: "Des documents pris au hasard gênent moins : 31 bonnes réponses sur 100 avec 4 documents, au lieu de 27.",
+};
+function hbar(label, base) {
+  const r = h("div", "hb"), t = h("span", "hb-t"), f = h("span", "hb-f"), n = h("b", "hb-n");
+  t.append(f);
+  if (base) t.append(h("span", "base"));
+  r.append(h("span", "hb-l", label), t, n);
+  return { r, f, n };
+}
+const noiseBars = NOISE.n.map((n) => { const b = hbar(String(n), true); $("#noiseBars").append(b.r); return b; });
+function renderNoise(t) {
+  NOISE[t].forEach((v, i) => {
+    noiseBars[i].f.style.setProperty("--v", v / 100);
+    countTo(noiseBars[i].n, v);
+  });
+  $("#noiseBars").setAttribute("aria-label", NOISE.n.map((n, i) => `${n} document${n > 1 ? "s" : ""} en trop : ${NOISE[t][i]} sur 100`).join(", "));
+  $("#noiseMsg").textContent = NOISE_MSG[t];
+}
+$("#noiseBars").setAttribute("role", "img");
+renderNoise(initSeg($("#segNoise"), renderNoise));
+
+// Et les IA récentes ? Lee et al., « Lost in the Noise », janvier 2026, tableau 1 (Gemini 2.5 Pro, score moyen sur 11 tests).
+const RECENT = [["Rien", 78], ["Des documents pris au hasard", 71], ["Une vieille conversation sans rapport", 63], ["Des documents presque justes", 48]];
+RECENT.forEach(([label, v], i) => {
+  const b = hbar(label);
+  b.f.style.setProperty("--v", v / 100);
+  b.f.classList.toggle("trap", i === RECENT.length - 1);
+  b.n.textContent = v;
+  $("#recentBars").append(b.r);
+});
+$("#recentBars").setAttribute("role", "img");
+$("#recentBars").setAttribute("aria-label", RECENT.map(([l, v]) => `${l} : ${v} sur 100`).join(", "));
+
+// Devine d'abord : avec 4 documents qui ressemblent à la réponse, la petite IA trouve 2 fois moins la bonne réponse.
+guess($("#distGuess"), {
+  q: "Avec le bon document, une petite IA trouve la bonne réponse 56 fois sur 100. Tu ajoutes 4 documents qui ressemblent à la réponse, sans la donner. Combien de bonnes réponses ?",
+  options: [["56", "Toujours 56"], ["27", "Environ 27"], ["5", "Environ 5"]], a: "27",
+  why: "Environ 27 : 2 fois moins ! Une info qui ressemble à la bonne est le piège le plus fort. Ce test utilise une petite IA de 2023. Les IA récentes résistent mieux, mais pas toujours.",
+  lock: [$("#noiseZone")],
+});
+
 // Répondre ou agir : l'IA voit ce que demande la tâche. Pour un logiciel, c'est l'agent de code.
 const ASK = {
   mail: { q: "Aide-moi à écrire un mail délicat à un client.", pill: ["ok", "{comments} L'IA répond"],
@@ -1261,6 +1523,9 @@ initDefi([
     why: "C'est ta situation : qui tu es. L'IA n'a plus à le deviner." },
   { q: "« Le but : avoir plus de clients le lundi midi. » C'est quel morceau du prompt ?", a: "obj", options: PIECES,
     why: "C'est le but : ce que tu veux obtenir." },
+  { q: "Pour écrire ton mail, tu colles le tarif de cette année et celui de l'an dernier. C'est…", a: "piege",
+    options: [["utile", "{circle-plus} Utile : plus l'IA en sait, mieux c'est"], ["piege", "{triangle-exclamation} Un piège : l'ancien tarif ressemble au bon"], ["rien", "{circle-minus} Sans effet : l'IA ignore toujours ce qui ne sert pas"]],
+    why: "L'ancien tarif ressemble au bon : l'IA peut prendre le mauvais prix. Garde seulement ce qui sert à ta demande." },
   { q: "L'IA doit ranger 200 factures de ton ordinateur, puis en faire un tableau. Que fait-elle ?", a: "agent",
     options: [["chat", "{comments} Elle répond seulement"], ["agent", "{handshake} Elle agit, comme un agent"], ["code", "{laptop-code} Il faut l'agent de code"]],
     why: "Ranger des fichiers, c'est une tâche en plusieurs étapes : l'IA agit, comme un agent. Elle te demande la permission avant les actions importantes." },
@@ -1275,6 +1540,7 @@ initDefi([
     why: "Une méthode écrite une fois et réutilisée : c'est une Skill." },
 ]);
 renderPrompt();
+renderDistr();
 renderKitchen();
 renderMissionK();
 </script>
