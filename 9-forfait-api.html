@@ -1156,9 +1156,10 @@ function drawChart({ perDay, days, plan, cpm, even }) {
   const W = Math.max(300, box.clientWidth || 700);
   const H = W < 560 ? 260 : 320;
   const m = { l: 58, r: 16, t: 26, b: 40 };
-  const xMax = 200;
-  // L'échelle montre le forfait et ton usage. Au-delà, la droite de l'API sort par le haut.
-  const yMax = niceMax(Math.max(plan * 2.5, cpm * days * perDay * 1.25, 1));
+  // L'axe des messages montre ton usage, et la bascule dans sa 1re moitié. Il va jusqu'à 200, le maximum du réglage.
+  const xMax = Math.min(200, niceMax(Math.max(perDay * 1.25, even * 2, 20)));
+  // L'échelle des prix suit la droite de l'API jusqu'au bord droit : elle ne sort jamais par le haut.
+  const yMax = niceMax(Math.max(cpm * days * xMax, plan * 1.4, 1));
   const x = (d) => m.l + (d / xMax) * (W - m.l - m.r);
   const y = (c) => H - m.b - (Math.min(c, yMax) / yMax) * (H - m.t - m.b);
   const ns = "http://www.w3.org/2000/svg";
@@ -1177,32 +1178,65 @@ function drawChart({ perDay, days, plan, cpm, even }) {
     const t = el("text", { x: m.l - 8, y: y(c) + 4, "text-anchor": "end" }, axis);
     t.textContent = fmt(c, c % 1 ? 1 : 0) + " $";
   }
-  for (const d of [0, 50, 100, 150, 200]) {
-    const t = el("text", { x: x(d), y: H - m.b + 22, "text-anchor": d === 0 ? "start" : d === 200 ? "end" : "middle" }, axis);
-    t.textContent = d;
+  for (let i = 0; i <= 4; i++) {
+    const t = el("text", { x: x((xMax / 4) * i), y: H - m.b + 22, "text-anchor": i === 0 ? "start" : i === 4 ? "end" : "middle" }, axis);
+    t.textContent = fmt((xMax / 4) * i);
   }
   const xl = el("text", { x: W - m.r, y: H - 2, "text-anchor": "end" }, axis);
   xl.textContent = "messages par jour";
 
-  // La droite de l'API est coupée en haut du graphique si elle dépasse.
-  const dEnd = Math.min(xMax, cpm > 0 ? yMax / (cpm * days) : xMax);
-  el("path", { class: "a-api", d: `M${x(0)},${y(0)} L${x(dEnd)},${y(cpm * days * dEnd)} L${x(xMax)},${y(cpm * days * xMax)} L${x(xMax)},${y(0)} Z` });
+  // La droite de l'API va d'un bord à l'autre. En dessous, la zone colorée est un triangle.
+  const yEnd = y(cpm * days * xMax);
+  el("path", { class: "a-api", d: `M${x(0)},${y(0)} L${x(xMax)},${yEnd} L${x(xMax)},${y(0)} Z` });
   el("line", { class: "l-plan", x1: x(0), x2: x(xMax), y1: y(plan), y2: y(plan) });
-  el("path", { class: "l-api", pathLength: 1, d: `M${x(0)},${y(0)} L${x(dEnd)},${y(cpm * days * dEnd)}` });
+  el("path", { class: "l-api", pathLength: 1, d: `M${x(0)},${y(0)} L${x(xMax)},${yEnd}` });
 
-  const tp = el("text", { class: "t-lab t-plan", x: W - m.r, y: y(plan) - 8, "text-anchor": "end" });
+  const tp = el("text", { class: "t-lab t-plan" });
   tp.textContent = "Forfait " + money(plan);
-  const ta = el("text", { class: "t-lab t-api", x: x(dEnd) - 6, y: Math.max(m.t - 8, y(cpm * days * dEnd) - 10), "text-anchor": "end" });
+  const ta = el("text", { class: "t-lab t-api" });
   ta.textContent = "API";
-
+  const yP = y(plan), lines = [[x(0), y(0), x(xMax), yEnd], [x(0), yP, x(xMax), yP]];
+  let te;
   if (even <= xMax && even > 0) {
     el("line", { class: "l-even", x1: x(even), x2: x(even), y1: m.t, y2: H - m.b });
-    const right = x(even) < W * 0.6;
-    const te = el("text", { class: "t-even", x: x(even) + (right ? 8 : -8), y: m.t + 4, "text-anchor": right ? "start" : "end" });
+    lines.push([x(even), m.t, x(even), H - m.b]);
+    te = el("text", { class: "t-even" });
     te.textContent = "Bascule : " + fmt(Math.ceil(even)) + " / jour";
   }
-  el("circle", { class: "dot-now", cx: x(perDay), cy: y(cpm * days * perDay), r: 9 });
+  const cx = x(perDay), cy = y(cpm * days * perDay);
+  el("circle", { class: "dot-now", cx, cy, r: 9 });
   box.replaceChildren(svg);
+
+  // Chaque étiquette prend la 1re place libre de sa liste : elle ne touche ni une ligne, ni le point, ni une autre étiquette.
+  const taken = [[cx - 11, cy - 11, cx + 11, cy + 11]];
+  const place = (t, spots) => {
+    for (const [px, py, anchor] of [...spots, spots[0]]) {
+      t.setAttribute("x", px); t.setAttribute("y", py); t.setAttribute("text-anchor", anchor);
+      const b = t.getBBox(), r = [b.x - 3, b.y - 3, b.x + b.width + 3, b.y + b.height + 3];
+      const inside = b.x >= m.l && b.x + b.width <= W - m.r + 1 && b.y >= 0 && b.y + b.height <= H - m.b;
+      if (inside && taken.every((o) => !boxesTouch(r, o)) && lines.every((s) => !segmentTouches(s, r))) { taken.push(r); return; }
+    }
+  };
+  if (te) {
+    const xe = x(even), side = xe < W * 0.6 ? [8, "start"] : [-8, "end"], other = [-side[0], side[1] === "start" ? "end" : "start"];
+    place(te, [0, 20, 40].flatMap((dy) => [[xe + side[0], m.t + 4 + dy, side[1]], [xe + other[0], m.t + 4 + dy, other[1]]]));
+  }
+  place(tp, [[W - m.r, yP - 8, "end"], [m.l + 8, yP - 8, "start"], [W - m.r, yP + 18, "end"], [m.l + 8, yP + 18, "start"]]);
+  // « API » se pose contre sa droite : au-dessus et à gauche d'un de ses points, ou en dessous et à droite. La droite monte, elle ne la touche donc pas.
+  const on = (f) => [x(xMax * f), y(cpm * days * xMax * f)];
+  place(ta, [...[1, 0.85, 0.7, 0.55, 0.4].map((f) => [on(f)[0] - 6, on(f)[1] - 14, "end"]),
+    ...[0.85, 0.7, 0.55, 0.4].map((f) => [on(f)[0] + 6, on(f)[1] + 24, "start"])]);
+}
+const boxesTouch = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+// Le segment [x1, y1, x2, y2] passe-t-il dans le rectangle [gauche, haut, droite, bas] ? (découpage de Liang-Barsky)
+function segmentTouches([x1, y1, x2, y2], [l, t, r, b]) {
+  let u0 = 0, u1 = 1;
+  for (const [p, q] of [[x1 - x2, x1 - l], [x2 - x1, r - x1], [y1 - y2, y1 - t], [y2 - y1, b - y1]]) {
+    if (p === 0) { if (q < 0) return false; }
+    else if (p < 0) u0 = Math.max(u0, q / p);
+    else u1 = Math.min(u1, q / p);
+  }
+  return u0 <= u1;
 }
 
 ["perDay", "days", "plan", "inP", "outP", "cache", "burst", "cap"].forEach((id) => $("#" + id).addEventListener("input", render));

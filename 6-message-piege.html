@@ -1277,10 +1277,9 @@ $("#xray").addEventListener("change", () => { if ($("#xray").checked) unlockAi()
 {
   const { seen, all } = countWords(HIDE.mail);
   guess($("#hideGuess"), {
-    q: "cet e-mail de Claire a l'air normal. Combien de mots y sont cachés ?",
-    options: [["peu", "Quelques mots"], ["autant", "Presque autant que les mots que tu vois"], ["plus", "Plus que les mots que tu vois"]],
-    a: all - seen > seen ? "plus" : "autant",
-    why: `Il y a ${all - seen} mots cachés, ${all - seen > seen ? "plus" : "presque autant"} que les ${seen} mots que tu vois. Allume la lampe pour les lire.`,
+    q: "cet e-mail de Claire a l'air normal. Est-ce qu'il cache des mots ?",
+    options: [["non", "Non, je vois tout"], ["oui", "Oui, il cache des mots"]], a: "oui",
+    why: `Il cache ${all - seen} mots. C'est ${all - seen > seen ? "plus" : "presque autant"} que les ${seen} mots que tu vois. Allume la lampe pour les lire.`,
     lock: [$("#lampSw"), $("#hideCtl")],
   });
 }

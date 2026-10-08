@@ -380,6 +380,82 @@ test.describe("schémas pas à pas", () => {
   });
 });
 
+// Le graphique du point de bascule : la droite de l'API va d'un bord à l'autre sans sortir par le haut,
+// la zone colorée reste sous la droite, et aucune étiquette ne touche une ligne, le point ou une autre étiquette.
+function chartProblems() {
+  const svg = document.querySelector("#chart svg"), pb = [];
+  const num = (e, a) => +e.getAttribute(a);
+  const grid = [...svg.querySelectorAll(".grid line")];
+  const left = num(grid[0], "x1"), right = num(grid[0], "x2");
+  const ys = grid.map((g) => num(g, "y1")), top = Math.min(...ys), bottom = Math.max(...ys);
+  const [x0, y0, x1, y1] = svg.querySelector(".l-api").getAttribute("d").match(/-?[\d.]+/g).map(Number);
+  if (Math.abs(x0 - left) > 0.5 || Math.abs(y0 - bottom) > 0.5) pb.push("la droite de l'API ne part pas de 0");
+  if (Math.abs(x1 - right) > 0.5) pb.push("la droite de l'API s'arrête avant le bord droit");
+  if (y1 < top - 0.5) pb.push("la droite de l'API sort par le haut");
+  if (svg.querySelector(".a-api").getBBox().y < Math.min(y0, y1) - 0.5) pb.push("la zone de l'API monte au-dessus de sa droite");
+  const plan = svg.querySelector(".l-plan"), even = svg.querySelector(".l-even"), dot = svg.querySelector(".dot-now");
+  if (num(plan, "y1") < top - 0.5) pb.push("la ligne du forfait sort par le haut");
+  if (even && (num(even, "x1") < left || num(even, "x1") > right)) pb.push("la bascule sort du graphique");
+  const cx = num(dot, "cx"), cy = num(dot, "cy"), r = num(dot, "r") + 1.5;
+  if (cx < left - 0.5 || cx > right + 0.5 || cy < top - 0.5 || cy > bottom + 0.5) pb.push("le point de ton usage sort du graphique");
+  // Les lignes, avec la moitié de leur épaisseur
+  const lines = [[x0, y0, x1, y1, 2], [num(plan, "x1"), num(plan, "y1"), num(plan, "x2"), num(plan, "y1"), 1.5]];
+  if (even) lines.push([num(even, "x1"), num(even, "y1"), num(even, "x1"), num(even, "y2"), 1]);
+  const [, , W, H] = svg.getAttribute("viewBox").split(" ").map(Number);
+  const labels = [...svg.querySelectorAll(".t-lab, .t-even")].map((t) => ({ name: t.textContent, b: t.getBBox() }));
+  labels.forEach(({ name, b }, i) => {
+    if (b.x < 0 || b.y < 0 || b.x + b.width > W || b.y + b.height > H) pb.push(`« ${name} » sort du graphique`);
+    for (const [ax, ay, bx, by, w] of lines) {
+      const n = Math.ceil(Math.hypot(bx - ax, by - ay));
+      for (let k = 0; k <= n; k++) {
+        const px = ax + ((bx - ax) * k) / n, py = ay + ((by - ay) * k) / n;
+        if (px > b.x - w && px < b.x + b.width + w && py > b.y - w && py < b.y + b.height + w) { pb.push(`« ${name} » touche une ligne`); break; }
+      }
+    }
+    const nx = Math.max(b.x, Math.min(cx, b.x + b.width)), ny = Math.max(b.y, Math.min(cy, b.y + b.height));
+    if (Math.hypot(cx - nx, cy - ny) < r) pb.push(`« ${name} » touche le point de ton usage`);
+    for (const o of labels.slice(i + 1)) {
+      const c = o.b;
+      if (b.x < c.x + c.width && c.x < b.x + b.width && b.y < c.y + c.height && c.y < b.y + b.height) pb.push(`« ${name} » touche « ${o.name} »`);
+    }
+  });
+  return [...new Set(pb)];
+}
+
+test("9-forfait-api.html : le graphique du point de bascule reste lisible, quels que soient les réglages", async ({ page, isMobile }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const choose = (seg, v) => page.locator(`#${seg} button[data-v="${v}"]`).click();
+  const bet = (i) => page.locator("#bets .qi").nth(i).locator(".qbtns button").first().click();
+  const CASES = {
+    "réglages de départ": async () => {},
+    "le pari de Tom": () => bet(0),
+    "le pari de Sophie": () => bet(1),
+    "le pari de Marc": () => bet(2),
+    "le pari du robot": () => bet(3),
+    "tout au maximum": async () => {
+      await page.locator("#perDay").fill("200"); await page.locator("#days").fill("31");
+      await choose("segSize", "long"); await choose("segModel", "expert");
+    },
+    "tout au minimum": async () => {
+      await page.locator("#perDay").fill("1"); await page.locator("#days").fill("1");
+      await choose("segSize", "short"); await choose("segModel", "rapide");
+    },
+    "un gros forfait": async () => {
+      await page.locator("#perDay").fill("40"); await choose("segSize", "mid"); await choose("segModel", "standard");
+      await page.locator("#plan").fill("200");
+    },
+  };
+  // Sur téléphone, aussi sur un petit écran (360 px) : c'est là que les étiquettes ont le moins de place.
+  for (const width of isMobile ? [null, 360] : [null]) {
+    if (width) await page.setViewportSize({ width, height: 780 });
+    await open(page, "9-forfait-api.html", "?demo=1");
+    for (const [name, act] of Object.entries(CASES)) {
+      await act();
+      expect(await page.evaluate(chartProblems), `${name}${width ? ` (${width} px)` : ""}`).toEqual([]);
+    }
+  }
+});
+
 test.describe("mode démonstration", () => {
   for (const f of FICHES) {
     test(`${f} : rien n'est flou`, async ({ page }) => {
