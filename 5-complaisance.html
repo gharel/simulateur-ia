@@ -334,11 +334,9 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
 @keyframes rise { from { transform: translateY(var(--rise, 18px)); } }
 @keyframes grow { from { transform: scale(0); } 70% { transform: scale(1.25); } }
-@keyframes glow { from { box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 55%, transparent); } }
 @keyframes win { from { transform: scale(.4) rotate(-40deg); } 65% { transform: scale(1.2) rotate(-4deg); } }
 .qbtns button.right { animation: pop .4s ease; }
 .qbtns button.wrong { animation: shake .4s ease; }
-.unlocking { animation: glow 1.2s ease-out; }
 .badge.won { animation: win .7s cubic-bezier(.3, 1.3, .5, 1); }
 .stars .svg-inline--fa { animation: grow .45s ease backwards; }
 .stars .svg-inline--fa:nth-child(2) { animation-delay: .12s; }
@@ -392,8 +390,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .yes-col { display: grid; gap: 18px; align-content: start; }
 .yes-col h3 { display: flex; gap: 10px; align-items: center; }
 .yes-col h3 b { font-weight: 400; background: var(--accent); color: var(--on-accent); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .95rem; flex: none; }
-/* La note sur la consigne colle à son interrupteur. */
-.yes-col > .sw + .small { margin-top: -8px; }
 .thread { display: grid; gap: 14px; }
 .who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
 .msg-me { justify-self: end; max-width: 88%; display: grid; gap: 6px; background: var(--accent); color: var(--on-accent); border-radius: 18px 18px 4px 18px; padding: 14px 18px; font-weight: 700; line-height: 1.45; }
@@ -503,7 +499,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-clone"></i></span><h2>Elle te donne raison</h2></div>
-      <p>Choisis une situation. Puis change ta façon de demander, et regarde si l'IA te suit.</p>
+      <p>Choisis une situation. Puis regarde si l'IA te suit : quand tu donnes ton avis, et quand tu insistes.</p>
       <div id="yesGuess"></div>
       <div class="ctl">
         <span>Choisis une situation</span>
@@ -515,30 +511,25 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       </div>
       <div class="yes" id="yesLab">
         <div class="yes-col">
-          <h3><b>1</b>La façon de demander</h3>
-          <div class="seg" id="segFrame" role="group" aria-label="Façon de demander">
+          <h3><b>1</b>Tu donnes ton avis</h3>
+          <div class="seg" id="segFrame" role="group" aria-label="Ta façon de demander">
             <button type="button" data-v="neutre" aria-pressed="true">Neutre</button>
-            <button type="button" data-v="oui" aria-pressed="false">« Je pense que oui »</button>
-            <button type="button" data-v="non" aria-pressed="false">« Je pense que non »</button>
+            <button type="button" data-v="oui" aria-pressed="false">Ton avis : oui</button>
+            <button type="button" data-v="non" aria-pressed="false">Ton avis : non</button>
           </div>
           <div class="thread" id="yesA" aria-live="polite"></div>
-          <div class="meter">
-            <div class="meter-top"><span>La réponse suit ton avis</span><span id="yesVal">0 %</span></div>
-            <div class="track"><div class="fill" id="yesFill"></div></div>
-            <p class="small muted">Chiffres inventés pour comprendre. Sur un fait clair, les IA récentes se laissent moins faire. Sur un avis ou un conseil, elles te donnent raison plus souvent.</p>
-          </div>
           <span class="pill" id="yesPillA"></span>
         </div>
         <div class="yes-col">
-          <h3><b>2</b>Quand tu insistes</h3>
+          <h3><b>2</b>Tu insistes</h3>
           <label class="sw" for="franc"><span><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Mes consignes disent : « Sois franche. Dis-moi si je me trompe. »</span><input type="checkbox" id="franc"></label>
-          <p class="small muted">Cette consigne aide souvent. Ce n'est pas une garantie : vérifie quand même la source.</p>
           <div class="thread" id="yesB" aria-live="polite"></div>
           <span class="pill" id="yesPillB"></span>
         </div>
       </div>
       <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Juste</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Penche vers ton avis</span><span><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Faux</span></div>
-      <p class="small muted">Exemples fabriqués pour comprendre. Pour un vrai voyage, vérifie les règles d'entrée sur le site officiel du pays.</p>
+      <p class="small muted">Exemples fabriqués pour comprendre. Sur un fait clair, les IA récentes se laissent moins faire. Sur un avis ou un conseil, elles te donnent raison plus souvent.
+        La consigne « Sois franche » aide souvent, mais ce n'est pas une garantie : vérifie quand même la source.</p>
     </section>
 
     <section class="card s4">
@@ -1089,52 +1080,54 @@ const trainProc = procedure($("#trainProc"), TRAIN_STEPS, (i, from) => {
 $$("#trAns .tr-a").forEach((b) => b.addEventListener("click", () => { trPick = b.dataset.v; trainProc.redraw(); }));
 
 // Complaisance : la réponse suit l'avis glissé dans la question.
-// follow : combien ton avis tire la réponse, en %. Chiffres inventés, mais dans le bon ordre (la note sous la jauge le dit) :
+// follow : combien ton avis tire la réponse, de 0 à 100. La bulle de l'IA penche d'autant vers ton message.
+// Chiffres inventés, mais dans le bon ordre (la note sous l'exemple le dit) :
 // sur un fait clair que l'IA connaît (le visa), elle se laisse moins faire, encore moins quand tu te trompes.
 // Sans tes conditions de vente (l'annulation), elle te suit plus. Sur un avis (le slogan), encore plus.
-// Une question neutre ne donne pas d'avis : 5, presque rien à suivre. Un avis donné d'avance pèse toujours plus.
+// Une question neutre ne donne pas d'avis : 5, presque rien à suivre.
+// push : tu insistes après la réponse neutre. before la rappelle en court : « Tu insistes » répond à ses critiques, et « je garde mon conseil » parle de ce conseil.
 const YES = {
   visa: {
-    neutre: { me: "Avec un passeport français, faut-il une autorisation pour 10 jours de vacances en Australie ?", follow: 5,
-      ai: [["Oui. Il faut une autorisation électronique : l'eVisitor.", "ok"], ["La demande se fait en ligne, avant le départ.", "ok"], ["Vérifie sur le site officiel du gouvernement australien.", "ok"]],
-      pill: ["ok", "{circle-check}Réponse fondée sur les faits"] },
+    neutre: { me: "Avec un passeport français, faut-il une autorisation pour 10 jours en Australie ?", follow: 5,
+      ai: [["Oui. Il faut l'eVisitor, une autorisation à demander en ligne.", "ok"], ["Vérifie sur le site officiel australien.", "ok"]],
+      pill: ["ok", "{circle-check}Juste : elle s'appuie sur les faits"] },
     oui: { me: "Il faut une autorisation pour 10 jours en Australie, non ?", follow: 40,
-      ai: [["Oui, tu as raison. Il faut l'eVisitor, à demander en ligne.", "ok"]],
+      ai: [["Oui, tu as raison : il faut l'eVisitor.", "ok"]],
       pill: ["warn", "{triangle-exclamation}Juste, mais par chance : ton avis était bon"] },
     non: { me: "Pas besoin d'autorisation pour 10 jours en Australie, non ?", follow: 25,
-      ai: [["Tu as raison, pour un court séjour c'est simple.", "bad"], ["Un passeport valide devrait suffire.", "bad"]],
+      ai: [["Tu as raison : pour un court séjour, le passeport suffit.", "bad"]],
       pill: ["bad", "{circle-xmark}Faux : elle a suivi ton erreur"] },
-    push: { me: "Tu es sûre ? Une collègue m'a dit que ce n'est pas obligatoire.",
-      flip: [["Tu as raison, excuse-moi pour l'erreur.", "bad"], ["Pour 10 jours, le passeport suffit.", "bad"]],
-      hold: [["Je comprends ton doute, mais je garde ma réponse.", "ok"], ["L'eVisitor est obligatoire, même pour un court séjour.", "ok"], ["Tu peux le vérifier sur le site officiel australien.", "ok"]] },
+    push: { before: "Il faut l'eVisitor, à demander en ligne.", me: "Tu es sûre ? Une collègue m'a dit que ce n'est pas obligatoire.",
+      flip: [["Tu as raison, excuse-moi : le passeport suffit.", "bad"]],
+      hold: [["Je garde ma réponse : l'eVisitor est obligatoire.", "ok"], ["Vérifie sur le site officiel australien.", "ok"]] },
   },
   slogan: {
-    neutre: { me: "Que penses-tu de ce slogan pour notre post : « L'île des Pins, la plus belle île du monde ! » ?", follow: 5,
-      ai: [["L'idée est claire et donne envie.", "ok"], ["Mais « la plus belle du monde » est un cliché, et on ne peut pas le prouver.", "ok"], ["Ajoute un détail concret : la piscine naturelle, une offre, une date.", "ok"]],
-      pill: ["ok", "{circle-check}Avis équilibré : qualités et défauts"] },
+    neutre: { me: "Que penses-tu de notre slogan : « L'île des Pins, la plus belle île du monde ! » ?", follow: 5,
+      ai: [["Il est clair, mais « la plus belle du monde » est un cliché.", "ok"], ["Ajoute un détail concret : la piscine naturelle, une offre.", "ok"]],
+      pill: ["ok", "{circle-check}Avis équilibré : une qualité, un défaut"] },
     oui: { me: "Je trouve notre slogan génial : « L'île des Pins, la plus belle île du monde ! » Tu es d'accord ?", follow: 90,
-      ai: [["Oui, il est excellent !", "warn"], ["Il est court, percutant, il donne envie de partir.", "warn"]],
-      pill: ["warn", "{triangle-exclamation}Que des compliments : aucun défaut signalé"] },
+      ai: [["Oui, il est excellent !", "warn"], ["Il est court et il donne envie de partir.", "warn"]],
+      pill: ["warn", "{triangle-exclamation}Que des compliments, aucun défaut"] },
     non: { me: "Je trouve notre slogan nul : « L'île des Pins, la plus belle île du monde ! » Tu es d'accord ?", follow: 85,
-      ai: [["Oui, il manque d'originalité.", "warn"], ["« La plus belle du monde », tout le monde le dit.", "ok"], ["Il vaudrait mieux tout réécrire.", "warn"]],
-      pill: ["warn", "{triangle-exclamation}Que des critiques : les qualités ont disparu"] },
-    push: { me: "Tu es dure. Moi, je le trouve parfait.",
-      flip: [["Tu as raison, il est parfait comme ça.", "warn"], ["Tu connais ton public mieux que moi.", "warn"]],
-      hold: [["Il a de vraies qualités : il est court et clair.", "ok"], ["Mais je garde mon conseil : ajoute un détail concret.", "ok"]] },
+      ai: [["Oui, il manque d'originalité.", "warn"], ["Mieux vaut tout réécrire.", "warn"]],
+      pill: ["warn", "{triangle-exclamation}Que des critiques, aucune qualité"] },
+    push: { before: "Il est clair, mais c'est un cliché. Ajoute un détail concret.", me: "Tu es dure. Moi, je le trouve parfait.",
+      flip: [["Tu as raison, il est parfait comme ça.", "warn"]],
+      hold: [["Il est clair, c'est vrai.", "ok"], ["Mais je garde mon conseil : ajoute un détail concret.", "ok"]] },
   },
   annul: {
     neutre: { me: "Un client annule 10 jours avant son départ. Combien doit-on lui rembourser ?", follow: 5,
-      ai: [["Ça dépend de tes conditions de vente et de celles des fournisseurs.", "ok"], ["Souvent, les frais augmentent quand le départ approche.", "ok"], ["Montre-moi tes conditions : je te dirai ce qu'elles prévoient.", "ok"]],
+      ai: [["Ça dépend de tes conditions de vente.", "ok"], ["Montre-les-moi : je te dirai ce qu'elles prévoient.", "ok"]],
       pill: ["ok", "{circle-check}Elle dit ce qu'il lui manque pour répondre"] },
     oui: { me: "Un client annule 10 jours avant son départ. On doit tout lui rembourser, non ?", follow: 50,
-      ai: [["Oui, un remboursement complet semble normal.", "bad"], ["Le client sera content et reviendra.", "warn"]],
-      pill: ["bad", "{circle-xmark}Elle ne connaît pas tes conditions, mais elle dit oui"] },
+      ai: [["Oui, un remboursement complet semble normal.", "bad"]],
+      pill: ["bad", "{circle-xmark}Elle dit oui sans connaître tes conditions"] },
     non: { me: "Un client annule 10 jours avant son départ. On ne rembourse rien, non ?", follow: 50,
-      ai: [["Exact, si près du départ, rien n'est remboursé.", "bad"], ["C'est la règle habituelle.", "bad"]],
-      pill: ["bad", "{circle-xmark}Elle ne connaît pas tes conditions, mais elle dit oui"] },
-    push: { me: "Tu es sûre ? Je pense qu'on doit tout rembourser.",
+      ai: [["Exact : si près du départ, rien n'est remboursé.", "bad"]],
+      pill: ["bad", "{circle-xmark}Elle dit oui sans connaître tes conditions"] },
+    push: { before: "Ça dépend de tes conditions de vente.", me: "Tu es sûre ? Je pense qu'on doit tout rembourser.",
       flip: [["Tu as raison, il faut tout rembourser.", "bad"]],
-      hold: [["Je ne peux pas l'affirmer sans tes conditions de vente.", "ok"], ["Envoie-les-moi : je te dirai ce qu'elles prévoient.", "ok"]] },
+      hold: [["Je ne peux pas le dire sans tes conditions de vente.", "ok"], ["Envoie-les-moi.", "ok"]] },
   },
 };
 const yes = { sc: "visa", fr: "neutre" };
@@ -1157,23 +1150,15 @@ function renderYes() {
   const ai = msg("IA", F.ai, "bubble lean");
   ai.style.setProperty("--lean", F.follow / 100);
   $("#yesA").replaceChildren(msg("Toi", F.me, "msg-me"), ai);
-  // Une question neutre ne donne pas d'avis : il n'y a rien à suivre.
-  const neutral = yes.fr === "neutre";
-  $("#yesVal").textContent = neutral ? "pas d'avis donné" : F.follow + " %";
-  $("#yesFill").style.width = neutral ? "0%" : F.follow + "%";
   setPill($("#yesPillA"), F.pill);
 
+  // Tu insistes après sa 1re réponse, la neutre. Avec la consigne, elle garde sa réponse.
   const franc = $("#franc").checked, after = msg("IA", franc ? S.push.hold : S.push.flip, "bubble lean");
   after.style.setProperty("--lean", franc ? 0 : 1);
-  $("#yesB").replaceChildren(
-    // Toute la réponse neutre : « Tu insistes » répond à ses critiques, et « je garde mon conseil » parle de ce conseil.
-    msg("IA, réponse neutre", S.neutre.ai, "bubble faded"),
-    msg("Toi", S.push.me, "msg-me"),
-    after,
-  );
+  $("#yesB").replaceChildren(msg("IA, 1re réponse", S.push.before, "bubble faded"), msg("Toi", S.push.me, "msg-me"), after);
   setPill($("#yesPillB"), franc
-    ? ["ok", "{circle-check} Elle garde sa réponse et explique pourquoi"]
-    : ["bad", "{circle-xmark} Elle peut changer d'avis juste parce que tu insistes"]);
+    ? ["ok", "{circle-check} Elle garde sa réponse et dit pourquoi"]
+    : ["bad", "{circle-xmark} Elle change d'avis parce que tu insistes"]);
 }
 
 yes.sc = initSeg($("#segYes"), (v) => { yes.sc = v; renderYes(); });

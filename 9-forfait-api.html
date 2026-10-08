@@ -334,11 +334,9 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
 @keyframes rise { from { transform: translateY(var(--rise, 18px)); } }
 @keyframes grow { from { transform: scale(0); } 70% { transform: scale(1.25); } }
-@keyframes glow { from { box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 55%, transparent); } }
 @keyframes win { from { transform: scale(.4) rotate(-40deg); } 65% { transform: scale(1.2) rotate(-4deg); } }
 .qbtns button.right { animation: pop .4s ease; }
 .qbtns button.wrong { animation: shake .4s ease; }
-.unlocking { animation: glow 1.2s ease-out; }
 .badge.won { animation: win .7s cubic-bezier(.3, 1.3, .5, 1); }
 .stars .svg-inline--fa { animation: grow .45s ease backwards; }
 .stars .svg-inline--fa:nth-child(2) { animation-delay: .12s; }
@@ -408,6 +406,10 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .legend i { display: inline-block; width: 22px; height: 0; vertical-align: middle; margin-right: 6px; border-top: 4px solid var(--accent); }
 .legend i.p { border-top: 3px dashed var(--plan); }
 .legend i.e { border-top: 2px dashed var(--warn); }
+.legend i.d { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--accent); vertical-align: -2px; }
+/* Les réglages du graphique, juste au-dessus : les mêmes que dans « Mon usage », ils bougent ensemble. */
+.chart-ctl { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px 32px; align-items: end; }
+@media (max-width: 760px) { .chart-ctl { grid-template-columns: minmax(0, 1fr); } }
 
 .versus { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 @media (max-width: 640px) { .versus { grid-template-columns: minmax(0, 1fr); } }
@@ -552,13 +554,29 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></span><h2>Où est le point de bascule ?</h2></div>
-      <p class="muted">Le coût par mois selon le nombre de messages par jour.</p>
+      <p class="muted">Le coût par mois selon le nombre de messages par jour. Le point, c'est ton usage : bouge le curseur, et regarde où il passe.</p>
+      <div class="chart-ctl">
+        <div class="ctl">
+          <div class="ctl-row"><label for="perDayC">Messages par jour</label><span class="ctl-val" id="vPerDayC"></span></div>
+          <input type="range" id="perDayC" min="1" max="200" value="40">
+        </div>
+        <div class="ctl">
+          <span>Type de message</span>
+          <div class="seg" id="segSizeC" role="group" aria-label="Type de message">
+            <button type="button" data-v="short" aria-pressed="false">Court</button>
+            <button type="button" data-v="mid" aria-pressed="true">Moyen</button>
+            <button type="button" data-v="long" aria-pressed="false">Gros travail</button>
+          </div>
+        </div>
+      </div>
       <div class="chart-box" id="chart" role="img" aria-label="Courbe du coût de l'API comparé au prix du forfait"></div>
       <div class="legend">
         <span><i></i>API : le prix monte avec l'usage</span>
         <span><i class="p"></i>Forfait : le prix reste le même</span>
         <span><i class="e"></i>Point de bascule</span>
+        <span><i class="d"></i>Ton usage</span>
       </div>
+      <div class="verdict" id="chartMsg" aria-live="polite"></div>
     </section>
 
     <section class="card s4">
@@ -574,7 +592,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-ban"></i></span><h2>Bloqué ou pas ?</h2></div>
-      <p>Une grosse journée de travail. Envoie des messages, l'un après l'autre. Avec le forfait, le quota se vide. Avec l'API, la facture monte.</p>
+      <p>Une grosse journée de travail : tu envoies des messages moyens, l'un après l'autre. Avec le forfait, le quota se vide. Avec l'API, la facture monte.</p>
       <div class="day">
         <div class="ctl">
           <div class="ctl-row"><label for="burst">Messages envoyés d'affilée</label><span class="ctl-val" id="vBurst"></span></div>
@@ -595,7 +613,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
           <div class="status" id="bSt" aria-live="polite"></div>
         </div>
       </div>
-      <p class="small muted">Exemple : un forfait avec environ 40 messages moyens par période de 5 heures. Un gros message use plus de quota. Le vrai quota change selon l'IA et le modèle. Le prix d'un message API vient de tes réglages, plus haut.</p>
+      <p class="small muted">Exemple : un forfait avec environ 40 messages moyens par période de 5 heures. Un gros travail use bien plus de quota : la pause arrive plus tôt. Le vrai quota change selon l'IA et le modèle. Le prix d'un message API vient des prix juste au-dessus.</p>
     </section>
 
     <section class="card s4">
@@ -1241,6 +1259,8 @@ function costPerMsg() {
   return (s.inTok * inP * inFactor + s.outTok * outP) / 1e6;
 }
 const money = (v) => (v < 10 ? fmt(v, 2) : fmt(v)) + " $";
+// Le prix d'un seul message : quelques centimes, avec 3 ou 4 chiffres après la virgule.
+const unitPrice = (v) => (v < 0.01 ? fmt(v, 4) : fmt(v, 3)) + " $";
 const compact = (n) => n >= 1e9 ? fmt(n / 1e9, 1) + " Md" : n >= 1e6 ? fmt(n / 1e6, 1) + " M" : n >= 1e3 ? fmt(n / 1e3) + " k" : fmt(n);
 
 function render() {
@@ -1253,6 +1273,10 @@ function render() {
   // Le bouton d'un modèle reste allumé seulement si les prix sont les siens : on peut les changer à la main, plus bas.
   const inP = +$("#inP").value, outP = +$("#outP").value;
   $$("#segModel button").forEach((b) => b.setAttribute("aria-pressed", String(PRICES[b.dataset.v][0] === inP && PRICES[b.dataset.v][1] === outP)));
+  // Le graphique a ses propres réglages, les mêmes que dans « Mon usage » : ils bougent ensemble.
+  for (const r of [$("#perDay"), $("#perDayC")]) { r.value = perDay; paintRange(r); }
+  $("#vPerDayC").textContent = fmt(perDay);
+  $$("#segSize button, #segSizeC button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === st.size)));
 
   $("#vPerDay").textContent = fmt(perDay);
   $("#vDays").textContent = fmt(days);
@@ -1267,7 +1291,7 @@ function render() {
   rich($("#cmpPlanTxt"), planLow ? "{circle-check} moins cher" : apiLow ? "" : "à peu près pareil");
   $("#sMsgs").textContent = fmt(msgs);
   $("#sToks").textContent = compact(msgs * (s.inTok + s.outTok));
-  $("#sPerMsg").textContent = cpm < 0.01 ? fmt(cpm, 4) + " $" : fmt(cpm, 3) + " $";
+  $("#sPerMsg").textContent = unitPrice(cpm);
 
   const even = cpm > 0 ? plan / (days * cpm) : Infinity;
   const v = $("#verdict");
@@ -1277,26 +1301,41 @@ function render() {
   else rich(v, "{handshake} Les deux coûtent à peu près pareil. Le forfait évite les surprises, l'API évite les pauses.");
 
   drawChart({ perDay, days, plan, cpm, even });
-  renderDay(cpm, plan);
+  rich($("#chartMsg"), chartSay({ perDay, plan, api, even }));
+  renderDay(plan);
   renderConv();
 }
 
-// Bloqué ou pas : des messages d'affilée. Le forfait a un quota pour 5 heures (en messages moyens : un gros message en use plus).
-// L'API ne s'arrête pas, sauf au plafond du mois que tu fixes. Exemple : 40 messages moyens, et 2 $ restants avant ce plafond.
-const QUOTA = 40, QUOTA_USE = { short: 0.3, mid: 1, long: 5 }, CAP = 2;
+// Ce que montre le graphique, en une phrase : ton usage, ses deux prix, et de quel côté de la bascule tu es.
+function chartSay({ perDay, plan, api, even }) {
+  const you = `{location-dot} Le point, c'est toi : ${fmt(perDay)} message${perDay > 1 ? "s" : ""} par jour. Avec l'API : ${money(api)} par mois. Avec le forfait : ${money(plan)}.`;
+  if (even === Infinity) return you + " Avec ces prix, l'API ne coûte rien.";
+  if (even < 1) return you + " Le forfait coûte moins cher dès 1 message par jour.";
+  if (even > 200) return you + " La bascule est après 200 messages par jour : l'API coûte moins cher sur tout le graphique.";
+  const at = ` La bascule est à ${fmt(Math.ceil(even))} messages par jour.`;
+  if (api > plan * 0.9 && api < plan * 1.1) return you + at + " Tu es tout près : les deux coûtent à peu près pareil.";
+  return you + at + (perDay < even ? " Tu en envoies moins : l'API coûte moins cher pour toi." : " Tu en envoies plus : le forfait coûte moins cher pour toi.");
+}
+
+// Bloqué ou pas : une grosse journée de messages moyens, envoyés d'affilée. Le type de message de « Mon usage » ne compte pas ici.
+// Le forfait a un quota de 40 messages moyens pour 5 heures. L'API ne s'arrête pas, sauf au plafond du mois que tu fixes :
+// ici, il reste 2 $ avant ce plafond. Le prix d'un message moyen vient des prix juste au-dessus, sans la mémoire cache.
+const QUOTA = 40, CAP = 2;
 const dayWas = { blocked: false, capped: false };
-function renderDay(cpm, plan) {
-  const n = +$("#burst").value, use = QUOTA_USE[st.size], cap = $("#cap").checked;
+function renderDay(plan) {
+  const n = +$("#burst").value, cap = $("#cap").checked;
+  const inP = Math.max(0, +$("#inP").value || 0), outP = Math.max(0, +$("#outP").value || 0);
+  const cpm = (SIZES.mid.inTok * inP + SIZES.mid.outTok * outP) / 1e6;
   $("#vBurst").textContent = fmt(n);
   // Forfait : le quota se vide, message après message.
-  const fit = Math.floor(QUOTA / use), left = Math.max(0, fit - n), blocked = n > fit;
+  const left = Math.max(0, QUOTA - n), blocked = n > QUOTA;
   const q = $("#qFill");
-  q.style.width = (left / fit) * 100 + "%";
-  q.className = "fill " + (blocked ? "bad" : left < fit / 4 ? "warn" : "ok");
+  q.style.width = (left / QUOTA) * 100 + "%";
+  q.className = "fill " + (blocked ? "bad" : left < QUOTA / 4 ? "warn" : "ok");
   $("#qTxt").textContent = blocked ? "Vide" : `${fmt(left)} message${left > 1 ? "s" : ""} restant${left > 1 ? "s" : ""}`;
   const qs = $("#qSt");
   qs.className = "status " + (blocked ? "bad" : "ok");
-  rich(qs, blocked ? `{hourglass-half} Pause au message ${fmt(fit + 1)}. Tu attends quelques heures que la limite revienne. Ou quelques jours, si c'est la limite de la semaine. Le prix ne bouge pas : ${money(plan)} par mois.`
+  rich(qs, blocked ? `{hourglass-half} Pause au message ${fmt(QUOTA + 1)}. Tu attends quelques heures que la limite revienne. Ou quelques jours, si c'est la limite de la semaine. Le prix ne bouge pas : ${money(plan)} par mois.`
     : `{circle-check} Ça marche. Le prix ne bouge pas : ${money(plan)} par mois.`);
   // API : la facture monte. Avec un plafond, elle s'arrête au plafond, et l'API aussi, jusqu'au mois suivant.
   const stopAt = cpm > 0 ? Math.floor(CAP / cpm) : Infinity, capped = cap && n > stopAt;
@@ -1311,7 +1350,7 @@ function renderDay(cpm, plan) {
   bs.className = "status " + (capped ? "warn" : "ok");
   rich(bs, capped ? `{ban} Plafond atteint au message ${fmt(stopAt + 1)} : l'API s'arrête jusqu'au mois prochain. Ou tu montes ton plafond. C'est toi qui l'as choisi.`
     : !n ? "{circle-check} Pas encore de message, pas de facture."
-    : `{circle-check} Pas de pause. Mais la facture monte : ${money(bill)} aujourd'hui.` + (cap ? "" : " Sans plafond à toi, elle peut monter très haut."));
+    : `{circle-check} Pas de pause. Mais la facture monte : ${money(bill)} aujourd'hui, à ${unitPrice(cpm)} le message.` + (cap ? "" : " Sans plafond à toi, elle peut monter très haut."));
   // Le message qui annonce un blocage tremble, au moment où il arrive.
   if (blocked && !dayWas.blocked) replay(qs, "hit");
   if (capped && !dayWas.capped) replay(bs, "hit");
@@ -1413,6 +1452,8 @@ function segmentTouches([x1, y1, x2, y2], [l, t, r, b]) {
 }
 
 ["perDay", "days", "plan", "inP", "outP", "cache", "burst", "cap"].forEach((id) => $("#" + id).addEventListener("input", render));
+// Le curseur du graphique règle les messages par jour de « Mon usage ».
+$("#perDayC").addEventListener("input", () => { $("#perDay").value = $("#perDayC").value; render(); });
 // La courbe se dessine quand elle arrive à l'écran, puis après chaque pari.
 let drawEnd;
 function drawIntro() {
@@ -1423,7 +1464,8 @@ function drawIntro() {
   drawEnd = setTimeout(() => $("#chart").classList.remove("draw"), 2000);
 }
 onSeen($("#chart"), drawIntro);
-st.size = initSeg($("#segSize"), (v) => { st.size = v; render(); });
+// Le type de message se choisit dans « Mon usage » ou au-dessus du graphique : render() allume le même bouton dans les deux.
+$$("#segSize button, #segSizeC button").forEach((b) => b.addEventListener("click", () => { st.size = b.dataset.v; render(); }));
 initSeg($("#segModel"), (v) => { $("#inP").value = PRICES[v][0]; $("#outP").value = PRICES[v][1]; render(); });
 initRanges();
 render();

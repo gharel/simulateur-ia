@@ -47,11 +47,14 @@ npm test
   - en CSS : vise `.fa-coins` ou `.svg-inline--fa`, jamais `.fa-solid`, qui disparaît une fois l'icône affichée.
 - **Trame des fiches.** Chaque fiche a la même trame : la carte du titre, ses cartes (avec au moins une question « Devine d'abord » et un mini-jeu), « Mes réflexes » (6 ou 7 cases à cocher), « À retenir », puis un défi final de 5 questions. Le CSS et le JS de « Mes réflexes » sont dans les blocs communs : écris seulement la carte (`#check`, `#chkTxt`, `#chkFill`).
   - Les fiches gardent une longueur proche : un test refuse que la plus longue fasse 1,75 fois la plus courte, sur bureau comme sur téléphone. Si une fiche grandit trop, range une partie de son contenu dans une fiche plus courte, là où elle a du sens.
+  - « À retenir » a 4 points au plus, courts : sur bureau, ils tiennent sur une seule rangée.
+  - Un jeu décrit la situation, sans souffler la réponse : « Tu veux faire le planning de l'équipe », pas « Nouveau sujet : le planning ».
+  - Un réglage est posé près de ce qu'il change : un graphique a ses propres réglages (synchronisés avec ceux du haut de page), et une carte ne dépend pas en cachette d'un réglage d'une autre carte.
 - **FALC.** Des phrases courtes, le tutoiement, et chaque mot difficile expliqué.
 - **Contraste.** Chaque texte doit atteindre 4,5:1 contre son fond (3:1 au-dessus de 24 px, ou de 18,66 px en gras), en thème clair comme en thème sombre. N'utilise pas `opacity` pour estomper un texte : choisis une couleur (`--muted`) ou un contour. Le test `tests/contraste.spec.js` mesure chaque texte, avant et après avoir joué.
 - **Animations.** Une animation montre ce qui change quand on agit : un score qui monte, une étape d'un schéma, un classement qui s'inverse. Elle dure de 0,3 à 0,6 s. Les cartes ne bougent pas : pas d'animation à l'arrivée d'une carte, ni au défilement.
   - Elle bouge avec `transform` : jamais d'`opacity` ni de couleur animée sur un texte (le test de contraste lit la page à tout moment), et jamais un contenu caché en attendant qu'elle se joue.
-  - Le bloc commun donne les `@keyframes` (`pop`, `bump`, `shake`, `rise`, `grow`, `glow`) et les outils JS : `replay(el)` relance une animation, `countTo(el, n)` fait monter un nombre, `onSeen(el, fn)` attend que l'élément arrive à l'écran.
+  - Le bloc commun donne les `@keyframes` (`pop`, `bump`, `shake`, `rise`, `grow`) et les outils JS : `replay(el)` relance une animation, `countTo(el, n)` fait monter un nombre, `onSeen(el, fn)` attend que l'élément arrive à l'écran.
   - Si le système demande moins d'animations (`prefers-reduced-motion`), tout s'arrête : la règle CSS commune s'en charge, et une animation lancée en JS vérifie `STILL()`. Un test le vérifie.
 - **Schémas pas à pas.** Une procédure ou un « pourquoi » en étapes devient un schéma interactif, pas une rangée de cartes figées. Le bloc commun donne `procedure(el, steps, show)` :
   - dans le HTML, `<div class="proc" id="…">` contient le schéma de la fiche. Le script ajoute le rail des étapes au début, puis le texte de l'étape, puis les boutons à la fin. Pour les placer ailleurs, mets `<div class="proc-txt">` et `<div class="proc-nav">` dans la page ;

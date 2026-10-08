@@ -143,6 +143,41 @@ test("2-memoire.html : le context rot, plus le texte est long, plus l'IA rate de
   await expect(page.locator("#focusBars .hb-n")).toHaveText(["90", "81", "62"]);
 });
 
+test("2-memoire.html : la mémoire se compresse chaque fois qu'elle est pleine, et les documents la remplissent plus vite", async ({ page }) => {
+  await open(page, "2-memoire.html");
+  // 300 messages moyens : la mémoire de 200 000 tokens a été pleine une fois.
+  await expect(page.locator("#sCmp")).toHaveText("1");
+  // 400 messages et 4 documents de 10 000 tokens : 362 000 tokens. La mémoire se remplit, se compresse, et recommence.
+  await page.locator("#nMsg").fill("400");
+  await page.locator("#nDoc").fill("4");
+  await expect(page.locator("#lRaw")).toHaveText(/362\s000\stokens/);
+  await expect(page.locator("#sCmp")).toHaveText("2");
+  await expect(page.locator("#sCmpL")).toHaveText("compressions");
+  // Les documents collés au début sont dans le résumé : leurs cases sont vides.
+  await expect(page.locator("#status")).toContainText("tes 4 documents");
+  await expect(page.locator("#dots .dot.doc.old")).toHaveCount(4);
+  // Avec une mémoire de 1 million de tokens, tout tient.
+  await page.locator('#segWin button[data-v="1000000"]').click();
+  await expect(page.locator("#sCmp")).toHaveText("0");
+  await expect(page.locator("#dots .dot.old")).toHaveCount(0);
+});
+
+test("2-memoire.html : ta journée, la suite d'une tâche continue la conversation, une autre tâche en ouvre une nouvelle", async ({ page }) => {
+  await open(page, "2-memoire.html");
+  const card = page.locator("#dayCard"), cont = card.locator(".btn").first(), fresh = card.locator(".btn").last();
+  // 10 h : le client change les dates (la suite du devis). 14 h : le planning (une autre tâche).
+  // 16 h : un congé à placer (la suite du planning, qui est la conversation ouverte).
+  for (const [pick, open] of [[cont, "Le devis"], [fresh, "Le devis"], [cont, "Le planning"]]) {
+    // La tâche ne dit pas si c'est un nouveau sujet : c'est au joueur de le voir.
+    await expect(card).not.toContainText(/sujet/i);
+    await expect(card.locator(".day-open")).toContainText(open);
+    await pick.click();
+  }
+  await expect(page.locator("#dayScore")).toHaveText("3 / 3");
+  await expect(page.locator("#dayLog li.ok")).toHaveCount(3);
+  await expect(page.locator("#dayConvN")).toHaveText("2");
+});
+
 test("5-complaisance.html : choisir chaque version neutre donne 4 sur 4", async ({ page }) => {
   await open(page, "5-complaisance.html");
   for (let r = 0; r < 4; r++) {
@@ -307,6 +342,23 @@ test("9-forfait-api.html : plus c'est long, plus ça coûte : le graphique montr
   await expect(page.locator("#sMult")).toHaveText("×1,0");
 });
 
+test("9-forfait-api.html : le graphique a ses propres réglages, les mêmes que « Mon usage »", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await open(page, "9-forfait-api.html");
+  // 12 petites questions par jour, réglées sur le graphique : « Mon usage » suit.
+  await page.locator("#perDayC").fill("12");
+  await page.locator('#segSizeC button[data-v="short"]').click();
+  await expect(page.locator("#perDay")).toHaveValue("12");
+  await expect(page.locator('#segSize button[data-v="short"]')).toHaveAttribute("aria-pressed", "true");
+  // La bascule est à 114 messages par jour : la phrase sous le graphique dit de quel côté tu es.
+  await expect(page.locator("#chartMsg")).toContainText("La bascule est à 114 messages par jour");
+  await expect(page.locator("#chartMsg")).toContainText("l'API coûte moins cher");
+  // Et dans l'autre sens : « Mon usage » règle le graphique.
+  await page.locator("#perDay").fill("150");
+  await expect(page.locator("#perDayC")).toHaveValue("150");
+  await expect(page.locator("#chartMsg")).toContainText("le forfait coûte moins cher");
+});
+
 // Les schémas pas à pas : un rail d'étapes, le texte de l'étape, et le schéma qui suit.
 test.describe("schémas pas à pas", () => {
   test("6-message-piege.html : l'ordre caché va du pirate à l'IA, puis revient au pirate", async ({ page }) => {
@@ -380,6 +432,8 @@ test.describe("schémas pas à pas", () => {
 
   test("9-forfait-api.html : le forfait se bloque, l'API s'arrête seulement au plafond", async ({ page }) => {
     await open(page, "9-forfait-api.html");
+    // La journée est faite de messages moyens : le quota reste de 40 messages, même avec « Gros travail » choisi plus haut.
+    await page.locator('#segSize button[data-v="long"]').click();
     await page.locator("#burst").fill("80");
     await expect(page.locator("#qSt")).toHaveClass(/bad/);
     await expect(page.locator("#qSt")).toContainText("Pause au message 41");
