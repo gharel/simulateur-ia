@@ -16,7 +16,8 @@ const MOVED = {
 const SKAZY = "https://formation.skazy.nc/";
 
 // Emoji et pictogrammes Unicode interdits : les icônes passent par Font Awesome.
-const PICTO = /(\p{Extended_Pictographic}|\p{Regional_Indicator}|[←-⇿⌀-⏿■-◿☀-➿⬀-⯿️])/u;
+// Le © et le ® d'une mention légale sont permis : ce sont des signes typographiques. Leur version emoji (avec U+FE0F) reste refusée.
+const PICTO = /((?![©®])\p{Extended_Pictographic}|\p{Regional_Indicator}|[←-⇿⌀-⏿■-◿☀-➿⬀-⯿️])/u;
 
 const read = (f) => fs.readFileSync(path.join(ROOT, f), "utf8").replace(/\r\n/g, "\n");
 const url = (f) => pathToFileURL(path.join(ROOT, f)).href;

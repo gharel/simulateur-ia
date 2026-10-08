@@ -41,7 +41,7 @@ npm test
   - `FICHES` dans `tests/site.js`.
 
   Si une adresse change, laisse une page de redirection et ajoute-la à `MOVED` dans `tests/site.js`. Pour renvoyer vers une autre fiche, écris son nom (« voir « Le Sac à Tokens » »), pas son numéro.
-- **Pas d'emoji.** Les icônes viennent de Font Awesome 7 Free, style Solid :
+- **Pas d'emoji.** Le © de la mention légale est permis : c'est un signe typographique. Les icônes viennent de Font Awesome 7 Free, style Solid :
   - dans le HTML : `<i class="fa-solid fa-coins" aria-hidden="true"></i>` ;
   - dans un texte JS : `{coins}`, affiché avec `rich(el, texte)` ou `h(tag, classe, texte)` ;
   - en CSS : vise `.fa-coins` ou `.svg-inline--fa`, jamais `.fa-solid`, qui disparaît une fois l'icône affichée.
