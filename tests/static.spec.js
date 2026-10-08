@@ -34,10 +34,16 @@ test("logo et mention Skazy Formation identiques sur toutes les pages", () => {
   const ref = read(PAGES[0]);
   expect(logo(ref)).toContain(`href="${SKAZY}"`);
   expect(foot(ref)).toContain(`href="${SKAZY}"`);
+  expect(foot(ref)).toContain("© ");
+  expect(foot(ref)).toContain("Usage réservé aux stagiaires de Skazy Formation");
   for (const f of PAGES.slice(1)) {
     expect(logo(read(f)), f).toBe(logo(ref));
     expect(foot(read(f)), f).toBe(foot(ref));
   }
+});
+
+test("aucune page n'est référencée par les moteurs de recherche", () => {
+  for (const f of [...PAGES, ...Object.keys(MOVED)]) expect(read(f), f).toContain('<meta name="robots" content="noindex">');
 });
 
 test("chaque page a son favicon, et les fichiers existent", () => {
