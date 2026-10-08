@@ -13,7 +13,7 @@ Consignes pour les agents (Claude Code, Codex…) qui travaillent sur ce dépôt
 - `index.html` : l'accueil, la progression, le permis à imprimer.
 - `1-tokens.html` à `9-forfait-api.html` : les fiches, dans l'ordre du parcours.
 - `2-modele-effort.html`, `3-hallucinations.html`, `4-boite-outils.html`, `5-forfait-api.html` : les adresses du parcours en 6 fiches. `8-forfait-api.html` : celle du parcours en 8 fiches. Ce sont de petites pages qui renvoient vers la nouvelle fiche, en gardant `?atelier=1` et `?demo=1`. Ne les supprime pas : des liens circulent.
-- `favicon.svg` : l'icône de l'onglet, « IA » en blanc avec une barre au vert Skazy. `favicon-32.png` et `apple-touch-icon.png` (180 px) en sont des copies, pour Safari et l'écran d'accueil des téléphones. Les liens sont relatifs, pour marcher sous `/simulateur-ia/` sur GitHub Pages.
+- `favicon.svg` : l'icône de l'onglet, des curseurs (`sliders` de Font Awesome) en blanc sur un dégradé cyan-bleu. Chaque outil Skazy Formation a sa couleur (jeu-formation orange-rose, exercices-ia vert, prompts rose-violet) : garde-la pour qu'on les distingue dans les onglets. `favicon-32.png` et `apple-touch-icon.png` (180 px) en sont des copies, pour Safari et l'écran d'accueil des téléphones. Les liens sont relatifs, pour marcher sous `/simulateur-ia/` sur GitHub Pages.
 - `tests/` : les tests Playwright. `playwright.config.js` les lance sur bureau (1280 px) et sur téléphone (Pixel 7).
 - `README.md` : le contenu des fiches et le mode d'emploi des icônes.
 
