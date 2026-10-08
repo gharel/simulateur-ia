@@ -228,8 +228,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
-/* Mise en page : bandeau « À retenir », réflexes sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
+/* Mise en page : bandeau « À retenir », réflexes à cocher sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
 .retenir.s4 ul { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 24px 40px; }
+.check { display: grid; gap: 10px; }
+.check label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 16px; background: var(--surface-2); border-radius: 12px; cursor: pointer; font-weight: 700; line-height: 1.45; }
+.check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); }
+.check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
 .check.cols { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
 @media (min-width: 901px) { .stick { position: sticky; top: 16px; align-self: start; } }
 /* Ce qui va ensemble reste proche. Le texte d'intro colle à son titre. Une note ou une légende colle à ce qu'elle explique.
@@ -382,9 +386,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .lab-col { display: grid; gap: 28px; align-content: start; }
 .lab-part { display: grid; gap: 14px; }
 .lab h3 .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
-.who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
-.msg-me { display: grid; gap: 6px; background: var(--accent); color: var(--on-accent); border-radius: 18px 18px 4px 18px; padding: 14px 18px; font-weight: 700; line-height: 1.45; }
-.msg-me .who { color: var(--on-accent); }
 .btns { display: flex; flex-wrap: wrap; gap: 10px; }
 .btn.go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 .lab-col > .pill { justify-self: start; }
@@ -394,28 +395,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .status.bad { box-shadow: inset 4px 0 0 var(--bad); }
 .status > div { margin-top: 10px; }
 
-/* La boucle de l'agent : 4 postes en cercle, un point qui passe de l'un à l'autre */
-.loop { position: relative; width: min(100%, 320px); aspect-ratio: 1; justify-self: center; }
-.loop::before { content: ""; position: absolute; inset: 17%; border-radius: 50%; border: 3px dashed var(--line); }
-.lp-arm { position: absolute; inset: 17%; transform: rotate(calc(var(--turn, 0) * 90deg)); transition: transform .6s cubic-bezier(.5, 0, .3, 1); }
-.lp-arm::before {
-  content: ""; position: absolute; left: 50%; top: 0; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%;
-  background: var(--accent); box-shadow: 0 0 0 4px var(--surface);
-}
-.lp {
-  position: absolute; z-index: 1; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 4px;
-  min-width: 92px; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); border: 2px solid var(--line);
-  font-weight: 700; font-size: .9rem; line-height: 1.2; transition: background .3s, color .3s, border-color .3s;
-}
-.lp .svg-inline--fa { font-size: 1.3rem; color: var(--accent-text); }
-.lp[data-k="look"] { left: 50%; top: 17%; }
-.lp[data-k="think"] { left: 83%; top: 50%; }
-.lp[data-k="act"] { left: 50%; top: 83%; }
-.lp[data-k="check"] { left: 17%; top: 50%; }
-.lp.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-.lp.on .svg-inline--fa { color: inherit; }
-.lp-mid { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; font-family: var(--font-display); font-size: 1.15rem; line-height: 1.15; padding: 0 31%; }
-@media (max-width: 640px) { .lp-mid { font-size: 1rem; } }
 .log { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
 .log li { padding: 12px 16px 12px 20px; border-radius: 10px; background: var(--surface-2); font-weight: 700; font-size: .95rem; line-height: 1.5; box-shadow: inset 4px 0 0 var(--accent); }
 .log li.ok { box-shadow: inset 4px 0 0 var(--ok); }
@@ -543,11 +522,9 @@ code, pre { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
 
 /* Animations de la fiche : le poste actif de la boucle saute, chaque étape ou test arrive dans le journal, chaque fichier lu s'allume.
    Dans le plan, une partie qui change saute, et son fil se branche. */
-@keyframes lp-bump { 40% { transform: translate(-50%, -50%) scale(1.15); } }
 @keyframes wire { from { transform: scaleX(0); } }
 .pl-slot.changed { animation: pop .4s ease; }
 .pl-slot.wired::before { animation: wire .4s ease; }
-.lp.on { animation: lp-bump .45s ease; }
 .log li { animation: rise .4s ease backwards; }
 .tree li.read .ord { animation: bump .4s ease; }
 .opts button[aria-pressed="true"] { animation: pop .3s ease; }
@@ -583,39 +560,9 @@ code, pre { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
     </section>
 
     <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-robot"></i></span><h2>C'est quoi, un agent ?</h2></div>
-      <p>Dans un chat, l'IA répond une fois. Un <strong>agent</strong>, lui, travaille en boucle : il regarde, il décide, il agit, il vérifie. Et il recommence, jusqu'à ce que le but soit atteint.</p>
-      <div id="loopGuess"></div>
-      <div class="lab" id="loopLab">
-        <div class="lab-col">
-          <div class="msg-me"><span class="who">Ta demande</span>« Prépare le devis de Mme Gope. Sa demande est dans la boîte mail de l'agence. »</div>
-          <div class="loop" id="loop" aria-hidden="true">
-            <span class="lp-arm" id="loopArm"></span>
-            <span class="lp" data-k="look"><i class="fa-solid fa-eye"></i>Regarde</span>
-            <span class="lp" data-k="think"><i class="fa-solid fa-lightbulb"></i>Décide</span>
-            <span class="lp" data-k="act"><i class="fa-solid fa-hand"></i>Agit</span>
-            <span class="lp" data-k="check"><i class="fa-solid fa-magnifying-glass"></i>Vérifie</span>
-            <span class="lp-mid" id="loopMid"></span>
-          </div>
-          <div class="btns">
-            <button type="button" class="btn go" id="loopNext"></button>
-            <button type="button" class="btn" id="loopReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Recommencer</button>
-          </div>
-        </div>
-        <div class="lab-col">
-          <div class="lab-part">
-            <h3><i class="fa-solid fa-list-check" aria-hidden="true"></i> Ce que fait l'agent</h3>
-            <ol class="log" id="loopLog" aria-live="polite" data-empty="Clique sur « Lancer l'agent » pour voir ses étapes."></ol>
-          </div>
-          <span class="pill" id="loopPill"></span>
-        </div>
-      </div>
-      <p class="small muted">Exemple fabriqué pour comprendre. Quand l'IA répond-elle, quand agit-elle ? Voir « La Boîte à Outils de l'IA ».</p>
-    </section>
-
-    <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-screwdriver-wrench"></i></span><h2>Créer ton agent en 5 étapes</h2></div>
-      <p>Construis ton agent des devis, étape par étape. À chaque étape, fais tes choix : le plan de ton agent se remplit.</p>
+      <p>Un <strong>agent</strong> travaille en boucle : il regarde, il décide, il agit, il vérifie (voir « La Boîte à Outils de l'IA »).
+        Construis ton agent des devis, étape par étape. À chaque étape, fais tes choix : le plan de ton agent se remplit.</p>
       <div class="proc" id="buildProc">
         <div class="build">
           <div class="proc-txt"></div>
@@ -733,6 +680,22 @@ code, pre { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
       </div>
       <p class="small muted">Anthropic fabrique Claude, OpenAI fabrique ChatGPT. Noms vérifiés en octobre 2026 : ils changent souvent.
         Chez ChatGPT, les GPT personnalisés s'arrêtent le 11 décembre 2026. OpenAI les transforme en plugins. Chez Claude, le dossier des Skills s'appelle « .claude/skills ». Les noms de l'agent, des Skills et des Connecteurs sont dans « La Boîte à Outils de l'IA ».</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-user-gear"></i></span><h2>Mes réflexes de créateur d'agent</h2></div>
+      <div class="meter">
+        <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 6</span></div>
+        <div class="track"><div class="fill" id="chkFill"></div></div>
+      </div>
+      <div class="check cols" id="check">
+        <label><input type="checkbox" id="c1"><span>Je commence par une tâche qui revient souvent, avec des étapes.</span></label>
+        <label><input type="checkbox" id="c2"><span>J'écris ses consignes dans AGENTS.md, court et clair : moins de 200 lignes.</span></label>
+        <label><input type="checkbox" id="c3"><span>Une méthode longue, pour une seule tâche, va dans une Skill.</span></label>
+        <label><input type="checkbox" id="c4"><span>Je lui donne le moins d'outils possible.</span></label>
+        <label><input type="checkbox" id="c5"><span>Il prépare, et je valide avant tout envoi.</span></label>
+        <label><input type="checkbox" id="c6"><span>Je le teste sur de vrais cas. S'il se trompe, je corrige ses consignes.</span></label>
+      </div>
     </section>
 
     <section class="card s4 retenir">
@@ -1067,6 +1030,18 @@ function initDefi(items, options) {
   paintBadge();
 }
 
+// Mes réflexes : chaque case cochée remplit la jauge (même bloc dans chaque fiche).
+(function initCheck() {
+  const boxes = $$("#check input");
+  const show = () => {
+    const n = boxes.filter((c) => c.checked).length;
+    rich($("#chkTxt"), n + " sur " + boxes.length + (n === boxes.length ? " {trophy}" : ""));
+    $("#chkFill").style.width = (n / boxes.length) * 100 + "%";
+  };
+  boxes.forEach((c) => c.addEventListener("change", show));
+  if (boxes.length) show();
+})();
+
 // Coupures de ligne. Une espace insécable garde ? ! : ; » % $ € = · / avec ce qui précède, « avec ce qui suit,
 // et un nombre avec les mots qui l'entourent (« la fiche 1 », « 3 étoiles »). Un mot à trait d'union (e-mail, dis-moi) ne se coupe plus en deux,
 // sauf une adresse ou un nom avec des chiffres (gpt-5-thinking-mini), qui restent tels quels.
@@ -1188,54 +1163,6 @@ $$(".tbl-wrap table").forEach((t) => {
   if (q) $$('a[href*=".html"]').forEach((a) => { a.href = a.getAttribute("href").replace(/\.html(#|$)/, ".html?" + q + "$1"); });
 })();
 
-
-// C'est quoi, un agent ? La boucle : il regarde, décide, agit, vérifie… et refait un tour tant que le but n'est pas atteint.
-const STATIONS = { look: "{eye} Regarde", think: "{lightbulb} Décide", act: "{hand} Agit", check: "{magnifying-glass} Vérifie" };
-const LOOP = [
-  ["look", "Il lit la demande de Mme Gope : 2 adultes, 3 nuits à l'île des Pins, en mars."],
-  ["think", "Il lui faut les prix de mars. Il décide d'ouvrir la grille des tarifs."],
-  ["act", "Il ouvre la grille des tarifs, il calcule le prix, et il remplit le modèle de devis."],
-  ["check", "Il relit son devis. La date d'arrivée manque : le but n'est pas atteint. Il refait un tour.", "warn"],
-  ["look", "Il relit la demande : la date n'y est pas."],
-  ["think", "Il ne doit pas l'inventer. Il décide de poser la question."],
-  ["act", "Il écrit la question en haut du devis : « À quelle date voulez-vous partir ? »"],
-  ["check", "Le devis est prêt, avec sa question. Il le range en brouillon, et il te prévient.", "ok"],
-];
-let loopAt = 0;
-function renderLoop() {
-  const done = loopAt === LOOP.length, k = loopAt ? LOOP[loopAt - 1][0] : null;
-  // Le poste s'allume quand le point y arrive.
-  const light = () => $$(".lp").forEach((p) => p.classList.toggle("on", p.dataset.k === k));
-  clearTimeout(renderLoop.t);
-  if (loopAt < 2 || STILL()) light();
-  else { $$(".lp").forEach((p) => p.classList.remove("on")); renderLoop.t = setTimeout(light, 450); }
-  // Le point avance d'un quart de tour à chaque étape, toujours dans le même sens.
-  $("#loopArm").style.setProperty("--turn", Math.max(0, loopAt - 1));
-  $("#loopMid").textContent = done ? "But atteint" : loopAt ? `Tour ${loopAt > 4 ? 2 : 1}` : "Prêt";
-  $("#loopNext").hidden = done;
-  rich($("#loopNext"), loopAt ? "Étape suivante {arrow-right}" : "{play} Lancer l'agent");
-  $("#loopPill").className = "pill" + (done ? " ok" : "");
-  rich($("#loopPill"), done ? "{flag-checkered} But atteint en 2 tours. Toi, tu relis et tu envoies."
-    : loopAt ? `{rotate} Étape ${loopAt} sur ${LOOP.length}` : "{robot} L'agent attend");
-}
-$("#loopNext").addEventListener("click", () => {
-  if (loopAt === LOOP.length) return;
-  const [k, text, cls] = LOOP[loopAt++];
-  const li = h("li", cls || "");
-  li.append(h("span", "tag", STATIONS[k]), h("span", "", text));
-  $("#loopLog").append(li);
-  renderLoop();
-});
-$("#loopReset").addEventListener("click", () => {
-  // Le point revient en haut sans faire les tours à l'envers.
-  const arm = $("#loopArm");
-  arm.style.transition = "none";
-  loopAt = 0;
-  $("#loopLog").replaceChildren();
-  renderLoop();
-  void arm.offsetWidth;
-  arm.style.transition = "";
-});
 
 // Créer ton agent en 5 étapes : un formulaire pas à pas. Chaque choix remplit le plan de l'agent.
 // À la fin, 3 tests disent ce qui marche, et quelle étape corriger. [valeur, texte, bon choix ?, explication]
@@ -1678,12 +1605,6 @@ function runBench() {
 $("#benchRun").addEventListener("click", runBench);
 
 // Devine d'abord
-guess($("#loopGuess"), {
-  q: "Tu demandes à un agent : « Prépare le devis de Mme Gope. » Que fait-il ?",
-  options: [["once", "Il écrit le devis d'un coup"], ["loop", "Il avance étape par étape, et vérifie son travail"], ["send", "Il envoie un devis au client"]], a: "loop",
-  why: "Il regarde, décide, agit et vérifie. S'il manque quelque chose, il refait un tour. Lance l'agent pour voir ses étapes.",
-  lock: $("#loopLab"),
-});
 guess($("#fileGuess"), {
   q: "Quand ton agent lit-il son fichier de consignes ?",
   options: [["once", "Une seule fois, le premier jour"], ["ask", "Seulement si tu le lui demandes"], ["each", "Au début de chaque conversation"]], a: "each",
@@ -1693,9 +1614,6 @@ guess($("#fileGuess"), {
 
 // Défi final
 initDefi([
-  { q: "Un agent, c'est…", a: "loop",
-    options: [["loop", "Une IA qui fait une tâche en plusieurs étapes, jusqu'au but"], ["chat", "Une IA qui répond une fois à ta question"], ["robot", "Un robot qui se déplace"]],
-    why: "Il regarde, décide, agit et vérifie. Puis il recommence, jusqu'au but." },
   { q: "Tu utilises 2 agents, de 2 marques différentes. Où écris-tu tes consignes ?", a: "one",
     options: [["two", "Dans 2 fichiers, à recopier"], ["one", "Dans un seul fichier AGENTS.md"], ["msg", "Dans chaque message"]],
     why: "AGENTS.md est le format commun : la plupart des agents savent le lire. Un seul fichier suffit pour presque tous les agents." },
@@ -1707,12 +1625,11 @@ initDefi([
     why: "Une date choisie au hasard, c'est une invention. Écris-le dans ses consignes : « S'il manque une info, pose la question. »" },
   { q: "Ton fichier de consignes fait 40 pages. C'est une bonne idée ?", a: "no",
     options: [["yes", "Oui : plus il en sait, mieux c'est"], ["no", "Non : il le relit à chaque conversation, et l'important se perd"]],
-    why: "Il le relit à chaque conversation, et le fichier prend de la place dans sa mémoire. Les consignes en trop peuvent aussi le distraire (voir « La Boîte à Outils de l'IA »). Moins de 200 lignes. Une méthode longue va dans une Skill." },
+    why: "Il le relit à chaque conversation, et le fichier prend de la place dans sa mémoire. Les consignes en trop peuvent aussi le distraire (voir « Le Bon Cerveau »). Moins de 200 lignes. Une méthode longue va dans une Skill." },
   { q: "Ton agent s'est trompé dans un devis. Que fais-tu ?", a: "fix",
     options: [["fix", "Je corrige ses consignes, puis je le teste encore"], ["hand", "Je corrige le devis à la main, à chaque fois"], ["stop", "J'arrête : l'IA ne marche pas"]],
     why: "Ajoute la consigne qui manquait. La prochaine fois, il fera juste." },
 ]);
-renderLoop();
 renderRead();
 renderBenchFile();
 </script>

@@ -228,8 +228,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
-/* Mise en page : bandeau « À retenir », réflexes sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
+/* Mise en page : bandeau « À retenir », réflexes à cocher sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
 .retenir.s4 ul { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 24px 40px; }
+.check { display: grid; gap: 10px; }
+.check label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 16px; background: var(--surface-2); border-radius: 12px; cursor: pointer; font-weight: 700; line-height: 1.45; }
+.check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); }
+.check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
 .check.cols { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
 @media (min-width: 901px) { .stick { position: sticky; top: 16px; align-self: start; } }
 /* Ce qui va ensemble reste proche. Le texte d'intro colle à son titre. Une note ou une légende colle à ce qu'elle explique.
@@ -549,14 +553,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .ask-card .btns .btn { flex: 1 1 140px; }
 .ask-card > .btn { justify-self: start; }
 
-/* Tableau, réflexes */
-.check { display: grid; gap: 10px; }
-.check label {
-  display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start;
-  padding: 14px 16px; background: var(--surface-2); border-radius: 12px; cursor: pointer; font-weight: 700; line-height: 1.45;
-}
-.check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); }
-.check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
 
 /* Icônes dont la couleur porte un sens : alerte et arrêt en rouge, risque moyen-élevé en orange */
 .fa-bell, .fa-hand, .fa-ban { color: var(--bad); }
@@ -1072,6 +1068,18 @@ function initDefi(items, options) {
   paintBadge();
 }
 
+// Mes réflexes : chaque case cochée remplit la jauge (même bloc dans chaque fiche).
+(function initCheck() {
+  const boxes = $$("#check input");
+  const show = () => {
+    const n = boxes.filter((c) => c.checked).length;
+    rich($("#chkTxt"), n + " sur " + boxes.length + (n === boxes.length ? " {trophy}" : ""));
+    $("#chkFill").style.width = (n / boxes.length) * 100 + "%";
+  };
+  boxes.forEach((c) => c.addEventListener("change", show));
+  if (boxes.length) show();
+})();
+
 // Coupures de ligne. Une espace insécable garde ? ! : ; » % $ € = · / avec ce qui précède, « avec ce qui suit,
 // et un nombre avec les mots qui l'entourent (« la fiche 1 », « 3 étoiles »). Un mot à trait d'union (e-mail, dis-moi) ne se coupe plus en deux,
 // sauf une adresse ou un nom avec des chiffres (gpt-5-thinking-mini), qui restent tels quels.
@@ -1472,17 +1480,12 @@ const QUIZ = [
     why: "Les 3 ingrédients sont réunis : tes données, des e-mails d'inconnus, et l'envoi sans toi." },
   { q: "L'IA lit ta boîte mail et te prépare des brouillons. C'est toi qui les envoies.", a: "warn",
     why: "Tes données et des e-mails extérieurs sont réunis. Tu gardes l'envoi, mais méfie-toi des liens et des images, et relis chaque brouillon." },
+  { q: "Un agent navigue sur le web avec tes comptes connectés, et achète seul ce qu'il trouve.", a: "bad",
+    why: "Des pages web inconnues, tes comptes, et le droit d'agir seul : les 3 ingrédients sont réunis. Garde la permission avant chaque achat." },
 ];
-function renderCheck() {
-  const n = $$("#check input:checked").length, total = $$("#check input").length;
-  rich($("#chkTxt"), n + " sur " + total + (n === total ? " {trophy}" : ""));
-  $("#chkFill").style.width = (n / total) * 100 + "%";
-}
-$$("#check input").forEach((c) => c.addEventListener("change", renderCheck));
 
 renderHide();
 renderSim();
 renderGard();
 initDefi(QUIZ, CHOICES);
-renderCheck();
 </script>

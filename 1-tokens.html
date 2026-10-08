@@ -228,8 +228,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
-/* Mise en page : bandeau « À retenir », réflexes sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
+/* Mise en page : bandeau « À retenir », réflexes à cocher sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
 .retenir.s4 ul { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 24px 40px; }
+.check { display: grid; gap: 10px; }
+.check label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 16px; background: var(--surface-2); border-radius: 12px; cursor: pointer; font-weight: 700; line-height: 1.45; }
+.check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); }
+.check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
 .check.cols { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
 @media (min-width: 901px) { .stick { position: sticky; top: 16px; align-self: start; } }
 /* Ce qui va ensemble reste proche. Le texte d'intro colle à son titre. Une note ou une légende colle à ce qu'elle explique.
@@ -430,6 +434,49 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 /* Les nouveaux tokens tombent un par un dans la zone : on voit le texte se découper en morceaux. */
 @keyframes drop { from { transform: translateY(-16px) scale(.5); } }
 .tok.new { animation: drop .4s cubic-bezier(.3, 1.4, .6, 1) backwards; animation-delay: var(--d, 0ms); }
+
+/* Comment l'IA écrit : ta question, la réponse de l'IA, et les mots possibles. */
+.who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.msg-me { justify-self: end; max-width: 88%; display: grid; gap: 6px; background: var(--accent); color: var(--on-accent); border-radius: 18px 18px 4px 18px; padding: 14px 18px; font-weight: 700; line-height: 1.45; }
+/* Sur un petit téléphone, « Nouvelle-Calédonie » tient dans la bulle. */
+@media (max-width: 400px) { .msg-me { max-width: 100%; } }
+.msg-me .who { color: var(--on-accent); }
+.bubble { background: var(--surface-2); border-radius: 18px 18px 18px 4px; padding: 18px 20px; display: grid; gap: 10px; }
+/* Pourquoi elle invente : la machine à deviner le mot suivant. À gauche la conversation, à droite les mots possibles. */
+.gm { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px 48px; align-items: start; }
+.gm-chat, .gm-viz, .gm-cmp { display: grid; gap: 16px; align-content: start; }
+/* Sur téléphone : la question, les mots possibles, puis la réponse. Le mot choisi arrive juste au-dessus des boutons. */
+@media (max-width: 900px) {
+  .gm { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .gm-chat { display: contents; }
+  .gm-viz { order: 1; }
+  .gm-ans { order: 2; }
+  .gm-cmp { order: 3; }
+  .gm-row { padding: 4px 10px; }
+}
+.gm-viz { gap: 14px; }
+.gm-viz h3 .svg-inline--fa, .gm-cmp .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
+.gm-ans { justify-self: start; max-width: 94%; }
+.gm-sent { font-weight: 700; line-height: 1.6; }
+.gm-slot { display: inline-block; min-width: 4em; padding: 0 8px; border-radius: 8px; border: 2px dashed var(--line); text-align: center; }
+.gm-slot.filled { border: 2px solid var(--accent); background: color-mix(in oklab, var(--accent) 16%, var(--surface-2)); }
+.gm-cmp[hidden] { display: none; }
+.gm-cmp > .pill { justify-self: start; }
+.gm-cmp .fill.ok { background: var(--ok); }
+.gm-cmp .fill.bad { background: var(--bad); }
+.gm-rows { display: grid; gap: 8px; }
+.gm-row {
+  display: grid; grid-template-columns: minmax(0, 6.5em) minmax(0, 1fr) 4.2em; gap: 12px; align-items: center;
+  padding: 8px 12px; border-radius: 12px; border: 2px solid transparent; font-weight: 700;
+}
+.gm-row.pick { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, var(--surface)); }
+.gm-track { height: 14px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.gm-row.pick .gm-track { background: var(--surface); }
+.gm-fill { display: block; height: 100%; border-radius: 99px; background: var(--accent); transform-origin: left center; transform: scaleX(var(--v, 0)); transition: transform .5s ease; }
+.gm-p { text-align: right; font-variant-numeric: tabular-nums; }
+/* Le mot choisi tombe dans la réponse. */
+@keyframes drop { from { transform: translateY(-16px) scale(.6); } }
+.gm-slot.drop { animation: drop .45s cubic-bezier(.3, 1.4, .6, 1); }
 </style>
 
 <main class="wrap">
@@ -447,7 +494,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <div class="ctl">
           <span class="eyebrow">Comprendre l'IA · Fiche 1 sur 9</span>
           <h1>Le Sac<br>à Tokens</h1>
-          <p class="lead">L'IA ne lit pas des mots. Elle lit des petits morceaux de texte : les tokens.</p>
+          <p class="lead">L'IA ne lit pas des mots. Elle lit des petits morceaux de texte : les tokens. Et elle écrit en devinant le suivant.</p>
         </div>
         <div class="word-card">
           <span class="eyebrow">Le mot à connaître</span>
@@ -517,12 +564,61 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <p class="small muted">Ordres de grandeur pour un texte en français. 200 000 tokens, c'est une taille de mémoire courante. Selon l'IA et ton abonnement, elle va de quelques dizaines de milliers à 1 million de tokens (voir « La Mémoire qui Déborde »).</p>
     </section>
 
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-pen-nib"></i></span><h2>Comment l'IA écrit : elle devine la suite</h2></div>
+      <p>L'IA écrit sa réponse token après token. À chaque fois, elle devine celui qui a le plus de chances de venir après. Ici, pour simplifier, on montre des mots entiers.
+        Choisis une question, puis suis l'IA, étape par étape.</p>
+      <div class="ctl">
+        <span>Choisis une question</span>
+        <div class="seg" id="segNext" role="group" aria-label="Choisis une question">
+          <button type="button" data-v="known" aria-pressed="true"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Une question connue</button>
+          <button type="button" data-v="rare" aria-pressed="false"><i class="fa-solid fa-store" aria-hidden="true"></i> Une question rare</button>
+        </div>
+      </div>
+      <div class="proc" id="nextProc">
+        <div class="gm">
+          <div class="gm-chat">
+            <div class="msg-me"><span class="who">Toi</span><span id="gmQ"></span></div>
+            <div class="bubble gm-ans"><span class="who">IA</span><span class="gm-sent"><span id="gmStart"></span> <span class="gm-slot" id="gmSlot"></span></span></div>
+            <div class="gm-cmp" id="gmCmp">
+              <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Le ton de la réponse</span><span>Sûr</span></div><div class="track"><div class="fill" style="width: 100%"></div></div></div>
+              <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> Ses chances d'avoir juste</span><span id="gmOdds"></span></div><div class="track"><div class="fill" id="gmOddsFill"></div></div></div>
+              <span class="pill" id="gmPill"></span>
+            </div>
+          </div>
+          <div class="gm-viz">
+            <h3><i class="fa-solid fa-dice" aria-hidden="true"></i> Les mots possibles, et leurs chances</h3>
+            <div class="gm-rows" id="gmRows"></div>
+            <p class="small muted">Chances sur 100. Les autres mots en ont encore moins.</p>
+          </div>
+        </div>
+      </div>
+      <p class="small muted">Chances inventées pour comprendre. Sur un sujet rare, elle devine quand même : c'est une hallucination (voir « Le Détecteur de Bobards »).</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span><h2>Mes réflexes anti-gaspi</h2></div>
+      <div class="meter">
+        <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 6</span></div>
+        <div class="track"><div class="fill" id="chkFill"></div></div>
+      </div>
+      <div class="check cols" id="check">
+        <label><input type="checkbox" id="c1"><span>J'écris court et clair. Pas de longue introduction.</span></label>
+        <label><input type="checkbox" id="c2"><span>Je colle seulement la partie utile d'un long texte.</span></label>
+        <label><input type="checkbox" id="c3"><span>Je garde l'ordre de grandeur en tête : 100 mots ≈ 170 tokens.</span></label>
+        <label><input type="checkbox" id="c4"><span>Un mot rare, un nom ou un nombre prend plus de tokens.</span></label>
+        <label><input type="checkbox" id="c5"><span>Je demande une réponse de la bonne longueur : « en 5 lignes », par exemple.</span></label>
+        <label><input type="checkbox" id="c6"><span>Une réponse qui sonne bien n'est pas forcément juste : l'IA devine la suite.</span></label>
+      </div>
+    </section>
+
     <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
         <li><span>L'IA lit et écrit en tokens. Un token = un petit morceau de texte : un mot court, ou un bout de mot long.</span></li>
         <li><span>Un mot court ou très courant = 1 token. Un mot long ou rare = plusieurs tokens. La ponctuation compte aussi.</span></li>
         <li><span>Tout se compte en tokens : ce que l'IA lit, ce qu'elle écrit, et ce que ça coûte.</span></li>
+        <li><span>Pour écrire, elle devine le token le plus probable, un par un. Même quand elle ne sait pas.</span></li>
       </ul>
     </section>
 
@@ -848,6 +944,18 @@ function initDefi(items, options) {
   paintBadge();
 }
 
+// Mes réflexes : chaque case cochée remplit la jauge (même bloc dans chaque fiche).
+(function initCheck() {
+  const boxes = $$("#check input");
+  const show = () => {
+    const n = boxes.filter((c) => c.checked).length;
+    rich($("#chkTxt"), n + " sur " + boxes.length + (n === boxes.length ? " {trophy}" : ""));
+    $("#chkFill").style.width = (n / boxes.length) * 100 + "%";
+  };
+  boxes.forEach((c) => c.addEventListener("change", show));
+  if (boxes.length) show();
+})();
+
 // Coupures de ligne. Une espace insécable garde ? ! : ; » % $ € = · / avec ce qui précède, « avec ce qui suit,
 // et un nombre avec les mots qui l'entourent (« la fiche 1 », « 3 étoiles »). Un mot à trait d'union (e-mail, dis-moi) ne se coupe plus en deux,
 // sauf une adresse ou un nom avec des chiffres (gpt-5-thinking-mini), qui restent tels quels.
@@ -1143,6 +1251,63 @@ function renderSac() {
 $("#sacEmpty").addEventListener("click", () => { sacGroups.length = 0; for (const k in sacCount) delete sacCount[k]; renderSac(); });
 renderSac();
 
+// Pourquoi elle invente : l'IA écrit le mot qui a le plus de chances de venir après. Même quand aucun mot n'a beaucoup de chances.
+// [mot, chances sur 100]. Chiffres inventés pour comprendre.
+const NEXT = {
+  known: { q: "Quelle est la plus grande ville de Nouvelle-Calédonie ?", start: "La plus grande ville de Nouvelle-Calédonie est",
+    words: [["Nouméa", 92], ["Dumbéa", 4], ["Païta", 2], ["Koné", 1]] },
+  rare: { q: "En quelle année a ouvert la boulangerie de ma rue, à Nouméa ?", start: "La boulangerie de ta rue a ouvert en",
+    words: [["1998", 9], ["2005", 8], ["1987", 7], ["2012", 6]] },
+};
+let nextQ = "known";
+const isKnown = () => nextQ === "known";
+const gmRows = NEXT.known.words.map(() => {
+  const r = h("div", "gm-row"), w = h("span", "gm-w"), track = h("span", "gm-track"), fill = h("span", "gm-fill"), p = h("span", "gm-p");
+  track.append(fill);
+  r.append(w, track, p);
+  $("#gmRows").append(r);
+  return { r, w, fill, p };
+});
+const NEXT_STEPS = [
+  { label: "Elle devine", title: "L'IA devine le mot qui vient le plus souvent après",
+    text: () => (isKnown() ? "Elle a lu beaucoup de textes sur Nouméa. Après « la plus grande ville de Nouvelle-Calédonie est », un mot revient presque toujours."
+      : "Sur ta boulangerie, elle n'a presque rien lu. Plusieurs années sont possibles, et aucune ne revient souvent.") },
+  { label: "Elle choisit", title: () => (isKnown() ? "Elle choisit le mot le plus probable" : "Si elle ne sait pas, elle devine quand même"),
+    text: () => (isKnown() ? "Nouméa a 92 chances sur 100. Elle l'écrit. Ici, elle sait."
+      : "1998 n'a que 9 chances sur 100. Elle l'écrit quand même : c'est le premier de la liste.") },
+  { label: "Ça a l'air sûr", title: "La réponse a l'air sûre",
+    text: () => (isKnown() ? "La réponse est juste. Elle a l'air sûre, et elle l'est."
+      : "La réponse a l'air aussi sûre que l'autre. Mais elle peut être fausse : 1998 n'avait que 9 chances sur 100. Si tu reposes la question, elle peut écrire une autre année.") },
+];
+const nextProc = procedure($("#nextProc"), NEXT_STEPS, (i, from) => {
+  const N = NEXT[nextQ], [top, odds] = N.words[0];
+  $("#gmQ").textContent = "« " + N.q + " »";
+  $("#gmStart").textContent = N.start;
+  const slot = $("#gmSlot");
+  slot.textContent = i ? top + "." : "…";
+  slot.classList.toggle("filled", i > 0);
+  // Le mot choisi tombe dans la réponse quand on arrive à l'étape 2, ou quand la question change.
+  if (i === 1 || (i && from === null)) replay(slot, "drop");
+  // Les barres poussent quand la question change, et quand on revient à la 1re étape.
+  const grow = from === null || (i === 0 && from !== 0);
+  gmRows.forEach(({ r, w, fill, p }, k) => {
+    const [word, v] = N.words[k];
+    w.textContent = word;
+    p.textContent = v + " %";
+    r.classList.toggle("pick", i > 0 && k === 0);
+    if (grow && !STILL()) { fill.style.transition = "none"; fill.style.setProperty("--v", 0); void fill.offsetWidth; fill.style.transition = ""; }
+    fill.style.setProperty("--v", v / 100);
+  });
+  $("#gmCmp").hidden = i < 2;
+  $("#gmOdds").textContent = odds + " %";
+  $("#gmOddsFill").className = "fill " + (isKnown() ? "ok" : "bad");
+  $("#gmOddsFill").style.width = odds + "%";
+  $("#gmPill").className = "pill " + (isKnown() ? "ok" : "bad");
+  rich($("#gmPill"), isKnown() ? "{circle-check} Juste" : "{triangle-exclamation} Peut-être faux : à vérifier");
+});
+// Une autre question : on repart de l'étape 1, et les barres repoussent.
+initSeg($("#segNext"), (v) => { nextQ = v; nextProc.go(0, true); });
+
 // Défi final
 initDefi([
   { q: "Pour l'IA, un token, c'est…", a: "bout",
@@ -1157,6 +1322,9 @@ initDefi([
   { q: "Un roman de 300 pages fait environ…", a: "150k",
     options: [["1500", "1 500 tokens"], ["150k", "150 000 tokens"], ["15M", "15 millions de tokens"]],
     why: "Environ 150 000 tokens. Il tient tout juste dans un sac de 200 000 tokens (voir « La Mémoire qui Déborde »)." },
+  { q: "Comment l'IA écrit-elle sa réponse ?", a: "guess",
+    options: [["copy", "Elle recopie une réponse rangée quelque part"], ["guess", "Elle devine le token le plus probable, un par un"], ["check", "Elle vérifie chaque mot dans un dictionnaire"]],
+    why: "Elle devine la suite, token après token. Sur une question connue, elle devine juste. Sur une question rare, elle devine quand même : sa réponse peut être fausse." },
 ]);
 
 renderText();

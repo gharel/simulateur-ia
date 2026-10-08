@@ -228,8 +228,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
-/* Mise en page : bandeau « À retenir », réflexes sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
+/* Mise en page : bandeau « À retenir », réflexes à cocher sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
 .retenir.s4 ul { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 24px 40px; }
+.check { display: grid; gap: 10px; }
+.check label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 16px; background: var(--surface-2); border-radius: 12px; cursor: pointer; font-weight: 700; line-height: 1.45; }
+.check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); }
+.check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
 .check.cols { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
 @media (min-width: 901px) { .stick { position: sticky; top: 16px; align-self: start; } }
 /* Ce qui va ensemble reste proche. Le texte d'intro colle à son titre. Une note ou une légende colle à ce qu'elle explique.
@@ -435,6 +439,31 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .chart-box.draw .l-even { transform-box: fill-box; transform-origin: bottom; animation: grow-line .5s ease 1s backwards; }
 .chart-box.draw .t-even { animation: rise .4s ease 1.2s backwards; }
 .chart-box.draw .dot-now { transform-box: fill-box; transform-origin: center; animation: beat .6s ease 1.1s; }
+
+/* Plus c'est long, plus ça coûte : à gauche on envoie des messages, à droite les tokens lus, envoi après envoi. */
+.mem { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 32px 48px; }
+@media (max-width: 900px) { .mem { grid-template-columns: minmax(0, 1fr); } }
+.controls { display: grid; gap: 28px; align-content: start; }
+.viz { display: grid; gap: 28px; align-content: start; }
+.viz > .small.muted { margin-top: -14px; }
+.mem .status { background: var(--surface-2); }
+.mem .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.status.squeeze { box-shadow: inset 4px 0 0 var(--accent); }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.bar-label { display: flex; justify-content: space-between; gap: 4px 12px; font-weight: 700; margin-bottom: 10px; flex-wrap: wrap; }
+.b-old { background: color-mix(in oklab, var(--accent) 50%, var(--surface)); }
+.b-new { background: var(--accent); }
+.legend i.b-old, .legend i.b-new { width: 14px; height: 14px; border: 0; border-radius: 4px; vertical-align: -2px; }
+.bars { display: flex; align-items: flex-end; gap: 2px; height: 150px; border-bottom: 2px solid var(--line); }
+/* Une barre par envoi : le total lu depuis le début. En bas, ce qui était déjà lu. En haut, ce que lit cet envoi. */
+.bars span { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; border-radius: 4px 4px 0 0; overflow: hidden; transition: height .3s ease; }
+.bars i { display: block; }
+.bars .now { flex: none; background: var(--accent); }
+.bars .old { flex: 1 1 auto; background: color-mix(in oklab, var(--accent) 50%, var(--surface)); }
+.bars-ends { display: flex; justify-content: space-between; gap: 10px; font-size: .85rem; color: var(--muted); margin-top: 8px; }
+/* Chaque nouvel envoi ajoute une barre qui pousse depuis le bas. */
+@keyframes grow-up { from { transform: scaleY(0); } }
+.bars span.new { transform-origin: bottom; animation: grow-up .45s ease backwards; animation-delay: var(--d, 0ms); }
 </style>
 
 <main class="wrap">
@@ -570,6 +599,54 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </section>
 
     <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-arrow-trend-up"></i></span><h2>Plus c'est long, plus ça coûte</h2></div>
+      <p>Tout ce que l'IA relit, ce sont des <strong>tokens d'entrée</strong>, et ils se paient.
+        À chaque envoi, elle relit les consignes, toutes tes questions, toutes ses réponses, puis ta nouvelle question (voir « La Mémoire qui Déborde »).</p>
+      <div id="convGuess"></div>
+      <div class="mem" id="convMem">
+        <div class="controls stick">
+          <div class="ctl">
+            <div class="ctl-row"><label for="nSend">Messages envoyés</label><span class="ctl-val" id="vSend">8</span></div>
+            <input type="range" id="nSend" min="1" max="40" value="8">
+            <div class="ctl-ends"><span>1 message</span><span>40 messages</span></div>
+          </div>
+          <div class="btns">
+            <button type="button" class="btn" id="btnSend"><i class="fa-solid fa-plus" aria-hidden="true"></i> Envoyer un message</button>
+            <button type="button" class="btn" id="btnReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Recommencer</button>
+          </div>
+          <div class="ctl">
+            <span>Taille d'un échange</span>
+            <div class="seg" id="segSend" role="group" aria-label="Taille d'un échange">
+              <button type="button" data-v="150" aria-pressed="false">Court</button>
+              <button type="button" data-v="800" aria-pressed="true">Moyen</button>
+              <button type="button" data-v="5000" aria-pressed="false">Avec un document</button>
+            </div>
+            <span class="small muted">Un échange = ta question + la réponse de l'IA.</span>
+          </div>
+          <div class="stats">
+            <div class="stat"><b id="sLast">0</b><span>tokens relus pour ce message</span></div>
+            <div class="stat"><b id="sCum">0</b><span>tokens lus en tout</span></div>
+            <div class="stat"><b id="sMult">×1</b><span>fois la taille de la conversation</span></div>
+            <div class="stat"><b id="sConvPrice">0 $</b><span>pour tout lire, avec l'API</span></div>
+          </div>
+        </div>
+
+        <div class="viz">
+          <div>
+            <div class="bar-label"><span>Tokens lus en tout, envoi après envoi</span><span class="muted" id="lBars"></span></div>
+            <div class="bars" id="bars" aria-hidden="true"></div>
+            <div class="bars-ends"><span>1er envoi</span><span id="lBarsEnd"></span></div>
+            <div class="legend"><span><i class="b-old"></i>Déjà lu aux envois d'avant</span><span><i class="b-new"></i>Lu à cet envoi</span></div>
+          </div>
+          <div class="status" id="convStatus" aria-live="polite"></div>
+          <p class="small muted">Chaque envoi lit un peu plus que le précédent. Le total, lui, grimpe de plus en plus vite : les spécialistes disent « quadratique ». 2 fois plus de messages, c'est jusqu'à 4 fois plus de tokens lus en tout.
+            Certains services gardent le début de la conversation en cache : la relecture coûte alors moins cher, mais elle remplit quand même la mémoire.
+            Avec un abonnement, tu ne paies pas au token. Mais une longue conversation use plus vite ta limite.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-clipboard-list"></i></span><h2>Récap</h2></div>
       <div class="tbl-wrap">
         <table>
@@ -599,6 +676,22 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         </table>
       </div>
       <p class="small muted">Attention au mot « Pro ». Chez Claude, c'est le forfait standard. Chez ChatGPT, c'est le gros forfait. Enterprise, chez Claude : un prix par personne, plus l'usage payé au token. Anthropic fabrique Claude, OpenAI fabrique ChatGPT. Noms vérifiés en octobre 2026 : ils changent souvent.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-piggy-bank"></i></span><h2>Mes réflexes anti-surprise</h2></div>
+      <div class="meter">
+        <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 6</span></div>
+        <div class="track"><div class="fill" id="chkFill"></div></div>
+      </div>
+      <div class="check cols" id="check">
+        <label><input type="checkbox" id="c1"><span>J'utilise l'IA chaque jour, dans son appli ? Je prends un forfait.</span></label>
+        <label><input type="checkbox" id="c2"><span>Mon outil appelle l'IA tout seul ? Il passe par l'API.</span></label>
+        <label><input type="checkbox" id="c3"><span>Avec l'API, je fixe un plafond de dépense par mois.</span></label>
+        <label><input type="checkbox" id="c4"><span>Je prends le plus petit modèle qui réussit la tâche (voir « Le Bon Cerveau »).</span></label>
+        <label><input type="checkbox" id="c5"><span>Nouveau sujet : nouvelle conversation. Une longue conversation coûte plus cher, et use plus vite mon quota.</span></label>
+        <label><input type="checkbox" id="c6"><span>Je vérifie les prix et les limites : ils changent souvent.</span></label>
+      </div>
     </section>
 
     <section class="card s4 retenir">
@@ -932,6 +1025,18 @@ function initDefi(items, options) {
   paintBadge();
 }
 
+// Mes réflexes : chaque case cochée remplit la jauge (même bloc dans chaque fiche).
+(function initCheck() {
+  const boxes = $$("#check input");
+  const show = () => {
+    const n = boxes.filter((c) => c.checked).length;
+    rich($("#chkTxt"), n + " sur " + boxes.length + (n === boxes.length ? " {trophy}" : ""));
+    $("#chkFill").style.width = (n / boxes.length) * 100 + "%";
+  };
+  boxes.forEach((c) => c.addEventListener("change", show));
+  if (boxes.length) show();
+})();
+
 // Coupures de ligne. Une espace insécable garde ? ! : ; » % $ € = · / avec ce qui précède, « avec ce qui suit,
 // et un nombre avec les mots qui l'entourent (« la fiche 1 », « 3 étoiles »). Un mot à trait d'union (e-mail, dis-moi) ne se coupe plus en deux,
 // sauf une adresse ou un nom avec des chiffres (gpt-5-thinking-mini), qui restent tels quels.
@@ -1054,6 +1159,73 @@ $$(".tbl-wrap table").forEach((t) => {
 })();
 
 
+// Conversation qui s'allonge : chaque envoi relit tout l'historique
+const SYS = 2000;
+const conv = { n: 8, per: 800 };
+const pct = (a, b) => (a / b) * 100 + "%";
+const qOf = (per) => Math.round(per * 0.3);
+const inputAt = (i, per) => SYS + (i - 1) * per + qOf(per);
+const cumTo = (n, per) => { let s = 0; for (let i = 1; i <= n; i++) s += inputAt(i, per); return s; };
+
+function renderConv() {
+  renderConv.bars ??= 0;
+  const { n, per } = conv;
+  const last = inputAt(n, per);
+  const cum = cumTo(n, per);
+
+  $("#vSend").textContent = fmt(n);
+  countTo($("#sLast"), last);
+  countTo($("#sCum"), cum);
+  // Tout ce qu'elle a lu, comparé à la conversation elle-même (ce qu'elle lit au dernier envoi).
+  $("#sMult").textContent = "×" + fmt(cum / last, 1);
+  // Le prix de tout ce qu'elle a lu, avec le prix de lecture de l'API (les prix sont plus bas, modifiables).
+  $("#sConvPrice").textContent = money((cum * Math.max(0, +$("#inP").value || 0)) / 1e6);
+
+  $("#bars").replaceChildren(...Array.from({ length: n }, (_, k) => {
+    const tot = cumTo(k + 1, per), s = document.createElement("span"), now = document.createElement("i"), old = document.createElement("i");
+    s.style.height = pct(tot, cum);
+    now.className = "now";
+    now.style.height = pct(inputAt(k + 1, per), tot);
+    old.className = "old";
+    s.append(now, old);
+    if (k >= renderConv.bars) { s.className = "new"; s.style.setProperty("--d", Math.min(k - renderConv.bars, 20) * 30 + "ms"); }
+    return s;
+  }));
+  renderConv.bars = n;
+  $("#lBars").textContent = `total : ${fmt(cum)}`;
+  $("#lBarsEnd").textContent = n > 1 ? `${n}e envoi` : "";
+
+  const c2 = cumTo(2 * n, per);
+  let msg = `{chart-line} Avec ${fmt(2 * n)} messages au lieu de ${fmt(n)}, l'IA lirait ${fmt(c2)} tokens en tout : ×${fmt(c2 / cum, 1)}, pas ×2.`;
+  if (n > 10) {
+    const split = Math.floor(n / 10) * cumTo(10, per) + cumTo(n % 10, per);
+    msg += ` {lightbulb} En ouvrant une nouvelle conversation tous les 10 messages : ${fmt(split)} tokens (−${fmt((1 - split / cum) * 100)} %).`;
+  }
+  // Même seuil que la carte de la mémoire, plus bas : elle compresse à 95 % de 200 000 tokens.
+  const full = last > 0.95 * 200000;
+  if (full) msg += " {triangle-exclamation} La conversation remplit presque 200 000 tokens : l'IA doit compresser (voir « La Mémoire qui Déborde »).";
+  const st = $("#convStatus");
+  st.className = "status " + (full ? "warn" : n > 10 ? "squeeze" : "ok");
+  rich(st, msg);
+}
+
+const nSend = $("#nSend");
+function setSend(v) { conv.n = Math.min(+nSend.max, Math.max(1, v)); nSend.value = conv.n; paintRange(nSend); renderConv(); }
+nSend.addEventListener("input", () => setSend(+nSend.value));
+$("#btnSend").addEventListener("click", () => setSend(conv.n + 1));
+$("#btnReset").addEventListener("click", () => setSend(1));
+conv.per = +initSeg($("#segSend"), (v) => { conv.per = +v; renderConv(); });
+// Devine d'abord
+{
+  const ratio = cumTo(16, 800) / cumTo(8, 800);
+  guess($("#convGuess"), {
+    q: "une conversation a 8 messages. Tu continues jusqu'à 16 messages, 2 fois plus. Combien de tokens l'IA lit-elle en tout ?",
+    options: [["2", "×2"], ["3-4", "Entre ×3 et ×4"], ["10", "×10"]], a: "3-4",
+    why: `×${fmt(ratio, 1)} ! Chaque nouveau message relit tous les anciens. Le total grimpe bien plus vite que le nombre de messages.`,
+    lock: $("#convMem"),
+  });
+}
+
 const SIZES = {
   short: { inTok: 2000,  outTok: 400,  hint: "≈ 2 000 tokens lus et 400 écrits. Une petite question." },
   mid:   { inTok: 10000, outTok: 1000, hint: "≈ 10 000 tokens lus et 1 000 écrits. Avec un document ou une longue conversation." },
@@ -1106,6 +1278,7 @@ function render() {
 
   drawChart({ perDay, days, plan, cpm, even });
   renderDay(cpm, plan);
+  renderConv();
 }
 
 // Bloqué ou pas : des messages d'affilée. Le forfait a un quota pour 5 heures (en messages moyens : un gros message en use plus).
@@ -1317,6 +1490,9 @@ initDefi([
   { q: "Ton outil interne doit appeler l'IA tout seul, la nuit.", a: "api",
     options: [["plan", "{credit-card} Forfait"], ["api", "{receipt} API"]],
     why: "Le forfait marche dans l'appli de l'IA. Ton propre outil passe par l'API." },
+  { q: "Avec l'API, tu colles un long document au début de la conversation. À chaque nouveau message…", a: "each",
+    options: [["once", "Tu l'as payé une seule fois"], ["each", "Tu le paies encore : l'IA le relit"], ["free", "Il ne coûte rien"]],
+    why: "L'IA relit tout à chaque message, le document aussi. Chaque lecture se paie. La mémoire cache fait baisser ce prix." },
 ]);
 if ("ResizeObserver" in window) {
   let w = 0;

@@ -99,9 +99,9 @@ test("1-tokens.html : le compte est bon se gagne en 3 manches", async ({ page })
   await expect(page.locator("#cbToks .tok")).toHaveText(["202", "6"]);
 });
 
-test("7-boite-outils.html : une info en trop qui ressemble à la bonne peut tromper l'IA", async ({ page }) => {
+test("3-modele-effort.html : une info en trop qui ressemble à la bonne peut tromper l'IA", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await open(page, "7-boite-outils.html");
+  await open(page, "3-modele-effort.html");
   const answer = page.locator("#dAnswer"), pill = page.locator("#dPill");
   await expect(answer).toContainText("35 €");
   await expect(pill).toHaveClass(/ok/);
@@ -118,6 +118,11 @@ test("7-boite-outils.html : une info en trop qui ressemble à la bonne peut trom
   // Le schéma : à la dernière étape, l'IA peut prendre l'ancien prix.
   for (let i = 0; i < 3; i++) await page.locator("#whyProc .proc-nav .go").click();
   await expect(page.locator("#whySlot")).toHaveText("30 €");
+});
+
+test("4-hallucinations.html : des documents en trop qui ressemblent à la réponse trompent l'IA", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await open(page, "4-hallucinations.html");
   // Les chercheurs : 4 documents qui ressemblent à la réponse, 27 bonnes réponses sur 100. Au hasard : 31.
   await page.locator("#distGuess .qbtns button").first().click();
   const four = page.locator("#noiseBars .hb").nth(3).locator(".hb-n");
@@ -167,26 +172,26 @@ test("4-hallucinations.html : changer la règle du classement change le gagnant"
   await expect(page.locator(".rk-n")).toHaveText(["−4", "−51"]);
 });
 
-test.describe("8-agent.html : l'agent sur mesure", () => {
-  test("la boucle fait 2 tours, puis le but est atteint", async ({ page }) => {
-    await open(page, "8-agent.html", "?demo=1");
-    const next = page.locator("#loopNext");
-    for (let step = 1; step <= 8; step++) {
-      await next.click();
-      await expect(page.locator("#loopLog li")).toHaveCount(step);
-      // Au 5e pas, l'agent refait un tour : « Regarde » se rallume.
-      if (step === 5) {
-        await expect(page.locator('.lp[data-k="look"]')).toHaveClass(/on/);
-        await expect(page.locator("#loopMid")).toHaveText("Tour 2");
-      }
+test("7-boite-outils.html : la boucle de l'agent fait 2 tours, puis le but est atteint", async ({ page }) => {
+  await open(page, "7-boite-outils.html", "?demo=1");
+  const next = page.locator("#loopNext");
+  for (let step = 1; step <= 8; step++) {
+    await next.click();
+    await expect(page.locator("#loopLog li")).toHaveCount(step);
+    // Au 5e pas, l'agent refait un tour : « Regarde » se rallume.
+    if (step === 5) {
+      await expect(page.locator('.lp[data-k="look"]')).toHaveClass(/on/);
+      await expect(page.locator("#loopMid")).toHaveText("Tour 2");
     }
-    await expect(next).toBeHidden();
-    await expect(page.locator("#loopPill")).toContainText("But atteint");
-    await page.locator("#loopReset").click();
-    await expect(page.locator("#loopLog li")).toHaveCount(0);
-    await expect(next).toBeVisible();
-  });
+  }
+  await expect(next).toBeHidden();
+  await expect(page.locator("#loopPill")).toContainText("But atteint");
+  await page.locator("#loopReset").click();
+  await expect(page.locator("#loopLog li")).toHaveCount(0);
+  await expect(next).toBeVisible();
+});
 
+test.describe("8-agent.html : l'agent sur mesure", () => {
   test("ce que l'agent lit : rangée dans une Skill, la méthode des devis n'est lue que pour un devis", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await open(page, "8-agent.html", "?demo=1");
@@ -286,14 +291,18 @@ test.describe("8-agent.html : l'agent sur mesure", () => {
   });
 });
 
-test("2-memoire.html : le graphique montre le total lu, et ×N part de 1", async ({ page }) => {
+test("9-forfait-api.html : plus c'est long, plus ça coûte : le graphique montre le total lu, et ×N part de 1", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await open(page, "2-memoire.html", "?demo=1");
+  await open(page, "9-forfait-api.html", "?demo=1");
   await page.locator("#nSend").fill("15");
   // 15 envois moyens : 117 600 tokens lus en tout. La dernière barre, c'est ce total.
   await expect(page.locator("#bars > span")).toHaveCount(15);
   await expect(page.locator("#lBars")).toHaveText(/117\s600/);
   await expect(page.locator("#sCum")).toHaveText(/117\s600/);
+  // Avec le prix de lecture de l'API (2 $ le million de tokens), puis avec celui du modèle expert (4 $).
+  await expect(page.locator("#sConvPrice")).toHaveText(/^0,24\s\$$/);
+  await page.locator('#segModel button[data-v="expert"]').click();
+  await expect(page.locator("#sConvPrice")).toHaveText(/^0,47\s\$$/);
   await page.locator("#btnReset").click();
   await expect(page.locator("#sMult")).toHaveText("×1,0");
 });
@@ -323,9 +332,9 @@ test.describe("schémas pas à pas", () => {
     await expect(page.locator("#flowNote")).toBeVisible();
   });
 
-  test("4-hallucinations.html : sur une question rare, l'IA choisit quand même un mot", async ({ page }) => {
-    await open(page, "4-hallucinations.html");
-    const next = page.locator("#whyProc .proc-nav .go");
+  test("1-tokens.html : sur une question rare, l'IA choisit quand même un mot", async ({ page }) => {
+    await open(page, "1-tokens.html");
+    const next = page.locator("#nextProc .proc-nav .go");
     await page.locator('#segNext button[data-v="rare"]').click();
     await expect(page.locator("#gmSlot")).toHaveText("…");
     await next.click();
@@ -336,7 +345,7 @@ test.describe("schémas pas à pas", () => {
     await expect(page.locator("#gmPill")).toContainText("être faux");
     // Une autre question repart de l'étape 1. Le mot choisi a alors 92 chances sur 100.
     await page.locator('#segNext button[data-v="known"]').click();
-    await expect(page.locator("#whyProc")).toHaveAttribute("data-at", "0");
+    await expect(page.locator("#nextProc")).toHaveAttribute("data-at", "0");
     await expect(page.locator("#gmSlot")).toHaveText("…");
     await expect(page.locator("#gmCmp")).toBeHidden();
     await next.click();

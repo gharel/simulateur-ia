@@ -228,8 +228,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
-/* Mise en page : bandeau « À retenir », réflexes sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
+/* Mise en page : bandeau « À retenir », réflexes à cocher sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
 .retenir.s4 ul { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 24px 40px; }
+.check { display: grid; gap: 10px; }
+.check label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 16px; background: var(--surface-2); border-radius: 12px; cursor: pointer; font-weight: 700; line-height: 1.45; }
+.check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); }
+.check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
 .check.cols { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
 @media (min-width: 901px) { .stick { position: sticky; top: 16px; align-self: start; } }
 /* Ce qui va ensemble reste proche. Le texte d'intro colle à son titre. Une note ou une légende colle à ce qu'elle explique.
@@ -404,53 +408,13 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .lever.up .fill { background: var(--bad); }
 .lever .meter-top span:last-child { font-variant-numeric: tabular-nums; }
 
-.check { display: grid; gap: 10px; }
-.check label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 16px; background: var(--surface-2); border-radius: 12px; cursor: pointer; font-weight: 700; line-height: 1.45; }
-.check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); }
 .who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
 .msg-me { justify-self: end; max-width: 88%; display: grid; gap: 6px; background: var(--accent); color: var(--on-accent); border-radius: 18px 18px 4px 18px; padding: 14px 18px; font-weight: 700; line-height: 1.45; }
 /* Sur un petit téléphone, « Nouvelle-Calédonie » tient dans la bulle. */
 @media (max-width: 400px) { .msg-me { max-width: 100%; } }
 .msg-me .who { color: var(--on-accent); }
-.check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
 .set-wrap { display: grid; gap: 22px; }
 .ring-wrap { display: flex; align-items: center; gap: 12px 24px; flex-wrap: wrap; }
-
-/* Pourquoi elle invente : la machine à deviner le mot suivant. À gauche la conversation, à droite les mots possibles. */
-.gm { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px 48px; align-items: start; }
-.gm-chat, .gm-viz, .gm-cmp { display: grid; gap: 16px; align-content: start; }
-/* Sur téléphone : la question, les mots possibles, puis la réponse. Le mot choisi arrive juste au-dessus des boutons. */
-@media (max-width: 900px) {
-  .gm { grid-template-columns: minmax(0, 1fr); gap: 20px; }
-  .gm-chat { display: contents; }
-  .gm-viz { order: 1; }
-  .gm-ans { order: 2; }
-  .gm-cmp { order: 3; }
-  .gm-row { padding: 4px 10px; }
-}
-.gm-viz { gap: 14px; }
-.gm-viz h3 .svg-inline--fa, .gm-cmp .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
-.gm-ans { justify-self: start; max-width: 94%; }
-.gm-sent { font-weight: 700; line-height: 1.6; }
-.gm-slot { display: inline-block; min-width: 4em; padding: 0 8px; border-radius: 8px; border: 2px dashed var(--line); text-align: center; }
-.gm-slot.filled { border: 2px solid var(--accent); background: color-mix(in oklab, var(--accent) 16%, var(--surface-2)); }
-.gm-cmp[hidden] { display: none; }
-.gm-cmp > .pill { justify-self: start; }
-.gm-cmp .fill.ok { background: var(--ok); }
-.gm-cmp .fill.bad { background: var(--bad); }
-.gm-rows { display: grid; gap: 8px; }
-.gm-row {
-  display: grid; grid-template-columns: minmax(0, 6.5em) minmax(0, 1fr) 4.2em; gap: 12px; align-items: center;
-  padding: 8px 12px; border-radius: 12px; border: 2px solid transparent; font-weight: 700;
-}
-.gm-row.pick { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, var(--surface)); }
-.gm-track { height: 14px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
-.gm-row.pick .gm-track { background: var(--surface); }
-.gm-fill { display: block; height: 100%; border-radius: 99px; background: var(--accent); transform-origin: left center; transform: scaleX(var(--v, 0)); transition: transform .5s ease; }
-.gm-p { text-align: right; font-variant-numeric: tabular-nums; }
-/* Le mot choisi tombe dans la réponse. */
-@keyframes drop { from { transform: translateY(-16px) scale(.6); } }
-.gm-slot.drop { animation: drop .45s cubic-bezier(.3, 1.4, .6, 1); }
 
 /* Jeu : surligne ce qu'il faut vérifier */
 .hl-game { display: grid; gap: 20px; }
@@ -516,6 +480,22 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .alarm .fa-bell { animation: ring 1s ease; transform-origin: 50% 10%; }
 .rk-n { display: inline-block; }
 .rk { position: relative; }
+/* Graphiques en barres : une ligne par cas, le score à droite. Une barre s'allonge ou rétrécit (scaleX) quand on change de cas. */
+.chart { display: grid; gap: 14px; }
+.hb-head { display: flex; justify-content: space-between; gap: 12px; font-size: .85rem; font-weight: 700; color: var(--muted); }
+.hb-head span:last-child { white-space: nowrap; }
+.hbars { display: grid; gap: 10px; }
+.hb { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) 2.4em; gap: 6px 12px; align-items: center; font-weight: 700; }
+.hb-l { font-family: var(--font-display); font-weight: 400; text-align: right; font-variant-numeric: tabular-nums; }
+.hbars.long .hb { grid-template-columns: minmax(0, 1fr) 2.4em; }
+.hbars.long .hb-l { grid-column: 1 / -1; font-family: inherit; font-weight: 700; text-align: left; }
+.hb-t { position: relative; height: 18px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.hb-f { position: absolute; inset: 0; border-radius: 99px; background: var(--accent); transform-origin: left center; transform: scaleX(var(--v, 0)); transition: transform .5s ease; }
+.hb-f.trap { background: var(--warn); }
+.hb-t .base { position: absolute; top: 0; bottom: 0; left: 56%; width: 3px; margin-left: -1px; background: var(--fg); }
+.hb-n { font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; text-align: right; font-variant-numeric: tabular-nums; }
+.legend .k-base { display: inline-block; width: 3px; height: 14px; margin-right: 8px; vertical-align: -2px; background: var(--fg); }
+.chart-msg { font-weight: 700; line-height: 1.5; }
 </style>
 
 <main class="wrap">
@@ -604,35 +584,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
     <section class="card s4">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-circle-question"></i></span><h2>Pourquoi elle invente ?</h2></div>
-      <p>L'IA écrit sa réponse mot après mot. À chaque mot, elle devine celui qui a le plus de chances de venir après. Choisis une question, puis suis l'IA, étape par étape.</p>
-      <div class="ctl">
-        <span>Choisis une question</span>
-        <div class="seg" id="segNext" role="group" aria-label="Choisis une question">
-          <button type="button" data-v="known" aria-pressed="true"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Une question connue</button>
-          <button type="button" data-v="rare" aria-pressed="false"><i class="fa-solid fa-store" aria-hidden="true"></i> Une question rare</button>
-        </div>
-      </div>
-      <div class="proc" id="whyProc">
-        <div class="gm">
-          <div class="gm-chat">
-            <div class="msg-me"><span class="who">Toi</span><span id="gmQ"></span></div>
-            <div class="bubble gm-ans"><span class="who">IA</span><span class="gm-sent"><span id="gmStart"></span> <span class="gm-slot" id="gmSlot"></span></span></div>
-            <div class="gm-cmp" id="gmCmp">
-              <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Le ton de la réponse</span><span>Sûr</span></div><div class="track"><div class="fill" style="width: 100%"></div></div></div>
-              <div class="meter"><div class="meter-top"><span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> Ses chances d'avoir juste</span><span id="gmOdds"></span></div><div class="track"><div class="fill" id="gmOddsFill"></div></div></div>
-              <span class="pill" id="gmPill"></span>
-            </div>
-          </div>
-          <div class="gm-viz">
-            <h3><i class="fa-solid fa-dice" aria-hidden="true"></i> Les mots possibles, et leurs chances</h3>
-            <div class="gm-rows" id="gmRows"></div>
-            <p class="small muted">Chances sur 100. Les autres mots en ont encore moins.</p>
-          </div>
-        </div>
-      </div>
-      <p class="small muted">Chances inventées pour comprendre. Le risque est plus grand pour les sujets rares, locaux ou très récents.</p>
-      <h3>Et pourquoi elle ne dit pas « je ne sais pas » ?</h3>
-      <p>Les IA passent des tests, comme un examen. Puis on les classe, de la meilleure note à la moins bonne.
+      <p>L'IA écrit en devinant le mot le plus probable (voir « Le Sac à Tokens »). Sur une question rare, aucun mot n'est sûr. Elle en choisit un quand même, et sa réponse a l'air aussi sûre qu'une vraie.</p>
+      <p><strong>Mais pourquoi ne dit-elle pas « je ne sais pas » ?</strong> Les IA passent des tests, comme un examen. Puis on les classe, de la meilleure note à la moins bonne.
         Souvent, la note compte seulement les bonnes réponses. « Je ne sais pas » rapporte 0 point. Une réponse au hasard est parfois juste.</p>
       <div id="rankGuess"></div>
       <div class="rank" id="rank">
@@ -649,6 +602,46 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
         <p class="verdict" id="verdict" aria-live="polite"></p>
       </div>
       <p class="small muted">Chiffres d'OpenAI (août 2025, repris en septembre 2025). Le test SimpleQA pose des questions courtes sur des faits. Les IA répondaient sans recherche web. Ce sont des modèles de 2025. Ici, on ramène tout à 100 questions : 22 % justes = 22 bonnes réponses = 22 points.</p>
+    </section>
+
+    <section class="card s4" id="noise">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-copy"></i></span><h2>Le bon document, pas toute la pile</h2></div>
+      <p>Donne-lui le bon document : le risque d'invention baisse beaucoup. Mais un document en trop peut la tromper, surtout s'il ressemble à la réponse.
+        On l'appelle un <strong>distracteur</strong> (voir « Le Bon Cerveau »).</p>
+      <p>Des chercheurs ont posé 10 000 questions de culture générale à une petite IA. Elle avait toujours le bon document pour répondre. Puis ils ont ajouté d'autres documents : des documents qui ressemblent à la réponse sans la donner, ou des documents pris au hasard.</p>
+      <div id="distGuess"></div>
+      <div class="lab">
+        <div class="lab-col">
+          <div class="lab-part">
+            <div class="chart" id="noiseZone">
+              <div class="ctl">
+                <span>Les documents en trop</span>
+                <div class="seg" id="segNoise" role="group" aria-label="Les documents en trop">
+                  <button type="button" data-v="sim" aria-pressed="true"><i class="fa-solid fa-clone" aria-hidden="true"></i> Ils ressemblent à la réponse</button>
+                  <button type="button" data-v="rand" aria-pressed="false"><i class="fa-solid fa-shuffle" aria-hidden="true"></i> Pris au hasard</button>
+                </div>
+              </div>
+              <div class="hb-head"><span>En trop</span><span>Bonnes réponses sur 100</span></div>
+              <div class="hbars" id="noiseBars"></div>
+              <div class="legend"><span><i class="k-base"></i>Le trait : sans document en trop (56)</span></div>
+              <p class="chart-msg" id="noiseMsg" aria-live="polite"></p>
+            </div>
+            <p class="small muted">Chiffres de chercheurs (2024) : une petite IA de 2023, 10 000 questions de culture générale, avec des pages de Wikipédia. Le bon document est loin de la question. Chiffres arrondis. Source : Cuconasu et al., « The Power of Noise », SIGIR 2024, tableaux 1 et 2 (modèle Llama 2).</p>
+          </div>
+        </div>
+        <div class="lab-col">
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-robot" aria-hidden="true"></i> Et les IA récentes ?</h3>
+            <p>Une étude de 2026 a testé des IA récentes, qui réfléchissent avant de répondre. Voici une des meilleures.</p>
+            <div class="chart">
+              <div class="hb-head"><span>Ce qu'on ajoute</span><span>Score sur 100</span></div>
+              <div class="hbars long" id="recentBars"></div>
+              <p class="chart-msg">Les IA récentes résistent mieux. Mais pas totalement. <strong>Le pire piège reste ce qui ressemble à la réponse.</strong></p>
+            </div>
+            <p class="small muted">Chiffres d'une étude de janvier 2026, pas encore relue par d'autres chercheurs : des IA qui réfléchissent, sur 11 tests. Les 7 IA testées montrent la même chose. Source : Lee et al., « Lost in the Noise », 2026, tableau 1 (modèle Gemini 2.5 Pro).</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="card s4">
@@ -677,7 +670,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <div class="check cols" id="check">
         <label><input type="checkbox" id="c1"><span>Je demande d'où vient l'information. Puis j'ouvre la source pour vérifier.</span></label>
         <label><input type="checkbox" id="c2"><span>Je vérifie les chiffres, les dates et les noms.</span></label>
-        <label><input type="checkbox" id="c3"><span>Je donne mes propres documents.</span></label>
+        <label><input type="checkbox" id="c3"><span>Je donne le bon document, pas toute la pile.</span></label>
         <label><input type="checkbox" id="c4"><span>J'écris : « Si tu ne sais pas, dis-le. »</span></label>
         <label><input type="checkbox" id="c5"><span>Je pose la question autrement, pour comparer.</span></label>
         <label><input type="checkbox" id="c6"><span>Santé, argent, droit : je demande aussi à un humain.</span></label>
@@ -688,7 +681,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
         <li><span>L'IA peut inventer des faits, des chiffres ou des noms. Ça s'appelle une hallucination.</span></li>
-        <li><span>Donne-lui le bon document, ou la recherche web. Le risque baisse beaucoup, mais pas jusqu'à zéro.</span></li>
+        <li><span>Donne-lui le bon document, ou la recherche web. Le risque baisse beaucoup, mais pas jusqu'à zéro. Pas toute la pile : un document qui ressemble à la réponse peut la tromper.</span></li>
         <li><span>Elle devine plutôt que de dire « je ne sais pas » : les tests la récompensent quand elle devine.</span></li>
       </ul>
     </section>
@@ -1015,6 +1008,18 @@ function initDefi(items, options) {
   paintBadge();
 }
 
+// Mes réflexes : chaque case cochée remplit la jauge (même bloc dans chaque fiche).
+(function initCheck() {
+  const boxes = $$("#check input");
+  const show = () => {
+    const n = boxes.filter((c) => c.checked).length;
+    rich($("#chkTxt"), n + " sur " + boxes.length + (n === boxes.length ? " {trophy}" : ""));
+    $("#chkFill").style.width = (n / boxes.length) * 100 + "%";
+  };
+  boxes.forEach((c) => c.addEventListener("change", show));
+  if (boxes.length) show();
+})();
+
 // Coupures de ligne. Une espace insécable garde ? ! : ; » % $ € = · / avec ce qui précède, « avec ce qui suit,
 // et un nombre avec les mots qui l'entourent (« la fiche 1 », « 3 étoiles »). Un mot à trait d'union (e-mail, dis-moi) ne se coupe plus en deux,
 // sauf une adresse ou un nom avec des chiffres (gpt-5-thinking-mini), qui restent tels quels.
@@ -1268,17 +1273,10 @@ function lever(label, val, ratio, cls, note) {
   return d;
 }
 
-function renderCheck() {
-  const n = $$("#check input:checked").length, total = $$("#check input").length;
-  rich($("#chkTxt"), n + " sur " + total + (n === total ? " {trophy}" : ""));
-  $("#chkFill").style.width = (n / total) * 100 + "%";
-}
 
 ids.forEach((id) => $("#" + id).addEventListener("input", render));
-$$("#check input").forEach((c) => c.addEventListener("change", renderCheck));
 initRanges();
 render();
-renderCheck();
 
 // Devine d'abord
 guess($("#riskGuess"), {
@@ -1288,63 +1286,6 @@ guess($("#riskGuess"), {
   why: () => `${riskOf({ level: 3, doc: false, web: false, idk: false, src: false, crea: 20 })} % ! Sur un sujet rare ou local, l'IA a peu d'infos. Elle complète quand même. Active un document ou la recherche web pour voir le risque baisser.`,
   lock: [$("#riskSet"), $("#ringWrap"), $("#answer"), $("#levers")],
 });
-
-// Pourquoi elle invente : l'IA écrit le mot qui a le plus de chances de venir après. Même quand aucun mot n'a beaucoup de chances.
-// [mot, chances sur 100]. Chiffres inventés pour comprendre.
-const NEXT = {
-  known: { q: "Quelle est la plus grande ville de Nouvelle-Calédonie ?", start: "La plus grande ville de Nouvelle-Calédonie est",
-    words: [["Nouméa", 92], ["Dumbéa", 4], ["Païta", 2], ["Koné", 1]] },
-  rare: { q: "En quelle année a ouvert la boulangerie de ma rue, à Nouméa ?", start: "La boulangerie de ta rue a ouvert en",
-    words: [["1998", 9], ["2005", 8], ["1987", 7], ["2012", 6]] },
-};
-let nextQ = "known";
-const isKnown = () => nextQ === "known";
-const gmRows = NEXT.known.words.map(() => {
-  const r = h("div", "gm-row"), w = h("span", "gm-w"), track = h("span", "gm-track"), fill = h("span", "gm-fill"), p = h("span", "gm-p");
-  track.append(fill);
-  r.append(w, track, p);
-  $("#gmRows").append(r);
-  return { r, w, fill, p };
-});
-const WHY_STEPS = [
-  { label: "Elle devine", title: "L'IA devine le mot qui vient le plus souvent après",
-    text: () => (isKnown() ? "Elle a lu beaucoup de textes sur Nouméa. Après « la plus grande ville de Nouvelle-Calédonie est », un mot revient presque toujours."
-      : "Sur ta boulangerie, elle n'a presque rien lu. Plusieurs années sont possibles, et aucune ne revient souvent.") },
-  { label: "Elle choisit", title: () => (isKnown() ? "Elle choisit le mot le plus probable" : "Si elle ne sait pas, elle devine quand même"),
-    text: () => (isKnown() ? "Nouméa a 92 chances sur 100. Elle l'écrit. Ici, elle sait."
-      : "1998 n'a que 9 chances sur 100. Elle l'écrit quand même : c'est le premier de la liste.") },
-  { label: "Ça a l'air sûr", title: "La réponse a l'air sûre",
-    text: () => (isKnown() ? "La réponse est juste. Elle a l'air sûre, et elle l'est."
-      : "La réponse a l'air aussi sûre que l'autre. Mais elle peut être fausse : 1998 n'avait que 9 chances sur 100. Si tu reposes la question, elle peut écrire une autre année.") },
-];
-const whyProc = procedure($("#whyProc"), WHY_STEPS, (i, from) => {
-  const N = NEXT[nextQ], [top, odds] = N.words[0];
-  $("#gmQ").textContent = "« " + N.q + " »";
-  $("#gmStart").textContent = N.start;
-  const slot = $("#gmSlot");
-  slot.textContent = i ? top + "." : "…";
-  slot.classList.toggle("filled", i > 0);
-  // Le mot choisi tombe dans la réponse quand on arrive à l'étape 2, ou quand la question change.
-  if (i === 1 || (i && from === null)) replay(slot, "drop");
-  // Les barres poussent quand la question change, et quand on revient à la 1re étape.
-  const grow = from === null || (i === 0 && from !== 0);
-  gmRows.forEach(({ r, w, fill, p }, k) => {
-    const [word, v] = N.words[k];
-    w.textContent = word;
-    p.textContent = v + " %";
-    r.classList.toggle("pick", i > 0 && k === 0);
-    if (grow && !STILL()) { fill.style.transition = "none"; fill.style.setProperty("--v", 0); void fill.offsetWidth; fill.style.transition = ""; }
-    fill.style.setProperty("--v", v / 100);
-  });
-  $("#gmCmp").hidden = i < 2;
-  $("#gmOdds").textContent = odds + " %";
-  $("#gmOddsFill").className = "fill " + (isKnown() ? "ok" : "bad");
-  $("#gmOddsFill").style.width = odds + "%";
-  $("#gmPill").className = "pill " + (isKnown() ? "ok" : "bad");
-  rich($("#gmPill"), isKnown() ? "{circle-check} Juste" : "{triangle-exclamation} Peut-être faux : à vérifier");
-});
-// Une autre question : on repart de l'étape 1, et les barres repoussent.
-initSeg($("#segNext"), (v) => { nextQ = v; whyProc.go(0, true); });
 
 // Pourquoi elle devine : le classement compte les bonnes réponses, pas les erreurs.
 // Chiffres d'OpenAI, en % des questions : test SimpleQA sans recherche web (GPT-5 System Card, tableau 8, août 2025),
@@ -1426,6 +1367,52 @@ guess($("#rankGuess"), {
   if (!zone.classList.contains("locked")) grow();
   else new MutationObserver((_, mo) => { if (!zone.classList.contains("locked")) { mo.disconnect(); grow(); } }).observe(zone, { attributes: true, attributeFilter: ["class"] });
 }
+
+// Ce que mesurent les chercheurs : bonnes réponses sur 100, selon le nombre de documents en trop.
+// Cuconasu et al., « The Power of Noise », SIGIR 2024, tableaux 1 et 2, le bon document loin de la question (Llama 2, 2023). Chiffres arrondis.
+const NOISE = { n: [0, 1, 2, 4, 8, 18], sim: [56, 46, 35, 27, 26, 23], rand: [56, 47, 38, 31, 31, 35] };
+const NOISE_MSG = {
+  sim: "Un seul document piège suffit : de 56 à 46 bonnes réponses sur 100. Avec 4 documents, 27 : 2 fois moins.",
+  rand: "Des documents pris au hasard gênent moins : 31 bonnes réponses sur 100 avec 4 documents, au lieu de 27.",
+};
+function hbar(label, base) {
+  const r = h("div", "hb"), t = h("span", "hb-t"), f = h("span", "hb-f"), n = h("b", "hb-n");
+  t.append(f);
+  if (base) t.append(h("span", "base"));
+  r.append(h("span", "hb-l", label), t, n);
+  return { r, f, n };
+}
+const noiseBars = NOISE.n.map((n) => { const b = hbar(String(n), true); $("#noiseBars").append(b.r); return b; });
+function renderNoise(t) {
+  NOISE[t].forEach((v, i) => {
+    noiseBars[i].f.style.setProperty("--v", v / 100);
+    countTo(noiseBars[i].n, v);
+  });
+  $("#noiseBars").setAttribute("aria-label", NOISE.n.map((n, i) => `${n} document${n > 1 ? "s" : ""} en trop : ${NOISE[t][i]} sur 100`).join(", "));
+  $("#noiseMsg").textContent = NOISE_MSG[t];
+}
+$("#noiseBars").setAttribute("role", "img");
+renderNoise(initSeg($("#segNoise"), renderNoise));
+
+// Et les IA récentes ? Lee et al., « Lost in the Noise », janvier 2026, tableau 1 (Gemini 2.5 Pro, score moyen sur 11 tests).
+const RECENT = [["Rien", 78], ["Des documents pris au hasard", 71], ["Une vieille conversation sans rapport", 63], ["Des documents presque justes", 48]];
+RECENT.forEach(([label, v], i) => {
+  const b = hbar(label);
+  b.f.style.setProperty("--v", v / 100);
+  b.f.classList.toggle("trap", i === RECENT.length - 1);
+  b.n.textContent = v;
+  $("#recentBars").append(b.r);
+});
+$("#recentBars").setAttribute("role", "img");
+$("#recentBars").setAttribute("aria-label", RECENT.map(([l, v]) => `${l} : ${v} sur 100`).join(", "));
+
+// Devine d'abord : avec 4 documents qui ressemblent à la réponse, la petite IA trouve 2 fois moins la bonne réponse.
+guess($("#distGuess"), {
+  q: "Avec le bon document, une petite IA trouve la bonne réponse 56 fois sur 100. Tu ajoutes 4 documents qui ressemblent à la réponse, sans la donner. Combien de bonnes réponses ?",
+  options: [["56", "Toujours 56"], ["27", "Environ 27"], ["5", "Environ 5"]], a: "27",
+  why: "Environ 27 : 2 fois moins ! Une info qui ressemble à la bonne est le piège le plus fort. Ce test utilise une petite IA de 2023. Les IA récentes résistent mieux, mais pas toujours.",
+  lock: [$("#noiseZone")],
+});
 
 // Jeu : surligne ce qu'il faut vérifier. [phrase, à vérifier ?, raison]
 const HL = [
@@ -1520,5 +1507,8 @@ initDefi([
   { q: "Une question sur un médicament ou sur un contrat. Que fais-tu ?", a: "human",
     options: [["ai", "Je fais confiance à l'IA"], ["human", "Je demande aussi à un professionnel"], ["never", "Je ne pose jamais la question"]],
     why: "Santé, argent, droit : l'IA peut t'aider à préparer tes questions. Mais un professionnel doit confirmer." },
+  { q: "Tu donnes à l'IA le bon document, et 4 autres qui lui ressemblent. Alors…", a: "worse",
+    options: [["better", "Elle répond encore mieux"], ["worse", "Elle peut se tromper plus souvent"], ["same", "Ça ne change rien"]],
+    why: "Dans une étude, une petite IA trouvait la bonne réponse 56 fois sur 100 avec le bon document. Avec 4 documents qui lui ressemblent : 27 fois. Donne seulement le bon." },
 ]);
 </script>

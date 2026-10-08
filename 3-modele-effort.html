@@ -228,8 +228,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .series a:hover { color: var(--accent-text); }
 .series a[aria-current="page"] { color: var(--accent-text); border-bottom-color: transparent; }
 
-/* Mise en page : bandeau « À retenir », réflexes sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
+/* Mise en page : bandeau « À retenir », réflexes à cocher sur 2 colonnes, colonne de réglages qui suit, liste vide (même bloc dans chaque fiche) */
 .retenir.s4 ul { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 24px 40px; }
+.check { display: grid; gap: 10px; }
+.check label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 16px; background: var(--surface-2); border-radius: 12px; cursor: pointer; font-weight: 700; line-height: 1.45; }
+.check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); }
+.check label:has(input:checked) span { text-decoration: line-through; text-decoration-color: var(--accent); color: var(--muted); }
 .check.cols { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
 @media (min-width: 901px) { .stick { position: sticky; top: 16px; align-self: start; } }
 /* Ce qui va ensemble reste proche. Le texte d'intro colle à son titre. Une note ou une légende colle à ce qu'elle explique.
@@ -395,11 +399,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .disabled-note { font-size: .9rem; color: var(--warn); font-weight: 700; }
 input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
 .steps { display: flex; justify-content: space-between; font-size: .8rem; color: var(--muted); font-weight: 700; }
-.analogy { display: grid; gap: 10px; }
-.analogy div { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 10px; align-items: center; }
-.analogy span:first-child { font-size: 1.7rem; text-align: center; }
-.noms thead th { width: 36%; }
-.noms thead th:first-child { width: 28%; }
 
 /* Jeu : mission budget */
 .mis { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 48px; }
@@ -422,10 +421,6 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
 .log li.warn { box-shadow: inset 4px 0 0 var(--warn); }
 .log li.bad { box-shadow: inset 4px 0 0 var(--bad); }
 
-/* Ta demande : floue ou précise */
-.ask { display: grid; grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); gap: 20px 28px; align-items: center; }
-@media (max-width: 640px) { .ask { grid-template-columns: minmax(0, 1fr); } }
-.prompt { display: grid; gap: 6px; max-width: none; background: var(--surface-2); border-radius: 16px 16px 16px 4px; padding: 16px 20px; font-weight: 700; line-height: 1.5; }
 
 /* Le résultat arrive à la vitesse du modèle : plus l'IA réfléchit, plus les jauges mettent du temps à se remplir. */
 .results .fill { transition-duration: var(--think, .45s); }
@@ -433,6 +428,59 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
 .think.on { display: inline-flex; }
 @keyframes think { to { transform: scale(1.25); } }
 .think.on .svg-inline--fa { animation: think .5s ease-in-out infinite alternate; }
+
+/* Le bon prompt et les infos en trop : à gauche on règle, à droite on voit le prompt et la réponse. */
+.switches { display: grid; gap: 10px; }
+.sw .lbl { display: grid; gap: 4px; }
+.sw .lbl small { font-size: .9rem; font-weight: 400; line-height: 1.4; color: var(--muted); }
+.lab { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 32px 48px; }
+@media (max-width: 900px) { .lab { grid-template-columns: minmax(0, 1fr); } }
+.lab-col { display: grid; gap: 32px; align-content: start; }
+.lab-part { display: grid; gap: 14px; }
+.lab h3 .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
+.set-wrap { display: grid; gap: 22px; }
+
+/* Le bon prompt : ton message, puis la réponse de l'IA */
+.who { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.msg-me { justify-self: end; max-width: 88%; display: grid; gap: 6px; background: var(--accent); color: var(--on-accent); border-radius: 18px 18px 4px 18px; padding: 14px 18px; font-weight: 700; line-height: 1.45; }
+.msg-me .who { color: var(--on-accent); }
+.bubble { background: var(--surface-2); border-radius: 18px 18px 18px 4px; padding: 18px 20px; display: grid; gap: 10px; }
+.sent { padding: 8px 12px; border-radius: 8px; font-weight: 700; line-height: 1.5; display: block; }
+.sent.ok { background: color-mix(in oklab, var(--ok) 16%, transparent); }
+.sent.warn { background: color-mix(in oklab, var(--warn) 18%, transparent); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: .9rem; color: var(--muted); }
+.fill.ok { background: var(--ok); } .fill.warn { background: var(--warn); } .fill.bad { background: var(--bad); }
+.out { display: grid; gap: 14px; justify-items: start; }
+.out > .bubble { justify-self: stretch; }
+
+.note { background: var(--surface-2); border-radius: 18px; padding: 20px 22px; display: grid; gap: 8px; }
+.note p { line-height: 1.5; }
+.note strong .svg-inline--fa { color: var(--accent-text); margin-right: 6px; }
+.sent.flip { animation: pop .5s ease; }
+
+/* Les infos en trop : une info en trop est hachurée dans le prompt, comme « La méthode, pour rien » dans « L'Agent sur Mesure ». */
+.msg-me .extra {
+  margin: 0 -8px; padding: 2px 8px; border-radius: 8px; border: 2px dashed color-mix(in oklab, var(--on-accent) 60%, transparent);
+  background: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--on-accent) 12%, transparent) 0 6px, transparent 6px 12px);
+}
+.msg-me .extra.new { animation: pop .4s ease; }
+
+/* Pourquoi une info piège trompe : les phrases du prompt, puis la réponse. Ce qui change est juste au-dessus des boutons. */
+.why-rows { display: grid; gap: 8px; }
+.why-row { padding: 10px 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); font-weight: 700; line-height: 1.45; }
+.why-row .svg-inline--fa { color: var(--accent-text); margin-right: 4px; }
+.why-row.lit { border-color: color-mix(in oklab, var(--accent) 50%, var(--line)); }
+.why-row.hit { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, var(--surface)); }
+.why-row.trap { border-color: var(--warn); background: color-mix(in oklab, var(--warn) 14%, var(--surface)); }
+.why-row.off { color: var(--muted); }
+.why-row.off .svg-inline--fa { color: var(--muted); }
+.why-row.pop { animation: pop .4s ease; }
+.why-ans { justify-self: start; max-width: 94%; }
+.why-sent { font-weight: 700; line-height: 1.6; }
+.why-slot { display: inline-block; min-width: 3.5em; padding: 0 8px; border-radius: 8px; border: 2px dashed var(--line); text-align: center; }
+.why-slot.trap { border: 2px solid var(--warn); background: color-mix(in oklab, var(--warn) 18%, var(--surface-2)); }
+@keyframes drop { from { transform: translateY(-16px) scale(.6); } }
+.why-slot.drop { animation: drop .45s cubic-bezier(.3, 1.4, .6, 1); }
 </style>
 
 <main class="wrap">
@@ -450,7 +498,7 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
         <div class="ctl">
           <span class="eyebrow">Comprendre l'IA · Fiche 3 sur 9</span>
           <h1>Le Bon<br>Cerveau</h1>
-          <p class="lead">Une petite tâche n'a pas besoin d'un expert. Choisis le bon modèle et le bon effort. Et dis clairement ce que tu veux.</p>
+          <p class="lead">Une petite tâche n'a pas besoin d'un expert. Choisis le bon modèle et le bon effort. Et dis clairement ce que tu veux, sans rien en trop.</p>
         </div>
         <div class="word-card">
           <span class="eyebrow">Les mots à connaître</span>
@@ -502,18 +550,6 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
         <button type="button" data-v="3" aria-pressed="false"><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i> Créer une appli</button>
         <button type="button" data-v="4" aria-pressed="false"><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i> Problème très difficile</button>
       </div>
-    </section>
-
-    <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-4"></i></span><h2>Écris ta demande</h2></div>
-      <div class="ask">
-        <div class="seg" id="segAsk" role="group" aria-label="Ta demande">
-          <button type="button" data-v="0" aria-pressed="false"><i class="fa-solid fa-cloud" aria-hidden="true"></i> Floue</button>
-          <button type="button" data-v="1" aria-pressed="true"><i class="fa-solid fa-bullseye" aria-hidden="true"></i> Précise</button>
-        </div>
-        <p class="prompt" id="askTxt" aria-live="polite"></p>
-      </div>
-      <p class="small muted">Une demande précise dit ce que tu veux, pour qui et sous quelle forme. Elle donne les informations utiles, et rien de plus.</p>
     </section>
 
     <section class="card s3">
@@ -585,47 +621,138 @@ input[type="range"]:disabled { opacity: .35; cursor: not-allowed; }
       <p class="small muted">Prix pour une tâche, avec les tarifs de l'API. La qualité est une estimation pour comprendre.</p>
     </section>
 
-    <section class="card s4">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></span><h2>Les 3 modèles en bref</h2></div>
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>Modèle</th><th>Pour quoi ?</th><th class="num">Mémoire*</th><th class="num">Prix API*</th></tr></thead>
-          <tbody>
-            <tr><td><strong>Rapide</strong></td><td>Tâches simples, gros volumes</td><td class="num">200 000</td><td class="num">1 $ / 5 $</td></tr>
-            <tr><td><strong>Standard</strong></td><td>Le quotidien : écrire, analyser, coder</td><td class="num">1 million</td><td class="num">2 $ / 10 $</td></tr>
-            <tr><td><strong>Expert</strong></td><td>Les tâches dures et longues</td><td class="num">1 million</td><td class="num">4 $ / 20 $</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="small muted">* Exemple avec les 3 modèles de Claude. Tarifs publics de l'API, vérifiés le 7 octobre 2026. Prix pour 1 million de tokens : lus / écrits. Il existe aussi des modèles encore plus puissants (10 $ / 50 $).</p>
-    </section>
-
     <section class="card s4" id="noms">
-      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-right-left"></i></span><h2>Claude ou ChatGPT : les mêmes modèles, d'autres noms</h2></div>
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-right-left"></i></span><h2>Claude ou ChatGPT : les modèles en bref</h2></div>
       <p>Chaque IA donne ses propres noms à ses modèles. Dans les fiches, on utilise des mots qui marchent pour toutes les IA. Voici comment Claude et ChatGPT les appellent.</p>
       <div class="tbl-wrap">
         <table class="noms">
-          <thead><tr><th>Dans les fiches</th><th>Chez Claude</th><th>Chez OpenAI (ChatGPT)</th></tr></thead>
+          <thead><tr><th>Dans les fiches</th><th>Pour quoi ?</th><th>Chez Claude</th><th>Chez OpenAI (ChatGPT)</th><th class="num">Prix API*</th></tr></thead>
           <tbody>
-            <tr><td><strong>Modèle rapide</strong></td><td>Haiku</td><td>Luna</td></tr>
-            <tr><td><strong>Modèle standard</strong></td><td>Sonnet</td><td>Terra</td></tr>
-            <tr><td><strong>Modèle expert</strong></td><td>Opus</td><td>Sol</td></tr>
-            <tr><td><strong>Modèle le plus puissant</strong></td><td>Fable</td><td>Astra</td></tr>
-            <tr><td><strong>Effort</strong></td><td>Effort (Low à Max)</td><td>Thinking (Instant à Extra High)</td></tr>
+            <tr><td><strong>Modèle rapide</strong></td><td>Tâches simples, gros volumes</td><td>Haiku</td><td>Luna</td><td class="num">1 $ / 5 $</td></tr>
+            <tr><td><strong>Modèle standard</strong></td><td>Le quotidien : écrire, analyser, coder</td><td>Sonnet</td><td>Terra</td><td class="num">2 $ / 10 $</td></tr>
+            <tr><td><strong>Modèle expert</strong></td><td>Les tâches dures et longues</td><td>Opus</td><td>Sol</td><td class="num">4 $ / 20 $</td></tr>
+            <tr><td><strong>Modèle le plus puissant</strong></td><td>Les tâches les plus dures</td><td>Fable</td><td>Astra</td><td class="num">10 $ / 50 $</td></tr>
+            <tr><td><strong>Effort</strong></td><td>Le temps de réflexion</td><td>Effort (Low à Max)</td><td>Thinking (Instant à Extra High)</td><td class="num">–</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="small muted">Dans ChatGPT, tu choisis surtout un niveau de réflexion : Instant, Medium, High ou Extra High. Sans abonnement payant, tu as le modèle rapide (Luna).
+      <p class="small muted">* Tarifs publics de l'API chez Claude, vérifiés le 7 octobre 2026. Prix pour 1 million de tokens : lus / écrits. La mémoire va de 200 000 tokens (modèle rapide) à 1 million (standard et expert).
+        Dans ChatGPT, tu choisis surtout un niveau de réflexion : Instant, Medium, High ou Extra High. Sans abonnement payant, tu as le modèle rapide (Luna).
         Anthropic fabrique Claude, OpenAI fabrique ChatGPT. Noms vérifiés en octobre 2026 : ils changent souvent.</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-pen-to-square"></i></span><h2>Le bon prompt : contexte, action, objectif</h2></div>
+      <p>Un <strong>prompt</strong>, c'est le message que tu écris à l'IA. Ce que tu ne dis pas, l'IA le devine. Et elle peut se tromper (voir « Le Détecteur de Bobards »).</p>
+      <div id="promptGuess"></div>
+      <div class="lab">
+        <div class="lab-col">
+          <div class="lab-part">
+            <h3>Ajoute les 3 morceaux</h3>
+            <div class="set-wrap" id="ppSet">
+              <div class="switches">
+                <label class="sw" for="ppCtx"><span class="lbl"><span><i class="fa-solid fa-user" aria-hidden="true"></i> Le contexte</span><small>Ta situation : qui tu es, à qui tu écris.</small></span><input type="checkbox" id="ppCtx"></label>
+                <label class="sw" for="ppAct"><span class="lbl"><span><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i> Une action précise</span><small>Un verbe, et ce qu'il faut faire exactement.</small></span><input type="checkbox" id="ppAct"></label>
+                <label class="sw" for="ppObj"><span class="lbl"><span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> L'objectif</span><small>Le but, et le résultat que tu veux.</small></span><input type="checkbox" id="ppObj"></label>
+              </div>
+              <div class="meter">
+                <div class="meter-top"><span>Ce que l'IA doit deviner</span><span id="ppVal"></span></div>
+                <div class="track"><div class="fill" id="ppFill"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="note">
+            <strong><i class="fa-solid fa-lightbulb" aria-hidden="true"></i>En plus</strong>
+            <p>Finis ton prompt par : « Si tu ne sais pas, dis-le. S'il te manque une info, pose-moi des questions. »</p>
+          </div>
+        </div>
+        <div class="lab-col">
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Ton prompt</h3>
+            <div class="msg-me" id="ppPrompt" aria-live="polite"></div>
+          </div>
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-envelope" aria-hidden="true"></i> La réponse de l'IA</h3>
+            <div class="out" id="ppOut">
+              <div class="bubble" id="ppAnswer" aria-live="polite"></div>
+              <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Vient de ton prompt</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Deviné par l'IA</span></div>
+              <span class="pill" id="ppPill"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="small muted">Exemple fabriqué pour comprendre. Tu réécris le même contexte à chaque fois ? Range-le dans un Projet (voir « La Boîte à Outils de l'IA »).</p>
+    </section>
+
+    <section class="card s4" id="distr">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-filter"></i></span><h2>Les infos en trop : les distracteurs</h2></div>
+      <p>Ce que tu ne dis pas, l'IA le devine. Ce que tu dis en trop, elle peut s'en servir. Une info qui ne sert pas à ta demande peut la tromper. Les spécialistes l'appellent un <strong>distracteur</strong>.</p>
+      <div class="lab">
+        <div class="lab-col">
+          <div class="lab-part">
+            <h3>Ajoute des infos en trop</h3>
+            <p class="small muted">Lucie reprend son bon prompt, avec le prix de cette année : 35 €. Ajoute des infos qui ne servent pas, et regarde la réponse.</p>
+            <div class="switches">
+              <label class="sw" for="dAnec"><span class="lbl"><span><i class="fa-solid fa-cloud-rain" aria-hidden="true"></i> Une anecdote</span><small>« Il a beaucoup plu ce week-end. »</small></span><input type="checkbox" id="dAnec"></label>
+              <label class="sw" for="dDate"><span class="lbl"><span><i class="fa-solid fa-calendar-day" aria-hidden="true"></i> Une autre date</span><small>« Le club de tennis fait payer avant le 15 octobre. »</small></span><input type="checkbox" id="dDate"></label>
+              <label class="sw" for="dPrix"><span class="lbl"><span><i class="fa-solid fa-tag" aria-hidden="true"></i> L'ancien prix</span><small>« L'an dernier, la cotisation était de 30 €. »</small></span><input type="checkbox" id="dPrix"></label>
+            </div>
+            <div class="meter">
+              <div class="meter-top"><span>Le risque que l'IA se trompe</span><span id="dVal"></span></div>
+              <div class="track"><div class="fill" id="dFill"></div></div>
+            </div>
+            <span class="pill" id="dPill"></span>
+          </div>
+        </div>
+        <div class="lab-col">
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Ton prompt</h3>
+            <div class="msg-me" id="dPrompt" aria-live="polite"></div>
+          </div>
+          <div class="lab-part">
+            <h3><i class="fa-solid fa-envelope" aria-hidden="true"></i> Une réponse possible de l'IA</h3>
+            <div class="bubble" id="dAnswer" aria-live="polite"></div>
+            <div class="legend"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Vient de ta demande</span><span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Vient d'une info en trop</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="small muted">Exemple fabriqué pour comprendre. Souvent, l'IA trie bien. Mais plus il y a d'infos pièges, plus le risque monte.</p>
+
+      <h3>Pourquoi une info piège trompe l'IA</h3>
+      <p>Lucie a laissé l'ancien prix dans son prompt. Suis l'IA, étape par étape.</p>
+      <div class="proc" id="whyProc">
+        <div class="why-rows" id="whyRows"></div>
+        <div class="bubble why-ans"><span class="who">L'IA</span><span class="why-sent">Merci de payer votre cotisation : <span class="why-slot" id="whySlot">…</span></span></div>
+      </div>
+
+      <p><strong>Attention : le contexte utile aide toujours.</strong> Garde ce qui sert à ta demande, et enlève le reste. Écrire « ignore ce qui ne sert pas » aide parfois, mais ce n'est pas une protection.</p>
+      <p class="small muted">Un avis glissé dans ta question est aussi une info piège (voir « L'IA qui Dit Oui »). Un ordre caché exprès, c'est autre chose : voir « Le Message Piégé ». Ce que mesurent les chercheurs : voir « Le Détecteur de Bobards ».</p>
+    </section>
+
+    <section class="card s4">
+      <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-list-check"></i></span><h2>Mes réflexes : bon modèle, bonne demande</h2></div>
+      <div class="meter">
+        <div class="meter-top"><span>Mes réflexes</span><span id="chkTxt">0 sur 6</span></div>
+        <div class="track"><div class="fill" id="chkFill"></div></div>
+      </div>
+      <div class="check cols" id="check">
+        <label><input type="checkbox" id="c1"><span>Tâche simple : je prends un petit modèle, avec peu d'effort.</span></label>
+        <label><input type="checkbox" id="c2"><span>Réponse à côté ? Je précise ma demande avant de prendre un plus gros modèle.</span></label>
+        <label><input type="checkbox" id="c3"><span>J'écris le contexte, une action précise et l'objectif.</span></label>
+        <label><input type="checkbox" id="c4"><span>J'enlève ce qui ne sert pas. Surtout ce qui ressemble à la bonne info : un ancien prix, une autre date.</span></label>
+        <label><input type="checkbox" id="c5"><span>Je colle un long texte ? Je le mets d'abord, et j'écris ma question à la fin.</span></label>
+        <label><input type="checkbox" id="c6"><span>Je finis par : « S'il te manque une info, pose-moi des questions. »</span></label>
+      </div>
     </section>
 
     <section class="card s4 retenir">
       <div class="head"><span class="emo" aria-hidden="true"><i class="fa-solid fa-brain"></i></span><h2>À retenir</h2></div>
       <ul>
-        <li><span>Gros modèle = plus intelligent, mais plus lent et plus cher.</span></li>
+        <li><span>Gros modèle = plus intelligent, mais plus lent et plus cher. Pour une tâche simple, un petit modèle avec peu d'effort suffit.</span></li>
         <li><span>Plus d'effort = l'IA réfléchit plus longtemps. Utile pour les tâches difficiles.</span></li>
-        <li><span>Pour une tâche simple, un petit modèle avec peu d'effort suffit.</span></li>
-        <li><span>Bonne réponse = bon modèle + bonne demande. Il faut les deux : le meilleur modèle ne devine pas ce que tu veux.</span></li>
+        <li><span>Un bon prompt = le contexte + une action précise + l'objectif.</span></li>
+        <li><span>Enlève les infos qui ne servent pas. Une info en trop peut tromper l'IA, surtout si elle ressemble à la bonne.</span></li>
+        <li><span>Bonne réponse = bon modèle + bonne demande. Le meilleur modèle ne devine pas ce que tu veux.</span></li>
       </ul>
     </section>
 
@@ -951,6 +1078,18 @@ function initDefi(items, options) {
   paintBadge();
 }
 
+// Mes réflexes : chaque case cochée remplit la jauge (même bloc dans chaque fiche).
+(function initCheck() {
+  const boxes = $$("#check input");
+  const show = () => {
+    const n = boxes.filter((c) => c.checked).length;
+    rich($("#chkTxt"), n + " sur " + boxes.length + (n === boxes.length ? " {trophy}" : ""));
+    $("#chkFill").style.width = (n / boxes.length) * 100 + "%";
+  };
+  boxes.forEach((c) => c.addEventListener("change", show));
+  if (boxes.length) show();
+})();
+
 // Coupures de ligne. Une espace insécable garde ? ! : ; » % $ € = · / avec ce qui précède, « avec ce qui suit,
 // et un nombre avec les mots qui l'entourent (« la fiche 1 », « 3 étoiles »). Un mot à trait d'union (e-mail, dis-moi) ne se coupe plus en deux,
 // sauf une adresse ou un nom avec des chiffres (gpt-5-thinking-mini), qui restent tels quels.
@@ -1092,23 +1231,13 @@ const TASKS = [
   { name: "créer une appli",             ic: "{mobile-screen}", need: 84, out: 20000, think: 15000 },
   { name: "résoudre un problème difficile", ic: "{puzzle-piece}", need: 92, out: 4000, think: 30000 },
 ];
-// Pour chaque tâche : la demande floue, puis la demande précise.
-const ASKS = [
-  ["Améliore mon texte.", "Corrige seulement les fautes d'orthographe. Ne change pas mes phrases."],
-  ["Résume.", "Résume cet e-mail en 3 points. Dis-moi ce que je dois faire, et pour quand."],
-  ["Fais un rapport.", "Écris un rapport d'une page sur les ventes de mars, pour mon chef. En 3 parties : les chiffres, les problèmes, les idées."],
-  ["Fais-moi une appli.", "Crée une appli de liste de courses, pour téléphone. Je coche ce que j'ai acheté. Les produits sont rangés par rayon."],
-  ["Ça ne marche pas. Aide-moi.", "Mon calcul donne un résultat faux. Voici le calcul, le résultat attendu et ce que j'ai déjà essayé. Trouve l'erreur, étape par étape."],
-];
-// Avec une demande floue, l'IA devine : la qualité reste bloquée, quel que soit le modèle.
-const FLOU = 30;
 const INPUT = 2000;
-const st = { model: "standard", effort: 1, task: 2, clear: true };
+const st = { model: "standard", effort: 1, task: 2 };
 
-function evaluate(mk, e, t, clear = true) {
+function evaluate(mk, e, t) {
   const m = MODELS[mk], task = TASKS[t];
   const lvl = m.effort ? EFFORT[e] : { q: 0, think: 0 };
-  const quality = Math.min(clear ? 99 : FLOU, m.quality + lvl.q);
+  const quality = Math.min(99, m.quality + lvl.q);
   const thinkTok = Math.round(task.think * lvl.think);
   const outTok = task.out + thinkTok;
   const secs = outTok / m.tps + 1;
@@ -1133,9 +1262,8 @@ function priceTxt(p) {
   return fmt(p, 2) + " $";
 }
 // Même règle que le jeu « Mission budget » : au-delà de 1,25 fois le prix du réglage le moins cher qui réussit, c'est trop.
-function verdictOf(r, t, clear) {
+function verdictOf(r, t) {
   const need = TASKS[t].need;
-  if (!clear) return { cls: "bad", lab: "{triangle-exclamation} Demande floue", txt: "L'IA doit deviner ce que tu veux. Même le plus gros modèle se trompe." };
   if (r.quality < need) {
     const m = MODELS[st.model], more = m.effort && st.effort < 4;
     return { cls: "bad", lab: "{triangle-exclamation} Pas assez fort", txt: "Le résultat risque d'être moyen. " +
@@ -1156,7 +1284,7 @@ function best(t) {
 
 function render() {
   const m = MODELS[st.model];
-  const r = evaluate(st.model, st.effort, st.task, st.clear);
+  const r = evaluate(st.model, st.effort, st.task);
   const task = TASKS[st.task];
   const slider = $("#effort");
   slider.disabled = !m.effort;
@@ -1185,18 +1313,15 @@ function render() {
   $("#sTime").textContent = timeTxt(r.secs);
   countTo($("#sThink"), r.thinkTok);
   $("#sPrice").textContent = priceTxt(r.price);
-  $("#askTxt").replaceChildren(h("span", "eyebrow", "Tu écris à l'IA"), h("span", "", `« ${ASKS[st.task][+st.clear]} »`));
 
-  const v = verdictOf(r, st.task, st.clear);
+  const v = verdictOf(r, st.task);
   const pill = $("#verdict");
   pill.className = "pill " + v.cls;
   rich(pill, v.lab);
   $("#verdictTxt").textContent = v.txt;
   const b = best(st.task);
   const cfg = b && `<b>${MODELS[b.mk].name}</b>${MODELS[b.mk].effort ? `, effort <b>${EFFORT[b.e].name}</b>` : ""}`;
-  $("#reco").innerHTML = !st.clear
-    ? `Précise ta demande : c'est gratuit. Ensuite, ${cfg} suffit.`
-    : `Le moins cher qui réussit à <b>${task.name}</b> : ${cfg} (${priceTxt(b.r.price)}).`;
+  $("#reco").innerHTML = `Le moins cher qui réussit à <b>${task.name}</b> : ${cfg} (${priceTxt(b.r.price)}).`;
 }
 
 $$("#models .model").forEach((btn) => btn.addEventListener("click", () => {
@@ -1205,7 +1330,6 @@ $$("#models .model").forEach((btn) => btn.addEventListener("click", () => {
 }));
 $("#effort").addEventListener("input", (e) => { st.effort = +e.target.value; render(); });
 st.task = +initSeg($("#segTask"), (v) => { st.task = +v; render(); });
-st.clear = initSeg($("#segAsk"), (v) => { st.clear = v === "1"; render(); }) === "1";
 initRanges();
 render();
 
@@ -1270,6 +1394,137 @@ $("#misAgain").addEventListener("click", () => {
 });
 renderMission();
 
+// Le bon prompt : chaque morceau ajouté remplace une partie que l'IA devinait.
+// Pour chaque morceau : ce que tu écris, puis la ligne de la réponse [devinée, venue du prompt].
+const PP = {
+  ctx: { icon: "{user}", say: "Je suis Lucie, la secrétaire d'un club de randonnée. J'écris aux 40 membres.",
+    lines: [["Madame, Monsieur,", "Bonjour à toutes et à tous,"], ["[Votre nom]", "Lucie, secrétaire du club de randonnée"]] },
+  act: { icon: "{hand-pointer}", vague: "Écris un mail.", say: "Écris un mail pour rappeler de payer la cotisation de l'année.",
+    // [devinée, venue du prompt, devinée quand l'objectif parle déjà de payer]
+    lines: [["Je me permets de vous écrire au sujet de notre projet commun.", "C'est le moment de payer votre cotisation au club pour l'année.", "Je vous écris au sujet d'un paiement."]] },
+  obj: { icon: "{bullseye}", say: "Le but : que tout le monde ait payé avant le 30 novembre. Ton amical, 5 lignes au plus.",
+    lines: [["Je reste à votre disposition pour toute question. Bien cordialement,", "Merci de payer avant le 30 novembre. À très bientôt."]] },
+};
+const PP_PILL = [
+  ["bad", "{circle-xmark} Un mail passe-partout : à réécrire"],
+  ["warn", "{triangle-exclamation} L'IA devine encore : à corriger"],
+  ["warn", "{triangle-exclamation} Presque : il manque un morceau"],
+  ["ok", "{circle-check} Prêt : relis-le avant de l'envoyer"],
+];
+function renderPrompt() {
+  const on = { ctx: $("#ppCtx").checked, act: $("#ppAct").checked, obj: $("#ppObj").checked };
+  const n = Object.values(on).filter(Boolean).length, missing = 3 - n;
+  // Le prompt : le contexte d'abord, puis l'action, puis l'objectif.
+  const said = [on.ctx && PP.ctx.icon + " " + PP.ctx.say, PP.act.icon + " " + (on.act ? PP.act.say : PP.act.vague), on.obj && PP.obj.icon + " " + PP.obj.say].filter(Boolean);
+  $("#ppPrompt").replaceChildren(h("span", "who", "Toi"), ...said.map((s) => h("span", "", s)));
+  // La réponse : salutation, sujet, fin, signature.
+  // Une ligne qui vient d'un morceau qu'on vient d'ajouter (ou d'enlever) saute : on voit ce que ce morceau change.
+  const was = renderPrompt.on || on;
+  renderPrompt.on = on;
+  const line = (k, i) => {
+    const known = on[k], L = PP[k].lines[i];
+    return h("span", "sent " + (known ? "ok" : "warn") + (known !== was[k] ? " flip" : ""), (known ? "{circle-check} " : "{triangle-exclamation} ") + (known ? L[1] : (on.obj && L[2]) || L[0]));
+  };
+  $("#ppAnswer").replaceChildren(h("span", "who", "L'IA"), line("ctx", 0), line("act", 0), line("obj", 0), line("ctx", 1));
+  $("#ppVal").textContent = missing ? `${missing} morceau${missing > 1 ? "x" : ""} sur 3` : "rien";
+  const fill = $("#ppFill");
+  fill.style.width = Math.max(4, (missing / 3) * 100) + "%";
+  fill.className = "fill " + (missing >= 2 ? "bad" : missing ? "warn" : "ok");
+  const [cls, txt] = PP_PILL[n];
+  $("#ppPill").className = "pill " + cls;
+  rich($("#ppPill"), txt);
+}
+["#ppCtx", "#ppAct", "#ppObj"].forEach((s) => $(s).addEventListener("change", renderPrompt));
+
+// Les infos en trop : une info qui ressemble à la bonne (une autre date, l'ancien prix) peut se glisser dans la réponse.
+// Une info sans rapport (l'anecdote) gêne peu. Exemple fabriqué : souvent, l'IA trie bien.
+const DX = {
+  anec: "{cloud-rain} Il a beaucoup plu ce week-end.",
+  date: "{calendar-day} Le club de tennis fait payer avant le 15 octobre.",
+  prix: "{tag} L'an dernier, la cotisation était de 30 €.",
+};
+const DX_PILL = [
+  ["ok", "{circle-check} Rien en trop : l'IA a ce qu'il faut"],
+  ["", "{circle-info} Une info sans rapport : elle gêne peu"],
+  ["warn", "{triangle-exclamation} Une info qui ressemble à la bonne : le piège le plus fort"],
+  ["bad", "{circle-xmark} 2 infos pièges : relis tout"],
+];
+function renderDistr() {
+  const on = { anec: $("#dAnec").checked, date: $("#dDate").checked, prix: $("#dPrix").checked };
+  const was = renderDistr.on || on;
+  renderDistr.on = on;
+  // Le prompt : chaque info en trop arrive à côté de ce qu'elle imite. Celle qu'on vient d'ajouter saute.
+  const extra = (k) => (on[k] ? [h("span", "extra" + (was[k] ? "" : " new"), DX[k])] : []);
+  $("#dPrompt").replaceChildren(
+    h("span", "who", "Toi"),
+    h("span", "", "{user} Je suis Lucie, la secrétaire d'un club de randonnée. J'écris aux 40 membres."), ...extra("anec"),
+    h("span", "", "{hand-pointer} Écris un mail pour rappeler de payer la cotisation de l'année."),
+    h("span", "", "{tag} La cotisation de cette année est de 35 €."), ...extra("prix"),
+    h("span", "", "{bullseye} Le but : que tout le monde ait payé avant le 30 novembre. Ton amical, 5 lignes au plus."), ...extra("date"),
+  );
+  // La réponse : une ligne qui vient d'une info en trop est signalée. Une ligne qui vient de changer saute.
+  const line = (fromExtra, text, changed) => h("span", "sent " + (fromExtra ? "warn" : "ok") + (changed ? " flip" : ""), (fromExtra ? "{triangle-exclamation} " : "{circle-check} ") + text);
+  $("#dAnswer").replaceChildren(
+    h("span", "who", "L'IA"),
+    line(false, "Bonjour à toutes et à tous,"),
+    ...(on.anec ? [line(true, "Quel week-end pluvieux ! J'espère que vous allez bien.", !was.anec)] : []),
+    line(on.prix, `C'est le moment de payer votre cotisation au club : ${on.prix ? 30 : 35} €.`, on.prix !== was.prix),
+    line(on.date, `Merci de payer avant le ${on.date ? "15 octobre" : "30 novembre"}. À très bientôt.`, on.date !== was.date),
+    line(false, "Lucie, secrétaire du club de randonnée"),
+  );
+  // Le risque (inventé pour comprendre) : une info sans rapport le monte un peu, une info qui ressemble à la bonne beaucoup.
+  const traps = on.date + on.prix, risk = 10 + (on.anec ? 8 : 0) + traps * 30;
+  $("#dVal").textContent = risk < 30 ? "faible" : risk < 60 ? "moyen" : "élevé";
+  $("#dFill").style.width = risk + "%";
+  $("#dFill").className = "fill " + (risk < 30 ? "ok" : risk < 60 ? "warn" : "bad");
+  const [cls, txt] = DX_PILL[traps ? traps + 1 : on.anec ? 1 : 0];
+  $("#dPill").className = "pill " + cls;
+  rich($("#dPill"), txt);
+}
+["#dAnec", "#dDate", "#dPrix"].forEach((s) => $(s).addEventListener("change", renderDistr));
+
+// Pourquoi une info piège trompe : l'IA lit tout, cherche un prix, en trouve deux qui se ressemblent, et peut prendre le mauvais.
+const WHY_ROWS = [
+  ["ctx", "{user} Je suis Lucie, la secrétaire d'un club de randonnée."],
+  ["anec", "{cloud-rain} Il a beaucoup plu ce week-end."],
+  ["act", "{hand-pointer} Écris un mail pour rappeler de payer la cotisation."],
+  ["p35", "{tag} La cotisation de cette année est de 35 €."],
+  ["p30", "{tag} L'an dernier, la cotisation était de 30 €."],
+];
+const whyRows = WHY_ROWS.map(([k, text]) => { const r = h("div", "why-row", text); r.dataset.k = k; $("#whyRows").append(r); return r; });
+// L'état de chaque phrase, étape par étape.
+const WHY_STATE = [
+  () => "lit",
+  (k) => (k === "p35" || k === "p30" ? "hit" : "off"),
+  (k) => (k === "p35" || k === "p30" ? "trap" : "off"),
+  (k) => (k === "p30" ? "trap" : k === "p35" ? "hit" : "off"),
+];
+const WHY_STEPS = [
+  { label: "Elle lit tout", title: "L'IA lit tout ton prompt", text: "Pour elle, chaque phrase compte. Même celle qui ne sert à rien." },
+  { label: "Elle cherche", title: "Elle cherche ce qui répond", text: "Ta demande : rappeler de payer la cotisation. Il lui faut un prix. Deux phrases parlent d'un prix. L'anecdote, elle, ne la gêne presque pas." },
+  { label: "Ça se ressemble", title: "Deux prix se ressemblent", text: "35 € et 30 € : le même club, la même cotisation. Seuls les mots « l'an dernier » disent que 30 € est l'ancien prix." },
+  { label: "Elle choisit", title: "Elle peut prendre le mauvais", text: "Souvent, elle prend le bon prix. Mais parfois, elle écrit 30 €. Enlève l'ancien prix : plus de piège." },
+];
+procedure($("#whyProc"), WHY_STEPS, (i, from) => {
+  whyRows.forEach((r) => {
+    const state = WHY_STATE[i](r.dataset.k), changed = from !== null && state !== WHY_STATE[from](r.dataset.k);
+    r.className = "why-row " + state;
+    if (changed && state !== "off") replay(r, "pop");
+  });
+  const slot = $("#whySlot");
+  slot.textContent = i === 3 ? "30 €" : "…";
+  slot.classList.toggle("trap", i === 3);
+  if (i === 3 && from !== null) replay(slot, "drop");
+});
+
+// Devine d'abord : avec « Écris un mail. », l'IA devine tout le reste.
+guess($("#promptGuess"), {
+  q: "Tu écris seulement : « Écris un mail. » Que fait l'IA ?",
+  options: [["ask", "Elle te pose des questions"], ["guess", "Elle écrit un mail, et devine le reste"], ["no", "Elle refuse"]], a: "guess",
+  why: "Le plus souvent, elle écrit un mail passe-partout. Elle devine à qui tu écris, pourquoi, et sur quel ton. Ajoute les 3 morceaux pour voir la différence.",
+  lock: [$("#ppSet"), $("#ppOut")],
+});
+
 // Défi final
 initDefi([
   { q: "Tu veux corriger les fautes d'un e-mail. Quel modèle ?", a: "rapide",
@@ -1278,17 +1533,16 @@ initDefi([
   { q: "Ton appli a un bug très difficile à trouver. Que choisis-tu ?", a: "expert",
     options: [["rapide", "Rapide"], ["standard", "Standard, effort moyen"], ["expert", "Expert, effort haut"]],
     why: "Une tâche dure : l'expert, avec du temps pour réfléchir." },
-  { q: "Tu dois résumer 500 avis clients, chaque jour.", a: "rapide",
-    options: [["rapide", "Rapide"], ["expert", "Expert, effort max"]],
-    why: "Une tâche simple, en gros volume : le modèle rapide suffit. Dans notre simulation, il coûte plus de 20 fois moins cher que l'expert en effort max. Chaque token coûte 4 fois moins cher. Et il ne passe pas de temps à réfléchir." },
-  { q: "Monter l'effort, ça veut dire…", a: "think",
-    options: [["fast", "L'IA répond plus vite"], ["think", "L'IA réfléchit plus longtemps"], ["model", "On change de modèle"]],
-    why: "Plus d'effort = plus de tokens de réflexion. Plus lent et plus cher, mais utile pour les tâches difficiles." },
   { q: "Le modèle expert te répond à côté de ce que tu voulais. Que fais-tu d'abord ?", a: "ask",
     options: [["effort", "Je monte l'effort au max"], ["ask", "Je précise ma demande"], ["same", "Je renvoie le même message"]],
     why: "L'IA ne devine pas ce que tu veux. Préciser ta demande est gratuit. Plus d'effort coûte plus cher, et ne l'aide pas à deviner." },
-  { q: "Quelle demande donne la meilleure affiche ?", a: "clear",
-    options: [["vague", "« Fais une belle affiche, vite ! »"], ["clear", "« Une affiche A4 pour la fête du quartier, samedi à 14 h. Couleurs gaies. »"]],
-    why: "Elle dit ce que tu veux, pour quoi et sous quelle forme. L'IA n'a plus à deviner." },
+  { q: "« Je tiens un petit restaurant à Nouméa. » C'est quel morceau du prompt ?", a: "ctx",
+    options: [["ctx", "{user} Le contexte"], ["act", "{hand-pointer} L'action"], ["obj", "{bullseye} L'objectif"]],
+    why: "C'est ta situation : qui tu es. L'IA n'a plus à le deviner." },
+  { q: "Pour écrire ton mail, tu colles le tarif de cette année et celui de l'an dernier. C'est…", a: "piege",
+    options: [["utile", "{circle-plus} Utile : plus l'IA en sait, mieux c'est"], ["piege", "{triangle-exclamation} Un piège : l'ancien tarif ressemble au bon"], ["rien", "{circle-minus} Sans effet : l'IA ignore toujours ce qui ne sert pas"]],
+    why: "L'ancien tarif ressemble au bon : l'IA peut prendre le mauvais prix. Garde seulement ce qui sert à ta demande." },
 ]);
+renderPrompt();
+renderDistr();
 </script>

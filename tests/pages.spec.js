@@ -52,8 +52,10 @@ for (const f of FICHES) {
 
   test(`${f} : chaque zone floutée dit quoi faire, puis se débloque`, async ({ page, isMobile }) => {
     await open(page, f);
+    // Chaque fiche pose au moins une question « Devine d'abord ».
     const n = await page.locator(".locked").count();
-    test.skip(n === 0, "pas de question « Devine d'abord » dans cette fiche");
+    expect(await page.locator(".guess").count(), "question « Devine d'abord »").toBeGreaterThan(0);
+    expect(n).toBeGreaterThan(0);
     expect(await page.locator(".locked > .lock-tip").count()).toBe(n);
     if (isMobile) {
       // Sur téléphone, on lit la question avant de tomber sur les zones qu'elle débloque.
@@ -68,7 +70,31 @@ for (const f of FICHES) {
     await expect(page.locator(".locked")).toHaveCount(0);
     await expect(page.locator(".lock-tip")).toHaveCount(0);
   });
+
+  // Chaque fiche a ses réflexes à cocher : la jauge se remplit, et la coupe arrive quand tout est coché.
+  test(`${f} : « Mes réflexes » se cochent, et la jauge se remplit`, async ({ page }) => {
+    await open(page, f, "?demo=1");
+    const boxes = page.locator("#check input[type=checkbox]"), n = await boxes.count();
+    expect(n).toBeGreaterThanOrEqual(6);
+    await expect(page.locator("#chkTxt")).toHaveText(new RegExp(`^0\\s+sur\\s+${n}$`));
+    for (const b of await boxes.all()) await b.check();
+    await expect(page.locator("#chkTxt")).toHaveText(new RegExp(`^${n}\\s+sur\\s+${n}`));
+    await expect(page.locator("#chkTxt .fa-trophy")).toHaveCount(1);
+    expect(await page.locator("#chkFill").evaluate((e) => e.style.width)).toBe("100%");
+  });
 }
+
+// Les fiches ont une longueur proche : la plus longue fait moins de 1,75 fois la plus courte, sur bureau comme sur téléphone.
+// Si une fiche grandit trop, range une partie de son contenu dans une fiche plus courte.
+test(`les ${FICHES.length} fiches ont une longueur proche`, async ({ page }) => {
+  const heights = {};
+  for (const f of FICHES) {
+    await open(page, f, "?demo=1");
+    heights[f] = await page.evaluate(() => document.documentElement.scrollHeight);
+  }
+  const hs = Object.values(heights);
+  expect(Math.max(...hs) / Math.min(...hs), JSON.stringify(heights)).toBeLessThan(1.75);
+});
 
 test.describe("6-message-piege.html : ce que tu vois, ce que l'IA lit", () => {
   test("l'e-mail vient avant la question, sans zone floutée entre les deux", async ({ page, isMobile }) => {

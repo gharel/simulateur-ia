@@ -4,21 +4,21 @@
 
 **Partie 1 · Comprendre comment elle marche**
 
-1. **Le Sac à Tokens** : les tokens, et comment l'IA découpe le texte
+1. **Le Sac à Tokens** : les tokens, comment l'IA découpe le texte, et comment elle écrit en devinant le token suivant
 2. **La Mémoire qui Déborde** : la conversation relue à chaque message, la fenêtre de contexte, la compression, et le « context rot » (plus le texte est long, plus l'IA rate de détails)
-3. **Le Bon Cerveau** : choisir le modèle et l'effort, et écrire une demande précise (bonne réponse = bon modèle + bonne demande), et les noms des modèles chez Claude et ChatGPT
+3. **Le Bon Cerveau** : choisir le modèle et l'effort, les noms des modèles chez Claude et ChatGPT, le bon prompt (contexte, action précise, objectif), et les infos en trop qui trompent l'IA (les distracteurs). Bonne réponse = bon modèle + bonne demande
 
 **Partie 2 · Repérer les pièges**
 
-4. **Le Détecteur de Bobards** : les hallucinations, et pourquoi l'IA devine au lieu de dire « je ne sais pas »
+4. **Le Détecteur de Bobards** : les hallucinations, pourquoi l'IA devine au lieu de dire « je ne sais pas », et pourquoi il faut le bon document, pas toute la pile (ce que mesurent les chercheurs)
 5. **L'IA qui Dit Oui** : la complaisance
 6. **Le Message Piégé** : l'injection de prompt et le « trio dangereux »
 
 **Partie 3 · Agir avec l'IA**
 
-7. **La Boîte à Outils de l'IA** : le bon prompt (contexte, action précise, objectif), les infos en trop qui trompent l'IA (les distracteurs), répondre ou agir (l'exemple de Claude, qui réunit Chat et Cowork), l'agent de code, Projets, Skills, Connecteurs, les risques de chaque outil, et les noms de ces outils chez Claude et ChatGPT
-8. **L'Agent sur Mesure** : ce qu'est un agent (la boucle regarde, décide, agit, vérifie), créer le sien en 5 étapes, ses fichiers (AGENTS.md pour les consignes, SKILL.md pour une méthode, et où ranger la méthode pour qu'elle ne prenne pas de place à chaque tâche), et où ranger ses consignes chez Claude et ChatGPT
-9. **Forfait ou Compteur ?** : abonnement ou paiement à l'usage, et les noms des forfaits chez Claude et ChatGPT
+7. **La Boîte à Outils de l'IA** : répondre ou agir (l'exemple de Claude, qui réunit Chat et Cowork), ce qu'est un agent (la boucle regarde, décide, agit, vérifie), l'agent de code, Projets, Skills, Connecteurs, les risques de chaque outil, et les noms de ces outils chez Claude et ChatGPT
+8. **L'Agent sur Mesure** : créer son agent en 5 étapes, ses fichiers (AGENTS.md pour les consignes, SKILL.md pour une méthode, et où ranger la méthode pour qu'elle ne prenne pas de place à chaque tâche), et où ranger ses consignes chez Claude et ChatGPT
+9. **Forfait ou Compteur ?** : abonnement ou paiement à l'usage, pourquoi une longue conversation coûte plus cher, et les noms des forfaits chez Claude et ChatGPT
 
 ## Jouer
 
@@ -34,8 +34,11 @@ Chaque fiche contient :
   - fiche 7 : Les missions de la cuisine ;
   - fiche 8 : Le banc d'essai ;
   - fiche 9 : Fais ton pari.
-- **des questions « Devine d'abord »** : on répond avant de voir le résultat.
-- **un défi final** : seule la 1re réponse compte. Il donne un badge et de 1 à 3 étoiles.
+- **des questions « Devine d'abord »** : on répond avant de voir le résultat. Au moins une par fiche.
+- **« Mes réflexes »** : 6 ou 7 bonnes habitudes à cocher.
+- **un défi final** de 5 questions : seule la 1re réponse compte. Il donne un badge et de 1 à 3 étoiles.
+
+Les fiches ont une longueur proche : la plus longue fait moins de 1,75 fois la plus courte (un test le vérifie).
 
 Avec les 9 badges, l'accueil délivre un **permis de conduire l'IA** à imprimer.
 
@@ -85,8 +88,8 @@ Les animations montrent ce qui change quand tu agis : les tokens tombent un par 
 
 Les explications en étapes sont des **schémas pas à pas** : un rail d'étapes, le texte de l'étape, et un schéma qui change à chaque clic.
 
-- fiche 1 : remplis le sac de 200 000 tokens, jusqu'à ce qu'il déborde ;
-- fiche 4 : la machine à deviner le mot suivant, sur une question connue ou rare ;
+- fiche 1 : remplis le sac de 200 000 tokens, jusqu'à ce qu'il déborde. Puis la machine à deviner le mot suivant, sur une question connue ou rare ;
+- fiche 3 : l'info piège. L'IA lit tout le prompt, cherche un prix, en trouve deux qui se ressemblent, et peut prendre le mauvais ;
 - fiche 5 : tu notes 2 réponses avec 9 autres personnes, et l'IA apprend que le oui plaît ;
 - fiche 6 : l'ordre caché va du pirate à l'e-mail, puis à l'IA, puis revient au pirate. Le fil de texte se voit avec tes yeux, ou avec ceux de l'IA ;
 - fiche 8 : un formulaire en 5 étapes (tâche, consignes, outils, limites, test) remplit le plan de ton agent. Les tests disent quelle étape corriger ;

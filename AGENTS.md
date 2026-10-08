@@ -27,7 +27,7 @@ npm test
 
 - Les tests ouvrent les pages en `file://`. Ils ont besoin d'internet : Font Awesome et les polices viennent de CDN.
 - Une seule page : `npx playwright test -g "4-hallucinations"`. Sous Windows, n'écris pas de `|` dans `-g` : lance une commande par page.
-- Les tests vérifient : pas d'emoji, blocs communs identiques, pages sans erreur JS, icônes connues, logo et lien Skazy Formation, bouton Accueil, pas de défilement horizontal, pas de grand vide en bas des cartes, pas de mauvaise coupure de ligne, pas de mot seul sur sa ligne dans un titre ou un bouton, pas de texte qui dépasse de sa case (aussi avec les jeux au maximum), zones floutées après leur question, mode démonstration, contraste de chaque texte, mode nuit des navigateurs sans effet, jeux et défis qui fonctionnent.
+- Les tests vérifient : pas d'emoji, blocs communs identiques, pages sans erreur JS, icônes connues, logo et lien Skazy Formation, bouton Accueil, pas de défilement horizontal, pas de grand vide en bas des cartes, pas de mauvaise coupure de ligne, pas de mot seul sur sa ligne dans un titre ou un bouton, pas de texte qui dépasse de sa case (aussi avec les jeux au maximum), zones floutées après leur question, mode démonstration, contraste de chaque texte, mode nuit des navigateurs sans effet, jeux et défis qui fonctionnent, réflexes et « Devine d'abord » dans chaque fiche, fiches de longueur proche.
 - Si tu changes une mise en page, regarde aussi le rendu toi-même, sur bureau et sur téléphone (captures Playwright).
 
 ## Règles
@@ -45,6 +45,8 @@ npm test
   - dans le HTML : `<i class="fa-solid fa-coins" aria-hidden="true"></i>` ;
   - dans un texte JS : `{coins}`, affiché avec `rich(el, texte)` ou `h(tag, classe, texte)` ;
   - en CSS : vise `.fa-coins` ou `.svg-inline--fa`, jamais `.fa-solid`, qui disparaît une fois l'icône affichée.
+- **Trame des fiches.** Chaque fiche a la même trame : la carte du titre, ses cartes (avec au moins une question « Devine d'abord » et un mini-jeu), « Mes réflexes » (6 ou 7 cases à cocher), « À retenir », puis un défi final de 5 questions. Le CSS et le JS de « Mes réflexes » sont dans les blocs communs : écris seulement la carte (`#check`, `#chkTxt`, `#chkFill`).
+  - Les fiches gardent une longueur proche : un test refuse que la plus longue fasse 1,75 fois la plus courte, sur bureau comme sur téléphone. Si une fiche grandit trop, range une partie de son contenu dans une fiche plus courte, là où elle a du sens.
 - **FALC.** Des phrases courtes, le tutoiement, et chaque mot difficile expliqué.
 - **Contraste.** Chaque texte doit atteindre 4,5:1 contre son fond (3:1 au-dessus de 24 px, ou de 18,66 px en gras), en thème clair comme en thème sombre. N'utilise pas `opacity` pour estomper un texte : choisis une couleur (`--muted`) ou un contour. Le test `tests/contraste.spec.js` mesure chaque texte, avant et après avoir joué.
 - **Animations.** Une animation montre ce qui change quand on agit : un score qui monte, une étape d'un schéma, un classement qui s'inverse. Elle dure de 0,3 à 0,6 s. Les cartes ne bougent pas : pas d'animation à l'arrivée d'une carte, ni au défilement.
@@ -56,7 +58,7 @@ npm test
   - `steps` : `[{ label, title, text }]`. `label` est court (le rail), `title` et `text` peuvent être des fonctions, quand l'étape dépend d'un réglage ;
   - `show(i, from)` redessine le schéma pour l'étape `i`. `from` vaut l'étape d'avant, ou `null` au premier affichage et après `redraw()` : n'anime que quand l'étape change. `.proc[data-at]` donne l'étape au CSS ;
   - sur téléphone, le rail ne garde que les numéros. Range le schéma pour que ce qui change soit juste au-dessus des boutons ;
-  - les schémas des fiches : le sac à remplir (1), la machine à deviner le mot suivant (4), l'entraînement qui récompense le oui (5), le chemin de l'ordre caché (6), l'info piège qui trompe l'IA (7), le plan de l'agent en 5 étapes (8), le quota et la facture d'une grosse journée (9).
+  - les schémas des fiches : le sac à remplir et la machine à deviner le mot suivant (1), l'info piège qui trompe l'IA (3), l'entraînement qui récompense le oui (5), le chemin de l'ordre caché (6), le plan de l'agent en 5 étapes (8), le quota et la facture d'une grosse journée (9).
 - **Mode nuit des navigateurs.** Les pages ont leur propre thème sombre. Chaque page garde `<meta name="color-scheme" content="light dark">` et `<meta name="darkreader-lock">`, sinon le mode nuit de Brave ou Dark Reader inverse les couleurs (texte clair sur les cartes jaunes).
 - **Mise en page.** La grille a 4 colonnes (`s1` à `s4`). Les cartes d'une même rangée prennent la hauteur de la plus haute. Associe donc des contenus de hauteur proche : le test refuse plus de 120 px de vide en bas d'une carte. Si « À retenir » est plus court que sa voisine, mets-le en pleine largeur (`s4`).
   - Sur téléphone, un tableau dans `.tbl-wrap` devient une suite de blocs : la 1re case donne le titre de la ligne, les autres rappellent le nom de leur colonne. Le JS commun le prend dans `<thead>` (ou dans l'`aria-label` d'une icône) et le met dans `data-label`.
