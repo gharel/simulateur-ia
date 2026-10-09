@@ -59,22 +59,28 @@ Les deux boutons sont en bas de chaque page, avec une courte explication. Le mod
 
 Pour enlever un mode : le même bouton, ou l'adresse avec `=0` (par exemple `?demo=0`).
 
-En haut de chaque fiche, le bouton « Accueil » ramène à la page d'accueil.
+En haut de chaque fiche, le bouton « Accueil » ramène à la page d'accueil. La pastille et le nom « Comprendre l'IA » y ramènent aussi.
+
+Sur chaque page, après un écran de défilement, un bouton rond vert, en bas à droite, fait remonter en haut de la page.
 
 ## Skazy Formation
 
 Les fiches sont une ressource [Skazy Formation](https://formation.skazy.nc/).
-En haut de chaque page, le bandeau : le logo (un lien vers formation.skazy.nc), un filet, la pastille de l'outil et son nom, « Comprendre l'IA ». Sur téléphone, le nom laisse la place au bouton Accueil des fiches : la pastille reste. En bas, une mention avec un lien vers formation.skazy.nc. Le permis imprimé porte aussi le logo.
-Le logo est un SVG intégré dans la page : le mot « skazy » prend la couleur du texte (clair ou sombre selon le thème), « formation » reste vert `#00997A`.
+En haut de chaque page, le bandeau, dans le même ordre que les autres outils Skazy Formation :
+- à gauche, le bouton « Accueil » (sur les fiches) et un filet, puis la pastille de l'outil et son nom, « Comprendre l'IA » : un lien vers l'accueil ;
+- à droite, « Les outils » (la page de tous les outils Skazy Formation, avec leur roue), un filet, et le logo, un lien vers formation.skazy.nc qui s'ouvre dans un nouvel onglet.
 
-Chaque outil Skazy Formation a sa couleur de l'arc-en-ciel, dans cet ordre : Quiz rouge, Mini-jeux orange, Vigie jaune, Atelier d’exercices IA vert, Comprendre l'IA bleu, Prompthèque violet. Le favicon (pictogramme blanc sur un dégradé de cette couleur) sert aussi de pastille dans le bandeau : logo Skazy Formation, filet, pastille, nom de l'outil. Titre d'onglet : « Page · Nom · Skazy Formation ».
+Sur téléphone, « Les outils » et le bouton « Accueil » ne gardent que leur icône, et le nom laisse la place au bouton Accueil des fiches : la pastille reste. En bas, une mention avec un lien vers formation.skazy.nc. Le permis imprimé porte aussi le logo.
+Le logo est un SVG intégré dans la page : le mot « skazy » prend la couleur du texte (clair ou sombre selon le thème), « formation » reste vert `#00997A`. La roue de « Les outils » est le fichier `les-outils.svg`, une copie du favicon de la page Les outils.
+
+Chaque outil Skazy Formation a sa couleur de l'arc-en-ciel, dans cet ordre : Quiz rouge, Mini-jeux orange, Vigie jaune, Atelier d’exercices IA vert, Comprendre l'IA bleu, Prompthèque violet. Le favicon (pictogramme blanc sur un dégradé de cette couleur) sert aussi de pastille dans le bandeau. Titre d'onglet : « Page · Nom · Skazy Formation ».
 Ici, le favicon (`favicon.svg`, et ses copies `favicon-32.png` et `apple-touch-icon.png`) montre des curseurs blancs sur un dégradé bleu. Les onglets s'appellent « Comprendre l'IA · Skazy Formation » pour l'accueil, et par exemple « Le Sac à Tokens · Comprendre l'IA · Skazy Formation » pour une fiche.
 
 ## Technique
 
 Pages HTML statiques, sans étape de build. Ouvrir `index.html`.
 
-Chaque fiche est autonome : CSS et JS sont dans le fichier. Le bloc « Parcours » (défi, badges, mode atelier) est le même dans les 9 fiches. Si tu le modifies, modifie-le partout. Le bandeau Skazy Formation aussi.
+Chaque fiche est autonome : CSS et JS sont dans le fichier. Le bloc « Parcours » (défi, badges, mode atelier) est le même dans les 9 fiches. Si tu le modifies, modifie-le partout. Le bandeau Skazy Formation et le bouton « Remonter en haut » aussi, sur les 10 pages.
 
 ### Icônes
 
@@ -112,7 +118,7 @@ npx playwright install chromium
 npm test
 ```
 
-Les tests Playwright ouvrent chaque page sur bureau et sur téléphone. Ils vérifient les icônes, la marque Skazy Formation, la mise en page, les coupures de ligne (pas de ponctuation seule en début de ligne, pas de mot coupé), les zones floutées, le contraste de chaque texte (thèmes clair et sombre) et les jeux.
+Les tests Playwright ouvrent chaque page sur bureau et sur téléphone. Ils vérifient les icônes, la marque Skazy Formation (l'ordre et les liens du bandeau, rien qui dépasse à 390 et 360 px), le bouton « Remonter en haut », la mise en page, les coupures de ligne (pas de ponctuation seule en début de ligne, pas de mot coupé), les zones floutées, le contraste de chaque texte (thèmes clair et sombre) et les jeux.
 
 Les pages ont leur propre thème sombre. Elles demandent aux modes nuit forcés (mode nuit de Brave, extension Dark Reader) de ne pas changer leurs couleurs, avec `<meta name="darkreader-lock">`.
 

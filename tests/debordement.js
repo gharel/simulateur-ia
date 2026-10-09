@@ -14,9 +14,11 @@ async function overflowIssues() {
   const isBox = (cs) => cs.backgroundColor !== "rgba(0, 0, 0, 0)" || cs.backgroundImage !== "none" || cs.overflowX !== "visible"
     || ["Top", "Right", "Bottom", "Left"].some((s) => parseFloat(cs[`border${s}Width`]) > 0 && cs[`border${s}Style`] !== "none");
   const range = document.createRange();
+  // Un texte masqué pour les yeux, mais lu par les lecteurs d'écran (« Accueil » dans le bandeau, sur téléphone) : sa case fait 1 px.
+  const masked = (e) => getComputedStyle(e).clipPath === "inset(50%)";
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode: (n) => (n.data.trim() && !n.parentElement.closest("script, style, svg, textarea, .confetti, .locked") && n.parentElement.checkVisibility({ visibilityProperty: true })
-      ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT),
+      && !masked(n.parentElement) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT),
   });
   for (let n; (n = walker.nextNode());) {
     range.selectNodeContents(n);

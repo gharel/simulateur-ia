@@ -246,25 +246,48 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
   border: 2px dashed var(--line); color: var(--muted); font-weight: 700; font-size: .95rem;
 }
 
-/* Skazy Formation : logo en haut, mention en bas (même bloc dans chaque fiche) */
-.brand { margin-bottom: clamp(24px, 3.2vw, 40px); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.brand a { display: inline-flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; color: var(--fg); text-decoration: none; border-radius: 10px; }
-.brand-logo { display: block; width: 109px; height: 36px; flex: none; }
-/* Après le logo, la signature de l'outil : un filet discret, la pastille (le favicon de l'outil) et son nom. */
-.brand-id { display: flex; align-items: center; }
-.brand-tool { position: relative; display: flex; align-items: center; gap: 10px; margin-left: 16px; padding-left: 17px; }
-.brand-tool::before { content: ""; position: absolute; left: 0; top: calc(50% - 12px); width: 1px; height: 24px; background: color-mix(in oklab, var(--muted) 35%, transparent); }
-.brand-tool img { display: block; flex: none; }
-.brand-name { font-size: 1.0625rem; font-weight: 700; line-height: 1.2; color: var(--fg); white-space: nowrap; }
-.brand-foot a { color: var(--fg); font-weight: 700; }
-.brand .home {
-  flex: none; gap: 8px; padding: 8px 14px; min-height: 44px; border: 2px solid var(--line); border-radius: 12px;
-  background: var(--surface); font-weight: 700; font-size: .95rem;
-}
+/* Skazy Formation : le bandeau en haut, la mention en bas, le bouton « Remonter en haut » (même bloc sur chaque page).
+   Le bandeau, de gauche à droite : le bouton Accueil et un filet (fiches), puis la signature de l'outil, un seul lien vers l'accueil :
+   la pastille (le favicon de l'outil) et son nom. À droite : « Les outils » (tous les outils Skazy Formation), un filet, le logo en dernier. */
+.brand { margin-bottom: clamp(24px, 3.2vw, 40px); display: flex; align-items: center; gap: 12px; }
+.brand a { flex: none; display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--fg); text-decoration: none; border-radius: 10px; }
+.brand .home { gap: 8px; padding: 8px 14px; border: 2px solid var(--line); border-radius: 12px; background: var(--surface); font-weight: 700; font-size: .95rem; }
 .brand .home:hover { border-color: var(--accent); }
-/* Sur téléphone, la pastille reste. Le nom laisse la place au bouton Accueil (fiches), ou à un écran très étroit (accueil). */
-@media (max-width: 480px) { .home ~ .brand-id .brand-name { display: none; } }
-@media (max-width: 359px) { .brand { gap: 8px; } .brand-tool { margin-left: 12px; padding-left: 13px; } .brand-name { display: none; } }
+.brand-sep { flex: none; width: 1px; height: 24px; background: color-mix(in oklab, var(--muted) 35%, transparent); }
+.brand img { display: block; flex: none; }
+.brand-name { font-size: 1.0625rem; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+.brand-tool:hover .brand-name { text-decoration: underline; text-underline-offset: 3px; }
+.brand .brand-outils { margin-left: auto; gap: 8px; min-height: 40px; padding: 7px 12px; border-radius: 99px; font-size: .9375rem; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+.brand .brand-outils:hover { background: var(--line); }
+.brand .brand-logo { display: block; width: 109px; height: 36px; }
+.brand-foot a { color: var(--fg); font-weight: 700; }
+/* Sur téléphone, les icônes et la pastille restent. Un texte caché reste lu par les lecteurs d'écran.
+   « Les outils » garde sa roue, et le nom de l'outil laisse la place au bouton Accueil (fiches). Plus étroit, Accueil garde sa maison.
+   Sur un écran très étroit, l'accueil cache aussi le nom. */
+@media (max-width: 640px) {
+  .brand .brand-outils { justify-content: center; min-width: 40px; padding: 7px; }
+  .brand-tool img { width: 24px; height: 24px; }
+  .brand .brand-logo { width: 91px; height: 30px; }
+  .brand-outils .brand-txt, .home ~ .brand-tool .brand-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+@media (max-width: 480px) {
+  .brand .home { justify-content: center; width: 44px; padding: 0; }
+  .home .brand-txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+@media (max-width: 400px) { .brand { gap: 8px; } .brand .brand-logo { width: 79px; height: 26px; } }
+@media (max-width: 359px) { .brand-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } }
+/* Remonter en haut : un bouton rond en bas à droite, qui paraît après un écran de défilement (voir initToTop() dans le script). */
+.to-top {
+  position: fixed; right: 24px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 40;
+  display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 0; border-radius: 50%;
+  background: #3D7A62; color: #FFFFFF; font-size: 1.15rem; cursor: pointer; box-shadow: 0 6px 20px rgb(0 0 0 / .3);
+  opacity: 0; visibility: hidden; transform: translateY(calc(-1 * var(--lift, 0px)));
+  transition: opacity .3s ease, visibility .3s, transform .3s ease;
+}
+.to-top.on { opacity: 1; visibility: visible; }
+.to-top:hover { background: #2F6150; }
+@media (max-width: 640px) { .to-top { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: 44px; height: 44px; } }
+@media print { .to-top { display: none; } }
 .modes { display: flex; flex-wrap: wrap; gap: 8px; }
 .modes-help { display: grid; gap: 8px; max-width: 80ch; }
 
@@ -475,14 +498,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 </style>
 
 <main class="wrap">
-  <header class="brand">
-    <a class="home" href="index.html"><i class="fa-solid fa-house" aria-hidden="true"></i> Accueil</a>
-    <div class="brand-id">
-      <a href="https://formation.skazy.nc/" target="_blank" rel="noopener" aria-label="Site de Skazy Formation (nouvel onglet)">
-        <svg class="brand-logo" viewBox="0 0 218 72" aria-hidden="true" focusable="false"><path fill-rule="evenodd" fill="currentColor" d="m202.4 1.4h15.3l-16 52.6q-1.1 3.5-3 6.3c-1.3 1.9-2.9 3.5-4.7 4.8-1.8 1.4-3.8 2.4-6 3.1-2.2 0.7-4.5 1.1-6.9 1.1-3 0-5.9-0.6-8.7-1.7v-14.4c2.8 1 5.1 1.5 7 1.5 3.7 0 5.6-2 6-6.2l-13.4-37v0.1l-21.3 25.3h26.7l3.9 11.6h-51.8c-3.1 0-5 0.1-6.3-0.8-1.6-1.1-2.6-2.8-3.1-4.9l-0.4-1.7c-2.1 2.7-4.5 4.7-7.2 6.1q-4 2.1-8.7 2.1c-2.3 0-4.5-0.4-6.5-1.2-2-0.8-3.7-1.9-5.2-3.2-1.4-1.4-2.6-3-3.4-4.8q-1.2-2.8-1.2-6c0-2.4 0.5-4.5 1.5-6.5q1.5-3 4.2-5.1c1.8-1.4 3.9-2.5 6.4-3.3 2.5-0.8 5.2-1.2 8.2-1.2 3.8 0 6.9 0.6 9.4 1.8v-1.4c0-2.2-0.6-3.8-1.9-4.9-1.3-1.1-3.3-1.6-6.2-1.6-2.7 0-5.1 0.4-7.4 1.3-2.2 0.9-4.6 2.1-7.1 3.8l-4.9-10.5c6.2-4 13.2-6 21.1-6 7.5 0 13.3 1.7 17.3 5 4.1 3.4 6.1 8.3 6.1 15v9.1c0 1.6 0.2 2.7 0.7 3.3 0.3 0.5 1.2 1.3 2.7 0l16.9-19.9h-20v-11.6h51.5l9 32.6 7.4-32.7zm-84.9 30.5v-3.3q-1.5-0.6-3.3-0.9c-1.2-0.3-2.3-0.4-3.2-0.4-2.1 0-3.8 0.5-5.2 1.5-1.4 1-2.1 2.3-2.1 3.8 0 1.3 0.6 2.4 1.6 3.2 1.1 0.8 2.4 1.2 4 1.2 1 0 2-0.2 3.1-0.5 1-0.3 2-0.8 2.8-1.3 0.7-0.5 1.2-1 1.6-1.6 0.4-0.5 0.6-1.1 0.6-1.7zm-94.6 18.2c-4.2 0.1-8.3-0.4-12.4-1.6-4.1-1.2-7.5-3.1-10.4-5.6l5.6-10.6c3.1 1.9 6 3.4 8.8 4.4 2.8 1 5.4 1.5 7.7 1.4q3.6-0.2 3.6-2.4 0-1.4-1.5-2.1c-1-0.6-2.8-1.2-5.6-1.9-3.4-0.9-6.3-1.7-8.6-2.6-2.3-0.9-4.2-1.8-5.7-2.9-1.5-1-2.5-2.2-3.2-3.5-0.7-1.3-1-2.9-1.1-4.7-0.1-2.4 0.3-4.7 1.2-6.8 0.9-2.1 2.2-3.9 3.9-5.5 1.7-1.6 3.7-2.8 6.1-3.7q3.6-1.4 7.8-1.5c3.5-0.1 6.9 0.2 10.1 1 3.2 0.8 6.5 2.5 9.8 5.2l-6.2 10.6c-3-1.8-5.6-3.1-7.6-3.9-2-0.8-3.9-1.1-5.7-1-1 0-1.9 0.3-2.5 0.7-0.7 0.4-1 1.1-0.9 1.9 0 0.9 0.5 1.6 1.5 2.2 1 0.5 2.9 1.1 5.8 1.8 3.5 0.8 6.5 1.6 8.9 2.6 2.4 0.9 4.3 1.9 5.8 3.1 1.5 1.1 2.5 2.4 3.2 3.9 0.7 1.5 1 3.2 1.1 5.1 0.1 2.5-0.3 4.7-1.1 6.7-0.8 2-2.1 3.7-3.8 5.2-1.7 1.5-3.7 2.6-6.2 3.4-2.5 0.6-5.3 1-8.4 1.1z"/><path fill="currentColor" d="m72.5 49.3l-10.9-17.5-3.5 3.8v13.7h-17.3v-49.2h17.3v19l12.9-17.8h18.3l-16.5 21 18.2 27z"/><path fill-rule="evenodd" fill="#00997A" d="m21.6 53.6v0.6h3.6v5h-3.6v11.8h-5.7v-11.8h-2.2v-5h2.2v-0.6c0-3.4 1.8-6.3 5.5-6.3 1.1 0 2.7 0.2 3.8 0.6v4.4c-0.6-0.2-1.2-0.4-1.8-0.4-1.5 0.1-1.8 1.2-1.8 1.7zm4.7 9c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm18.9-9.2l-0.9 5.7c-0.2 0-0.6-0.1-0.9-0.1-1.7 0-4.1 0.7-4.1 5.2v6.8h-5.7v-16.8h5.2l0.3 2c1.8-2 4.1-2.7 6.1-2.8zm28.8 8.5v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.9 0-2.8 1.3-2.8 3.2v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.8 0-2.8 1.3-2.8 3.2v9.1h-5.7v-16.8h5.2l0.2 1.3c1.2-1.2 2.9-1.9 5-1.9 2 0 3.9 0.6 5 2.8 1.2-1.7 3.2-2.8 5.8-2.8 3.3 0 6.3 1.6 6.3 8.3zm20.9-7.7v16.8h-5.2l-0.3-1.7c-1.2 1.5-3.1 2.3-5.3 2.3-5.1 0-8.4-4.2-8.4-9 0-5 3.5-9 8.4-9 2.2 0 4.1 0.8 5.3 2.3l0.3-1.7zm-5.7 8.3c0-2.4-1.8-3.8-3.9-3.8-2.3 0-4 1.8-4 3.9 0 2 1.6 3.9 4 3.9 2.3 0 3.9-1.7 3.9-4zm9.4 2.8v-6.2h-2.4v-4.5h0.5c1.5 0 2.4-0.8 2.4-2.3v-1.7h5.1v3.5h3.4v5h-3.4v5.9c0 1.2 0.7 1.7 1.7 1.7 0.5 0 1.2-0.2 1.7-0.3v4.3c-0.9 0.4-2.5 0.6-3.6 0.6-4.1 0-5.4-2.8-5.4-6zm11.1-15.5c0-1.6 1.4-2.8 3.2-2.8 1.8 0 3.2 1.3 3.2 2.8 0 1.5-1.3 2.8-3.2 2.8-1.9 0-3.2-1.3-3.2-2.8zm0.3 4.4h5.7v16.8h-5.7zm7.7 8.4c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm23.7-0.7v9.1h-5.7v-9.1c0-2.3-1-3.2-2.7-3.2-1.8 0-2.9 1.3-2.9 3.2v9.1h-5.7v-16.8h5.2l0.2 1.5c1.3-1.2 3-2 5.2-2 3.2-0.1 6.4 1.5 6.4 8.2z"/></svg>
-      </a>
-      <span class="brand-tool"><img src="favicon.svg" width="28" height="28" alt=""><span class="brand-name">Comprendre l'IA</span></span>
-    </div>
+  <header class="brand" tabindex="-1">
+    <a class="home" href="index.html"><i class="fa-solid fa-house" aria-hidden="true"></i> <span class="brand-txt">Accueil</span></a>
+    <span class="brand-sep" aria-hidden="true"></span>
+    <a class="brand-tool" href="index.html"><img src="favicon.svg" width="28" height="28" alt=""><span class="brand-name">Comprendre l'IA</span></a>
+    <a class="brand-outils" href="https://gharel.github.io/home/" title="Tous les outils Skazy Formation"><img src="les-outils.svg" width="26" height="26" alt=""><span class="brand-txt">Les outils</span></a>
+    <span class="brand-sep" aria-hidden="true"></span>
+    <a class="brand-skazy" href="https://formation.skazy.nc/" target="_blank" rel="noopener" aria-label="Site de Skazy Formation (nouvel onglet)">
+      <svg class="brand-logo" viewBox="0 0 218 72" aria-hidden="true" focusable="false"><path fill-rule="evenodd" fill="currentColor" d="m202.4 1.4h15.3l-16 52.6q-1.1 3.5-3 6.3c-1.3 1.9-2.9 3.5-4.7 4.8-1.8 1.4-3.8 2.4-6 3.1-2.2 0.7-4.5 1.1-6.9 1.1-3 0-5.9-0.6-8.7-1.7v-14.4c2.8 1 5.1 1.5 7 1.5 3.7 0 5.6-2 6-6.2l-13.4-37v0.1l-21.3 25.3h26.7l3.9 11.6h-51.8c-3.1 0-5 0.1-6.3-0.8-1.6-1.1-2.6-2.8-3.1-4.9l-0.4-1.7c-2.1 2.7-4.5 4.7-7.2 6.1q-4 2.1-8.7 2.1c-2.3 0-4.5-0.4-6.5-1.2-2-0.8-3.7-1.9-5.2-3.2-1.4-1.4-2.6-3-3.4-4.8q-1.2-2.8-1.2-6c0-2.4 0.5-4.5 1.5-6.5q1.5-3 4.2-5.1c1.8-1.4 3.9-2.5 6.4-3.3 2.5-0.8 5.2-1.2 8.2-1.2 3.8 0 6.9 0.6 9.4 1.8v-1.4c0-2.2-0.6-3.8-1.9-4.9-1.3-1.1-3.3-1.6-6.2-1.6-2.7 0-5.1 0.4-7.4 1.3-2.2 0.9-4.6 2.1-7.1 3.8l-4.9-10.5c6.2-4 13.2-6 21.1-6 7.5 0 13.3 1.7 17.3 5 4.1 3.4 6.1 8.3 6.1 15v9.1c0 1.6 0.2 2.7 0.7 3.3 0.3 0.5 1.2 1.3 2.7 0l16.9-19.9h-20v-11.6h51.5l9 32.6 7.4-32.7zm-84.9 30.5v-3.3q-1.5-0.6-3.3-0.9c-1.2-0.3-2.3-0.4-3.2-0.4-2.1 0-3.8 0.5-5.2 1.5-1.4 1-2.1 2.3-2.1 3.8 0 1.3 0.6 2.4 1.6 3.2 1.1 0.8 2.4 1.2 4 1.2 1 0 2-0.2 3.1-0.5 1-0.3 2-0.8 2.8-1.3 0.7-0.5 1.2-1 1.6-1.6 0.4-0.5 0.6-1.1 0.6-1.7zm-94.6 18.2c-4.2 0.1-8.3-0.4-12.4-1.6-4.1-1.2-7.5-3.1-10.4-5.6l5.6-10.6c3.1 1.9 6 3.4 8.8 4.4 2.8 1 5.4 1.5 7.7 1.4q3.6-0.2 3.6-2.4 0-1.4-1.5-2.1c-1-0.6-2.8-1.2-5.6-1.9-3.4-0.9-6.3-1.7-8.6-2.6-2.3-0.9-4.2-1.8-5.7-2.9-1.5-1-2.5-2.2-3.2-3.5-0.7-1.3-1-2.9-1.1-4.7-0.1-2.4 0.3-4.7 1.2-6.8 0.9-2.1 2.2-3.9 3.9-5.5 1.7-1.6 3.7-2.8 6.1-3.7q3.6-1.4 7.8-1.5c3.5-0.1 6.9 0.2 10.1 1 3.2 0.8 6.5 2.5 9.8 5.2l-6.2 10.6c-3-1.8-5.6-3.1-7.6-3.9-2-0.8-3.9-1.1-5.7-1-1 0-1.9 0.3-2.5 0.7-0.7 0.4-1 1.1-0.9 1.9 0 0.9 0.5 1.6 1.5 2.2 1 0.5 2.9 1.1 5.8 1.8 3.5 0.8 6.5 1.6 8.9 2.6 2.4 0.9 4.3 1.9 5.8 3.1 1.5 1.1 2.5 2.4 3.2 3.9 0.7 1.5 1 3.2 1.1 5.1 0.1 2.5-0.3 4.7-1.1 6.7-0.8 2-2.1 3.7-3.8 5.2-1.7 1.5-3.7 2.6-6.2 3.4-2.5 0.6-5.3 1-8.4 1.1z"/><path fill="currentColor" d="m72.5 49.3l-10.9-17.5-3.5 3.8v13.7h-17.3v-49.2h17.3v19l12.9-17.8h18.3l-16.5 21 18.2 27z"/><path fill-rule="evenodd" fill="#00997A" d="m21.6 53.6v0.6h3.6v5h-3.6v11.8h-5.7v-11.8h-2.2v-5h2.2v-0.6c0-3.4 1.8-6.3 5.5-6.3 1.1 0 2.7 0.2 3.8 0.6v4.4c-0.6-0.2-1.2-0.4-1.8-0.4-1.5 0.1-1.8 1.2-1.8 1.7zm4.7 9c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm18.9-9.2l-0.9 5.7c-0.2 0-0.6-0.1-0.9-0.1-1.7 0-4.1 0.7-4.1 5.2v6.8h-5.7v-16.8h5.2l0.3 2c1.8-2 4.1-2.7 6.1-2.8zm28.8 8.5v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.9 0-2.8 1.3-2.8 3.2v9.1h-5.7v-9.1c0-2.2-0.8-3.2-2.4-3.2-1.8 0-2.8 1.3-2.8 3.2v9.1h-5.7v-16.8h5.2l0.2 1.3c1.2-1.2 2.9-1.9 5-1.9 2 0 3.9 0.6 5 2.8 1.2-1.7 3.2-2.8 5.8-2.8 3.3 0 6.3 1.6 6.3 8.3zm20.9-7.7v16.8h-5.2l-0.3-1.7c-1.2 1.5-3.1 2.3-5.3 2.3-5.1 0-8.4-4.2-8.4-9 0-5 3.5-9 8.4-9 2.2 0 4.1 0.8 5.3 2.3l0.3-1.7zm-5.7 8.3c0-2.4-1.8-3.8-3.9-3.8-2.3 0-4 1.8-4 3.9 0 2 1.6 3.9 4 3.9 2.3 0 3.9-1.7 3.9-4zm9.4 2.8v-6.2h-2.4v-4.5h0.5c1.5 0 2.4-0.8 2.4-2.3v-1.7h5.1v3.5h3.4v5h-3.4v5.9c0 1.2 0.7 1.7 1.7 1.7 0.5 0 1.2-0.2 1.7-0.3v4.3c-0.9 0.4-2.5 0.6-3.6 0.6-4.1 0-5.4-2.8-5.4-6zm11.1-15.5c0-1.6 1.4-2.8 3.2-2.8 1.8 0 3.2 1.3 3.2 2.8 0 1.5-1.3 2.8-3.2 2.8-1.9 0-3.2-1.3-3.2-2.8zm0.3 4.4h5.7v16.8h-5.7zm7.7 8.4c0-5.1 4.1-9 9.5-9 5.3 0 9.5 4 9.5 9 0 5-4.1 9-9.5 9-5.4 0-9.5-4-9.5-9zm13.2 0c0-2.1-1.6-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.2 0 3.8-1.7 3.8-3.8zm23.7-0.7v9.1h-5.7v-9.1c0-2.3-1-3.2-2.7-3.2-1.8 0-2.9 1.3-2.9 3.2v9.1h-5.7v-16.8h5.2l0.2 1.5c1.3-1.2 3-2 5.2-2 3.2-0.1 6.4 1.5 6.4 8.2z"/></svg>
+    </a>
   </header>
   <div class="bento">
 
@@ -762,6 +786,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     <span class="brand-foot">Une ressource Skazy Formation : <a href="https://formation.skazy.nc/" target="_blank" rel="noopener">formation.skazy.nc</a><br>© 2026 Skazy Formation. Usage réservé aux stagiaires de Skazy Formation : reproduction et réutilisation dans une autre formation interdites sans accord écrit.</span>
   </footer>
 </main>
+<button type="button" class="to-top" id="toTop" aria-label="Remonter en haut de la page" title="Remonter en haut de la page"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
 
 <script>
 const $ = (s, r = document) => r.querySelector(s);
@@ -1164,6 +1189,36 @@ $$(".tbl-wrap table").forEach((t) => {
   const heads = $$("thead th", t).map((th) => th.textContent.trim() || th.querySelector("[aria-label]")?.getAttribute("aria-label") || "");
   $$("tbody tr", t).forEach((tr) => [...tr.children].forEach((c, i) => { if (i && heads[i]) c.dataset.label = heads[i]; }));
 });
+
+// « Remonter en haut » (même bloc sur chaque page) : le bouton rond paraît après un écran de défilement.
+// Il ne cache jamais le message « Réponds d'abord à la question » : quand ce message passe dessous, le bouton monte au-dessus.
+// Au clic, la page remonte, puis le bandeau prend le focus : au clavier, on repart du haut de la page.
+(function initToTop() {
+  const b = $("#toTop");
+  let raf;
+  function place() {
+    const on = scrollY >= innerHeight * 1.2;
+    b.classList.toggle("on", on);
+    // La place du bouton sans son décalage, comparée à chaque message affiché.
+    const r = b.getBoundingClientRect(), dy = new DOMMatrixReadOnly(getComputedStyle(b).transform).m42;
+    const top = r.top - dy, bottom = r.bottom - dy;
+    let lift = 0;
+    if (on) for (const t of document.querySelectorAll(".lock-tip > span")) {
+      const m = t.getBoundingClientRect();
+      if (m.right > r.left && m.left < r.right && m.bottom > top && m.top < bottom) lift = Math.max(lift, bottom - top + m.height + 8);
+    }
+    b.style.setProperty("--lift", lift + "px");
+  }
+  const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(place); };
+  addEventListener("scroll", later, { passive: true });
+  addEventListener("resize", later);
+  addEventListener("click", later);
+  place();
+  b.addEventListener("click", () => {
+    scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    $(".brand").focus({ preventScroll: true });
+  });
+})();
 
 // Boutons des modes, en bas de page. Atelier : texte plus gros, réponses révélées par l'animateur.
 // Démonstration : rien n'est flou. Le choix suit d'une fiche à l'autre.
