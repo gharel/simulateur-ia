@@ -63,14 +63,24 @@ En haut de chaque fiche, le bouton « Accueil » ramène à la page d'accueil. L
 
 Sur chaque page, après un écran de défilement, un bouton rond vert, en bas à droite, fait remonter en haut de la page.
 
+## Thème clair ou sombre
+
+Les pages ont un thème clair et un thème sombre. Le bouton du thème, en haut à droite (juste avant « Les outils »), a trois modes. Chaque clic passe au suivant :
+
+- **celui du système** (le demi-cercle), par défaut : la page suit le réglage de l'ordinateur ou du téléphone ;
+- **clair** (le soleil) ;
+- **sombre** (la lune).
+
+L'icône montre le mode en cours. Le choix reste dans le navigateur (`localStorage`, clé `skazy-outils:theme`), et vaut pour tous les outils Skazy Formation (ils sont à la même adresse, gharel.github.io) : choisi ici, il s'applique aussi aux autres outils, et tout de suite dans les autres onglets ouverts.
+
 ## Skazy Formation
 
 Les fiches sont une ressource [Skazy Formation](https://formation.skazy.nc/).
 En haut de chaque page, le bandeau, dans le même ordre que les autres outils Skazy Formation :
 - à gauche, le bouton « Accueil » (sur les fiches) et un filet, puis la pastille de l'outil et son nom, « Comprendre l'IA » : un lien vers l'accueil ;
-- à droite, « Les outils » (la page de tous les outils Skazy Formation, avec leur roue), un filet, et le logo, un lien vers formation.skazy.nc qui s'ouvre dans un nouvel onglet.
+- à droite, le bouton du thème, « Les outils » (la page de tous les outils Skazy Formation, avec leur roue), un filet, et le logo, un lien vers formation.skazy.nc qui s'ouvre dans un nouvel onglet.
 
-Sur téléphone, « Les outils » et le bouton « Accueil » ne gardent que leur icône, et le nom laisse la place au bouton Accueil des fiches : la pastille reste. En bas, une mention avec un lien vers formation.skazy.nc. Le permis imprimé porte aussi le logo.
+Sur téléphone, « Les outils » et le bouton « Accueil » ne gardent que leur icône, et le nom laisse la place au bouton Accueil des fiches : la pastille reste. Sur l'accueil, le nom ne disparaît que sous 400 px de large. En bas, une mention avec un lien vers formation.skazy.nc. Le permis imprimé porte aussi le logo.
 Le logo est un SVG intégré dans la page : le mot « skazy » prend la couleur du texte (clair ou sombre selon le thème), « formation » reste vert `#00997A`. La roue de « Les outils » est le fichier `les-outils.svg`, une copie du favicon de la page Les outils.
 
 Chaque outil Skazy Formation a sa couleur de l'arc-en-ciel, dans cet ordre : Quiz rouge, Mini-jeux orange, Vigie jaune, Atelier d’exercices IA vert, Comprendre l'IA bleu, Prompthèque violet. Le favicon (pictogramme blanc sur un dégradé de cette couleur) sert aussi de pastille dans le bandeau. Titre d'onglet : « Page · Nom · Skazy Formation ».
@@ -80,7 +90,7 @@ Ici, le favicon (`favicon.svg`, et ses copies `favicon-32.png` et `apple-touch-i
 
 Pages HTML statiques, sans étape de build. Ouvrir `index.html`.
 
-Chaque fiche est autonome : CSS et JS sont dans le fichier. Le bloc « Parcours » (défi, badges, mode atelier) est le même dans les 9 fiches. Si tu le modifies, modifie-le partout. Le bandeau Skazy Formation et le bouton « Remonter en haut » aussi, sur les 10 pages.
+Chaque fiche est autonome : CSS et JS sont dans le fichier. Le bloc « Parcours » (défi, badges, mode atelier) est le même dans les 9 fiches. Si tu le modifies, modifie-le partout. Le bandeau Skazy Formation, le bouton « Remonter en haut » et le thème aussi, sur les 10 pages.
 
 ### Icônes
 
@@ -118,8 +128,8 @@ npx playwright install chromium
 npm test
 ```
 
-Les tests Playwright ouvrent chaque page sur bureau et sur téléphone. Ils vérifient les icônes, la marque Skazy Formation (l'ordre et les liens du bandeau, rien qui dépasse à 390 et 360 px), le bouton « Remonter en haut », la mise en page, les coupures de ligne (pas de ponctuation seule en début de ligne, pas de mot coupé), les zones floutées, le contraste de chaque texte (thèmes clair et sombre) et les jeux.
+Les tests Playwright ouvrent chaque page sur bureau et sur téléphone. Ils vérifient les icônes, la marque Skazy Formation (l'ordre et les liens du bandeau, rien qui dépasse à 390 et 360 px), le bouton du thème, le bouton « Remonter en haut », la mise en page, les coupures de ligne (pas de ponctuation seule en début de ligne, pas de mot coupé), les zones floutées, le contraste de chaque texte (thèmes clair et sombre, du système ou choisis) et les jeux.
 
-Les pages ont leur propre thème sombre. Elles demandent aux modes nuit forcés (mode nuit de Brave, extension Dark Reader) de ne pas changer leurs couleurs, avec `<meta name="darkreader-lock">`.
+Les pages ont leur propre thème sombre. Un script dans le `<head>` pose le thème choisi (`data-theme="light"` ou `"dark"` sur `<html>`) avant l'affichage : sans choix, la page suit le système. Le thème clair choisi a `color-scheme: only light`. Les pages demandent aussi aux modes nuit forcés (mode nuit de Brave, extension Dark Reader) de ne pas changer leurs couleurs, avec `<meta name="darkreader-lock">`.
 
 `npm run deploy` relance les tests, puis pousse sur `main` et sur `gh-pages` (le site GitHub Pages). Les consignes complètes pour les agents sont dans [AGENTS.md](AGENTS.md).

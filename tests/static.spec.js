@@ -27,9 +27,11 @@ for (const [name, cut] of Object.entries(BLOCKS)) {
     for (const f of FICHES.slice(1)) expect(cut(read(f)), f).toBe(ref);
   });
 }
-// Et sur les 10 pages, accueil compris : le CSS du bandeau, le bouton « Remonter en haut » et son JS.
+// Et sur les 10 pages, accueil compris : le CSS du bandeau, le bouton « Remonter en haut » et son JS, le thème (script du <head> et JS du bouton).
 const PAGE_BLOCKS = {
   "CSS du bandeau et de « Remonter en haut »": (t) => t.slice(t.indexOf("/* Skazy Formation"), t.indexOf(".modes {")),
+  "script du thème dans le <head>": (t) => t.slice(t.indexOf("<!-- Le thème choisi"), t.indexOf("</script>", t.indexOf("<!-- Le thème choisi")) + 9),
+  "JS du bouton du thème": (t) => t.slice(t.indexOf("// Thème (même bloc sur chaque page)"), t.indexOf("})();", t.indexOf("(function initTheme")) + 5),
   "bouton « Remonter en haut »": (t) => t.slice(t.indexOf('<button type="button" class="to-top"'), t.indexOf("</button>", t.indexOf('class="to-top"')) + 9),
   "JS « Remonter en haut »": (t) => t.slice(t.indexOf("// « Remonter en haut »"), t.indexOf("})();", t.indexOf("(function initToTop")) + 5),
 };
@@ -43,12 +45,14 @@ for (const [name, cut] of Object.entries(PAGE_BLOCKS)) {
 
 test("bandeau Skazy Formation : le même ordre et les mêmes liens sur toutes les pages", () => {
   // De gauche à droite : le bouton Accueil et un filet (fiches), puis la pastille et le nom de l'outil, un seul lien vers l'accueil.
-  // À droite : « Les outils » (tous les outils Skazy Formation, dans le même onglet), un filet, et le logo en dernier (nouvel onglet).
+  // À droite : le bouton du thème, « Les outils » (tous les outils Skazy Formation, dans le même onglet), un filet, et le logo en dernier (nouvel onglet).
   const brand = (t) => (t.match(/<header class="brand"[^>]*>\n[\s\S]*?<\/header>/) || [""])[0];
   const LOGO = /^<svg class="brand-logo" viewBox="0 0 218 72" aria-hidden="true" focusable="false">.*<\/svg>$/;
   const lines = (t) => brand(t).split("\n").map((l) => l.trim()).map((l) => (LOGO.test(l) ? "<svg logo>" : l));
   const tool = (current) => `<a class="brand-tool" href="index.html"${current}><img src="favicon.svg" width="28" height="28" alt=""><span class="brand-name">Comprendre l'IA</span></a>`;
   const right = [
+    '<button type="button" class="brand-theme" id="themeBtn" aria-label="Thème&nbsp;: celui du système. Changer de thème" title="Thème&nbsp;: celui du système. Changer de thème">'
+      + '<i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i><i class="fa-solid fa-sun" aria-hidden="true"></i><i class="fa-solid fa-moon" aria-hidden="true"></i></button>',
     '<a class="brand-outils" href="https://gharel.github.io/home/" title="Tous les outils Skazy Formation"><img src="les-outils.svg" width="26" height="26" alt=""><span class="brand-txt">Les outils</span></a>',
     '<span class="brand-sep" aria-hidden="true"></span>',
     `<a class="brand-skazy" href="${SKAZY}" target="_blank" rel="noopener" aria-label="Site de Skazy Formation (nouvel onglet)">`,
@@ -115,6 +119,27 @@ test("chaque page refuse les modes nuit forcés (elle a déjà son thème sombre
     expect(read(f), f).toContain('<meta name="color-scheme" content="light dark">');
     expect(read(f), f).toContain('<meta name="darkreader-lock">');
   }
+});
+
+// Le thème : celui du système, clair ou sombre, choisi avec le bouton du bandeau. Le choix est commun aux outils Skazy Formation.
+test("chaque page pose le thème choisi avant l'affichage, et le thème clair ne s'applique jamais au thème sombre choisi", () => {
+  for (const f of PAGES) {
+    const t = read(f);
+    // Le script du <head> vient avant le CSS : la page s'affiche tout de suite dans le bon thème.
+    const early = t.indexOf("JSON.parse(localStorage.getItem('skazy-outils:theme'))");
+    expect(early, f).toBeGreaterThan(0);
+    expect(early, f).toBeLessThan(t.indexOf("<style>"));
+    // Clair choisi : « only light ». Sombre choisi : les règles du thème clair du système ne s'appliquent pas.
+    expect(t, f).toMatch(/:root\[data-theme="light"\] \{[^}]*color-scheme: only light;\n\}/);
+    const media = t.split("@media (prefers-color-scheme: light) {").slice(1).map((s) => s.trim().split("{")[0].trim());
+    expect(media.length, f).toBeGreaterThan(0);
+    for (const sel of media) expect(sel, f).toMatch(/^:root:not\(\[data-theme="dark"\]\)/);
+    // Chaque règle du thème clair du système a sa jumelle pour le clair choisi. Le thème sombre est celui par défaut.
+    for (const sel of media) expect(t, f).toContain(sel.replace(':root:not([data-theme="dark"])', ':root[data-theme="light"]') + " {");
+    expect(t, f).not.toContain("prefers-color-scheme: dark");
+  }
+  // Les pages de redirection n'ont pas de bandeau, ni de thème.
+  for (const f of Object.keys(MOVED)) expect(read(f), f).not.toContain("skazy-outils:theme");
 });
 
 test("Font Awesome chargé depuis cdnjs avec contrôle d'intégrité", () => {

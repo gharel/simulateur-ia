@@ -7,6 +7,15 @@
 <!-- La page a déjà ses thèmes clair et sombre : les modes nuit forcés (Dark Reader, mode nuit de Brave) ne doivent pas changer ses couleurs. -->
 <meta name="color-scheme" content="light dark">
 <meta name="darkreader-lock">
+<!-- Le thème choisi dans un outil Skazy Formation (clair ou sombre), posé avant l'affichage. Sans choix : celui du système. -->
+<script>
+try {
+  const theme = JSON.parse(localStorage.getItem('skazy-outils:theme'));
+  if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+} catch {
+  // stockage indisponible : thème du système
+}
+</script>
 <title>L'Agent sur Mesure · Comprendre l'IA · Skazy Formation</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
@@ -43,11 +52,12 @@
     color-scheme: light;
   }
 }
+/* Clair choisi avec le bouton du thème : « only light » interdit aussi au navigateur d'assombrir la page. */
 :root[data-theme="light"] {
   --bg: #F1F1F6; --surface: #FFFFFF; --surface-2: #E9E9F1; --line: #D9D9E5;
   --fg: #12121A; --muted: #55556B; --ok: #0C6B3B; --warn: #8A5A00; --bad: #A61E1E;
   --accent-text: color-mix(in oklab, var(--accent) 52%, #000);
-  color-scheme: light;
+  color-scheme: only light;
 }
 
 * { box-sizing: border-box; }
@@ -248,7 +258,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 
 /* Skazy Formation : le bandeau en haut, la mention en bas, le bouton « Remonter en haut » (même bloc sur chaque page).
    Le bandeau, de gauche à droite : le bouton Accueil et un filet (fiches), puis la signature de l'outil, un seul lien vers l'accueil :
-   la pastille (le favicon de l'outil) et son nom. À droite : « Les outils » (tous les outils Skazy Formation), un filet, le logo en dernier. */
+   la pastille (le favicon de l'outil) et son nom. À droite : le bouton du thème, « Les outils » (tous les outils Skazy Formation), un filet, le logo en dernier. */
 .brand { margin-bottom: clamp(24px, 3.2vw, 40px); display: flex; align-items: center; gap: 12px; }
 .brand a { flex: none; display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--fg); text-decoration: none; border-radius: 10px; }
 .brand .home { gap: 8px; padding: 8px 14px; border: 2px solid var(--line); border-radius: 12px; background: var(--surface); font-weight: 700; font-size: .95rem; }
@@ -257,25 +267,35 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .brand img { display: block; flex: none; }
 .brand-name { font-size: 1.0625rem; font-weight: 700; line-height: 1.2; white-space: nowrap; }
 .brand-tool:hover .brand-name { text-decoration: underline; text-underline-offset: 3px; }
-.brand .brand-outils { margin-left: auto; gap: 8px; min-height: 40px; padding: 7px 12px; border-radius: 99px; font-size: .9375rem; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+.brand .brand-outils { gap: 8px; min-height: 40px; padding: 7px 12px; border-radius: 99px; font-size: .9375rem; font-weight: 700; line-height: 1.2; white-space: nowrap; }
 .brand .brand-outils:hover { background: var(--line); }
+/* Le bouton du thème, le premier à droite : celui du système, clair ou sombre (voir initTheme() dans le script).
+   Il contient les trois icônes, et n'affiche que celle du thème en cours : le demi-cercle (système), le soleil (clair), la lune (sombre). */
+.brand .brand-theme {
+  flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; margin-left: auto; padding: 0;
+  border: 2px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--fg); font-size: 1.125rem; cursor: pointer;
+}
+.brand .brand-theme:hover { border-color: var(--accent, var(--fg)); }
+:root[data-theme] .brand-theme .fa-circle-half-stroke, :root:not([data-theme="light"]) .brand-theme .fa-sun, :root:not([data-theme="dark"]) .brand-theme .fa-moon { display: none; }
 .brand .brand-logo { display: block; width: 109px; height: 36px; }
 .brand-foot a { color: var(--fg); font-weight: 700; }
-/* Sur téléphone, les icônes et la pastille restent. Un texte caché reste lu par les lecteurs d'écran.
-   « Les outils » garde sa roue, et le nom de l'outil laisse la place au bouton Accueil (fiches). Plus étroit, Accueil garde sa maison.
-   Sur un écran très étroit, l'accueil cache aussi le nom. */
-@media (max-width: 640px) {
+/* Sur téléphone et petite tablette (720 px et moins), les icônes et la pastille restent. Un texte caché reste lu par les lecteurs d'écran.
+   « Les outils » garde sa roue, le bouton du thème passe à 40 px, et le nom de l'outil laisse la place au bouton Accueil (fiches).
+   Plus étroit, les éléments se rapprochent et Accueil garde sa maison. Sous 400 px, l'accueil cache aussi le nom. */
+@media (max-width: 720px) {
   .brand .brand-outils { justify-content: center; min-width: 40px; padding: 7px; }
+  .brand .brand-theme { width: 40px; height: 40px; }
   .brand-tool img { width: 24px; height: 24px; }
   .brand .brand-logo { width: 91px; height: 30px; }
   .brand-outils .brand-txt, .home ~ .brand-tool .brand-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
 @media (max-width: 480px) {
+  .brand { gap: 8px; }
   .brand .home { justify-content: center; width: 44px; padding: 0; }
   .home .brand-txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
-@media (max-width: 400px) { .brand { gap: 8px; } .brand .brand-logo { width: 79px; height: 26px; } }
-@media (max-width: 359px) { .brand-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } }
+@media (max-width: 420px) { .brand .brand-logo { width: 79px; height: 26px; } }
+@media (max-width: 399px) { .brand-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } }
 /* Remonter en haut : un bouton rond en bas à droite, qui paraît après un écran de défilement (voir initToTop() dans le script). */
 .to-top {
   position: fixed; right: 24px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 40;
@@ -562,6 +582,7 @@ code, pre { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
     <a class="home" href="index.html"><i class="fa-solid fa-house" aria-hidden="true"></i> <span class="brand-txt">Accueil</span></a>
     <span class="brand-sep" aria-hidden="true"></span>
     <a class="brand-tool" href="index.html"><img src="favicon.svg" width="28" height="28" alt=""><span class="brand-name">Comprendre l'IA</span></a>
+    <button type="button" class="brand-theme" id="themeBtn" aria-label="Thème&nbsp;: celui du système. Changer de thème" title="Thème&nbsp;: celui du système. Changer de thème"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i><i class="fa-solid fa-sun" aria-hidden="true"></i><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
     <a class="brand-outils" href="https://gharel.github.io/home/" title="Tous les outils Skazy Formation"><img src="les-outils.svg" width="26" height="26" alt=""><span class="brand-txt">Les outils</span></a>
     <span class="brand-sep" aria-hidden="true"></span>
     <a class="brand-skazy" href="https://formation.skazy.nc/" target="_blank" rel="noopener" aria-label="Site de Skazy Formation (nouvel onglet)">
@@ -1203,6 +1224,45 @@ $$(".tbl-wrap table").forEach((t) => {
     scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
     $(".brand").focus({ preventScroll: true });
   });
+})();
+
+// Thème (même bloc sur chaque page) : celui du système, clair ou sombre. Le choix vaut pour tous les outils Skazy Formation :
+// ils sont à la même adresse (gharel.github.io) et le rangent sous la même clé, "light" ou "dark" en JSON (pas de clé : le système).
+// Le script du <head> le pose avant l'affichage. Le bouton du bandeau passe au suivant : système, clair, sombre, puis système.
+// Un choix fait dans un autre onglet, ou avant un retour en arrière, s'applique aussi.
+(function initTheme() {
+  const KEY = "skazy-outils:theme";
+  const NAMES = { system: "Thème\u00a0: celui du système", light: "Thème\u00a0: clair", dark: "Thème\u00a0: sombre" };
+  const NEXT = { system: "light", light: "dark", dark: "system" };
+  const b = $("#themeBtn");
+  function saved() {
+    try {
+      const theme = JSON.parse(localStorage.getItem(KEY));
+      return theme === "light" || theme === "dark" ? theme : "system";
+    } catch {
+      return "system";
+    }
+  }
+  function apply(theme) {
+    if (theme === "system") delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = theme;
+    const label = `${NAMES[theme]}. Changer de thème`;
+    b.setAttribute("aria-label", label);
+    b.title = label;
+  }
+  b.addEventListener("click", () => {
+    const theme = NEXT[document.documentElement.dataset.theme || "system"];
+    try {
+      if (theme === "system") localStorage.removeItem(KEY);
+      else localStorage.setItem(KEY, JSON.stringify(theme));
+    } catch {
+      // stockage indisponible : le choix vaut pour cette page seulement
+    }
+    apply(theme);
+  });
+  addEventListener("storage", (e) => { if (e.key === KEY || e.key === null) apply(saved()); });
+  addEventListener("pageshow", (e) => { if (e.persisted) apply(saved()); });
+  apply(saved());
 })();
 
 // Boutons des modes, en bas de page. Atelier : texte plus gros, réponses révélées par l'animateur.

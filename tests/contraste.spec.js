@@ -23,6 +23,25 @@ for (const colorScheme of ["dark", "light"]) {
   });
 }
 
+// Le thème choisi avec le bouton du bandeau, à l'inverse de celui du système : les textes restent lisibles, avant et après avoir joué.
+for (const [forced, os] of [["dark", "light"], ["light", "dark"]]) {
+  const nom = { dark: "sombre", light: "clair" };
+  test.describe(`thème ${nom[forced]} choisi, système ${nom[os]}`, () => {
+    test.use({ colorScheme: os });
+    for (const f of PAGES) {
+      test(`${f} : tous les textes sont assez contrastés`, async ({ page }) => {
+        await page.addInitScript((theme) => localStorage.setItem("skazy-outils:theme", JSON.stringify(theme)), forced);
+        await open(page, f);
+        expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe(forced);
+        const avant = await contrastIssues(page);
+        await playEverything(page);
+        const apres = await contrastIssues(page);
+        expect({ avant, apres }).toEqual({ avant: [], apres: [] });
+      });
+    }
+  });
+}
+
 // Le mode nuit de Brave (et l'extension Dark Reader) inverse les couleurs des pages claires.
 // Nos pages ont déjà leur thème sombre : la balise darkreader-lock doit l'empêcher d'agir.
 for (const f of PAGES) {

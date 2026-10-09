@@ -44,12 +44,17 @@ for (const f of PAGES) {
       await expect(logo).toHaveAttribute("rel", "noopener");
       await expect(logo).toHaveAccessibleName("Site de Skazy Formation (nouvel onglet)");
       await expect(logo.locator(".brand-logo")).toBeVisible();
+      // Le bouton du thème, juste avant « Les outils » : assez grand pour le doigt (40 px au moins).
+      const theme = page.locator(".brand > button.brand-theme");
+      await expect(theme).toBeVisible();
+      const box = await theme.boundingBox();
+      expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(40);
       // Tout tient sur une seule ligne, dans cet ordre de gauche à droite : le logo est tout à droite.
       const row = await page.locator(".brand > *").evaluateAll((els) => els.map((e) => {
         const r = e.getBoundingClientRect();
         return { nom: e.className, gauche: r.left, droite: r.right, milieu: (r.top + r.bottom) / 2 };
       }));
-      expect(row.map((e) => e.nom)).toEqual([...(f === "index.html" ? [] : ["home", "brand-sep"]), "brand-tool", "brand-outils", "brand-sep", "brand-skazy"]);
+      expect(row.map((e) => e.nom)).toEqual([...(f === "index.html" ? [] : ["home", "brand-sep"]), "brand-tool", "brand-theme", "brand-outils", "brand-sep", "brand-skazy"]);
       for (let i = 1; i < row.length; i++) {
         expect(row[i].gauche, row[i].nom).toBeGreaterThanOrEqual(row[i - 1].droite);
         expect(Math.abs(row[i].milieu - row[0].milieu), row[i].nom).toBeLessThan(4);

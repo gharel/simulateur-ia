@@ -57,7 +57,7 @@ async function displayProblems(page) {
 const NO_PROBLEM = { jetons: [], emoji: [], iconesInconnues: 0, coupures: [], cadres: [], debordements: [] };
 
 // Joue avec toute la page : répond aux « Devine d'abord », allume la lampe, clique partout, bouge les curseurs.
-// Pas les boutons des modes (ils rechargent la page) ni l'impression.
+// Pas les boutons des modes (ils rechargent la page), ni celui du thème, ni l'impression.
 async function playEverything(page, rounds = 2) {
   page.on("dialog", (d) => d.dismiss());
   for (const g of await page.locator(".guess").all()) {
@@ -67,7 +67,7 @@ async function playEverything(page, rounds = 2) {
     if (await reveal.isVisible()) await reveal.click();
   }
   if (await page.locator("#lampSw").count()) await page.locator("#lampSw").click();
-  const controls = page.locator("main button:visible:not(#atelierBtn):not(#demoBtn):not(#licPrint), main input[type=checkbox]:visible");
+  const controls = page.locator("main button:visible:not(#atelierBtn):not(#demoBtn):not(#themeBtn):not(#licPrint), main input[type=checkbox]:visible");
   for (let round = 0; round < rounds; round++) {
     const n = await controls.count();
     for (let i = 0; i < n; i++) await controls.nth(i).click({ timeout: 1000 }).catch(() => {});
