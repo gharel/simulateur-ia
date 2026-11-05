@@ -83,7 +83,7 @@ En haut de chaque page, le bandeau, dans le même ordre que les autres outils Sk
 Sur téléphone, « Les outils » et le bouton « Accueil » ne gardent que leur icône, et le nom laisse la place au bouton Accueil des fiches : la pastille reste. Sur l'accueil, le nom ne disparaît que sous 400 px de large. En bas, une mention avec un lien vers formation.skazy.nc. Le permis imprimé porte aussi le logo.
 Le logo est un SVG intégré dans la page : le mot « skazy » prend la couleur du texte (clair ou sombre selon le thème), « formation » reste vert `#00997A`. La roue de « Les outils » est le fichier `les-outils.svg`, une copie du favicon de la page Les outils.
 
-Chaque outil Skazy Formation a sa couleur de l'arc-en-ciel, dans cet ordre : Quiz rouge, Mini-jeux orange, Vigie jaune, Atelier d’exercices IA vert, Permis IA bleu, Captif indigo, Prompthèque violet. Le favicon (pictogramme blanc sur un dégradé de cette couleur) sert aussi de pastille dans le bandeau. Titre d'onglet : « Page · Nom · Skazy Formation ».
+Chaque outil Skazy Formation a sa couleur de l'arc-en-ciel, dans cet ordre : Vigie rouge, Quiz orange, Mini-jeux jaune, Atelier d’exercices IA vert, L’IA en schémas turquoise, Permis IA bleu, Prompthèque indigo, Captif violet. Le favicon (pictogramme blanc sur un dégradé de cette couleur) sert aussi de pastille dans le bandeau. Titre d'onglet : « Page · Nom · Skazy Formation ».
 Ici, le favicon (`favicon.svg`, et ses copies `favicon-32.png` et `apple-touch-icon.png`) montre des curseurs blancs sur un dégradé bleu. Les onglets s'appellent « Permis IA · Skazy Formation » pour l'accueil, et par exemple « Le Sac à Tokens · Permis IA · Skazy Formation » pour une fiche.
 
 ## Technique
