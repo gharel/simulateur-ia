@@ -26,7 +26,7 @@ for (const f of PAGES) {
       // sur téléphone, le nom peut laisser la place au bouton Accueil, mais les lecteurs d'écran le lisent encore.
       const tool = page.locator(".brand > a.brand-tool");
       await expect(tool).toHaveAttribute("href", "index.html");
-      await expect(tool).toHaveAccessibleName("Comprendre l'IA");
+      await expect(tool).toHaveAccessibleName("Permis IA");
       await expect(tool.locator('img[src="favicon.svg"]')).toBeVisible();
       if (f === "index.html") await expect(tool).toHaveAttribute("aria-current", "page");
       else expect(await tool.getAttribute("aria-current")).toBeNull();

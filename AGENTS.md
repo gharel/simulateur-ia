@@ -4,7 +4,7 @@ Consignes pour les agents (Claude Code, Codex…) qui travaillent sur ce dépôt
 
 ## Le projet
 
-- « Comprendre l'IA en 9 fiches » : 9 fiches interactives en 3 parties, et une page d'accueil, écrites en FALC. C'est une ressource [Skazy Formation](https://formation.skazy.nc/).
+- « Permis IA en 9 fiches » : 9 fiches interactives en 3 parties, et une page d'accueil, écrites en FALC. C'est une ressource [Skazy Formation](https://formation.skazy.nc/).
 - Pages HTML statiques, sans étape de build. Chaque page est autonome : son CSS et son JS sont dans le fichier.
 - En ligne avec GitHub Pages, depuis la branche `gh-pages` : https://gharel.github.io/simulateur-ia/
 
@@ -78,17 +78,17 @@ npm test
   - Une espace insécable garde `? ! : ; » % $ € = · /` avec le mot d'avant, `«` avec le mot d'après, et un nombre avec ses mots (« la fiche 1 », « 3 étoiles »).
   - Un mot à trait d'union (e-mail, dis-moi) ne se coupe plus. Une adresse ou un nom avec des chiffres (gpt-5-thinking-mini) reste tel quel.
   - Une icône reste avec son mot, dans un `<span class="nobr">` : Chrome coupe toujours juste après une icône, même devant une espace insécable.
-  - Un titre ou un bouton ne laisse pas un mot seul sur une ligne (« COMPRENDRE / L'IA »). Le JS commun (`unlone()`, sur les éléments de `LONE`) essaie les coupures du navigateur (`text-wrap: balance`, `pretty`) et garde la première qui n'en laisse pas. Avec 3 mots ou moins, un texte sur 2 lignes laisse forcément un mot seul : c'est la largeur de la case ou la taille du texte qu'il faut changer.
+  - Un titre ou un bouton ne laisse pas un mot seul sur une ligne (« PERMIS / IA »). Le JS commun (`unlone()`, sur les éléments de `LONE`) essaie les coupures du navigateur (`text-wrap: balance`, `pretty`) et garde la première qui n'en laisse pas. Avec 3 mots ou moins, un texte sur 2 lignes laisse forcément un mot seul : c'est la largeur de la case ou la taille du texte qu'il faut changer.
   - Chaque ligne d'un titre `h1` (entre deux `<br>`) reste entière, et un grand nombre (`.stat b`, « 4 040 000 ») reste dans sa case : s'ils sont trop larges, `fit()` les fait rapetisser. Ajoute à `FIT` un autre texte qui ne doit pas passer à la ligne. L'accueil n'a pas ce JS : son titre a une taille calculée en CSS.
   - Un mot trop long pour sa case : un trait d'union discret (`­`) dit où le couper. Sinon, `overflow-wrap: anywhere` le coupe n'importe où. Une adresse e-mail peut passer à la ligne après le `@` (`​`, comme dans « Le Message Piégé »).
   - Le test (`tests/coupures.js`) mesure chaque ligne affichée, sur bureau et sur téléphone, avant et après avoir joué.
 - **« Devine d'abord ».** La question vient avant les zones qu'elle floute, sur téléphone aussi. `guess()` floute les zones et y ajoute le message « Réponds d'abord à la question ». Pour flouter une zone, passe toujours par `lockZones()` : le mode démonstration (`?demo=1`) doit pouvoir tout montrer.
 - **Modes.** Atelier (`?atelier=1`) et démonstration (`?demo=1`) se gardent dans le navigateur et se transmettent dans les liens entre pages. Les boutons et leur explication sont en bas de chaque page.
-- **Bandeau et titres.** Chaque outil Skazy Formation a sa couleur de l'arc-en-ciel, dans cet ordre : Quiz rouge, Mini-jeux orange, Vigie jaune, Atelier d’exercices IA vert, Comprendre l'IA bleu, Prompthèque violet. Le favicon (pictogramme blanc sur un dégradé de cette couleur) sert aussi de pastille dans le bandeau. Titre d'onglet : « Page · Nom · Skazy Formation ».
-  - Ici : « Le Sac à Tokens · Comprendre l'IA · Skazy Formation », « Comprendre l'IA · Skazy Formation » pour l'accueil, « … a changé d'adresse · Comprendre l'IA · Skazy Formation » pour une redirection. Un point médian entre les parties, pas de tiret.
+- **Bandeau et titres.** Chaque outil Skazy Formation a sa couleur de l'arc-en-ciel, dans cet ordre : Quiz rouge, Mini-jeux orange, Vigie jaune, Atelier d’exercices IA vert, Permis IA bleu, Captif indigo, Prompthèque violet. Le favicon (pictogramme blanc sur un dégradé de cette couleur) sert aussi de pastille dans le bandeau. Titre d'onglet : « Page · Nom · Skazy Formation ».
+  - Ici : « Le Sac à Tokens · Permis IA · Skazy Formation », « Permis IA · Skazy Formation » pour l'accueil, « … a changé d'adresse · Permis IA · Skazy Formation » pour une redirection. Un point médian entre les parties, pas de tiret.
   - Le bandeau suit l'ordre commun aux outils Skazy Formation, de gauche à droite :
     1. le bouton « Accueil » (fiches seulement), puis un filet ;
-    2. la signature de l'outil, un seul lien vers `index.html` : la pastille (`<img src="favicon.svg" width="28" height="28" alt="">`, décorative) et le nom « Comprendre l'IA » en gras. Sur l'accueil, ce lien porte `aria-current="page"` ;
+    2. la signature de l'outil, un seul lien vers `index.html` : la pastille (`<img src="favicon.svg" width="28" height="28" alt="">`, décorative) et le nom « Permis IA » en gras. Sur l'accueil, ce lien porte `aria-current="page"` ;
     3. à droite, les actions de l'outil : ici, le bouton du thème (voir « Thème »), un bouton carré à bord, comme Accueil ;
     4. « Les outils » : un lien vers https://gharel.github.io/home/, dans le même onglet, avec la roue (`les-outils.svg`) ;
     5. un filet, puis le logo Skazy Formation, le dernier élément du bandeau. Son lien vers `https://formation.skazy.nc/` (avec la barre oblique finale) s'ouvre dans un nouvel onglet et ne contient que le logo.

@@ -49,7 +49,7 @@ test("bandeau Skazy Formation : le même ordre et les mêmes liens sur toutes le
   const brand = (t) => (t.match(/<header class="brand"[^>]*>\n[\s\S]*?<\/header>/) || [""])[0];
   const LOGO = /^<svg class="brand-logo" viewBox="0 0 218 72" aria-hidden="true" focusable="false">.*<\/svg>$/;
   const lines = (t) => brand(t).split("\n").map((l) => l.trim()).map((l) => (LOGO.test(l) ? "<svg logo>" : l));
-  const tool = (current) => `<a class="brand-tool" href="index.html"${current}><img src="favicon.svg" width="28" height="28" alt=""><span class="brand-name">Comprendre l'IA</span></a>`;
+  const tool = (current) => `<a class="brand-tool" href="index.html"${current}><img src="favicon.svg" width="28" height="28" alt=""><span class="brand-name">Permis IA</span></a>`;
   const right = [
     '<button type="button" class="brand-theme" id="themeBtn" aria-label="Thème&nbsp;: celui du système. Changer de thème" title="Thème&nbsp;: celui du système. Changer de thème">'
       + '<i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i><i class="fa-solid fa-sun" aria-hidden="true"></i><i class="fa-solid fa-moon" aria-hidden="true"></i></button>',
@@ -84,10 +84,10 @@ test("bandeau Skazy Formation : le même ordre et les mêmes liens sur toutes le
   }
 });
 
-// Titre d'onglet commun aux outils Skazy Formation : « Page · Comprendre l'IA · Skazy Formation » (l'accueil, sans « Page · »).
+// Titre d'onglet commun aux outils Skazy Formation : « Page · Permis IA · Skazy Formation » (l'accueil, sans « Page · »).
 test("chaque titre d'onglet suit la règle des outils Skazy Formation", () => {
-  expect(read("index.html")).toContain("<title>Comprendre l'IA · Skazy Formation</title>");
-  for (const f of [...FICHES, ...Object.keys(MOVED)]) expect(read(f), f).toMatch(/<title>[^<·—]+ · Comprendre l'IA · Skazy Formation<\/title>/);
+  expect(read("index.html")).toContain("<title>Permis IA · Skazy Formation</title>");
+  for (const f of [...FICHES, ...Object.keys(MOVED)]) expect(read(f), f).toMatch(/<title>[^<·—]+ · Permis IA · Skazy Formation<\/title>/);
 });
 
 test("aucune page n'est référencée par les moteurs de recherche", () => {
@@ -153,7 +153,7 @@ test("chaque fiche donne son numéro, le menu de toutes les fiches et le lien ve
   const n = FICHES.length;
   FICHES.forEach((f, i) => {
     const t = read(f);
-    expect(t, f).toContain(`Comprendre l'IA · Fiche ${i + 1} sur ${n}`);
+    expect(t, f).toContain(`Permis IA · Fiche ${i + 1} sur ${n}`);
     const nav = (t.match(/<nav class="series"[^>]*>.*?<\/nav>/) || [""])[0];
     expect(nav.match(/href="\d-[^"]+\.html"/g), f).toEqual(FICHES.filter((g) => g !== f).map((g) => `href="${g}"`));
     expect(t, f).toContain(`<a class="card s4 next" href="${FICHES[i + 1] || "index.html#permis"}">`);

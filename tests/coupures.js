@@ -71,7 +71,7 @@ async function lineBreakIssues() {
     if (r && Math.abs((r.top + r.bottom) / 2 - (b.top + b.bottom) / 2) > Math.max(r.height, b.height) / 2)
       out.push({ coupure: "icône séparée de son texte", ou: name(svg.parentElement), texte: (next ? "[icône]⏎" + t.slice(0, 30) : t.slice(-30) + "⏎[icône]").replace(/\s+/g, " ") });
   }
-  // Un titre ou un bouton ne laisse pas un mot seul sur une ligne (« COMPRENDRE / L'IA »).
+  // Un titre ou un bouton ne laisse pas un mot seul sur une ligne (« PERMIS / IA »).
   // Les lignes d'un titre h1 (entre deux <br>) restent entières. Avec 3 mots ou moins, un texte sur 2 lignes
   // laisse forcément un mot seul : c'est permis, sauf dans un h1.
   for (const el of document.querySelectorAll("h1, h2, h3, .next strong, button, .btn, .pill, .sw > span, .lock-tip > span, .lic-title")) {

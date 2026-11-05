@@ -1,4 +1,4 @@
-# Comprendre l'IA en 9 fiches
+# Permis IA en 9 fiches
 
 9 fiches interactives, écrites en FALC (Facile À Lire et à Comprendre), pour expliquer l'IA à un public non technique. Elles vont de « je comprends » à « je crée mon agent et je choisis mon budget ».
 
@@ -59,7 +59,7 @@ Les deux boutons sont en bas de chaque page, avec une courte explication. Le mod
 
 Pour enlever un mode : le même bouton, ou l'adresse avec `=0` (par exemple `?demo=0`).
 
-En haut de chaque fiche, le bouton « Accueil » ramène à la page d'accueil. La pastille et le nom « Comprendre l'IA » y ramènent aussi.
+En haut de chaque fiche, le bouton « Accueil » ramène à la page d'accueil. La pastille et le nom « Permis IA » y ramènent aussi.
 
 Sur chaque page, après un écran de défilement, un bouton rond vert, en bas à droite, fait remonter en haut de la page.
 
@@ -77,14 +77,14 @@ L'icône montre le mode en cours. Le choix reste dans le navigateur (`localStora
 
 Les fiches sont une ressource [Skazy Formation](https://formation.skazy.nc/).
 En haut de chaque page, le bandeau, dans le même ordre que les autres outils Skazy Formation :
-- à gauche, le bouton « Accueil » (sur les fiches) et un filet, puis la pastille de l'outil et son nom, « Comprendre l'IA » : un lien vers l'accueil ;
+- à gauche, le bouton « Accueil » (sur les fiches) et un filet, puis la pastille de l'outil et son nom, « Permis IA » : un lien vers l'accueil ;
 - à droite, le bouton du thème, « Les outils » (la page de tous les outils Skazy Formation, avec leur roue), un filet, et le logo, un lien vers formation.skazy.nc qui s'ouvre dans un nouvel onglet.
 
 Sur téléphone, « Les outils » et le bouton « Accueil » ne gardent que leur icône, et le nom laisse la place au bouton Accueil des fiches : la pastille reste. Sur l'accueil, le nom ne disparaît que sous 400 px de large. En bas, une mention avec un lien vers formation.skazy.nc. Le permis imprimé porte aussi le logo.
 Le logo est un SVG intégré dans la page : le mot « skazy » prend la couleur du texte (clair ou sombre selon le thème), « formation » reste vert `#00997A`. La roue de « Les outils » est le fichier `les-outils.svg`, une copie du favicon de la page Les outils.
 
-Chaque outil Skazy Formation a sa couleur de l'arc-en-ciel, dans cet ordre : Quiz rouge, Mini-jeux orange, Vigie jaune, Atelier d’exercices IA vert, Comprendre l'IA bleu, Prompthèque violet. Le favicon (pictogramme blanc sur un dégradé de cette couleur) sert aussi de pastille dans le bandeau. Titre d'onglet : « Page · Nom · Skazy Formation ».
-Ici, le favicon (`favicon.svg`, et ses copies `favicon-32.png` et `apple-touch-icon.png`) montre des curseurs blancs sur un dégradé bleu. Les onglets s'appellent « Comprendre l'IA · Skazy Formation » pour l'accueil, et par exemple « Le Sac à Tokens · Comprendre l'IA · Skazy Formation » pour une fiche.
+Chaque outil Skazy Formation a sa couleur de l'arc-en-ciel, dans cet ordre : Quiz rouge, Mini-jeux orange, Vigie jaune, Atelier d’exercices IA vert, Permis IA bleu, Captif indigo, Prompthèque violet. Le favicon (pictogramme blanc sur un dégradé de cette couleur) sert aussi de pastille dans le bandeau. Titre d'onglet : « Page · Nom · Skazy Formation ».
+Ici, le favicon (`favicon.svg`, et ses copies `favicon-32.png` et `apple-touch-icon.png`) montre des curseurs blancs sur un dégradé bleu. Les onglets s'appellent « Permis IA · Skazy Formation » pour l'accueil, et par exemple « Le Sac à Tokens · Permis IA · Skazy Formation » pour une fiche.
 
 ## Technique
 
